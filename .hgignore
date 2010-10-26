@@ -1,0 +1,15 @@
+# use glob syntax.
+syntax: glob
+
+*.tex
+*.html
+*log*
+*.png
+*.dot
+*.css
+*.md5
+*.eps
+*.pdf
+*.toc
+*~
+
