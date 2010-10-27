@@ -51,6 +51,17 @@ type LCD_DRVR_CTRL_BUSS is
 	
 
 
+component LCD_16x2_DRIVER is
+	generic(
+		OSC_Freq_MHz	 :	integer:=60
+	);
+    Port ( reset : in  STD_LOGIC;
+	   clk : in  STD_LOGIC;
+           LCD_CTRL	:	out LCD_DRVR_CTRL_BUSS;
+	   SYNCH	:	out LCD_DRVR_SYNCH_BUSS;
+	   DRIVER_CMD	:	in  LCD_DRVR_CMD_BUSS
+			  );
+end component;
 
 
 
