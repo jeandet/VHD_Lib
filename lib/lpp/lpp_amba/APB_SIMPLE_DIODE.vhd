@@ -51,7 +51,7 @@ architecture AR_APB_SIMPLE_DIODE of APB_SIMPLE_DIODE is
 constant REVISION : integer := 1;
 
 constant pconfig : apb_config_type := (
-  0 => ahb_device_reg (VENDOR_LPP, ROCKET_TM, 0, REVISION, 0),
+  0 => ahb_device_reg (VENDOR_LPP, LPP_SIMPLE_DIODE, 0, REVISION, 0),
   1 => apb_iobar(paddr, pmask));
 
 
@@ -105,10 +105,10 @@ end process;
 
 
 -- pragma translate_off
-    bootmsg : report_version
-    generic map ("apbuart" & tost(pindex) &
-	": Generic UART rev " & tost(REVISION) & ", fifo " & tost(fifosize) &
-	", irq " & tost(pirq));
+--    bootmsg : report_version
+--    generic map ("apbuart" & tost(pindex) &
+--	": Generic UART rev " & tost(REVISION) & ", fifo " & tost(fifosize) &
+--	", irq " & tost(pirq));
 -- pragma translate_on
 
 

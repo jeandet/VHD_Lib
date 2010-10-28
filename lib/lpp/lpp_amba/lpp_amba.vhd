@@ -35,8 +35,9 @@ constant VENDOR_LPP        : amba_vendor_type := 16#19#;
 
 -- LPP device ids
 
-constant ROCKET_TM	        : amba_device_type := 16#001#;
-constant otherCore         	: amba_device_type := 16#002#;
+constant ROCKET_TM	                : amba_device_type := 16#001#;
+constant otherCore         	        : amba_device_type := 16#002#;
+constant LPP_SIMPLE_DIODE	        : amba_device_type := 16#003#;
 
 
 component APB_SIMPLE_DIODE is

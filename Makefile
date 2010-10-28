@@ -20,7 +20,7 @@ init: allGPL
 	sh lib/lpp/makeDirs.sh lib/lpp
 
 
-Patch-GRLIB: init doc
+Patch-GRLIB: init
 	sh patch.sh $(GRLIB)
 
 
