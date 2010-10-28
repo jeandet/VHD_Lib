@@ -1,9 +1,0 @@
-FRAME_CLK.vhd
-LCD_16x2_CFG.vhd
-LCD_16x2_DRIVER
-.vhd
-LCD_16x2_ENGINE.vhd
-LCD_2x16_DRIVER.vhd
-LCD_CLK_GENERATOR.vhd
-Top_LCD.vhd
-amba_lcd_16x2_ctrlr.vhd

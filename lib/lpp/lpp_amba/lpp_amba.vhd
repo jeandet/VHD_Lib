@@ -24,9 +24,7 @@ use grlib.amba.all;
 -- pragma translate_off
 use std.textio.all;
 -- pragma translate_on
-
-
-
+  
 
 
 package lpp_amba is
@@ -38,6 +36,7 @@ constant VENDOR_LPP        : amba_vendor_type := 16#19#;
 constant ROCKET_TM	                : amba_device_type := 16#001#;
 constant otherCore         	        : amba_device_type := 16#002#;
 constant LPP_SIMPLE_DIODE	        : amba_device_type := 16#003#;
+constant LPP_MULTI_DIODE	        : amba_device_type := 16#004#;
 
 
 component APB_SIMPLE_DIODE is
@@ -56,5 +55,21 @@ component APB_SIMPLE_DIODE is
     );
 end component;
 
+
+component APB_MULTI_DIODE is
+  generic (
+    pindex   : integer := 0;
+    paddr    : integer := 0;
+    pmask    : integer := 16#fff#;
+    pirq     : integer := 0;
+    abits    : integer := 8);
+  port (
+    rst    : in  std_ulogic;
+    clk    : in  std_ulogic;
+    apbi   : in  apb_slv_in_type;
+    apbo   : out apb_slv_out_type;
+    LED    : out std_logic_vector(2 downto 0)
+    );
+end component;
 
 end;
