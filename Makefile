@@ -25,7 +25,7 @@ Patch-GRLIB: init
 
 
 dist: init
-	tar -cvzf ./../lpp-lib.tgz ./../lib_lpp/*
+	tar -cvzf ./../lpp-lib.tgz ./../VHD_Lib/*
 
 Patched-dist: Patch-GRLIB
 	tar -cvzf ./../lpp-patched-GRLIB.tgz $(GRLIB)/*
