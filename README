@@ -1,0 +1,66 @@
+------------------------------------------------------------------------------
+--  This file is a part of the LPP VHDL IP LIBRARY
+--  Copyright (C) 2009 - 2010, Laboratory of Plasmas Physic - CNRS
+--
+--  This program is free software; you can redistribute it and/or modify
+--  it under the terms of the GNU General Public License as published by
+--  the Free Software Foundation; either version 2 of the License, or
+--  (at your option) any later version.
+--
+--  This program is distributed in the hope that it will be useful,
+--  but WITHOUT ANY WARRANTY; without even the implied warranty of
+--  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--  GNU General Public License for more details.
+--
+--  You should have received a copy of the GNU General Public License
+--  along with this program; if not, write to the Free Software
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+-------------------------------------------------------------------------------
+
+
+| ABOUT
+| ~~~~~
+
+LPP's VHD_Lib is a VHDL library, which is target independent and includes a set of scripts for integrating into 
+gaisler's grlib and use its features. For setup read instalation section.
+
+
+| REQUIREMENTS
+| ~~~~~~~~~~~~
+
+To use this library you need the grlib and linux shell or mingw for windows users.
+
+
+| PERSONALIZATION
+| ~~~~~~~~~~~~~~~
+
+You can add your IPs to the library, see how_to_improve.pdf(Comming soon).
+
+
+| INSTALLATION
+| ~~~~~~~~~~~~
+
+To set up the VHD_Lib follow this steps:
+	-download and setup the grlib
+	-create a VARIABLE called GRLIB with value the path to the grlib folder.
+	-untar the VHD_Lib and type "make Patch-GRLIB"
+	-now you can use the grlib's Makefiles and designs.
+Please note that if you try "make" or "make help" you will see all targets and if the GRLIB variable is correct.
+
+
+| HACKING
+| ~~~~~~~
+
+The first thing you should look at is the Makefile and then all scripts in "scripts" folder.
+
+
+| LICENSE
+| ~~~~~~~
+
+All the programs used by the VHD_Lib are protected by their respective
+license. They all are free software and most of them are covered by the
+GNU General Public License.
+
+The VHD_Lib itself, meaning all the scripts which are used in the building
+process, are covered by the GNU General Public License.
+
