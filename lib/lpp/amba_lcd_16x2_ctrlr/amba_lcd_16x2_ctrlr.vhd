@@ -121,23 +121,6 @@ component LCD_CLK_GENERATOR is
            clk_1us : out  STD_LOGIC);
 end component;
 
-component AMBA_LCD_16x2_DRIVER is
-    Port ( reset 		: in  STD_LOGIC;
-           clk 		: in  STD_LOGIC;
-           Bp0 		: in  STD_LOGIC;
-           Bp1 		: in  STD_LOGIC;
-           Bp2 		: in  STD_LOGIC;
-			  LCD_data 	: out  STD_LOGIC_VECTOR (7 downto 0);
-           LCD_RS 	: out  STD_LOGIC;
-           LCD_RW 	: out  STD_LOGIC;
-			  LCD_E  	: out  STD_LOGIC;
-           LCD_RET 	: out  STD_LOGIC;
-           LCD_CS1 	: out  STD_LOGIC;
-           LCD_CS2 	: out  STD_LOGIC;
-			  SF_CE0		: out	std_logic
-			  );
-end component;
-
 component LCD_16x2_ENGINE is
 	generic(OSC_freqKHz	:	integer := 50000);
     Port ( clk 	:	in  STD_LOGIC;
@@ -149,25 +132,6 @@ component LCD_16x2_ENGINE is
 	  LCD_CTRL	:	out LCD_DRVR_CTRL_BUSS
 			  );
 end component;
-
-
-component AMBA_LCD_16x2_DRIVER is
-    Port ( reset 		: in  STD_LOGIC;
-           clk 		: in  STD_LOGIC;
-           Bp0 		: in  STD_LOGIC;
-           Bp1 		: in  STD_LOGIC;
-           Bp2 		: in  STD_LOGIC;
-	   LCD_data 	: out  STD_LOGIC_VECTOR (7 downto 0);
-           LCD_RS 	: out  STD_LOGIC;
-           LCD_RW 	: out  STD_LOGIC;
-	   LCD_E  	: out  STD_LOGIC;
-           LCD_RET 	: out  STD_LOGIC;
-           LCD_CS1 	: out  STD_LOGIC;
-           LCD_CS2 	: out  STD_LOGIC;
-	   SF_CE0	: out	std_logic
-			  );
-end component;
-
 
 
 end;

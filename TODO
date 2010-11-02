@@ -1,4 +1,5 @@
-patch VENDOR Ids
-Write a README
-add app_simple_diode
-add LCD_16x2_DRIVER.vhd
+x patch VENDOR Ids
+x Write a README
+x add app_simple_diode
+x add LCD_16x2_DRIVER.vhd
+Write how_to_improve.pdf
