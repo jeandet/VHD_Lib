@@ -83,13 +83,12 @@ LCD_CS2	<=	'0';
 
 SF_CE0	<=	'1';
 
-rst <= not reset;
 
 
 
 Driver0 : LCD_16x2_ENGINE
 	generic map(50000)
-    Port map(clk,rst,FramBUFF,CMD,Exec,Ready,LCD_CTRL);
+    Port map(clk,reset,FramBUFF,CMD,Exec,Ready,LCD_CTRL);
 
 FramBUFF(0*8+7 downto 0*8)	<=	X"41" when	Bp0 = '1' else
 								X"42" when	Bp1 = '1' else

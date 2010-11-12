@@ -153,12 +153,12 @@ begin
 					DRIVER_CMD.Duration	<=	Duration_100us;
 					DRIVER_CMD.CMD_Data	<=	'1';
 					DRIVER_CMD.Word			<=	DATA(i*8+7 downto i*8);
-					i	<=	i + 1;
 					state	<=	Refresh0;
 				else
 					DRIVER_CMD.Exec		<=	'0';
 				end if;
 			when Refresh0=>
+				i	<=	i + 1;
 				state	<=	Refresh1;
 				DRIVER_CMD.Exec		<=	'0';
 			when Refresh1=>
@@ -205,7 +205,7 @@ begin
 					DRIVER_CMD.Exec		<=	'1';
 					DRIVER_CMD.Duration	<=	Duration_4ms;
 					DRIVER_CMD.CMD_Data	<=	'0';
-					DRIVER_CMD.Word			<= X"02";
+					DRIVER_CMD.Word			<= RetHome;
 					state	<=	Idle;
 				else
 					DRIVER_CMD.Exec		<=	'0';

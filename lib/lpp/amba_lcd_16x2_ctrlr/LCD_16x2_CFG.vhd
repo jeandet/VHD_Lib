@@ -36,7 +36,7 @@ constant ClearDSPLY		:	std_logic_vector(7 downto 0):= X"01";
 constant	FunctionSet		:	std_logic_vector(7 downto 0):= X"38";	
 constant RetHome			:	std_logic_vector(7 downto 0):= X"02";	
 constant SetEntryMode	:	std_logic_vector(7 downto 0):= X"06";	
-constant DSPL_CTRL		:	std_logic_vector(7 downto 0):= X"0C";	
+constant DSPL_CTRL		:	std_logic_vector(7 downto 0):= X"0E";	
 	
 constant CursorON			:	std_logic_vector(7 downto 0):= X"0E";	
 constant CursorOFF		:	std_logic_vector(7 downto 0):= X"0C";	

@@ -21,7 +21,7 @@
 | ABOUT
 | ~~~~~
 
-LPP's VHD_Lib is a VHDL library, which is target independent and includes a set of scripts for integrating into 
+LPP's VHD_Lib is a VHDL library which is target independent and includes a set of scripts for integrating into 
 gaisler's grlib and use its features. For setup read instalation section.
 
 
@@ -61,6 +61,4 @@ All the programs used by the VHD_Lib are protected by their respective
 license. They all are free software and most of them are covered by the
 GNU General Public License.
 
-The VHD_Lib itself, meaning all the scripts which are used in the building
-process, are covered by the GNU General Public License.
 
