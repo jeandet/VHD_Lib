@@ -19,7 +19,10 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-
+library grlib;
+use grlib.amba.all;
+use grlib.stdlib.all;
+use grlib.devices.all;
 
 
 package amba_lcd_16x2_ctrlr is
@@ -132,6 +135,33 @@ component LCD_16x2_ENGINE is
 	  LCD_CTRL	:	out LCD_DRVR_CTRL_BUSS
 			  );
 end component;
+
+
+
+component apb_lcd_ctrlr is
+  generic (
+    pindex   : integer := 0;
+    paddr    : integer := 0;
+    pmask    : integer := 16#fff#;
+    pirq     : integer := 0;
+    abits    : integer := 8);
+  port (
+	rst    : in  std_ulogic;
+	clk    : in  std_ulogic;
+	apbi   : in  apb_slv_in_type;
+	apbo   : out apb_slv_out_type;
+	LCD_data 	: out  STD_LOGIC_VECTOR (7 downto 0);
+	LCD_RS 	: out  STD_LOGIC;
+	LCD_RW 	: out  STD_LOGIC;
+	LCD_E  	: out  STD_LOGIC;
+	LCD_RET 	: out  STD_LOGIC;
+	LCD_CS1 	: out  STD_LOGIC;
+	LCD_CS2 	: out  STD_LOGIC;
+	SF_CE0		: out	std_logic
+    );
+end component;
+
+
 
 
 end;

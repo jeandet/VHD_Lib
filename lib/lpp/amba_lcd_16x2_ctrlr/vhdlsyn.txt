@@ -1,4 +1,5 @@
 amba_lcd_16x2_ctrlr.vhd
+apb_lcd_ctrlr.vhd
 FRAME_CLK.vhd
 LCD_16x2_CFG.vhd
 LCD_16x2_DRVR.vhd

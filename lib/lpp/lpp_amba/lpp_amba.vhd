@@ -37,6 +37,7 @@ constant ROCKET_TM	                : amba_device_type := 16#001#;
 constant otherCore         	        : amba_device_type := 16#002#;
 constant LPP_SIMPLE_DIODE	        : amba_device_type := 16#003#;
 constant LPP_MULTI_DIODE	        : amba_device_type := 16#004#;
+constant LPP_LCD_CTRLR		        : amba_device_type := 16#005#;
 
 
 component APB_SIMPLE_DIODE is
