@@ -62,6 +62,7 @@ type LEDregs is record
 end record;
 
 signal r : LEDregs;
+signal Rdata     : std_logic_vector(31 downto 0);
 
 
 begin
@@ -73,7 +74,6 @@ begin
     if rst = '0' then
         LED <=  '0';
         r.DATAin <= (others => '0');
-        apbo.prdata <= (others => '0');
     elsif clk'event and clk = '1' then
 
             LED <= r.DATAin(0);
@@ -92,9 +92,9 @@ begin
         if (apbi.psel(pindex) and apbi.penable and (not apbi.pwrite)) = '1' then
             case apbi.paddr(abits-1 downto 2) is
                 when "000000" =>
-                    apbo.prdata <= r.DATAin;
+                    Rdata <= r.DATAin;
                 when others =>
-                    apbo.prdata <= r.DATAout;
+                    Rdata <= r.DATAout;
             end case;
         end if;
     
@@ -102,7 +102,7 @@ begin
     apbo.pconfig <= pconfig;
 end process;
 
-
+apbo.prdata     <=   Rdata when apbi.penable = '1';
 
 -- pragma translate_off
 --    bootmsg : report_version

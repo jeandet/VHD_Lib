@@ -43,5 +43,5 @@ Patched-dist: Patch-GRLIB
 
 doc:
 	doxygen lib/lpp/Doxyfile
-	make lib/lpp/doc/latex
-	cp lib/lpp/doc/latex/refman.pdf lib/lpp/doc/VHD_lib.pdf
+	#make lib/lpp/doc/latex
+	#cp lib/lpp/doc/latex/refman.pdf lib/lpp/doc/VHD_lib.pdf

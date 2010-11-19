@@ -69,6 +69,7 @@ type UART_ctrlr_Reg is record
 end record;
 
 signal Rec : UART_ctrlr_Reg;
+signal Rdata     : std_logic_vector(31 downto 0);
 
 begin
 
@@ -88,7 +89,6 @@ Rec.UART_Cfg(4) <= NwData;
     begin
         if(rst='0')then
             Rec.UART_Wdata <=  (others => '0');
-            apbo.prdata <= (others => '0');
 
         elsif(clk'event and clk='1')then 
         
@@ -109,20 +109,21 @@ Rec.UART_Cfg(4) <= NwData;
             if (apbi.psel(pindex) and apbi.penable and (not apbi.pwrite)) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                        apbo.prdata(31 downto 27) <= Rec.UART_Cfg;
-                        apbo.prdata(26 downto 12) <= (others => '0');
-                        apbo.prdata(11 downto 0) <= Rec.UART_BTrig;
+                        Rdata(31 downto 27) <= Rec.UART_Cfg;
+                        Rdata(26 downto 12) <= (others => '0');
+                        Rdata(11 downto 0) <= Rec.UART_BTrig;
                     when "000001" =>
-                        apbo.prdata(7 downto 0) <= Rec.UART_Wdata;
+                        Rdata(7 downto 0) <= Rec.UART_Wdata;
                     when "000010" =>
-                        apbo.prdata(7 downto 0) <= Rec.UART_Rdata;
+                        Rdata(7 downto 0) <= Rec.UART_Rdata;
                     when others =>
-                        apbo.prdata <= (others => '0');
+                        Rdata <= (others => '0');
                 end case;
             end if;
 
         end if;
         apbo.pconfig <= pconfig;
     end process;
-
+    
+apbo.prdata     <=   Rdata when apbi.penable = '1';
 end ar_APB_UART;

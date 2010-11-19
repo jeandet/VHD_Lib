@@ -10,6 +10,26 @@ use lpp.lpp_amba.all;
 
 package lpp_uart is
 
+
+component APB_UART is
+  generic (
+    pindex   : integer := 0;
+    paddr    : integer := 0;
+    pmask    : integer := 16#fff#;
+    pirq     : integer := 0;
+    abits    : integer := 8;
+    Data_sz  : integer := 8);
+  port (
+    clk     : in  std_logic;
+    rst     : in  std_logic;    
+    apbi    : in  apb_slv_in_type;
+    apbo    : out apb_slv_out_type;
+    TXD    :   out std_logic;
+    RXD    :   in  std_logic
+    );
+end component;
+
+
 component UART is
 generic(Data_sz     :   integer :=  8);            --! Constante de taille pour un mot de donnee
 port(
@@ -55,24 +75,6 @@ port(
     RXD         :   in  std_logic;
     BTrigger    :   out std_logic_vector(11 downto 0)
 );
-end component;
-
-component APB_UART is
-  generic (
-    pindex   : integer := 0;
-    paddr    : integer := 0;
-    pmask    : integer := 16#fff#;
-    pirq     : integer := 0;
-    abits    : integer := 8;
-    Data_sz  : integer := 8);
-  port (
-    clk     : in  std_logic;
-    rst     : in  std_logic;    
-    apbi    : in  apb_slv_in_type;
-    apbo    : out apb_slv_out_type;
-    TXD    :   out std_logic;
-    RXD    :   in  std_logic
-    );
 end component;
 
 
