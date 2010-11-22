@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--This is an ISE project configuration file.-->
+<!--It holds project specific layout data for the projectmgr plugin.-->
+<!--Copyright (c) 1995-2009 Xilinx, Inc.  All rights reserved.-->
+<Project version="2" owner="projectmgr" name="leon3mp" >
+   <!--This is an ISE project configuration file.-->
+   <ItemView engineview="SynthesisOnly" guiview="Source" compilemode="AutoCompile" >
+      <ClosedNodes>
+         <ClosedNodesVersion>2</ClosedNodesVersion>
+         <ClosedNode>/Unassigned User Library Modules</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/LCD0 - apb_lcd_ctrlr - Behavioral</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/addr_pad - outpadv - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/ahbjtag0 - ahbjtag - struct</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/ahbram0 - ahbram - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/clk_pad - clkpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/clkgen0 - clkgen - struct</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/data_pad - iopadv - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/dcom0 - ahbuart - struct</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/ddrc - ddrspa - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/dsu0 - dsu3 - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/dsubre_pad - inpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/dsurx_pad - inpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/dsutx_pad - outpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/e1 - grethm - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/emdc_pad - outpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/emdio_pad - iopad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/error_pad - odpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/erxc_pad - inpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/erxco_pad - inpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/erxcr_pad - inpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/erxd_pad - inpadv - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/erxdv_pad - inpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/erxer_pad - inpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/etxc_pad - inpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/etxd_pad - outpadv - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/etxen_pad - outpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/etxer_pad - outpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/horiz_sync_pad - outpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/kbdata_pad - iopad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/kbdclk_pad - iopad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/oen_pad - outpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/roms_pad - outpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/serrx_pad - inpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/sertx_pad - outpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/sr1 - mctrl - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/svga0 - svgactrl - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/u0 - leon3s - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/vert_sync_pad - outpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/video_out_b_pad - outpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/video_out_g_pad - outpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/video_out_r_pad - outpad - rtl</ClosedNode>
+         <ClosedNode>/leon3mp - rtl |opt|GRLIB|grlib-gpl-1.1.0-b4104|designs|leon3-digilent-xc3s1600e|leon3mp.vhd/wri_pad - outpad - rtl</ClosedNode>
+      </ClosedNodes>
+      <SelectedItems>
+         <SelectedItem>leon3mp - rtl (/opt/GRLIB/grlib-gpl-1.1.0-b4104/designs/leon3-digilent-xc3s1600e/leon3mp.vhd)</SelectedItem>
+      </SelectedItems>
+      <ScrollbarPosition orientation="vertical" >33</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff00000000000000010000000100000000000000000000000000000000020200000001000000010000006400000278000000020000000000000000000000000000000064ffffffff000000810000000000000002000002780000000100000000000000000000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem>leon3mp - rtl (/opt/GRLIB/grlib-gpl-1.1.0-b4104/designs/leon3-digilent-xc3s1600e/leon3mp.vhd)</CurrentItem>
+   </ItemView>
+   <ItemView engineview="SynthesisOnly" sourcetype="DESUT_VHDL_ARCHITECTURE" guiview="Process" >
+      <ClosedNodes>
+         <ClosedNodesVersion>1</ClosedNodesVersion>
+         <ClosedNode>Design Utilities</ClosedNode>
+         <ClosedNode>Implement Design/Map</ClosedNode>
+         <ClosedNode>Implement Design/Place &amp; Route</ClosedNode>
+         <ClosedNode>Implement Design/Translate</ClosedNode>
+         <ClosedNode>Synthesize - XST</ClosedNode>
+         <ClosedNode>User Constraints</ClosedNode>
+      </ClosedNodes>
+      <SelectedItems>
+         <SelectedItem>Configure Target Device</SelectedItem>
+      </SelectedItems>
+      <ScrollbarPosition orientation="vertical" >7</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff00000000000000010000000100000000000000000000000000000000000000000000000177000000010000000100000000000000000000000064ffffffff000000810000000000000001000001770000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem>Configure Target Device</CurrentItem>
+   </ItemView>
+   <ItemView guiview="File" >
+      <ClosedNodes>
+         <ClosedNodesVersion>1</ClosedNodesVersion>
+      </ClosedNodes>
+      <SelectedItems/>
+      <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff00000000000000010000000000000000010000000000000000000000000000000000000598000000040101000100000000000000000000000064ffffffff000000810000000000000004000001970000000100000000000000d60000000100000000000000840000000100000000000002a70000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem>../../lib/cypress/ssram/components.vhd</CurrentItem>
+   </ItemView>
+   <ItemView guiview="Library" >
+      <ClosedNodes>
+         <ClosedNodesVersion>1</ClosedNodesVersion>
+         <ClosedNode>cypress</ClosedNode>
+         <ClosedNode>dw02</ClosedNode>
+         <ClosedNode>esa</ClosedNode>
+         <ClosedNode>eth</ClosedNode>
+         <ClosedNode>fmf</ClosedNode>
+         <ClosedNode>gaisler</ClosedNode>
+         <ClosedNode>gsi</ClosedNode>
+         <ClosedNode>hynix</ClosedNode>
+         <ClosedNode>micron</ClosedNode>
+         <ClosedNode>synplify</ClosedNode>
+         <ClosedNode>techmap</ClosedNode>
+         <ClosedNode>unisim</ClosedNode>
+      </ClosedNodes>
+      <SelectedItems>
+         <SelectedItem>../../lib/lpp/lpp_amba/lpp_amba.vhd</SelectedItem>
+      </SelectedItems>
+      <ScrollbarPosition orientation="vertical" >43</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff00000000000000010000000000000000010000000000000000000000000000000000000177000000010001000100000000000000000000000064ffffffff000000810000000000000001000001770000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem>../../lib/lpp/lpp_amba/lpp_amba.vhd</CurrentItem>
+   </ItemView>
+   <SourceProcessView>000000ff0000000000000002000001f4000000b001000000060100000002</SourceProcessView>
+   <CurrentView>Implementation</CurrentView>
+   <ItemView engineview="SynthesisOnly" sourcetype="DESUT_UCF" guiview="Process" >
+      <ClosedNodes>
+         <ClosedNodesVersion>1</ClosedNodesVersion>
+         <ClosedNode>User Constraints</ClosedNode>
+      </ClosedNodes>
+      <SelectedItems>
+         <SelectedItem/>
+      </SelectedItems>
+      <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff000000000000000100000001000000000000000000000000000000000000000000000000fd000000010000000100000000000000000000000064ffffffff000000810000000000000001000000fd0000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem/>
+   </ItemView>
+   <ItemView engineview="SynthesisOnly" sourcetype="" guiview="Process" >
+      <ClosedNodes>
+         <ClosedNodesVersion>1</ClosedNodesVersion>
+         <ClosedNode>Design Utilities</ClosedNode>
+      </ClosedNodes>
+      <SelectedItems>
+         <SelectedItem/>
+      </SelectedItems>
+      <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
+      <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
+      <ViewHeaderState orientation="horizontal" >000000ff000000000000000100000001000000000000000000000000000000000000000000000000fd000000010000000100000000000000000000000064ffffffff000000810000000000000001000000fd0000000100000000</ViewHeaderState>
+      <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
+      <CurrentItem/>
+   </ItemView>
+</Project>

@@ -50,6 +50,7 @@ constant    Duration_100us   		:   std_logic_vector(1 downto 0) := "01";
 constant    Duration_4ms    		:   std_logic_vector(1 downto 0) := "10";	
 constant    Duration_20ms    		:   std_logic_vector(1 downto 0) := "11";	
 	
+	
 
 end LCD_16x2_CFG;
 

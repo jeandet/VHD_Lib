@@ -27,6 +27,10 @@ use grlib.devices.all;
 
 package amba_lcd_16x2_ctrlr is
 
+constant lcd_space_size : integer := 80;
+
+type FRM_Buff_Space	is array(lcd_space_size-1 downto 0) of std_logic_vector(7 downto 0);
+
 
 type LCD_DRVR_CTRL_BUSS is
     record
@@ -128,7 +132,7 @@ component LCD_16x2_ENGINE is
 	generic(OSC_freqKHz	:	integer := 50000);
     Port ( clk 	:	in  STD_LOGIC;
            reset 	:	in  STD_LOGIC;
-	  DATA	:	in std_logic_vector(16*2*8-1 downto 0);
+	  DATA	:	in FRM_Buff_Space;
 	  CMD		:	in std_logic_vector(10 downto 0);
 	  Exec	:	in	std_logic;
 	  Ready	:	out std_logic;
