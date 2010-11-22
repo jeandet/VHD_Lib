@@ -50,7 +50,7 @@ end FRAME_CLK_GEN;
 
 architecture Behavioral of FRAME_CLK_GEN is
 
-Constant	Goal_FRAME_CLK_FREQ	:	integer := 20;
+Constant	Goal_FRAME_CLK_FREQ	:	integer := 25;
 
 Constant FRAME_CLK_TRIG	:	integer	:= OSC_freqKHz*500/Goal_FRAME_CLK_FREQ -1;
 

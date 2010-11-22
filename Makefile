@@ -20,6 +20,7 @@ help:
 	@echo " make allGPL          : add a GPL HEADER in all vhdl Files"
 	@echo " make init            : add a GPL HEADER in all vhdl Files, init all files"
 	@echo " make doc             : make documentation for VHDL IPs"
+	@echo " make pdf             : make pdf documentation for VHDL IPs"
 	@echo
 
 allGPL:
@@ -43,5 +44,7 @@ Patched-dist: Patch-GRLIB
 
 doc:
 	doxygen lib/lpp/Doxyfile
-	#make lib/lpp/doc/latex
-	#cp lib/lpp/doc/latex/refman.pdf lib/lpp/doc/VHD_lib.pdf
+
+pdf:
+	make lib/lpp/doc/latex
+	cp lib/lpp/doc/latex/refman.pdf lib/lpp/doc/VHD_lib.pdf

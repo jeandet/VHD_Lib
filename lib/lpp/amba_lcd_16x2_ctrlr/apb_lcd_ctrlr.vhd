@@ -72,7 +72,7 @@ end apb_lcd_ctrlr;
 
 architecture Behavioral of apb_lcd_ctrlr is
 
-signal	FramBUFF :  STD_LOGIC_VECTOR(16*2*8-1 downto 0);
+signal	FramBUFF :  FRM_Buff_Space;
 signal	CMD		:	std_logic_vector(10 downto 0);
 signal	Exec		:	std_logic;
 signal	Ready		:	std_logic;
@@ -88,7 +88,7 @@ constant pconfig : apb_config_type := (
 
 
 --type FRM_Buff_El	is std_logic_vector(31 downto 0);
-type FRM_Buff_Reg	is array(31 downto 0) of std_logic_vector(31 downto 0);
+type FRM_Buff_Reg	is array(lcd_space_size-1 downto 0) of std_logic_vector(31 downto 0);
 
 
 type LCD_ctrlr_Reg is record
@@ -98,6 +98,7 @@ end record;
 
 signal r : LCD_ctrlr_Reg;
 
+signal Rdata	:	std_logic_vector(31 downto 0);
 
 begin
 
@@ -122,8 +123,8 @@ Driver0 : LCD_16x2_ENGINE
 	generic map(50000)
     Port map(clk,rst,FramBUFF,CMD,Exec,Ready,LCD_CTRL);
 
-FRM_BF : for i in 0 to 15 generate
-	FramBUFF((8*(i+1))-1 downto 8*i)	<=	r.FRAME_BUFF(i)(7 downto 0);
+FRM_BF : for i in 0 to lcd_space_size-1 generate
+	FramBUFF(i)	<=	r.FRAME_BUFF(i)(7 downto 0);
 end generate;
 
 
@@ -131,7 +132,6 @@ process(rst,clk)
 begin
     if rst = '0' then
         r.CTRL_Reg(9 downto 0) <= (others => '0');
-        apbo.prdata <= (others => '0');
 		  Exec	<=	'0';
     elsif clk'event and clk = '1' then
 
@@ -140,37 +140,38 @@ begin
             case apbi.paddr(7 downto 2) is
                 when "000000" =>
                     r.CTRL_Reg(9 downto 0) <= apbi.pwdata(9 downto 0);
+						  Exec	<=	'1';
                 when others =>
-                 writeC:   for i in 1 to 32 loop
+                 writeC:   for i in 1 to lcd_space_size loop
 								if TO_INTEGER(unsigned(apbi.paddr(abits-1 downto 2))) =i then
 									r.FRAME_BUFF(i-1)	<=	apbi.pwdata;
 								end if;
-					end loop;
-            end case;
-        end if;
-
---APB READ OP
-        if (apbi.psel(pindex) and apbi.penable and (not apbi.pwrite)) = '1' then
-            case apbi.paddr(7 downto 2) is
-                when "000000" =>
-                    apbo.prdata <= r.CTRL_Reg;
-                when others =>
-                    readC:   for i in 1 to 32 loop
-								if TO_INTEGER(unsigned(apbi.paddr(abits-1 downto 2))) =i then
-									apbo.prdata(7 downto 0) <= r.FRAME_BUFF(i-1)(7 downto 0);
-									Exec	<=	'1';
-								end if;
+						Exec	<=	'0';
 					end loop;
             end case;
 			else
 				Exec	<=	'0';
+        end if;
+
+--APB READ OP
+        if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
+            case apbi.paddr(7 downto 2) is
+                when "000000" =>
+                    Rdata <= r.CTRL_Reg;
+                when others =>
+                    readC:   for i in 1 to lcd_space_size loop
+								if TO_INTEGER(unsigned(apbi.paddr(abits-1 downto 2))) =i then
+									Rdata(7 downto 0) <= r.FRAME_BUFF(i-1)(7 downto 0);
+								end if;
+					end loop;
+            end case;
         end if;
     
     end if;
     apbo.pconfig <= pconfig;
 end process;
 
-
+apbo.prdata <=	Rdata when apbi.penable = '1' ;
 
 end Behavioral;
 

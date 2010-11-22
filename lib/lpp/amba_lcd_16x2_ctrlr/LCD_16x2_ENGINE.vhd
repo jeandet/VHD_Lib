@@ -48,7 +48,7 @@ entity LCD_16x2_ENGINE is
 	generic(OSC_freqKHz	:	integer := 50000);
     Port ( clk 	:	in  STD_LOGIC;
            reset 	:	in  STD_LOGIC;
-			  DATA	:	in std_logic_vector(16*2*8-1 downto 0);
+			  DATA	:	in FRM_Buff_Space;
 			  CMD		:	in std_logic_vector(10 downto 0);
 			  Exec	:	in	std_logic;
 			  Ready	:	out std_logic;
@@ -73,7 +73,7 @@ signal	Exec_Reg			:	std_logic;
 
 type state_t is (INIT0,INIT1,INIT2,IDLE,Refresh,Refresh0,Refresh1,ReturnHome,GoLine2,GoLine2_0,ExecCMD0,ExecCMD1);
 signal	state	:	state_t;
-signal	i		:	integer range 0 to 32 := 0;
+signal	i		:	integer range 0 to lcd_space_size := 0;
 
 
 
@@ -152,7 +152,7 @@ begin
 					DRIVER_CMD.Exec		<=	'1';
 					DRIVER_CMD.Duration	<=	Duration_100us;
 					DRIVER_CMD.CMD_Data	<=	'1';
-					DRIVER_CMD.Word			<=	DATA(i*8+7 downto i*8);
+					DRIVER_CMD.Word			<=	DATA(i);
 					state	<=	Refresh0;
 				else
 					DRIVER_CMD.Exec		<=	'0';
@@ -163,10 +163,11 @@ begin
 				DRIVER_CMD.Exec		<=	'0';
 			when Refresh1=>
 				if SYNCH.DRVR_READY = '1' then 
-					if i = 32 then
-						state	<=	ReturnHome;
-					elsif i = 16 then
-						state	<=	GoLine2;
+					if i = lcd_space_size then
+--						state	<=	ReturnHome;
+						state	<=	Idle;
+--					elsif i = 16 then
+--						state	<=	GoLine2;
 					else
 						state	<=	Refresh;
 					end if;
@@ -190,7 +191,7 @@ begin
 			when	GoLine2=>
 				if SYNCH.DRVR_READY = '1' then 
 					DRIVER_CMD.Exec		<=	'1';
-					DRIVER_CMD.Duration	<=	Duration_100us;
+					DRIVER_CMD.Duration	<=	Duration_4ms;
 					DRIVER_CMD.CMD_Data	<=	'0';
 					DRIVER_CMD.Word			<= X"C0";
 					state	<=	GoLine2_0;
