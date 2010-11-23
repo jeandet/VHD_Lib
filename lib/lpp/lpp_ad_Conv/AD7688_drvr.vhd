@@ -17,43 +17,38 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 -------------------------------------------------------------------------------
 library IEEE;
-use IEEE.numeric_std.all;
-use IEEE.std_logic_1164.all;
-library lpp;
-use lpp.general_purpose.all;
+use IEEE.STD_LOGIC_1164.ALL;
 
 
 
-entity MAC_REG is 
-generic(size    :   integer := 16);
-port(
-    reset   :   in  std_logic;
-    clk     :   in  std_logic;
-    D       :   in  std_logic_vector(size-1 downto 0);
-    Q       :   out std_logic_vector(size-1 downto 0)
-);
-end entity;
+entity AD7688_drvr is
+    generic(ChanelCount	:	integer; 
+				clkkHz		:	integer);
+		 Port ( clk 	: in  STD_LOGIC;
+				  reset 	: in  STD_LOGIC;
+				  smplClk: in	STD_LOGIC;
+				  smpout : out Samples_out(ChanelCount-1 downto 0);	
+				  AD_in	: in	AD7688_in(ChanelCount-1 downto 0);	
+				  AD_out : out AD7688_out);
+end AD7688_drvr;
 
+architecture ar_AD7688_drvr of AD7688_drvr is
 
+constant		convTrigger	:	integer:=  clkkHz*1.6/1000;  --tconv = 1.6µs
 
-architecture    ar_MAC_REG of MAC_REG is
+signal i	: integer range 0 to convTrigger :=0;
+
 begin
-process(clk,reset)
+
+sckgen: process(clk,reset)
 begin
-if reset = '0' then
-    Q   <=  (others => '0');
-elsif clk'event and clk ='1' then
-    Q   <=  D;
-end if;
+	if reset = '0' then
+		i <= 0;
+		AD_out.CNV	<=	'0';
+	elsif clk'event and clk = '1' then
+	end if;
 end process;
-end ar_MAC_REG;
 
 
-
-
-
-
-
-
-
+end ar_AD7688_drvr;
 

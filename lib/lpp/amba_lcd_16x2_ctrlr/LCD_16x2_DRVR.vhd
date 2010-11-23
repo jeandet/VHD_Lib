@@ -1,10 +1,10 @@
-					------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 --  This file is a part of the LPP VHDL IP LIBRARY
 --  Copyright (C) 2009 - 2010, Laboratory of Plasmas Physic - CNRS
 --
 --  This program is free software; you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
+--  the Free Software Foundation; either version 3 of the License, or
 --  (at your option) any later version.
 --
 --  This program is distributed in the hope that it will be useful,
@@ -16,25 +16,6 @@
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 -------------------------------------------------------------------------------
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date:    10:09:57 10/13/2010 
--- Design Name: 
--- Module Name:    LCD_2x16_DRIVER - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
---
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
-----------------------------------------------------------------------------------
 
 ---TDODO => Clean Enable pulse FSM
 library IEEE;

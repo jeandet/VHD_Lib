@@ -1,6 +1,6 @@
 echo  "======================================================================================="
 echo  "---------------------------------------------------------------------------------------"
-echo  "                              LPP's GRLIB Designs PATCHER				"
+echo  "                                PDF Doc generator				"
 echo  "                    Copyright (C) 2010 Laboratory of Plasmas Physic.			" 
 echo  "======================================================================================="
 echo '----------------------------------------------------------------------------------------
@@ -26,24 +26,8 @@ echo
 echo 
 
 
-LPP_LIBPATH=`pwd -L`
-
-echo "Patching designs..."
-echo
-echo
-
-#COPY
-echo "Copy designs Files..."
-cp -R -v $LPP_LIBPATH/designs $1
-echo
-echo
-echo
 
 
-#CLEAN
-echo "CLEANING .."
-rm -v $1/designs/*.sh
-echo
-echo
-echo
-
+cd doc/latex
+make
+cp refman.pdf ../../VHD_lib.pdf

@@ -17,43 +17,48 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 -------------------------------------------------------------------------------
 library IEEE;
-use IEEE.numeric_std.all;
-use IEEE.std_logic_1164.all;
-library lpp;
-use lpp.general_purpose.all;
+use IEEE.STD_LOGIC_1164.ALL;
 
 
+entity Clk_divider is
+	 generic(OSC_freqHz	:	integer := 50000000;
+				TargetFreq_Hz	:	integer := 50000);
+    Port ( clk : in  STD_LOGIC;
+           reset : in  STD_LOGIC;
+           clk_divided : out  STD_LOGIC);
+end Clk_divider;
 
-entity MAC_REG is 
-generic(size    :   integer := 16);
-port(
-    reset   :   in  std_logic;
-    clk     :   in  std_logic;
-    D       :   in  std_logic_vector(size-1 downto 0);
-    Q       :   out std_logic_vector(size-1 downto 0)
-);
-end entity;
+architecture ar_Clk_divider of Clk_divider is
+
+Constant clk_TRIGER	:	integer	:=	(OSC_freqHz/(2*TargetFreq_Hz))+1;
 
 
+signal	cpt1				:	integer;
 
-architecture    ar_MAC_REG of MAC_REG is
+signal	clk_int		:	std_logic := '0';
+
+
 begin
-process(clk,reset)
+
+clk_divided		<=	clk_int;
+
+
+process(reset,clk)
 begin
-if reset = '0' then
-    Q   <=  (others => '0');
-elsif clk'event and clk ='1' then
-    Q   <=  D;
-end if;
+	if reset = '0' then
+		cpt1			<=	0;
+		clk_int		<=	'0';
+	elsif clk'event and clk = '1' then
+		if cpt1 = clk_TRIGER then
+			clk_int	<=	not clk_int;
+			cpt1			<=	0;
+		else
+			cpt1			<=	cpt1 + 1;
+		end if;
+	end if;
 end process;
-end ar_MAC_REG;
 
 
-
-
-
-
-
-
+end ar_Clk_divider;
 
 

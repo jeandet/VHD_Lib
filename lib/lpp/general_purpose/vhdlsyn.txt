@@ -1,6 +1,7 @@
 Adder.vhd
 ADDRcntr.vhd
 ALU.vhd
+Clk_divider.vhd
 general_purpose.vhd
 MAC_CONTROLER.vhd
 MAC_MUX2.vhd
