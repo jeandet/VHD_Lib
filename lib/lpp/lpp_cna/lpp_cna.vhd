@@ -54,10 +54,10 @@ component Clock_Serie is
 end component;
 
 
-component GeneSYNC_flag is
+component Gene_SYNC is
     port(
         clk,raz     : in std_logic;
-        flag_nw     : in std_logic;
+        send     : in std_logic;
         Sysclk      : in std_logic;
         OKAI_send   : out std_logic;
         SYNC        : out std_logic);

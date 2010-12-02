@@ -38,13 +38,11 @@ constant pconfig : apb_config_type := (
   0 => ahb_device_reg (VENDOR_LPP, LPP_CNA, 0, REVISION, 0),
   1 => apb_iobar(paddr, pmask));
 
-signal flag_nw   : std_logic;
-signal bp        : std_logic;
-signal Rz        : std_logic;
-signal flag_sd   : std_logic;
+signal enable   : std_logic;
+signal flag_sd : std_logic;
 
 type CNA_ctrlr_Reg is record
-     CNA_Cfg  : std_logic_vector(3 downto 0);
+     CNA_Cfg  : std_logic_vector(1 downto 0);
      CNA_Data : std_logic_vector(15 downto 0);
 end record;
 
@@ -53,14 +51,11 @@ signal Rdata     : std_logic_vector(31 downto 0);
 
 begin
 
-bp <= Rec.CNA_Cfg(0);
-flag_nw <= Rec.CNA_Cfg(1);
-Rec.CNA_Cfg(2) <= flag_sd;
-Rec.CNA_Cfg(3) <= Rz;
+enable <= Rec.CNA_Cfg(0);
+Rec.CNA_Cfg(1) <= flag_sd;
 
-    
     CONVERTER : entity Work.CNA_TabloC
-        port map(clk,rst,flag_nw,bp,Rec.CNA_Data,SYNC,SCLK,Rz,flag_sd,Data); 
+        port map(clk,rst,enable,Rec.CNA_Data,SYNC,SCLK,flag_sd,Data);
 
 
     process(rst,clk)
@@ -75,7 +70,7 @@ Rec.CNA_Cfg(3) <= Rz;
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                        Rec.CNA_Cfg(1 downto 0) <= apbi.pwdata(1 downto 0);
+                        Rec.CNA_Cfg(0) <= apbi.pwdata(0);
                     when "000001" =>
                         Rec.CNA_Data <= apbi.pwdata(15 downto 0);
                     when others =>
@@ -87,8 +82,8 @@ Rec.CNA_Cfg(3) <= Rz;
             if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                        Rdata(31 downto 4) <= X"ABCDEF5";
-                        Rdata(3 downto 0) <= Rec.CNA_Cfg;
+                        Rdata(31 downto 2) <= X"ABCDEF5" & "00";
+                        Rdata(1 downto 0) <= Rec.CNA_Cfg;
                     when "000001" =>
                         Rdata(31 downto 16) <= X"FD18";
                         Rdata(15 downto 0) <= Rec.CNA_Data;

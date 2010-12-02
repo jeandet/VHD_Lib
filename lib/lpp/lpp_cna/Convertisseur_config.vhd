@@ -18,7 +18,7 @@ constant Tablo : Tbl (0 to 49):= (X"800",X"901",X"9FD",X"AF2",X"BDB",X"CB4",X"D7
 --===========================================================|
 --============= Fréquence de sérialisation ==================|
 --===========================================================|
-constant Freq_serial : integer := 1_000_000;
-constant nb_serial : integer := 40_000_000 / Freq_serial;
+constant Freq_serial : integer := 5_000_000;
+constant nb_serial : integer := 30_000_000 / Freq_serial;
 
 end;

@@ -8,12 +8,12 @@ entity CNA_TabloC is
     port(
         clock       : in std_logic;
         rst         : in std_logic;
-        flag_nw     : in std_logic;
-        bp          : in std_logic;
+        enable      : in std_logic;
+        --bp          : in std_logic;
         Data_C      : in std_logic_vector(15 downto 0);
         SYNC        : out std_logic;
         SCLK        : out std_logic;
-        Rz          : out std_logic;
+        --Rz          : out std_logic;
         flag_sd     : out std_logic;
         Data        : out std_logic
         );
@@ -28,12 +28,11 @@ port( A : in    std_logic := 'U';
 end component;
 
 signal clk      : std_logic;
---signal reset    : std_logic;
 
 signal raz          : std_logic;
-signal sys_clk      : std_logic;
-signal Data_int     : std_logic_vector(15 downto 0);
+signal s_SCLK      : std_logic;
 signal OKAI_send    : std_logic;
+--signal Data_int     : std_logic_vector(15 downto 0);
 
 begin
 
@@ -47,25 +46,22 @@ CLKINT_1 : CLKINT
 
 SystemCLK : entity work.Clock_Serie
     generic map (nb_serial)
-    port map (clk,raz,sys_clk);
+    port map (clk,raz,s_SCLK);
 
 
-Signal_sync : entity work.GeneSYNC_flag
-    port map (clk,raz,flag_nw,sys_clk,OKAI_send,SYNC);
+Signal_sync : entity work.Gene_SYNC
+    port map (s_SCLK,raz,enable,OKAI_send,SYNC);
 
 
 Serial : entity work.serialize
-    port map (clk,raz,sys_clk,Data_int,OKAI_send,flag_sd,Data);
+    port map (clk,raz,s_SCLK,Data_C,OKAI_send,flag_sd,Data);
 
 
---raz         <= not reset;
-Rz          <= raz;
-SCLK        <= not sys_clk;
---Data_Cvec   <= std_logic_vector(to_unsigned(Data_C,12));
---Data_TOT    <= "0001" & Data_Cvec;
+--Rz          <= raz;
+SCLK        <= s_SCLK;
 
-with bp select
-    Data_int <= X"9555" when '1',
-                Data_C when others;
+--with bp select
+--    Data_int <= X"9555" when '1',
+--                Data_C when others;
 
 end ar_CNA_TabloC;

@@ -68,7 +68,7 @@ begin
         elsif(load='1')then
             vector_int <= vectin & '0';
             N <= 0;
-        elsif(sclk'event and sclk='0')then        
+        elsif(sclk'event and sclk='1')then        
             if (CPT_ended='0') then
                 vector_int <= vector_int(15 downto 0) & '0'; 
                 N <= N+1;
