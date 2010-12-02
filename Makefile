@@ -24,9 +24,14 @@ help:
 	@echo
 
 allGPL:
-	sh $(SCRIPTSDIR)/GPL_Patcher.sh -R 
+	@echo "Scanning VHDL files ..."
+	sh $(SCRIPTSDIR)/GPL_Patcher.sh -R vhd lib
+	@echo "Scanning C files ..."
+	sh $(SCRIPTSDIR)/GPL_Patcher.sh -R c LPP_drivers
+	@echo "Scanning H files ..."
+	sh $(SCRIPTSDIR)/GPL_Patcher.sh -R h LPP_drivers
 
-init: allGPL
+init:
 	sh $(SCRIPTSDIR)/vhdlsynPatcher.sh
 	sh $(SCRIPTSDIR)/makeDirs.sh lib/lpp
 
@@ -45,6 +50,5 @@ Patched-dist: Patch-GRLIB
 doc:
 	doxygen lib/lpp/Doxyfile
 
-pdf:
-	make lib/lpp/doc/latex
-	cp lib/lpp/doc/latex/refman.pdf lib/lpp/doc/VHD_lib.pdf
+pdf: doc
+	sh $(SCRIPTSDIR)/doc.sh

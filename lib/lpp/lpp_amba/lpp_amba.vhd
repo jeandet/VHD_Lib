@@ -4,7 +4,7 @@
 --
 --  This program is free software; you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
+--  the Free Software Foundation; either version 3 of the License, or
 --  (at your option) any later version.
 --
 --  This program is distributed in the hope that it will be useful,
@@ -16,7 +16,6 @@
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 -------------------------------------------------------------------------------
-
 library ieee;
 use ieee.std_logic_1164.all;
 library grlib;
@@ -40,7 +39,7 @@ constant LPP_MULTI_DIODE	        : amba_device_type := 16#004#;
 constant LPP_LCD_CTRLR		        : amba_device_type := 16#005#;
 constant LPP_UART                       : amba_device_type := 16#006#;
 constant LPP_CNA                        : amba_device_type := 16#007#;
-
+constant LPP_ADC_7688                   : amba_device_type := 16#008#;
 
 component APB_SIMPLE_DIODE is
   generic (

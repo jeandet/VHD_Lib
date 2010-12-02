@@ -4,7 +4,7 @@
 --
 --  This program is free software; you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
+--  the Free Software Foundation; either version 3 of the License, or
 --  (at your option) any later version.
 --
 --  This program is distributed in the hope that it will be useful,
@@ -16,8 +16,6 @@
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 -------------------------------------------------------------------------------
--- APB_MULTI_DIODE.vhd
-
 library ieee;
 use ieee.std_logic_1164.all;
 --use ieee.numeric_std.all;
@@ -62,7 +60,6 @@ type LEDregs is record
 end record;
 
 signal r : LEDregs;
-signal Rdata     : std_logic_vector(31 downto 0);
 
 
 begin
@@ -74,6 +71,7 @@ begin
     if rst = '0' then
         LED <=  "000";
         r.DATAin <= (others => '0');
+        apbo.prdata <= (others => '0');
     elsif clk'event and clk = '1' then
 
             LED <= r.DATAin(2 downto 0);
@@ -92,9 +90,9 @@ begin
         if (apbi.psel(pindex) and apbi.penable and (not apbi.pwrite)) = '1' then
             case apbi.paddr(abits-1 downto 2) is
                 when "000000" =>
-                    Rdata <= r.DATAin;
+                    apbo.prdata <= r.DATAin;
                 when others =>
-                    Rdata <= r.DATAout;
+                    apbo.prdata <= r.DATAout;
             end case;
         end if;
     
@@ -102,5 +100,5 @@ begin
     apbo.pconfig <= pconfig;
 end process;
 
-apbo.prdata     <=   Rdata when apbi.penable = '1';
+
 end ar_APB_MULTI_DIODE;

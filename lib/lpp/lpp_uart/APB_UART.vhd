@@ -4,7 +4,7 @@
 --
 --  This program is free software; you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
+--  the Free Software Foundation; either version 3 of the License, or
 --  (at your option) any later version.
 --
 --  This program is distributed in the hope that it will be useful,
@@ -16,8 +16,6 @@
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 -------------------------------------------------------------------------------
--- APB_UART.vhd
-
 library ieee;
 use ieee.std_logic_1164.all;
 library grlib;
@@ -69,7 +67,6 @@ type UART_ctrlr_Reg is record
 end record;
 
 signal Rec : UART_ctrlr_Reg;
-signal Rdata     : std_logic_vector(31 downto 0);
 
 begin
 
@@ -89,6 +86,7 @@ Rec.UART_Cfg(4) <= NwData;
     begin
         if(rst='0')then
             Rec.UART_Wdata <=  (others => '0');
+            apbo.prdata <= (others => '0');
 
         elsif(clk'event and clk='1')then 
         
@@ -109,21 +107,20 @@ Rec.UART_Cfg(4) <= NwData;
             if (apbi.psel(pindex) and apbi.penable and (not apbi.pwrite)) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                        Rdata(31 downto 27) <= Rec.UART_Cfg;
-                        Rdata(26 downto 12) <= (others => '0');
-                        Rdata(11 downto 0) <= Rec.UART_BTrig;
+                        apbo.prdata(31 downto 27) <= Rec.UART_Cfg;
+                        apbo.prdata(26 downto 12) <= (others => '0');
+                        apbo.prdata(11 downto 0) <= Rec.UART_BTrig;
                     when "000001" =>
-                        Rdata(7 downto 0) <= Rec.UART_Wdata;
+                        apbo.prdata(7 downto 0) <= Rec.UART_Wdata;
                     when "000010" =>
-                        Rdata(7 downto 0) <= Rec.UART_Rdata;
+                        apbo.prdata(7 downto 0) <= Rec.UART_Rdata;
                     when others =>
-                        Rdata <= (others => '0');
+                        apbo.prdata <= (others => '0');
                 end case;
             end if;
 
         end if;
         apbo.pconfig <= pconfig;
     end process;
-    
-apbo.prdata     <=   Rdata when apbi.penable = '1';
+
 end ar_APB_UART;

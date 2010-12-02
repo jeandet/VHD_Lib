@@ -11,5 +11,16 @@ syntax: glob
 *.eps
 *.pdf
 *.toc
+*.map
+*.sty
+*.3
+*.js
+*.aux
+*.idx
+*doc*
+*Doc*
+*vhdlsyn.txt
+*.orig
+*.o
 *~
 

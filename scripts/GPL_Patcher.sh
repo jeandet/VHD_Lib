@@ -9,7 +9,7 @@ echo '--------------------------------------------------------------------------
 
             This program is free software; you can redistribute it and/or modify
             it under the terms of the GNU General Public License as published by
-            the Free Software Foundation; either version 2 of the License, or
+            the Free Software Foundation; either version 3 of the License, or
             (at your option) any later version.
 
             This program is distributed in the hope that it will be useful,
@@ -33,15 +33,20 @@ echo
 LPP_PATCHPATH=`pwd -L`
 
 
+cd $LPP_PATCHPATH/$3
+
+echo $LPP_PATCHPATH/$3
+echo $LPP_PATCHPATH
+
 case $1 in
 	-R | --recursive ) 
-	for file in $(find . -name '*.vhd')
+	for file in $(find . -name *.$2)
 		do
-		if(grep -q "This program is free software" $file); then
+		if(grep -q "This program is free software" $file); then	
 			echo "$file already contains GPL HEADER"
 		else
 			echo "Modifying file : $file"
-			more $LPP_PATCHPATH/licenses/GPL_V2/HEADER >> $file.tmp
+			more $LPP_PATCHPATH/licenses/GPL_V3/${2}HEADER >> $file.tmp
 			cat $file >> $file.tmp
 			mv $file.tmp $file
 		fi
@@ -50,18 +55,22 @@ case $1 in
 	-h | --help | --h | -help) 
 		echo 'Help:
 			This script add a GPL HEADER in all vhdl files.
-
+			usage: sh GPL_Patcher.sh [-R] [extension] [path] 
 			-R or --recurcive:
-				Analyse recurcively folders starting from $LPP_PATCHPATH'
+				Analyse recurcively folders starting from $LPP_PATCHPATH
+			extension 
+				for example vhd,h,c
+			path 
+				starting path'
 	;;
 	* )
-	for file in $(ls *.vhd)
+	for file in $(ls *.$2)
 		do
 		if(grep -q "This program is free software" $file); then
 			echo "$file already contains GPL HEADER"
 		else
 			echo "Modifying file : $file"
-			more $LPP_PATCHPATH/licenses/GPL_V2/HEADER  >> $file.tmp
+			more $LPP_PATCHPATH/licenses/GPL_V3/${2}HEADER  >> $file.tmp
 			cat $file >> $file.tmp
 			mv $file.tmp $file
 		fi
@@ -70,3 +79,4 @@ case $1 in
 	
 esac
 
+cd $LPP_PATCHPATH

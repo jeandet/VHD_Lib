@@ -1,6 +1,7 @@
-./amba_lcd_16x2_ctrlr
-./dsp/iir_filter
 ./general_purpose
-./lpp_amba
-./lpp_cna
+./lpp_ad_Conv
+./lpp_CNA_amba
 ./lpp_uart
+./lpp_amba
+./dsp/iir_filter
+./amba_lcd_16x2_ctrlr
