@@ -17,47 +17,26 @@
 #--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 #------------------------------------------------------------------------------
 
-CC  = sparc-elf-gcc
-AR  = sparc-elf-ar
-LIBDIR = ../../lib/
-INCPATH = ../../includes/
-SCRIPTDIR=../../scripts/
-OUTBINDIR=bin/
-EXEC=exec.bin
+include ../../../rules.mk
+LIBDIR = ../../../lib/
+INCPATH = ../../../includes/
+SCRIPTDIR=../../../scripts/
+LIBS=-lapb_lcd_driver -llpp_apb_functions
 INPUTFILE=main.c
+EXEC=main.bin
+OUTBINDIR=bin/
 
-$(FILE): $(FILE).a
-	@echo "library ""lib"$(FILE)" created"
 
-
-$(FILE).o: 
-	mkdir tmp
-	$(CC) -c $(FILE).c -I $(INCPATH) -o tmp/$(FILE).o
-
-$(FILE).a: $(FILE).o
-	$(AR) rs $(LIBDIR)"lib"$(FILE).a tmp/$(FILE).o
-	cp *.h $(INCPATH)
-	rm -R tmp
-
-load: all
-	@echo "load "$(OUTBINDIR)$(EXEC)>$(SCRIPTDIR)load.txt
-	grmon-eval -uart $(PORT) -u -c $(SCRIPTDIR)load.txt
-
-bin:
-	mkdir -p $(OUTBINDIR)
-	$(CC) $(INPUTFILE) -o $(OUTBINDIR)/$(EXEC) -I $(INCPATH) -L $(LIBDIR) -static $(LIBS)
+all:bin
+	@echo $(EXEC)" file created"
 
 clean:
-	rm -f -R tmp
 	rm -f *.{o,a}
-	rm -f $(INCPATH)*.h
-	rm -f $(LIBDIR)*.{o,a}
 
-ruleshelp:
-	@echo ""
-	@echo ""
-	@echo ""
-	@echo "          load     : call grmon-eval and loads "$(EXEC)" in the leon"
-	@echo "                     usage: make PORT=/dev/ttyUSBx load"
 
+
+help:ruleshelp
+	@echo "          all      : makes an executable file called "$(EXEC)
+	@echo "                     in "$(OUTBINDIR)
+	@echo "          clean    : removes temporary files"
 
