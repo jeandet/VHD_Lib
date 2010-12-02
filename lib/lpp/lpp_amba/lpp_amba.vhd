@@ -39,7 +39,7 @@ constant LPP_MULTI_DIODE	        : amba_device_type := 16#004#;
 constant LPP_LCD_CTRLR		        : amba_device_type := 16#005#;
 constant LPP_UART                       : amba_device_type := 16#006#;
 constant LPP_CNA                        : amba_device_type := 16#007#;
-
+constant LPP_ADC_7688                   : amba_device_type := 16#008#;
 
 component APB_SIMPLE_DIODE is
   generic (

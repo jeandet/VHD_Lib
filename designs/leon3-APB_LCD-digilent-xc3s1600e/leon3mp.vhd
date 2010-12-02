@@ -43,6 +43,8 @@ use work.config.all;
 library lpp;
 use lpp.amba_lcd_16x2_ctrlr.all;
 use lpp.LCD_16x2_CFG.all;
+use lpp.lpp_ad_conv.all;
+
 
 entity leon3mp is
   generic (
@@ -133,7 +135,10 @@ entity leon3mp is
 	  LCD_CS2 	: out  STD_LOGIC;
 	  SF_CE0		: out	std_logic;
 	  BTN_NORTH : in    std_ulogic;
-	  BTN_WEST  : in    std_ulogic
+	  BTN_WEST  : in    std_ulogic;
+	  ADC_SCK	: out  std_logic;
+	  ADC_CNV	: out  std_logic;
+	  ADC_SDI	: in   std_logic
     );
 end;
 
@@ -203,6 +208,9 @@ architecture rtl of leon3mp is
   signal ddr_cke  	: std_logic_vector(1 downto 0);
   signal ddr_csb  	: std_logic_vector(1 downto 0);
   signal ddr_adl        : std_logic_vector(13 downto 0);   -- ddr address
+
+  signal  AD_in      : AD7688_in(0 downto 0);
+  signal  AD_out     : AD7688_out;
 
   attribute keep : boolean;
   attribute syn_keep : boolean;
@@ -477,6 +485,17 @@ LCD0 : apb_lcd_ctrlr
  generic map(  8,  8,16#fff#,0,8)
     Port map( rstn,clkm,apbi, apbo(8),data(15 downto 8),LCD_RS,LCD_RW,LCD_E,LCD_RET,LCD_CS1,LCD_CS2,SF_CE0);
 
+-----------------------------------------------------------------------
+---  ADS7886       ----------------------------------------------------
+-----------------------------------------------------------------------
+
+ADC0 :  lpp_apb_ad_conv
+        generic map(9,9,16#fff#,0,8,1,50000,100,ADS7886)
+        Port map(clkm,rstn,apbi, apbo(9),AD_in,AD_out);
+		  
+AD_in(0).SDI    <=   ADC_SDI;
+ADC_CNV         <=   AD_out.CNV;
+ADC_SCK         <=   AD_out.SCK;
 -----------------------------------------------------------------------
 ---  ETHERNET ---------------------------------------------------------
 -----------------------------------------------------------------------

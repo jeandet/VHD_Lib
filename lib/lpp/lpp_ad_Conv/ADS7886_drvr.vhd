@@ -22,7 +22,7 @@ library lpp;
 use lpp.lpp_ad_conv.all;
 use lpp.general_purpose.Clk_divider;
 
-entity AD7688_drvr is
+entity ADS7886_drvr is
     generic(ChanelCount	:	integer; 
 				clkkHz		:	integer);
 		 Port ( clk 	: in  STD_LOGIC;
@@ -32,26 +32,30 @@ entity AD7688_drvr is
 				  smpout : out Samples_out(ChanelCount-1 downto 0);	
 				  AD_in	: in	AD7688_in(ChanelCount-1 downto 0);	
 				  AD_out : out AD7688_out);
-end AD7688_drvr;
+end ADS7886_drvr;
 
-architecture ar_AD7688_drvr of AD7688_drvr is
+architecture ar_ADS7886_drvr of ADS7886_drvr is
 
-constant		convTrigger	:	integer:=  clkkHz*16/10000;  --tconv = 1.6µs
+constant		convTrigger	:	integer:=  clkkHz*1/1000;  --tconv = 1.6µs
 
-signal i					: integer range 0 to convTrigger :=0;
-signal clk_int			:	std_logic;
-signal smplClk_reg	:	std_logic;
-signal cnv_int			:	std_logic;
+signal i		:       integer range 0 to convTrigger :=0;
+signal clk_int		:       std_logic;
+signal smplClk_reg	:       std_logic;
+signal cnv_int		:       std_logic;
+signal smpout_int       :       Samples_out(ChanelCount-1 downto 0);
+
 
 begin
 
-clkdiv: if clkkHz>=66000 generate 
+
+clkdiv: if clkkHz>=20000 generate 
 	clkdivider: Clk_divider
-		 generic map(clkkHz*1000,60000000)
+       generic map(clkkHz*1000,19000000)
 		 Port map( clk ,reset,clk_int);
 end generate;
 		
-clknodiv: if clkkHz<66000 generate 
+
+clknodiv: if clkkHz<20000 generate 
 nodiv:		 clk_int <=	clk;
 end generate;
 
@@ -82,17 +86,17 @@ begin
 end process;
 
 
+NDMSK: for i in 0 to ChanelCount-1
+generate
+	smpout(i)     <=    smpout_int(i) and X"0FFF";
+end generate;
+
 
 spidrvr: AD7688_spi_if 
    generic map(ChanelCount)
-   Port map(clk_int,reset,cnv_int,DataReady,AD_in,smpout);
+   Port map(clk_int,reset,cnv_int,DataReady,AD_in,smpout_int);
 
 
 
-end ar_AD7688_drvr;
-
-
-
-
-
+end ar_ADS7886_drvr;
 

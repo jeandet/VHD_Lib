@@ -16,12 +16,20 @@
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 -------------------------------------------------------------------------------
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
-
+library grlib;
+use grlib.amba.all;
+use grlib.stdlib.all;
+use grlib.devices.all;
 
 
 package lpp_ad_conv is
+
+
+  constant    AD7688    : integer := 0;
+  constant    ADS7886   : integer := 1;
 
   
   type AD7688_out is
@@ -40,18 +48,63 @@ package lpp_ad_conv is
 	type Samples_out is array(natural range <>) of std_logic_vector(15 downto 0);
 
 	component  AD7688_drvr is
-		generic(ChanelCount	:	integer; 
-					clkkHz		:	integer);
+		    generic(ChanelCount	:	integer; 
+				clkkHz		:	integer);
 		 Port ( clk 	: in  STD_LOGIC;
 				  reset 	: in  STD_LOGIC;
 				  smplClk: in	STD_LOGIC;
+				  DataReady : out std_logic;
 				  smpout : out Samples_out(ChanelCount-1 downto 0);	
 				  AD_in	: in	AD7688_in(ChanelCount-1 downto 0);	
 				  AD_out : out AD7688_out);
 	end component;
 
 
+component AD7688_spi_if is
+	 generic(ChanelCount	:	integer);
+    Port(    clk      : in  STD_LOGIC;
+             reset    : in  STD_LOGIC;
+             cnv      : in  STD_LOGIC;
+				 DataReady:	out std_logic;
+             sdi      : in	AD7688_in(ChanelCount-1 downto 0);
+             smpout   :  out Samples_out(ChanelCount-1 downto 0)
+     );
+end component;
 
+
+component lpp_apb_ad_conv
+        generic(
+          pindex      : integer := 0;
+          paddr       : integer := 0;
+          pmask       : integer := 16#fff#;
+          pirq        : integer := 0;
+          abits       : integer := 8;
+          ChanelCount : integer := 1; 
+          clkkHz      : integer := 50000;
+	  smpClkHz    : integer := 100;
+          ADCref      : integer := AD7688);
+    Port ( 
+          clk        : in   STD_LOGIC;
+          reset      : in   STD_LOGIC;
+          apbi       : in   apb_slv_in_type;
+          apbo       : out  apb_slv_out_type;
+          AD_in      : in   AD7688_in(ChanelCount-1 downto 0);	
+          AD_out     : out  AD7688_out);
+end component;
+
+component ADS7886_drvr is
+    generic(ChanelCount :      integer; 
+            clkkHz      :      integer);
+    Port ( 
+            clk         :      in  STD_LOGIC;
+            reset       :      in  STD_LOGIC;
+            smplClk     :      in  STD_LOGIC;
+            DataReady   :      out std_logic;
+            smpout      :      out Samples_out(ChanelCount-1 downto 0);	
+            AD_in       :      in  AD7688_in(ChanelCount-1 downto 0);	
+            AD_out      :      out AD7688_out
+           );
+end component;
 
 
 end lpp_ad_conv;
