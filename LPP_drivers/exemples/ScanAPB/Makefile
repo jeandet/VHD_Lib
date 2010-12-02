@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #--  This file is a part of the LPP VHDL IP LIBRARY
-#--  Copyright (C) 2009 - 2010, Laboratory of Plasmas Physic - CNRS
+#--  Copyright (C) 2010, Laboratory of Plasmas Physic - CNRS
 #--
 #--  This program is free software; you can redistribute it and/or modify
 #--  it under the terms of the GNU General Public License as published by
@@ -14,31 +14,31 @@
 #--
 #--  You should have received a copy of the GNU General Public License
 #--  along with this program; if not, write to the Free Software
-#--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+#--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #------------------------------------------------------------------------------
 
-CC  = sparc-elf-gcc
-AR  = sparc-elf-ar
-LIBDIR = ../../lib/
-INCPATH = ../../includes/
+include ../../rules.mk
+LIBDIR = ../../lib
+INCPATH = ../../includes
+SCRIPTDIR=../../scripts/
+LIBS=-llpp_apb_functions
+INPUTFILE=main.c
+EXEC=exec.bin
+OUTBINDIR=bin/debug/
 
 
-$(FILE): $(FILE).a
-	@echo "library ""lib"$(FILE)" created"
+.PHONY:bin
 
-
-$(FILE).o: 
-	mkdir tmp
-	$(CC) -c $(FILE).c -I $(INCPATH) -o tmp/$(FILE).o
-
-$(FILE).a: $(FILE).o
-	$(AR) rs $(LIBDIR)"lib"$(FILE).a tmp/$(FILE).o
-	cp *.h $(INCPATH)
-	rm -R tmp
+all:bin
+	@echo $(EXEC)" file created"
 
 clean:
-	rm -f -R tmp
 	rm -f *.{o,a}
-	rm -f $(INCPATH)*.h
-	rm -f $(LIBDIR)*.{o,a}
+
+
+
+help:ruleshelp
+	@echo "          all      : makes an executable file called "$(EXEC)
+	@echo "                     in "$(OUTBINDIR)
+	@echo "          clean    : removes temporary files"
 

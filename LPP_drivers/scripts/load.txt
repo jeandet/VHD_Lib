@@ -1,1 +1,1 @@
-load bin/main.bin
+load bin/debug/exec.yop

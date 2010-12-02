@@ -20,7 +20,7 @@
 CC  = sparc-elf-gcc
 AR  = sparc-elf-ar
 LIBDIR = ../../lib/
-INCPATH = ../../includes/
+INCPATH = ../../includes
 SCRIPTDIR=../../scripts/
 OUTBINDIR=bin/
 EXEC=exec.bin
@@ -31,7 +31,7 @@ $(FILE): $(FILE).a
 
 
 $(FILE).o: 
-	mkdir tmp
+	mkdir -p tmp
 	$(CC) -c $(FILE).c -I $(INCPATH) -o tmp/$(FILE).o
 
 $(FILE).a: $(FILE).o

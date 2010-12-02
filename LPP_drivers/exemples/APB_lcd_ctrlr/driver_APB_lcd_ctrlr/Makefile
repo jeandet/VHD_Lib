@@ -14,18 +14,20 @@
 #--
 #--  You should have received a copy of the GNU General Public License
 #--  along with this program; if not, write to the Free Software
-#--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+#--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #------------------------------------------------------------------------------
 
 include ../../../rules.mk
-LIBDIR = ../../../lib/
-INCPATH = ../../../includes/
+LIBDIR = ../../../lib
+INCPATH = ../../../includes
 SCRIPTDIR=../../../scripts/
 LIBS=-lapb_lcd_driver -llpp_apb_functions
 INPUTFILE=main.c
 EXEC=main.bin
 OUTBINDIR=bin/
 
+
+.PHONY:bin
 
 all:bin
 	@echo $(EXEC)" file created"
