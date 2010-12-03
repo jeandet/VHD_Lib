@@ -16,17 +16,10 @@
 #--  along with this program; if not, write to the Free Software
 #--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 #------------------------------------------------------------------------------
+FILE = apb_dac_Driver
+LIB = liblpp_dac_Driver.a
 
-include ../rules.mk
+include ../../rules.mk
 
-
-
-all:
-	make all -C AMBA
-	make all -C LCD
-	make all -C DAC
-
-cleanall:
-	make clean -C AMBA
-	make clean -C LCD
-	make clean -C DAC
+all: $(FILE).a
+	@echo $(FILE)".a created"
