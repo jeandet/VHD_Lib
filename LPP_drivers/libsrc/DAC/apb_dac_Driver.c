@@ -59,7 +59,7 @@ int DacConst()
     dac3->configReg = DAC_enable;
     while(1)
     {
-        printf("\nEntrer une valeur Hexa entre 4096 et 8191 : ");
+        printf("\nEntrer une valeur entre 4096 et 8191 : ");
         scanf("%d",&Value);
         dac3->dataReg = Value;
     }
