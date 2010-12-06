@@ -44,7 +44,7 @@ CLKINT_1 : CLKINT
     port map(A => rst, Y => raz);
 
 
-SystemCLK : entity work.Clock_Serie
+SystemCLK : entity work.Systeme_Clock
     generic map (nb_serial)
     port map (clk,raz,s_SCLK);
 

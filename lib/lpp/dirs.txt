@@ -4,5 +4,4 @@
 ./lpp_ad_Conv
 ./lpp_amba
 ./lpp_cna
-./lpp_CNA_amba
 ./lpp_uart
