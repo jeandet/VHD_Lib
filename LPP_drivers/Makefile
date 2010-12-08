@@ -17,18 +17,23 @@
 #--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 #------------------------------------------------------------------------------
 
-.PHONY:exemples lib
+
 
 all:
+	mkdir -p lib/
+	mkdir -p includes/
 	make all -C libsrc
 	make all -C exemples
 
+.PHONY:exemples lib
 
 exemples:
 	make all -C exemples
 
 
 lib:
+	mkdir -p lib/
+	mkdir -p includes/
 	make all -C libsrc
 
 

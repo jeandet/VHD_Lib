@@ -27,9 +27,6 @@ EXEC=exec.bin
 INPUTFILE=main.c
 
 
-all:bin
-	@echo "                    "
-
 
 $(FILE): $(FILE).a
 	@echo "library ""lib"$(FILE)" created"

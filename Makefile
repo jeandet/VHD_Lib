@@ -31,9 +31,11 @@ allGPL:
 	@echo "Scanning H files ..."
 	sh $(SCRIPTSDIR)/GPL_Patcher.sh -R h LPP_drivers
 
-init:
+init: C-libs
 	sh $(SCRIPTSDIR)/vhdlsynPatcher.sh
 	sh $(SCRIPTSDIR)/makeDirs.sh lib/lpp
+
+C-libs:
 	make -C LPP_drivers
 
 Patch-GRLIB: init doc

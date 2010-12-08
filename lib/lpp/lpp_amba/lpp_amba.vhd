@@ -40,6 +40,24 @@ constant LPP_LCD_CTRLR		        : amba_device_type := 16#005#;
 constant LPP_UART                       : amba_device_type := 16#006#;
 constant LPP_CNA                        : amba_device_type := 16#007#;
 constant LPP_ADC_7688                   : amba_device_type := 16#008#;
+constant LPP_CHENILLARD                 : amba_device_type := 16#009#;
+
+component APB_CHENILLARD is
+  generic (
+    pindex   : integer := 0;
+    paddr    : integer := 0;
+    pmask    : integer := 16#fff#;
+    pirq     : integer := 0;
+    abits    : integer := 8);
+  port (
+    rst    : in  std_ulogic;
+    clk    : in  std_ulogic;
+    RegLed : in std_logic_vector (7 downto 0);
+    apbi   : in  apb_slv_in_type;
+    apbo   : out apb_slv_out_type;
+    Leds   : out std_logic_vector (7 downto 0)
+    );
+end component;
 
 component APB_SIMPLE_DIODE is
   generic (
