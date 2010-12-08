@@ -14,7 +14,7 @@
 --
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -------------------------------------------------------------------------------*/
 #ifndef LPP_APB_FUNCTIONS_H
 #define LPP_APB_FUNCTIONS_H
@@ -30,6 +30,8 @@
 #define LPP_SIMPLE_DIODE    0x003
 #define LPP_MULTI_DIODE     0x004
 #define LPP_LCD_CTRLR       0x005
+#define LPP_UART_CTRLR      0x006
+#define LPP_DAC_CTRLR       0x007
 
 /** @todo implemente a descriptor structure for any APB device */
 

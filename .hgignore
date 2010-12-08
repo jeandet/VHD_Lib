@@ -22,5 +22,6 @@ syntax: glob
 *vhdlsyn.txt
 *.orig
 *.o
+*.a
 *~
 
