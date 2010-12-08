@@ -1,12 +1,12 @@
 APB_IIR_CEL.vhd
+FILTER.vhd
+FILTER_RAM_CTRLR.vhd
 FILTERcfg.vhd
 FilterCTRLR.vhd
-FILTER_RAM_CTRLR.vhd
-FILTER.vhd
 IIR_CEL_CTRLR.vhd
 IIR_CEL_FILTER.vhd
-iir_filter.vhd
+RAM.vhd
 RAM_CEL.vhd
 RAM_CTRLR2.vhd
-RAM.vhd
 Top_Filtre_IIR.vhd
+iir_filter.vhd

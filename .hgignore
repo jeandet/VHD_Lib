@@ -20,6 +20,7 @@ syntax: glob
 *doc*
 *Doc*
 *vhdlsyn.txt
+*dirs.txt
 *.orig
 *.o
 *.a

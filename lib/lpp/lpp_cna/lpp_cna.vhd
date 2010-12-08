@@ -46,7 +46,7 @@ component CNA_TabloC is
 end component;
 
 
-component Clock_Serie is
+component Systeme_Clock is
     generic(N :integer := 695);
     port(
         clk, raz   : in std_logic ;
