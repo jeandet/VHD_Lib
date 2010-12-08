@@ -17,15 +17,21 @@
 #--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 #------------------------------------------------------------------------------
 
-include ../rules.mk
-
-
+.PHONY:exemples lib
 
 all:
-	make all -C AMBA
-	make all -C LCD
+	make all -C libsrc
+	make all -C exemples
 
 
-cleanall:
-	make clean -C AMBA
-	make clean -C LCD
+exemples:
+	make all -C exemples
+
+
+lib:
+	make all -C libsrc
+
+
+clean:
+	rm lib/*
+	rm includes/*

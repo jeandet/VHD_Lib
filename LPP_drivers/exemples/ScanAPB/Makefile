@@ -23,8 +23,8 @@ INCPATH = ../../includes
 SCRIPTDIR=../../scripts/
 LIBS=-llpp_apb_functions
 INPUTFILE=main.c
-EXEC=exec.bin
-OUTBINDIR=bin/debug/
+EXEC=ScanAPB.bin
+OUTBINDIR=bin/
 
 
 .PHONY:bin

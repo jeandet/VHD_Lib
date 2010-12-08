@@ -1,3 +1,5 @@
 APB_MULTI_DIODE.vhd
+APB_MULTI_DIODE.vhd.orig
 APB_SIMPLE_DIODE.vhd
+APB_SIMPLE_DIODE.vhd.orig
 lpp_amba.vhd

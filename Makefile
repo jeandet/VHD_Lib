@@ -34,7 +34,7 @@ allGPL:
 init:
 	sh $(SCRIPTSDIR)/vhdlsynPatcher.sh
 	sh $(SCRIPTSDIR)/makeDirs.sh lib/lpp
-
+	make -C LPP_drivers
 
 Patch-GRLIB: init doc
 	sh $(SCRIPTSDIR)/patch.sh $(GRLIB)
@@ -43,6 +43,7 @@ Patch-GRLIB: init doc
 dist: init
 	tar -cvzf ./../lpp-lib.tgz ./../VHD_Lib/*
 
+
 Patched-dist: Patch-GRLIB
 	tar -cvzf ./../lpp-patched-GRLIB.tgz $(GRLIB)/*
 
@@ -50,5 +51,11 @@ Patched-dist: Patch-GRLIB
 doc:
 	doxygen lib/lpp/Doxyfile
 
+
 pdf: doc
 	sh $(SCRIPTSDIR)/doc.sh
+
+
+
+
+

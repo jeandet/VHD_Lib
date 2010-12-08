@@ -1,1 +1,1 @@
-load bin/debug/exec.yop
+load bin/APB_lcd_ctrlr.bin

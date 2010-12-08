@@ -26,6 +26,11 @@ OUTBINDIR=bin/
 EXEC=exec.bin
 INPUTFILE=main.c
 
+
+all:bin
+	@echo "                    "
+
+
 $(FILE): $(FILE).a
 	@echo "library ""lib"$(FILE)" created"
 
@@ -47,11 +52,13 @@ bin:
 	mkdir -p $(OUTBINDIR)
 	$(CC) $(INPUTFILE) -o $(OUTBINDIR)/$(EXEC) -I $(INCPATH) -L $(LIBDIR) -static $(LIBS)
 
+
 clean:
 	rm -f -R tmp
 	rm -f *.{o,a}
 	rm -f $(INCPATH)*.h
 	rm -f $(LIBDIR)*.{o,a}
+
 
 ruleshelp:
 	@echo ""

@@ -17,15 +17,9 @@
 #--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 #------------------------------------------------------------------------------
 
-include ../rules.mk
-
 
 
 all:
-	make all -C AMBA
-	make all -C LCD
+	make all -C ScanAPB
+	make all -C APB_lcd_ctrlr
 
-
-cleanall:
-	make clean -C AMBA
-	make clean -C LCD

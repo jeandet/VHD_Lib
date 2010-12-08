@@ -17,13 +17,13 @@
 #--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #------------------------------------------------------------------------------
 
-include ../../../rules.mk
-LIBDIR = ../../../lib
-INCPATH = ../../../includes
-SCRIPTDIR=../../../scripts/
+include ../../rules.mk
+LIBDIR = ../../lib
+INCPATH = ../../includes
+SCRIPTDIR=../../scripts/
 LIBS=-lapb_lcd_driver -llpp_apb_functions
 INPUTFILE=main.c
-EXEC=main.bin
+EXEC=APB_lcd_ctrlr.bin
 OUTBINDIR=bin/
 
 
