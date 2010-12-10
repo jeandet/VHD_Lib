@@ -23,15 +23,7 @@
 #define APB_BASE_ADDRS 0x80000000
 #define APB_MAX_DEVICES 256
 
-#define VENDOR_LPP  0x19
-
-#define ROCKET_TM           0x001
-#define otherCore           0x002
-#define LPP_SIMPLE_DIODE    0x003
-#define LPP_MULTI_DIODE     0x004
-#define LPP_LCD_CTRLR       0x005
-#define LPP_UART_CTRLR      0x006
-#define LPP_DAC_CTRLR       0x007
+#include "apb_devices_list.h"
 
 /** @todo implemente a descriptor structure for any APB device */
 

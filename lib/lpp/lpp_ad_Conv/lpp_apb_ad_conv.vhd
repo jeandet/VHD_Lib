@@ -53,7 +53,7 @@ architecture ar_lpp_apb_ad_conv of lpp_apb_ad_conv is
 constant REVISION : integer := 1;
 
 constant pconfig : apb_config_type := (
-  0 => ahb_device_reg (VENDOR_LPP, LPP_ADC_7688, 0, REVISION, 0),
+  0 => ahb_device_reg (VENDOR_LPP, LPP_APB_ADC, 0, REVISION, 0),
   1 => apb_iobar(paddr, pmask));
 
 signal Rdata	  :  std_logic_vector(31 downto 0);

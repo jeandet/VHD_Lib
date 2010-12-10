@@ -6,7 +6,7 @@
 DAC_Device* DacOpen(int count)
 {
     DAC_Device* dac0;
-    dac0 = (DAC_Device*) apbgetdevice(LPP_DAC_CTRLR,VENDOR_LPP,count);
+    dac0 = (DAC_Device*) apbgetdevice(LPP_CNA,VENDOR_LPP,count);
     dac0->configReg = DAC_enable;
     return dac0;
 }
@@ -15,7 +15,7 @@ DAC_Device* DacOpen(int count)
 DAC_Device* DacClose(int count)
 {
     DAC_Device* dac1;
-    dac1 = (DAC_Device*) apbgetdevice(LPP_DAC_CTRLR,VENDOR_LPP,count);
+    dac1 = (DAC_Device*) apbgetdevice(LPP_CNA,VENDOR_LPP,count);
     dac1->configReg = DAC_disable;
     return dac1;
 }

@@ -61,7 +61,7 @@ architecture AR_APB_IIR_CEL of APB_IIR_CEL is
 constant REVISION : integer := 1;
 
 constant pconfig : apb_config_type := (
-  0 => ahb_device_reg (VENDOR_LPP, ROCKET_TM, 0, REVISION, 0),
+  0 => ahb_device_reg (VENDOR_LPP, LPP_IIR_CEL_FILTER, 0, REVISION, 0),
   1 => apb_iobar(paddr, pmask));
 
 

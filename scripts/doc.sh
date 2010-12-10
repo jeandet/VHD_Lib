@@ -26,8 +26,5 @@ echo
 echo 
 
 
-
-
-cd doc/latex
-make
-cp refman.pdf ../../VHD_lib.pdf
+make -C doc/latex
+cp doc/latex/refman.pdf ../../VHD_lib.pdf

@@ -1,9 +1,9 @@
 echo  "======================================================================================="
 echo  "---------------------------------------------------------------------------------------"
-echo  "                                 LPP VHDL lib makeDirs					"
+echo  "                            LPP VHDL APB Devices List Updater		        	"
 echo  "                    Copyright (C) 2010 Laboratory of Plasmas Physic.			" 
 echo  "======================================================================================="
-echo '----------------------------------------------------------------------------------------
+echo  '----------------------------------------------------------------------------------------
             This file is a part of the LPP VHDL IP LIBRARY
             Copyright (C) 2010, Laboratory of Plasmas Physic - CNRS
 
@@ -25,26 +25,53 @@ echo
 echo
 echo 
 
-
-
 LPP_PATCHPATH=`pwd -L`
 
 cd $LPP_PATCHPATH/lib/lpp
 
 
-#find . -type d|grep ./>$LPP_PATCHPATH/lib/lpp/dirs.txt
+VHDFileStart=$LPP_PATCHPATH/APB_DEVICES/VHDListSTART
+VHDFileEnd=$LPP_PATCHPATH/APB_DEVICES/VHDListEND
 
-rm -f $LPP_PATCHPATH/lib/lpp/dirs.txt
+CFileStart=$LPP_PATCHPATH/APB_DEVICES/CListSTART
+CFileEnd=$LPP_PATCHPATH/APB_DEVICES/CListEND
 
-for folders in $(find . -type d|grep ./)
-		do
-			echo "enter folder : $folders"
-			files=$(ls $folders|grep .vhd)
-			if(ls $folders|grep .vhd|grep -i -v .html|grep -i -v .tex); then
-				echo "found $files"
-				echo $folders>>$LPP_PATCHPATH/lib/lpp/dirs.txt
-			fi
-		done
+ListFILE=$LPP_PATCHPATH/APB_DEVICES/apb_devices_list.txt
 
+VHDListFILE=$LPP_PATCHPATH/lib/lpp/lpp_amba/apb_devices_list.vhd
+CListFILE=$LPP_PATCHPATH/LPP_drivers/libsrc/AMBA/apb_devices_list.h
+
+
+cat $VHDFileStart>$VHDListFILE
+cat $CFileStart>$CListFILE
+
+grep vendor $ListFILE | sed "s/vendor /constant /" | sed "s/.* /&  : amba_vendor_type := 16#/" | sed "s/.*#*/&;/" >> $VHDListFILE
+grep vendor $ListFILE | sed "s/vendor /#define /" | sed "s/.* /& 0x/" >> $CListFILE
+
+echo " ">>$VHDListFILE
+echo " ">>$CListFILE
+
+grep device $ListFILE | sed "s/device /constant /" |  sed "s/.* /&  : amba_device_type := 16#/" | sed "s/.*#*/&;/"   >> $VHDListFILE
+grep device $ListFILE | sed "s/device /#define /" | sed "s/.* /& 0x/" >> $CListFILE
+
+cat $VHDFileEnd>>$VHDListFILE
+cat $CFileEnd>>$CListFILE
+
+sh $(SCRIPTSDIR)/GPL_Patcher.sh vhd lib/lpp/lpp_amba/
+sh $(SCRIPTSDIR)/GPL_Patcher.sh h LPP_drivers/libsrc/AMBA/
 
 cd $LPP_PATCHPATH
+
+
+
+
+
+
+
+
+
+
+
+
+
+

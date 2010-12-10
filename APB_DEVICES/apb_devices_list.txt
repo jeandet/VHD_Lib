@@ -1,0 +1,12 @@
+vendor VENDOR_LPP 19
+
+device ROCKET_TM 1
+device otherCore 2
+device LPP_SIMPLE_DIODE 3
+device LPP_MULTI_DIODE 4
+device LPP_LCD_CTRLR 5
+device LPP_UART 6
+device LPP_CNA 7
+device LPP_APB_ADC 8
+device LPP_CHENILLARD 9
+device LPP_IIR_CEL_FILTER 10

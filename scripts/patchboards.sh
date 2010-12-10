@@ -42,7 +42,7 @@ echo
 
 #CLEAN
 echo "CLEANING .."
-rm -v $1/boards/*.sh
+rm -f -v $1/boards/*.sh
 echo
 echo
 echo

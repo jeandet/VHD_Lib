@@ -34,7 +34,7 @@ echo
 
 #COPY
 echo "Remove old lib Files..."
-rm -R -v $1/lib/lpp
+rm -f -R -v $1/lib/lpp
 echo "Copy lib Files..."
 cp -R -v $LPP_LIBPATH/lib $1
 echo
@@ -56,8 +56,8 @@ echo
 
 #CLEAN
 echo "CLEANING .."
-rm -v $1/lib/*.sh
-rm -v $1/lib/GPL_HEADER
+rm -f -v $1/lib/*.sh
+rm -f -v $1/lib/GPL_HEADER
 echo
 echo
 echo

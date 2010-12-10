@@ -60,7 +60,7 @@ constant zeroVect       :   std_logic_vector(Data_sz+1 downto 0) := (others => '
 begin
 
 
-RDATA       <=  RDATA_int(8 downto 1);
+
 WDATA_int   <=  '1' & WDATA & '0'; 
 
 BaudGenerator : BaudGen
@@ -90,6 +90,7 @@ begin
         end if;
         if NwDat_int_reg = '0' and NwDat_int = '1' then
             NwDat   <=  '1';
+				RDATA   <=  RDATA_int(8 downto 1);
         elsif ack = '1' then
             NwDat   <=  '0';
         end if;
@@ -97,3 +98,6 @@ begin
 end process;
 
 end ar_UART;
+
+
+

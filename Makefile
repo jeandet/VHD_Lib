@@ -35,8 +35,13 @@ init: C-libs
 	sh $(SCRIPTSDIR)/vhdlsynPatcher.sh
 	sh $(SCRIPTSDIR)/makeDirs.sh lib/lpp
 
-C-libs:
+C-libs:APB_devs
 	make -C LPP_drivers
+
+
+APB_devs:
+	sh $(SCRIPTSDIR)/APB_DEV_UPDATER.sh
+
 
 Patch-GRLIB: init doc
 	sh $(SCRIPTSDIR)/patch.sh $(GRLIB)

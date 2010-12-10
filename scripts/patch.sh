@@ -60,10 +60,10 @@ if [ -d "$GRLIBPATH" ]; then
 
 				#CLEAN
 				echo "CLEANING .."
-				rm -v $1/lib/*.sh
-				rm -v $1/lib/TODO
-				rm -v $1/lib/Makefile
-				rm -v $1/lib/log.txt
+				rm -f -v $1/lib/*.sh
+				rm -f -v $1/lib/TODO
+				rm -f -v $1/lib/Makefile
+				rm -f -v $1/lib/log.txt
 				echo
 				echo
 				echo

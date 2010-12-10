@@ -47,7 +47,7 @@ case $1 in
 			echo "enter folder : $folders"
 			files=$(ls $folders | grep .vhd | grep -i -v "test")
 				echo "found $files"
-				rm $folders/vhdlsyn.txt
+				rm -f $folders/vhdlsyn.txt
 				for file in $files
 					do
 						echo "$file">>$folders/vhdlsyn.txt

@@ -20,27 +20,11 @@ library ieee;
 use ieee.std_logic_1164.all;
 library grlib;
 use grlib.amba.all;
--- pragma translate_off
 use std.textio.all;
--- pragma translate_on
   
 
 
 package lpp_amba is
-
-constant VENDOR_LPP        : amba_vendor_type := 16#19#;
-
--- LPP device ids
-
-constant ROCKET_TM	                : amba_device_type := 16#001#;
-constant otherCore         	        : amba_device_type := 16#002#;
-constant LPP_SIMPLE_DIODE	        : amba_device_type := 16#003#;
-constant LPP_MULTI_DIODE	        : amba_device_type := 16#004#;
-constant LPP_LCD_CTRLR		        : amba_device_type := 16#005#;
-constant LPP_UART                       : amba_device_type := 16#006#;
-constant LPP_CNA                        : amba_device_type := 16#007#;
-constant LPP_ADC_7688                   : amba_device_type := 16#008#;
-constant LPP_CHENILLARD                 : amba_device_type := 16#009#;
 
 component APB_CHENILLARD is
   generic (

@@ -42,7 +42,7 @@ echo
 
 #CLEAN
 echo "CLEANING .."
-rm -v $1/designs/*.sh
+rm -f -v $1/designs/*.sh
 echo
 echo
 echo
