@@ -26,6 +26,7 @@ use grlib.devices.all;
 library lpp;
 use lpp.lpp_ad_conv.all;
 use lpp.lpp_amba.all;
+use lpp.apb_devices_list.all;
 use lpp.general_purpose.Clk_divider;
 
 entity lpp_apb_ad_conv is

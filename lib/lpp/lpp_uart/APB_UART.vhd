@@ -24,6 +24,7 @@ use grlib.stdlib.all;
 use grlib.devices.all;
 library lpp;
 use lpp.lpp_amba.all;
+use lpp.apb_devices_list.all;
 use lpp.lpp_uart.all;
 
 entity APB_UART is

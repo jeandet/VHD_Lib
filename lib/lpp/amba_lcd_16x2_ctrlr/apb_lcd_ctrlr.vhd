@@ -27,6 +27,7 @@ library lpp;
 use lpp.amba_lcd_16x2_ctrlr.all;
 use lpp.LCD_16x2_CFG.all;
 use lpp.lpp_amba.all;
+use lpp.apb_devices_list.all;
 
 entity apb_lcd_ctrlr is
   generic (

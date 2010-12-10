@@ -27,6 +27,7 @@ library lpp;
 use lpp.iir_filter.all;
 use lpp.general_purpose.all;
 use lpp.lpp_amba.all;
+use lpp.apb_devices_list.all;
 
 entity APB_IIR_CEL is
   generic (
