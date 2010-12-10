@@ -1,0 +1,39 @@
+source compile.synp
+add_file -vhdl -lib work config.vhd
+add_file -vhdl -lib work ahbrom.vhd
+add_file -vhdl -lib work leon3mp.vhd
+add_file -edif ../../netlists/xilinx/Spartan3/grfpw_0_unisim.edf
+add_file -edif ../../netlists/xilinx/Spartan3/grfpw4_0_unisim.edf
+add_file -edif ../../netlists/xilinx/Spartan3/grlfpw_0_unisim.edf
+add_file -edif ../../netlists/xilinx/Spartan3/grlfpw4_0_unisim.edf
+add_file -constraint  default.sdc
+
+#implementation: "synplify"
+impl -add synplify
+
+#device options
+set_option -technology Spartan3E
+set_option -part xc3s1600e
+set_option -speed_grade -4
+
+#compilation/mapping options
+set_option -symbolic_fsm_compiler 0
+set_option -resource_sharing 0
+set_option -use_fsm_explorer 0
+set_option -write_vhdl 1
+#set_option -disable_io_insertion 0
+
+#map options
+set_option -frequency 70
+
+set_option -top_module leon3mp
+
+#set result format/file last
+project -result_file "synplify/leon3mp.edf"
+
+#implementation attributes
+set_option -vlog_std v95
+set_option -compiler_compatible 0
+set_option -package fg320
+set_option -pipe 1; set_option -retiming 1; set_option -write_apr_constraint 0
+impl -active "synplify"

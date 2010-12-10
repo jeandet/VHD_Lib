@@ -24,11 +24,50 @@ use grlib.amba.all;
 use grlib.stdlib.all;
 use grlib.devices.all;
 library lpp;
-use lpp.FILTERcfg.all;
+
 
 
 
 package iir_filter is
+
+
+--===========================================================|
+--================A L U   C O N T R O L======================|
+--===========================================================|
+constant    IDLE    :   std_logic_vector(3 downto 0) := "0000";
+constant    MAC_op  :   std_logic_vector(3 downto 0) := "0001";
+constant    MULT    :   std_logic_vector(3 downto 0) := "0010";
+constant    ADD     :   std_logic_vector(3 downto 0) := "0011";
+constant    clr_mac :   std_logic_vector(3 downto 0) := "0100";
+
+--____
+--RAM |
+--____|
+constant use_RAM    :   integer := 1;
+constant use_CEL    :   integer := 0;
+
+
+--===========================================================|
+--=============C O E F S ====================================|
+--===========================================================|
+--  create a specific type of data for coefs to avoid errors |
+--===========================================================|
+
+type    scaleValT   is array(natural range <>) of integer;
+
+type    samplT   is array(natural range <>,natural range <>) of std_logic;
+
+type in_IIR_CEL_reg is record
+  config    :   std_logic_vector(31 downto 0);
+  virgPos   :   std_logic_vector(4 downto 0);
+end record;
+
+type out_IIR_CEL_reg is record
+  config    :   std_logic_vector(31 downto 0);
+  status    :   std_logic_vector(31 downto 0);
+end record;
+
+
 
 component APB_IIR_CEL is
   generic (
@@ -37,7 +76,13 @@ component APB_IIR_CEL is
     pmask    : integer  := 16#fff#;
     pirq     : integer  := 0;
     abits    : integer  := 8;
-    Sample_SZ : integer := Smpl_SZ
+    Sample_SZ : integer := 16;
+    ChanelsCount : integer := 1;
+	 Coef_SZ      : integer := 9;
+	 CoefCntPerCel: integer := 3;
+	 Cels_count   : integer := 5;
+	 virgPos      : integer := 3;
+    Mem_use      : integer := use_RAM
     );
   port (
     rst             : in  std_logic;
@@ -46,63 +91,72 @@ component APB_IIR_CEL is
     apbo            : out apb_slv_out_type;
     sample_clk      : in  std_logic;
     sample_clk_out  : out std_logic;
-    sample_in       : in  samplT;
-    sample_out      : out samplT
+    sample_in   :   in  samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
+    sample_out  :   out samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0)
     );
 end component;
 
 
-component FILTER is 
-port(
-
-    reset       :   in  std_logic;
-    clk         :   in  std_logic;
-    sample_clk  :   in  std_logic;
-    Sample_IN   :   in  std_logic_vector(Smpl_SZ*ChanelsCNT-1 downto 0);
-    Sample_OUT  :   out std_logic_vector(Smpl_SZ*ChanelsCNT-1 downto 0)
-);
-end component;
-
-
-
-component  FilterCTRLR is
-port(
-    reset       :   in  std_logic;
-    clk         :   in  std_logic;
-    sample_clk  :   in  std_logic;
-    ALU_Ctrl    :   out std_logic_vector(3 downto 0);
-    sample_in   :   in  samplT;
-    coef        :   out std_logic_vector(Coef_SZ-1 downto 0);
-    sample      :   out std_logic_vector(Smpl_SZ-1 downto 0)
-);
-end component;
+--component FILTER is 
+--generic(Smpl_SZ    :  integer := 16;
+--        ChanelsCNT :  integer := 3
+--);
+--port(
+--
+--    reset       :   in  std_logic;
+--    clk         :   in  std_logic;
+--    sample_clk  :   in  std_logic;
+--    Sample_IN   :   in  std_logic_vector(Smpl_SZ*ChanelsCNT-1 downto 0);
+--    Sample_OUT  :   out std_logic_vector(Smpl_SZ*ChanelsCNT-1 downto 0)
+--);
+--end component;
 
 
-component  FILTER_RAM_CTRLR is
-port(
-    reset       :   in  std_logic;
-    clk         :   in  std_logic;
-    run         :   in  std_logic;
-    GO_0        :   in  std_logic;
-    B_A         :   in  std_logic;
-    writeForce  :   in  std_logic;
-    next_blk    :   in  std_logic;
-    sample_in   :   in  std_logic_vector(Smpl_SZ-1 downto 0);
-    sample_out  :   out std_logic_vector(Smpl_SZ-1 downto 0)
-);
-end component;
+
+--component  FilterCTRLR is
+--port(
+--    reset       :   in  std_logic;
+--    clk         :   in  std_logic;
+--    sample_clk  :   in  std_logic;
+--    ALU_Ctrl    :   out std_logic_vector(3 downto 0);
+--    sample_in   :   in  samplT;
+--    coef        :   out std_logic_vector(Coef_SZ-1 downto 0);
+--    sample      :   out std_logic_vector(Smpl_SZ-1 downto 0)
+--);
+--end component;
+
+
+--component  FILTER_RAM_CTRLR is
+--port(
+--    reset       :   in  std_logic;
+--    clk         :   in  std_logic;
+--    run         :   in  std_logic;
+--    GO_0        :   in  std_logic;
+--    B_A         :   in  std_logic;
+--    writeForce  :   in  std_logic;
+--    next_blk    :   in  std_logic;
+--    sample_in   :   in  std_logic_vector(Smpl_SZ-1 downto 0);
+--    sample_out  :   out std_logic_vector(Smpl_SZ-1 downto 0)
+--);
+--end component;
 
 
 component  IIR_CEL_CTRLR is
-generic(Sample_SZ : integer := 16);
+generic(Sample_SZ : integer := 16;
+		  ChanelsCount : integer := 1;
+		  Coef_SZ      : integer := 9;
+		  CoefCntPerCel: integer := 3;
+		  Cels_count   : integer := 5;
+        Mem_use      : integer := use_RAM
+);
 port(
     reset       :   in  std_logic;
     clk         :   in  std_logic;
     sample_clk  :   in  std_logic;
-    sample_in   :   in  samplT;
-    sample_out  :   out samplT;
+    sample_in   :   in  samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
+    sample_out  :   out samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
     virg_pos    :   in  integer;
-    coefs       :   in  coefs_celsT
+    coefs       :   in  std_logic_vector(Coef_SZ*CoefCntPerCel*Cels_count-1 downto 0)
 );
 end component;
 
@@ -125,15 +179,21 @@ component RAM_CEL is
 end component;
 
 component  IIR_CEL_FILTER is
-generic(Sample_SZ : integer := 16);
+generic(Sample_SZ : integer := 16;
+		  ChanelsCount : integer := 1;
+		  Coef_SZ      : integer := 9;
+		  CoefCntPerCel: integer := 3;
+		  Cels_count   : integer := 5;
+        Mem_use      : integer := use_RAM);
 port(
     reset       :   in  std_logic;
     clk         :   in  std_logic;
     sample_clk  :   in  std_logic;
     regs_in     :   in  in_IIR_CEL_reg;
     regs_out    :   in  out_IIR_CEL_reg;
-    sample_in   :   in  samplT;
-    sample_out  :   out samplT
+    sample_in   :   in  samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
+    sample_out  :   out samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
+	 coefs       :   in  std_logic_vector(Coef_SZ*CoefCntPerCel*Cels_count-1 downto 0)
     
 );
 end component;
@@ -141,7 +201,8 @@ end component;
 
 component  RAM_CTRLR2 is
 generic(
-    Input_SZ_1      :   integer := 16
+    Input_SZ_1      :   integer := 16;
+	 Mem_use         :   integer := use_RAM
 );
 port(
     reset       :   in  std_logic;

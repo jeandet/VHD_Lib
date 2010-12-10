@@ -61,33 +61,11 @@ clr_MAC     <=  '1' when    ctrl = "0100" else '0';
 
 
 arith : if Arith_en = 1 generate
-
-
 MACinst : MAC  
-generic map(
-    Input_SZ_A     =>   Input_SZ_1,
-    Input_SZ_B     =>   Input_SZ_2
-
-)
-port map(
-    clk         =>  clk,
-    reset       =>  reset,
-    clr_MAC     =>  clr_MAC,
-    MAC_MUL_ADD =>  ctrl(1 downto 0),
-    OP1         =>  OP1,
-    OP2         =>  OP2,
-    RES         =>  RES
-);
-
+generic map(Input_SZ_1,Input_SZ_2)
+port map(clk,reset,clr_MAC,ctrl(1 downto 0),OP1,OP2,RES);
 end generate;
 
-process(clk,reset)
-begin
-if reset = '0' then
-elsif clk'event and clk ='1' then
-
-end if;
-end process;
 end architecture;
 
 

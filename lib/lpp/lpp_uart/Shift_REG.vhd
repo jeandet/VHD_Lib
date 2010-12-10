@@ -34,7 +34,6 @@ port(
     Serialized  :   out std_logic;
     D           :   in  std_logic_vector(Data_sz-1 downto 0);
     Q           :   out std_logic_vector(Data_sz-1 downto 0)
-
 );
 end entity;
 
@@ -100,7 +99,6 @@ begin
             else
                 CptBits <=  '1' & CptBits(Data_sz-1 downto 1);
             end if;
-
         else
             CptBits <=  (others =>  '0');
         end if;

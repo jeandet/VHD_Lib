@@ -3,12 +3,12 @@
 <!--The data in this file is primarily intended for consumption by Xilinx tools.
 The structure and the elements are likely to change over the next few releases.
 This means code written to parse this file will need to be revisited each subsequent release.-->
-<application name="pn" timeStamp="Wed Dec  1 15:45:26 2010">
+<application name="pn" timeStamp="Wed Dec  8 09:10:18 2010">
 <section name="Project Information" visible="false">
-<property name="ProjectID" value="144BAC8BCC020358A10E3C9EB2A797A8" type="project"/>
-<property name="ProjectIteration" value="9" type="project"/>
+<property name="ProjectID" value="314B616C181AFB6097A4EDCB224EA28B" type="project"/>
+<property name="ProjectIteration" value="11" type="project"/>
 <property name="ProjectFile" value="/opt/GRLIB/grlib-gpl-1.1.0-b4104/designs/leon3-APB_LCD-digilent-xc3s1600e/leon3mp.xise" type="project"/>
-<property name="ProjectCreationTimestamp" value="2010-12-01T11:32:09" type="project"/>
+<property name="ProjectCreationTimestamp" value="2010-12-02T08:01:13" type="project"/>
 </section>
 <section name="Project Statistics" visible="true">
 <property name="PROP_Enable_Message_Filtering" value="false" type="design"/>
@@ -17,18 +17,20 @@ This means code written to parse this file will need to be revisited each subseq
 <property name="PROP_LastAppliedStrategy" value="Xilinx Default (unlocked)" type="design"/>
 <property name="PROP_ManualCompileOrderImp" value="false" type="design"/>
 <property name="PROP_PropSpecInProjFile" value="Store all values" type="design"/>
+<property name="PROP_SelectedInstanceHierarchicalPath" value="/APB_IIR_CEL/filter" type="process"/>
 <property name="PROP_Simulator" value="Modelsim-SE Mixed" type="design"/>
 <property name="PROP_SynthFsmEncode" value="None" type="process"/>
 <property name="PROP_SynthTopFile" value="changed" type="process"/>
 <property name="PROP_Top_Level_Module_Type" value="HDL" type="design"/>
 <property name="PROP_UseSmartGuide" value="false" type="design"/>
 <property name="PROP_UserConstraintEditorPreference" value="Text Editor" type="process"/>
-<property name="PROP_intProjectCreationTimestamp" value="2010-12-01T11:32:09" type="design"/>
-<property name="PROP_intWbtProjectID" value="144BAC8BCC020358A10E3C9EB2A797A8" type="design"/>
-<property name="PROP_intWbtProjectIteration" value="9" type="process"/>
+<property name="PROP_intProjectCreationTimestamp" value="2010-12-02T08:01:13" type="design"/>
+<property name="PROP_intWbtProjectID" value="314B616C181AFB6097A4EDCB224EA28B" type="design"/>
+<property name="PROP_intWbtProjectIteration" value="11" type="process"/>
 <property name="PROP_intWorkingDirLocWRTProjDir" value="Same" type="design"/>
 <property name="PROP_intWorkingDirUsed" value="No" type="design"/>
 <property name="PROP_map_otherCmdLineOptions" value="-timing" type="process"/>
+<property name="PROP_selectedSimRootSourceNode_behav" value="lpp.IIR_CEL_FILTER" type="process"/>
 <property name="PROP_xilxBitgCfg_GenOpt_DRC" value="false" type="process"/>
 <property name="PROP_xilxBitgCfg_GenOpt_ReadBack" value="true" type="process"/>
 <property name="PROP_xilxBitgStart_Clk_DriveDone" value="true" type="process"/>
@@ -40,7 +42,6 @@ This means code written to parse this file will need to be revisited each subseq
 <property name="PROP_xst_otherCmdLineOptions" value="-uc leon3mp.xcf" type="process"/>
 <property name="PROP_AutoTop" value="false" type="design"/>
 <property name="PROP_DevFamily" value="Spartan3E" type="design"/>
-<property name="PROP_WriteDefaultPropToSourceProject" value="false" type="process"/>
 <property name="PROP_xilxBitgCfg_GenOpt_MaskFile" value="true" type="process"/>
 <property name="PROP_DevDevice" value="xc3s1600e" type="design"/>
 <property name="PROP_DevFamilyPMName" value="spartan3e" type="design"/>

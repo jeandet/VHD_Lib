@@ -24,11 +24,12 @@ use lpp.iir_filter.all;
 use lpp.FILTERcfg.all;
 use lpp.general_purpose.all;
 
---TODO améliorer la flexibilité de la config de la RAM.
+--TODO amliorer la flexibilit de la config de la RAM.
 
 entity  RAM_CTRLR2 is
 generic(
-    Input_SZ_1      :   integer := 16
+    Input_SZ_1      :   integer := 16;
+	 Mem_use         :   integer := use_RAM
 );
 port(
     reset       :   in  std_logic;
@@ -62,7 +63,7 @@ signal  WADDR_D     :   std_logic_vector(7 downto 0);
 
 begin
 
-sample_out  <=  RD(Smpl_SZ-1 downto 0);
+sample_out  <=  RD(Input_SZ_1-1 downto 0);
 
 
 WEN <=  not Write;
@@ -115,12 +116,12 @@ port map(
 
 
 MUX2_inst1 :MUX2 
-generic map(Input_SZ    => Smpl_SZ)
+generic map(Input_SZ    => Input_SZ_1)
 port map(
     sel     =>  WD_sel,
     IN1     =>  sample_in,
-    IN2     =>  RD(Smpl_SZ-1 downto 0),
-    RES     =>  WD(Smpl_SZ-1 downto 0)
+    IN2     =>  RD(Input_SZ_1-1 downto 0),
+    RES     =>  WD(Input_SZ_1-1 downto 0)
 );
 
 
@@ -155,12 +156,12 @@ port map(
 );
 
 WDRreg :REG
-generic map(size    => Smpl_SZ)
+generic map(size    => Input_SZ_1)
 port map(
     reset   =>  reset,
     clk     =>  clk,
-    D       =>  WD(Smpl_SZ-1 downto 0),
-    Q       =>  WD_D(Smpl_SZ-1 downto 0)
+    D       =>  WD(Input_SZ_1-1 downto 0),
+    Q       =>  WD_D(Input_SZ_1-1 downto 0)
 );
 
 

@@ -72,8 +72,8 @@ signal Rdata     : std_logic_vector(31 downto 0);
 begin
 
 Capture <= Rec.UART_Cfg(0);
-ACK <= Rec.UART_Cfg(1);
-Send <= Rec.UART_Cfg(2);
+--ACK <= Rec.UART_Cfg(1);
+--Send <= Rec.UART_Cfg(2);
 Rec.UART_Cfg(3) <= Sended;
 Rec.UART_Cfg(4) <= NwData;
 
@@ -94,30 +94,36 @@ Rec.UART_Cfg(4) <= NwData;
 
     --APB Write OP
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
-                case apbi.paddr(abits-1 downto 2) is
+                case apbi.paddr(7 downto 2) is
                     when "000000" =>
                         Rec.UART_Cfg(2 downto 0) <= apbi.pwdata(2 downto 0);
                     when "000001" =>
                         Rec.UART_Wdata <= apbi.pwdata(7 downto 0);
+								Send           <=	'1';
                     when others =>
                         null;
                 end case;
+				else
+					Send           <=	'0';
             end if;
 
     --APB READ OP
             if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
-                case apbi.paddr(abits-1 downto 2) is
+                case apbi.paddr(7 downto 2) is
                     when "000000" =>
-                        Rdata(31 downto 27) <= Rec.UART_Cfg;
+                        Rdata(4 downto 0) <= Rec.UART_Cfg;
                         Rdata(26 downto 12) <= (others => '0');
-                        Rdata(11 downto 0) <= Rec.UART_BTrig;
+                        Rdata(27 downto 16) <= Rec.UART_BTrig;
                     when "000001" =>
                         Rdata(7 downto 0) <= Rec.UART_Wdata;
                     when "000010" =>
                         Rdata(7 downto 0) <= Rec.UART_Rdata;
+								Ack               <= '1';
                     when others =>
                         Rdata <= (others => '0');
                 end case;
+				else
+				    Ack               <= '0';
             end if;
 
         end if;

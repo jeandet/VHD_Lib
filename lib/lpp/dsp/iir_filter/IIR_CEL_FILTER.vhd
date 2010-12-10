@@ -21,21 +21,26 @@ use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
 library lpp;
 use lpp.iir_filter.all;
-use lpp.FILTERcfg.all;
 use lpp.general_purpose.all;
 
---TODO améliorer la gestion de la RAM et de la flexibilité du filtre
+--TODO amliorer la gestion de la RAM et de la flexibilit du filtre
 
 entity  IIR_CEL_FILTER is
-generic(Sample_SZ : integer := 16);
+generic(Sample_SZ : integer := 16;
+		  ChanelsCount : integer := 1;
+		  Coef_SZ      : integer := 9;
+		  CoefCntPerCel: integer := 3;
+		  Cels_count   : integer := 5;
+        Mem_use      : integer := use_RAM);
 port(
     reset       :   in  std_logic;
     clk         :   in  std_logic;
     sample_clk  :   in  std_logic;
     regs_in     :   in  in_IIR_CEL_reg;
     regs_out    :   in  out_IIR_CEL_reg;
-    sample_in   :   in  samplT;
-    sample_out  :   out samplT
+    sample_in   :   in  samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
+    sample_out  :   out samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
+	 coefs       :   in  std_logic_vector(Coef_SZ*CoefCntPerCel*Cels_count-1 downto 0)
     
 );
 end IIR_CEL_FILTER;
@@ -50,9 +55,8 @@ begin
 
 virg_pos    <=  to_integer(unsigned(regs_in.virgPos));
 
-
 CTRLR : IIR_CEL_CTRLR
-generic map (Sample_SZ => Sample_SZ)
+generic map (Sample_SZ,ChanelsCount,Coef_SZ,CoefCntPerCel,Cels_count,Mem_use)
 port map(
     reset       =>  reset,
     clk         =>  clk,
@@ -60,7 +64,7 @@ port map(
     sample_in   =>  sample_in,
     sample_out  =>  sample_out,
     virg_pos    =>  virg_pos,
-    coefs       =>  regs_in.coefsTB
+    coefs       =>  coefs
 );
 
 

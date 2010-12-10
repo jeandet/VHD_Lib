@@ -55,6 +55,7 @@ signal  TXD_Dummy       :   std_logic;
 signal  NwDat_int       :   std_logic;
 signal  NwDat_int_reg   :   std_logic;
 signal  receive         :   std_logic;
+constant zeroVect       :   std_logic_vector(Data_sz+1 downto 0) := (others => '0');
 
 begin
 
@@ -68,7 +69,7 @@ BaudGenerator : BaudGen
 
 RX_REG  : Shift_REG
     generic map(Data_sz+2)
-    port map(clk,Bclk,reset,RXD,TXD_Dummy,receive,NwDat_int,(others => '0'),RDATA_int);
+    port map(clk,Bclk,reset,RXD,TXD_Dummy,receive,NwDat_int,zeroVect,RDATA_int);
 
 TX_REG  : Shift_REG
     generic map(Data_sz+2)

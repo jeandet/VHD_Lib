@@ -25,7 +25,6 @@ use grlib.stdlib.all;
 use grlib.devices.all;
 library lpp;
 use lpp.iir_filter.all;
-use lpp.FILTERcfg.all;
 use lpp.general_purpose.all;
 use lpp.lpp_amba.all;
 
@@ -36,7 +35,13 @@ entity APB_IIR_CEL is
     pmask    : integer  := 16#fff#;
     pirq     : integer  := 0;
     abits    : integer  := 8;
-    Sample_SZ : integer := Smpl_SZ
+    Sample_SZ : integer := 16;
+    ChanelsCount : integer := 1;
+	 Coef_SZ      : integer := 9;
+	 CoefCntPerCel: integer := 3;
+	 Cels_count   : integer := 5;
+	 virgPos      : integer := 3;
+    Mem_use      : integer := use_RAM
     );
   port (
     rst             : in  std_logic;
@@ -45,8 +50,8 @@ entity APB_IIR_CEL is
     apbo            : out apb_slv_out_type;
     sample_clk      : in  std_logic;
     sample_clk_out  : out std_logic;
-    sample_in       : in  samplT;
-    sample_out      : out samplT
+    sample_in   :   in  samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
+    sample_out  :   out samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0)
     );
 end;
 
@@ -66,17 +71,30 @@ type FILTERreg is record
   regout    :   out_IIR_CEL_reg;
 end record;
 
+signal Rdata	  :  std_logic_vector(31 downto 0);
 signal  r : FILTERreg;
 signal  filter_reset    :   std_logic:='0';
 signal  smp_cnt : integer :=0;
 signal  sample_clk_out_R : std_logic;
+
+
+type    CoefCelT  is array(CoefCntPerCel-1 downto 0) of std_logic_vector(Coef_SZ-1 downto 0);
+type    CoefTblT  is array(Cels_count-1 downto 0) of CoefCelT;
+
+type    CoefsRegT is record
+    numCoefs    : CoefTblT;
+	 denCoefs    : CoefTblT;
+end record;
+
+signal  CoefsReg   : CoefsRegT;
+
 begin
 
 filter_reset    <=  rst and r.regin.config(0);
 sample_clk_out  <=  sample_clk_out_R;
 
 filter : IIR_CEL_FILTER
-generic map(Sample_SZ => Sample_SZ)
+generic map(Sample_SZ,ChanelsCount,Coef_SZ,CoefCntPerCel,Cels_count,Mem_use)
 port map(
     reset       =>  filter_reset,
     clk         =>  clk,
@@ -106,8 +124,6 @@ end process;
 process(rst,clk)
 begin
     if rst = '0' then
-        r.regin.coefsTB.NumCoefs <= NumCoefs_cel;
-        r.regin.coefsTB.DenCoefs <= DenCoefs_cel;
         r.regin.virgPos          <= std_logic_vector(to_unsigned(virgPos,5));
 
     elsif clk'event and clk = '1' then
@@ -125,17 +141,17 @@ begin
                         if conv_integer(apbi.paddr(7 downto 5)) = i+1 then
                             case apbi.paddr(4 downto 2) is
                                 when "000" =>
-                                    r.regin.coefsTB.NumCoefs(i)(0)  <=  coefT(apbi.pwdata(Coef_SZ-1 downto 0));
+                                    CoefsReg.numCoefs(i)(0)  <=  (apbi.pwdata(Coef_SZ-1 downto 0));
                                 when "001" =>
-                                    r.regin.coefsTB.NumCoefs(i)(1)  <=  coefT(apbi.pwdata(Coef_SZ-1 downto 0));
+                                    CoefsReg.numCoefs(i)(1)  <=  (apbi.pwdata(Coef_SZ-1 downto 0));
                                 when "010" =>
-                                    r.regin.coefsTB.NumCoefs(i)(2)  <=  coefT(apbi.pwdata(Coef_SZ-1 downto 0));
+                                    CoefsReg.numCoefs(i)(2)  <=  (apbi.pwdata(Coef_SZ-1 downto 0));
                                 when "011" =>
-                                    r.regin.coefsTB.DenCoefs(i)(0)  <=  coefT(apbi.pwdata(Coef_SZ-1 downto 0));
+                                    CoefsReg.denCoefs(i)(0)  <=  (apbi.pwdata(Coef_SZ-1 downto 0));
                                 when "100" =>
-                                    r.regin.coefsTB.DenCoefs(i)(1)  <=  coefT(apbi.pwdata(Coef_SZ-1 downto 0));
+                                    CoefsReg.denCoefs(i)(1)  <=  (apbi.pwdata(Coef_SZ-1 downto 0));
                                 when "101" =>
-                                    r.regin.coefsTB.DenCoefs(i)(2)  <=  coefT(apbi.pwdata(Coef_SZ-1 downto 0));
+                                    CoefsReg.denCoefs(i)(2)  <=  (apbi.pwdata(Coef_SZ-1 downto 0));
                                 when others =>
                             end case;
                         end if;
@@ -144,28 +160,28 @@ begin
         end if;
 
 --APB READ OP
-        if (apbi.psel(pindex) and apbi.penable and (not apbi.pwrite)) = '1' then
+        if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
             case apbi.paddr(7 downto 2) is
                 when "000000" =>
                     
                 when "000001" =>
-                    apbo.prdata(4 downto 0) <=   r.regin.virgPos;
+                    Rdata(4 downto 0) <=   r.regin.virgPos;
                 when others =>
                     for i in 0 to Cels_count-1 loop
                         if conv_integer(apbi.paddr(7 downto 5)) = i+1 then
                             case apbi.paddr(4 downto 2) is
                                 when "000" =>
-                                    apbo.prdata(Coef_SZ-1 downto 0)  <= std_logic_vector(r.regin.coefsTB.NumCoefs(i)(0));
+                                    Rdata(Coef_SZ-1 downto 0)  <= std_logic_vector(CoefsReg.numCoefs(i)(0));
                                 when "001" =>
-                                    apbo.prdata(Coef_SZ-1 downto 0)  <=  std_logic_vector(r.regin.coefsTB.NumCoefs(i)(1));
+                                    Rdata(Coef_SZ-1 downto 0)  <=  std_logic_vector(CoefsReg.numCoefs(i)(1));
                                 when "010" =>
-                                    apbo.prdata(Coef_SZ-1 downto 0)  <=  std_logic_vector(r.regin.coefsTB.NumCoefs(i)(2));
+                                    Rdata(Coef_SZ-1 downto 0)  <=  std_logic_vector(CoefsReg.numCoefs(i)(2));
                                 when "011" =>
-                                    apbo.prdata(Coef_SZ-1 downto 0)  <=  std_logic_vector(r.regin.coefsTB.DenCoefs(i)(0));
+                                    Rdata(Coef_SZ-1 downto 0)  <=  std_logic_vector(CoefsReg.denCoefs(i)(0));
                                 when "100" =>
-                                    apbo.prdata(Coef_SZ-1 downto 0)  <=  std_logic_vector(r.regin.coefsTB.DenCoefs(i)(1));
+                                    Rdata(Coef_SZ-1 downto 0)  <=  std_logic_vector(CoefsReg.denCoefs(i)(1));
                                 when "101" =>
-                                    apbo.prdata(Coef_SZ-1 downto 0)  <=  std_logic_vector(r.regin.coefsTB.DenCoefs(i)(2));
+                                    Rdata(Coef_SZ-1 downto 0)  <=  std_logic_vector(CoefsReg.denCoefs(i)(2));
                                 when others =>
                             end case;
                         end if;
@@ -177,7 +193,7 @@ begin
     apbo.pconfig <= pconfig;
 end process;
 
-
+apbo.prdata <=	Rdata when apbi.penable = '1' ;
 
 -- pragma translate_off
     bootmsg : report_version

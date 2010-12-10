@@ -28,6 +28,9 @@ use lpp.general_purpose.all;
 --Ncoefs = 26 000 000 /(6 * 110 000) = 39 coefs
 
 entity FILTER is 
+generic(Smpl_SZ    :  integer := 16;
+        ChanelsCNT :  integer := 3
+);
 port(
 
     reset       :   in  std_logic;

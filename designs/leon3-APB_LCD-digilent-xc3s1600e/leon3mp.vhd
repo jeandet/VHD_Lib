@@ -44,7 +44,9 @@ library lpp;
 use lpp.amba_lcd_16x2_ctrlr.all;
 use lpp.LCD_16x2_CFG.all;
 use lpp.lpp_ad_conv.all;
-
+use lpp.iir_filter.all;
+use lpp.general_purpose.all;
+use lpp.lpp_uart.all;
 
 entity leon3mp is
   generic (
@@ -138,7 +140,9 @@ entity leon3mp is
 	  BTN_WEST  : in    std_ulogic;
 	  ADC_SCK	: out  std_logic;
 	  ADC_CNV	: out  std_logic;
-	  ADC_SDI	: in   std_logic
+	  ADC_SDI	: in   std_logic;
+	  lppTXD    : out  std_logic;
+	  lppRXD    : in   std_logic
     );
 end;
 
@@ -211,7 +215,13 @@ architecture rtl of leon3mp is
 
   signal  AD_in      : AD7688_in(0 downto 0);
   signal  AD_out     : AD7688_out;
-
+  signal  smpclk_out : std_logic;
+  signal  smpclk_in  : std_logic;
+  signal  sample_out : samplT(0 downto 0,11 downto 0);
+  signal  sample_in  : samplT(0 downto 0,11 downto 0);
+  signal  sample_clk : std_logic;
+  signal  sample_clk_out : std_logic;
+  
   attribute keep : boolean;
   attribute syn_keep : boolean;
   attribute syn_preserve : boolean;
@@ -486,6 +496,15 @@ LCD0 : apb_lcd_ctrlr
     Port map( rstn,clkm,apbi, apbo(8),data(15 downto 8),LCD_RS,LCD_RW,LCD_E,LCD_RET,LCD_CS1,LCD_CS2,SF_CE0);
 
 -----------------------------------------------------------------------
+--------  LPP UART ----------------------------------------------------
+-----------------------------------------------------------------------
+
+LPPUART0: APB_UART 
+  generic map( 12,  12,16#fff#,0,8,8)
+  port map(clkm,rstn,apbi, apbo(12),lppTXD,lppRXD);
+
+
+-----------------------------------------------------------------------
 ---  ADS7886       ----------------------------------------------------
 -----------------------------------------------------------------------
 
@@ -496,6 +515,21 @@ ADC0 :  lpp_apb_ad_conv
 AD_in(0).SDI    <=   ADC_SDI;
 ADC_CNV         <=   AD_out.CNV;
 ADC_SCK         <=   AD_out.SCK;
+
+
+-----------------------------------------------------------------------
+---  I I R     F I L T E R --------------------------------------------
+-----------------------------------------------------------------------
+smplclkgen: Clk_divider
+		 generic map(40000000,1000)
+		 Port map( clkm ,rstn,sample_clk);
+
+
+FILTER0: APB_IIR_CEL
+  generic map(10,10,16#fff#,0,8,1,12,9,3,5,use_RAM)
+  port map(rstn,clkm,apbi, apbo(10),sample_clk,sample_clk_out,sample_in,sample_out
+    );
+
 -----------------------------------------------------------------------
 ---  ETHERNET ---------------------------------------------------------
 -----------------------------------------------------------------------
@@ -583,7 +617,7 @@ ADC_SCK         <=   AD_out.SCK;
 ---  Drive unused bus elements  ---------------------------------------
 -----------------------------------------------------------------------
 
-  nam1 : for i in (CFG_NCPU+CFG_AHB_UART+CFG_AHB_JTAG+CFG_GRETH+CFG_SVGA_ENABLE+1) to NAHBMST-1 generate
+  nam1 : for i in (CFG_NCPU+CFG_AHB_UART+CFG_AHB_JTAG+CFG_GRETH+CFG_SVGA_ENABLE+5) to NAHBMST-1 generate
     ahbmo(i) <= ahbm_none;
   end generate;
 --  nap0 : for i in 9 to NAPBSLV-1-CFG_GRETH generate apbo(i) <= apb_none; end generate;

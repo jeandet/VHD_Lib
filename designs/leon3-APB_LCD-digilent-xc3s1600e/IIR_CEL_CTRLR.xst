@@ -1,0 +1,5 @@
+set -tmpdir "/opt/GRLIB/grlib-gpl-1.1.0-b4104/designs/leon3-APB_LCD-digilent-xc3s1600e/xst/projnav.tmp"
+set -xsthdpdir "/opt/GRLIB/grlib-gpl-1.1.0-b4104/designs/leon3-APB_LCD-digilent-xc3s1600e/xst"
+elaborate
+-ifn IIR_CEL_CTRLR.prj
+-ifmt mixed

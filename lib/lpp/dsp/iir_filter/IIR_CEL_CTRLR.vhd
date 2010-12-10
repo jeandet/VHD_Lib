@@ -20,26 +20,32 @@
 --  This file is a part of the LPP VHDL IP LIBRARY
 --  Copyright (C) 2009 - 2010, Laboratory of Plasmas Physic - CNRS
 --
+
 library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
 library lpp;
 use lpp.iir_filter.all;
-use lpp.FILTERcfg.all;
 use lpp.general_purpose.all;
 
---TODO améliorer la gestion de la RAM et de la flexibilité du filtre
+--TODO amliorer la gestion de la RAM et de la flexibilit du filtre
 
 entity  IIR_CEL_CTRLR is
-generic(Sample_SZ : integer := 16);
+generic(Sample_SZ : integer := 16;
+		  ChanelsCount : integer := 1;
+		  Coef_SZ      : integer := 9;
+		  CoefCntPerCel: integer := 3;
+		  Cels_count   : integer := 5;
+        Mem_use      : integer := use_RAM
+);
 port(
     reset       :   in  std_logic;
     clk         :   in  std_logic;
     sample_clk  :   in  std_logic;
-    sample_in   :   in  samplT;
-    sample_out  :   out samplT;
+    sample_in   :   in  samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
+    sample_out  :   out samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
     virg_pos    :   in  integer;
-    coefs       :   in  coefs_celsT
+    coefs       :   in  std_logic_vector(Coef_SZ*CoefCntPerCel*Cels_count-1 downto 0)
 );
 end IIR_CEL_CTRLR;
 
@@ -47,6 +53,8 @@ end IIR_CEL_CTRLR;
 
 
 architecture ar_IIR_CEL_CTRLR of IIR_CEL_CTRLR is
+
+subtype    sampleVect   is std_logic_vector(Sample_SZ-1 downto 0);
 
 signal  smpl_clk_old    :   std_logic := '0';
 signal  WD_sel          :   std_logic := '0';
@@ -57,20 +65,31 @@ signal  Write           :   std_logic := '0';
 signal  WADDR_sel       :   std_logic := '0';
 signal  GO_0            :   std_logic := '0';
 
-signal  RAM_sample_in   :   std_logic_vector(Sample_SZ-1 downto 0);
-signal  RAM_sample_in_bk:   std_logic_vector(Sample_SZ-1 downto 0);
-signal  RAM_sample_out  :   std_logic_vector(Sample_SZ-1 downto 0);
+signal  RAM_sample_in   :   sampleVect;
+signal  RAM_sample_in_bk:   sampleVect;
+signal  RAM_sample_out  :   sampleVect;
 signal  ALU_ctrl        :   std_logic_vector(3 downto 0);
-signal  ALU_sample_in   :   std_logic_vector(Sample_SZ-1 downto 0);
+signal  ALU_sample_in   :   sampleVect;
 signal  ALU_Coef_in     :   std_logic_vector(Coef_SZ-1 downto 0);
 signal  ALU_out         :   std_logic_vector(Sample_SZ+Coef_SZ-1 downto 0);
 signal  curentCel       :   integer range 0 to Cels_count-1 := 0;
-signal  curentChan      :   integer range 0 to ChanelsCNT-1 := 0;
-
-signal  sample_in_BUFF  :   samplT;
-signal  sample_out_BUFF :   samplT;
+signal  curentChan      :   integer range 0 to ChanelsCount-1 := 0;
 
 
+type    sampleBuffT  is array(ChanelsCount-1 downto 0) of sampleVect;
+
+signal  sample_in_BUFF  :   sampleBuffT;
+signal  sample_out_BUFF :   sampleBuffT;
+
+type    CoefCelT  is array(CoefCntPerCel-1 downto 0) of std_logic_vector(Coef_SZ-1 downto 0);
+type    CoefTblT  is array(Cels_count-1 downto 0) of CoefCelT;
+
+type    CoefsRegT is record
+    numCoefs    : CoefTblT;
+	 denCoefs    : CoefTblT;
+end record;
+
+signal  CoefsReg   : CoefsRegT;
 
 type    fsmIIR_CEL_T is (waiting,pipe1,computeb1,computeb2,computea1,computea2,next_cel,pipe2,pipe3,next_chan);
 
@@ -79,11 +98,18 @@ signal  IIR_CEL_STATE   :   fsmIIR_CEL_T;
 begin
 
 
-
+coefsConnectL0: for z in 0 to Cels_count-1 generate
+     coefsConnectL1: for y in 0 to CoefCntPerCel-1 generate
+          coefsConnectL2: for x in 0 to Coef_SZ-1 generate
+               CoefsReg.numCoefs(z)(y)(x)     <=   coefs(x + y*Coef_SZ + z*Coef_SZ*CoefCntPerCel);
+					CoefsReg.denCoefs(z)(y)(x)     <=   coefs(x + y*Coef_SZ + z*Coef_SZ*CoefCntPerCel);
+          end generate;
+     end generate;
+end generate;
 
 
 RAM_CTRLR2inst : RAM_CTRLR2
-generic map(Input_SZ_1 => Sample_SZ)
+generic map(Sample_SZ,Mem_use)
 port map(
     reset       =>  reset,
     clk         =>  clk,
@@ -148,10 +174,12 @@ if reset = '0' then
     curentCel       <=  0;
     curentChan      <=  0;
     IIR_CEL_STATE   <=  waiting;
-reset :    for i in 0 to ChanelsCNT-1 loop
+resetL0 : for i in 0 to ChanelsCount-1 loop
                 sample_in_BUFF(i)    <=  (others => '0');
                 sample_out_BUFF(i)   <=  (others => '0');
-                sample_out(i)        <=  (others => '0');
+					 resetL1: for j in 0 to Sample_SZ-1 loop
+                    sample_out(i,j)        <=  '0';
+					 end loop;
            end loop;
 
 elsif clk'event and clk = '1' then
@@ -163,14 +191,17 @@ elsif clk'event and clk = '1' then
         when waiting =>
             if sample_clk = '1' and smpl_clk_old = '0' then
                 IIR_CEL_STATE   <=  pipe1;
-                RAM_sample_in   <=  sample_in_BUFF(0);
-                ALU_sample_in   <=  sample_in_BUFF(0);
+                RAM_sample_in   <=  std_logic_vector(sample_in_BUFF(0));
+                ALU_sample_in   <=  std_logic_vector(sample_in_BUFF(0));
                 
             else
-                ALU_ctrl        <=  IDLE;           
-                sample_in_BUFF  <=  sample_in;
-                sample_out      <=  sample_out_BUFF;
-
+                ALU_ctrl        <=  IDLE; 
+                smplConnectL0: for i in 0 to ChanelsCount-1 loop
+                    smplConnectL1: for j in 0 to Sample_SZ-1 loop
+						      sample_in_BUFF(i)(j)  <=  sample_in(i,j);
+                        sample_out(i,j)      <=  sample_out_BUFF(i)(j);
+					     end loop;
+					 end loop;
             end if;
             curentCel       <=  0;
             curentChan      <=  0;
@@ -178,30 +209,30 @@ elsif clk'event and clk = '1' then
         when pipe1 =>
                 IIR_CEL_STATE   <=  computeb1;
                 ALU_ctrl        <=  MAC_op;
-                ALU_Coef_in     <=  std_logic_vector(coefs.NumCoefs(curentCel)(0));
+                ALU_Coef_in     <=  std_logic_vector(CoefsReg.NumCoefs(curentCel)(0));
 
         when computeb1 =>
             
             ALU_ctrl        <=  MAC_op;
             ALU_sample_in   <=  RAM_sample_out;
-            ALU_Coef_in     <=  std_logic_vector(coefs.NumCoefs(curentCel)(1));
+            ALU_Coef_in     <=  std_logic_vector(CoefsReg.NumCoefs(curentCel)(1));
             IIR_CEL_STATE   <=  computeb2;
             RAM_sample_in   <=  RAM_sample_in_bk;
         when computeb2 =>
             ALU_sample_in   <=  RAM_sample_out;
-            ALU_Coef_in     <=  std_logic_vector(coefs.NumCoefs(curentCel)(2));
+            ALU_Coef_in     <=  std_logic_vector(CoefsReg.NumCoefs(curentCel)(2));
             IIR_CEL_STATE   <=  computea1;
             
 
         when computea1 =>
             ALU_sample_in   <=  RAM_sample_out;
-            ALU_Coef_in     <=  std_logic_vector(coefs.DenCoefs(curentCel)(1));
+            ALU_Coef_in     <=  std_logic_vector(CoefsReg.DenCoefs(curentCel)(1));
             IIR_CEL_STATE   <=  computea2;
             
 
         when computea2 =>
             ALU_sample_in   <=  RAM_sample_out;
-            ALU_Coef_in     <=  std_logic_vector(coefs.DenCoefs(curentCel)(2));
+            ALU_Coef_in     <=  std_logic_vector(CoefsReg.DenCoefs(curentCel)(2));
             IIR_CEL_STATE   <=  next_cel;
             
 
@@ -230,17 +261,17 @@ elsif clk'event and clk = '1' then
             end if;
         when next_chan =>
  
-rotate :    for i in 0 to ChanelsCNT-2 loop
-                sample_in_BUFF(i)    <=  sample_in_BUFF(i+1);
-                sample_out_BUFF(i)   <=  sample_out_BUFF(i+1);
+rotate :    for i in 1 to ChanelsCount-1 loop
+                sample_in_BUFF(i-1)    <=  sample_in_BUFF(i);
+                sample_out_BUFF(i-1)   <=  sample_out_BUFF(i);
             end loop;
-                sample_in_BUFF(ChanelsCNT-1) <= sample_in_BUFF(0);
-                sample_out_BUFF(ChanelsCNT-1)<= sample_out_BUFF(0);
+                sample_in_BUFF(ChanelsCount-1) <= sample_in_BUFF(0);
+                sample_out_BUFF(ChanelsCount-1)<= sample_out_BUFF(0);
                 
-            if curentChan   = (ChanelsCNT-1) then
+            if curentChan   = (ChanelsCount-1) then
                 IIR_CEL_STATE   <=  waiting;
                 ALU_ctrl        <=  clr_mac;
-            else
+            elsif ChanelsCount>1 then
                 curentChan       <=  curentChan + 1;
                 IIR_CEL_STATE    <=  pipe1;
                 ALU_sample_in    <=  sample_in_BUFF(1);
