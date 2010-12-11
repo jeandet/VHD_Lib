@@ -45,20 +45,20 @@ CListFILE=$LPP_PATCHPATH/LPP_drivers/libsrc/AMBA/apb_devices_list.h
 cat $VHDFileStart>$VHDListFILE
 cat $CFileStart>$CListFILE
 
-grep vendor $ListFILE | sed "s/vendor /constant /" | sed "s/.* /&  : amba_vendor_type := 16#/" | sed "s/.*#*/&;/" >> $VHDListFILE
+grep vendor $ListFILE | sed "s/vendor /constant /" | sed "s/.* /&  : amba_vendor_type := 16#/" | sed "s/.*#*/&#;/" >> $VHDListFILE
 grep vendor $ListFILE | sed "s/vendor /#define /" | sed "s/.* /& 0x/" >> $CListFILE
 
 echo " ">>$VHDListFILE
 echo " ">>$CListFILE
 
-grep device $ListFILE | sed "s/device /constant /" |  sed "s/.* /&  : amba_device_type := 16#/" | sed "s/.*#*/&;/"   >> $VHDListFILE
+grep device $ListFILE | sed "s/device /constant /" |  sed "s/.* /&  : amba_device_type := 16#/" | sed "s/.*#*/&#;/"   >> $VHDListFILE
 grep device $ListFILE | sed "s/device /#define /" | sed "s/.* /& 0x/" >> $CListFILE
 
 cat $VHDFileEnd>>$VHDListFILE
 cat $CFileEnd>>$CListFILE
 
-sh $(SCRIPTSDIR)/GPL_Patcher.sh vhd lib/lpp/lpp_amba/
-sh $(SCRIPTSDIR)/GPL_Patcher.sh h LPP_drivers/libsrc/AMBA/
+sh $LPP_PATCHPATH/scripts/GPL_Patcher.sh vhd $LPP_PATCHPATH/lib/lpp/lpp_amba/
+sh $LPP_PATCHPATH/scripts/GPL_Patcher.sh h $LPP_PATCHPATH/LPP_drivers/libsrc/AMBA/
 
 cd $LPP_PATCHPATH
 

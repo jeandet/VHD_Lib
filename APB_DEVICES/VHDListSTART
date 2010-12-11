@@ -13,6 +13,6 @@ use grlib.amba.all;
 use std.textio.all;
 
 
-package lpp_apb_devices is
+package apb_devices_list is
 
 
