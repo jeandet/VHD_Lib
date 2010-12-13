@@ -16,6 +16,9 @@
 #--  along with this program; if not, write to the Free Software
 #--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 #------------------------------------------------------------------------------
+#--                 Author : Alexis Jeandet
+#--                   Mail : alexis.jeandet@lpp.polytechnique.fr
+#----------------------------------------------------------------------------
 
 CC  = sparc-elf-gcc
 AR  = sparc-elf-ar
@@ -41,7 +44,7 @@ $(FILE).a: $(FILE).o
 	cp *.h $(INCPATH)
 	rm -R tmp
 
-load: all
+load:
 	@echo "load "$(OUTBINDIR)$(EXEC)>$(SCRIPTDIR)load.txt
 	grmon-eval -uart $(PORT) -u -c $(SCRIPTDIR)load.txt
 

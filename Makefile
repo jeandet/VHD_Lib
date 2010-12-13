@@ -5,7 +5,7 @@ DESIGNSDIR=designs/
 	
 
 
-
+.PHONY:doc
 
 
 all: help
@@ -16,12 +16,17 @@ help:
 	@echo
 	@echo " make Patch-GRLIB     : install library into GRLIB at : $(GRLIB)"
 	@echo " make dist            : create a tar file for using into an other computer"
-	@echo " make Patched-dist    : create a tar file for with a patched grlib for using into an other computer"
+	@echo " make Patched-dist    : create a tar file for with a patched grlib for using"
+	@echo "                        into an other computer"
 	@echo " make allGPL          : add a GPL HEADER in all vhdl Files"
 	@echo " make init            : add a GPL HEADER in all vhdl Files, init all files"
 	@echo " make doc             : make documentation for VHDL IPs"
 	@echo " make pdf             : make pdf documentation for VHDL IPs"
+	@echo " make C-libs          : make C drivers for APB devices"
+	@echo "                        binary files availiable on VHD_Lib/LPP_DRIVERS/lib ./includes"
 	@echo
+
+
 
 allGPL:
 	@echo "Scanning VHDL files ..."
@@ -56,7 +61,7 @@ Patched-dist: Patch-GRLIB
 
 
 doc:
-	doxygen lib/lpp/Doxyfile
+	make -C lib/lpp doc
 
 
 pdf: doc
