@@ -15,8 +15,10 @@
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
--------------------------------------------------------------------------------
--- Systeme_Clock.vhd
+------------------------------------------------------------------------------
+--                    Author : Martin Morlot
+--                     Mail : martin.morlot@lpp.polytechnique.fr
+------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
@@ -24,14 +26,15 @@ use IEEE.numeric_std.all;
 --! Programme qui va permetre de générer l'horloge systeme (sclk)
 
 entity Systeme_Clock is
-generic(N :integer := 695);   --! Générique contenant le résultat de la division clk/sclk
-port( 
-    clk, raz   : in std_logic;   --! Horloge et Reset globale
+  generic(N :integer := 695);   --! Générique contenant le résultat de la division clk/sclk
+  port(
+    clk, raz   : in std_logic;   --! Horloge et Reset globale du composant
     sclk       : out std_logic   --! Horloge Systeme générée
-);
+    );
 end Systeme_Clock;
 
 --! @details Fonctionne a base d'un compteur (countint) qui va permetre de diviser l'horloge N fois
+
 architecture ar_Systeme_Clock of Systeme_Clock is
 
 signal clockint : std_logic;

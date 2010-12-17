@@ -46,6 +46,7 @@ architecture ar_Shift_REG of Shift_REG is
 signal   REG                :   std_logic_vector(Data_sz-1 downto 0);
 signal   Serialized_int     :   std_logic;
 signal   Serialize_reg      :   std_logic;
+signal   Serial_reg         :   std_logic;
 signal   CptBits            :   std_logic_vector(Data_sz-1 downto 0);
 constant CptBits_trig       :   std_logic_vector(Data_sz-1 downto 0) := (others => '1');
 signal   CptBits_flag       :   std_logic;
@@ -61,14 +62,16 @@ begin
     if reset = '0' then
         Serialized_int  <=  '1';
         CptBits_flag_reg    <=  '0';
+        Serial_reg    <=   '0';
         Q               <=  (others => '0');
     elsif clk'event and clk = '1' then
         CptBits_flag_reg    <=  CptBits_flag;
+        Serial_reg   <=    Serialize;
         
         if CptBits_flag = '1' and CptBits_flag_reg = '0' then
             Serialized_int  <=  '1';
             Q               <=  REG;
-        elsif Serialize = '1'  then
+        elsif(Serial_reg='0' and Serialize='1')then
             Serialized_int  <=  '0';
         end if;
     end if;

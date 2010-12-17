@@ -15,9 +15,10 @@
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
--------------------------------------------------------------------------------
--- APB_CNA.vhd
-
+------------------------------------------------------------------------------
+--                    Author : Martin Morlot
+--                     Mail : martin.morlot@lpp.polytechnique.fr
+------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 library grlib;
@@ -29,6 +30,7 @@ use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
 use lpp.lpp_cna.all;
 
+--! Driver APB, va faire le lien entre l'IP VHDL du convertisseur et le bus Amba
 
 entity APB_CNA is
   generic (
@@ -38,16 +40,18 @@ entity APB_CNA is
     pirq     : integer := 0;
     abits    : integer := 8);
   port (
-    clk     : in  std_logic;
-    rst     : in  std_logic;
-    apbi    : in  apb_slv_in_type;
-    apbo    : out apb_slv_out_type;
-    SYNC    : out std_logic;
-    SCLK    : out std_logic;
-    DATA    : out std_logic
+    clk     : in  std_logic;           --! Horloge du composant
+    rst     : in  std_logic;           --! Reset general du composant
+    apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
+    apbo    : out apb_slv_out_type;    --! Registre de gestion des sorties du bus
+    SYNC    : out std_logic;           --! Signal de synchronisation du convertisseur
+    SCLK    : out std_logic;           --! Horloge systeme du convertisseur
+    DATA    : out std_logic            --! Donnée numérique sérialisé
     );
 end APB_CNA;
 
+--! @details Les deux registres (apbi,apbo) permettent de gérer la communication sur le bus
+--! et les sorties seront cablées vers le convertisseur. 
 
 architecture ar_APB_CNA of APB_CNA is
 

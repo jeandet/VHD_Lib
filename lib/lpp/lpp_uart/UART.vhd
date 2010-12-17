@@ -45,9 +45,9 @@ port(
 );
 end entity;
 
-
 --! @details Gestion de la Reception/Transmission donc de la Vectorisation/Serialisation
---! ainsi que la detection et le reglage de le frequence de transmission optimale sur le bus (Generateur de Bauds) 
+--! ainsi que la detection et le reglage de le frequence de transmission optimale sur le bus (Generateur de Bauds)
+ 
 architecture ar_UART of UART is
 signal  Bclk    :   std_logic;
 
