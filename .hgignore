@@ -26,4 +26,7 @@ syntax: glob
 *.a
 *.bin
 *~
+apb_devices_list.h
+apb_devices_list.vhd
+
 
