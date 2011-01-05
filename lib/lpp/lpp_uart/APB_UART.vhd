@@ -79,8 +79,6 @@ signal temp_ND : std_logic;
 begin
 
 Capture <= Rec.UART_Cfg(0);
---ACK <= Rec.UART_Cfg(1);
---Send <= Rec.UART_Cfg(1);
 Rec.UART_Cfg(1) <= Sended;
 Rec.UART_Cfg(2) <= NwData;
 
@@ -109,7 +107,6 @@ Rec.UART_Cfg(2) <= NwData;
                 case apbi.paddr(7 downto 2) is
                     when "000000" =>
                         Rec.UART_Cfg(0) <= apbi.pwdata(0);
-                        --Rec.UART_Cfg(1) <= apbi.pwdata(4);
                     when "000001" =>
                         Rec.UART_Wdata(7 downto 0) <= apbi.pwdata(7 downto 0);
 			Send <=	'1';
@@ -135,12 +132,9 @@ Rec.UART_Cfg(2) <= NwData;
                     when "000010" =>
                         Rdata(31 downto 8) <= X"EEEEEE";
                         Rdata(7 downto 0) <= Rec.UART_Rdata;
-								--Ack               <= '1';
                     when others =>
                         Rdata <= (others => '0');
                 end case;
-				--else
-				    --Ack               <= '0';
             end if;
 
         end if;
