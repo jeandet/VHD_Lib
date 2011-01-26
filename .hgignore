@@ -26,4 +26,5 @@ syntax: glob
 *.a
 *.bin
 *~
-
+LPP_drivers/libsrc/AMBA/apb_devices_list.h
+lib/lpp/lpp_amba/apb_devices_list.vhd

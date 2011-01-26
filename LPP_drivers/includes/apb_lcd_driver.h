@@ -16,6 +16,9 @@
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 -------------------------------------------------------------------------------*/
+/*--                  Author : Alexis Jeandet
+--                     Mail : alexis.jeandet@lpp.polytechnique.fr
+----------------------------------------------------------------------------*/
 #ifndef APB_LCD_DRIVER_H
 #define APB_LCD_DRIVER_H
 
@@ -64,7 +67,8 @@ typedef int lcd_err;
 /** structure representing the lcd registers */
 struct lcd_driver
 {
-    int cfg_reg;                    /**< Configuration register composed of Ready flag [10], CMD time Value [9:8], CMD to send [7:0]*/
+    int cfg_reg;                    /**< Configuration register composed of Ready flag [10], CMD time Value [9:8], 
+					CMD to send [7:0]*/
     int Frame_buff[lcdCharCnt];     /**< Frame Buffer space each address corresponds to a char on the lcd screen */
 };
 
