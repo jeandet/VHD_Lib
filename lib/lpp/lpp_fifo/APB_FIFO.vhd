@@ -28,11 +28,11 @@ use grlib.devices.all;
 library lpp;
 use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
-use lpp.lpp_cna.all;
+use lpp.lpp_fifo.all;
 
---! Driver APB, va faire le lien entre l'IP VHDL du convertisseur et le bus Amba
+--! Driver APB, va faire le lien entre l'IP VHDL de la FIFO et le bus Amba
 
-entity APB_CNA is
+entity APB_FIFO is
   generic (
     pindex   : integer := 0;
     paddr    : integer := 0;
@@ -43,59 +43,59 @@ entity APB_CNA is
     clk     : in  std_logic;           --! Horloge du composant
     rst     : in  std_logic;           --! Reset general du composant
     apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
-    apbo    : out apb_slv_out_type;    --! Registre de gestion des sorties du bus
-    SYNC    : out std_logic;           --! Signal de synchronisation du convertisseur
-    SCLK    : out std_logic;           --! Horloge systeme du convertisseur
-    DATA    : out std_logic            --! Donnée numérique sérialisé
+    apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
     );
-end APB_CNA;
+end APB_FIFO;
 
---! @details Les deux registres (apbi,apbo) permettent de gérer la communication sur le bus
---! et les sorties seront cablées vers le convertisseur. 
 
-architecture ar_APB_CNA of APB_CNA is
+architecture ar_APB_FIFO of APB_FIFO is
 
 constant REVISION : integer := 1;
 
 constant pconfig : apb_config_type := (
-  0 => ahb_device_reg (VENDOR_LPP, LPP_CNA, 0, REVISION, 0),
+  0 => ahb_device_reg (VENDOR_LPP, LPP_FIFO, 0, REVISION, 0),
   1 => apb_iobar(paddr, pmask));
 
-signal enable   : std_logic;
-signal flag_sd : std_logic;
-
-type CNA_ctrlr_Reg is record
-     CNA_Cfg  : std_logic_vector(1 downto 0);
-     CNA_Data : std_logic_vector(15 downto 0);
+type FIFO_ctrlr_Reg is record
+     FIFO_Cfg   : std_logic_vector(3 downto 0);
+     FIFO_DataW : std_logic_vector(15 downto 0);
+     FIFO_DataR : std_logic_vector(15 downto 0);
 end record;
 
-signal Rec : CNA_ctrlr_Reg;
-signal Rdata     : std_logic_vector(31 downto 0);
+signal Rec    : FIFO_ctrlr_Reg;
+signal Rdata  : std_logic_vector(31 downto 0);
 
+signal flag_RE : std_logic;
+signal flag_WR : std_logic;
+signal full    : std_logic;
+signal empty   : std_logic;
 begin
 
-enable <= Rec.CNA_Cfg(0);
-Rec.CNA_Cfg(1) <= flag_sd;
+flag_RE <= Rec.FIFO_Cfg(0);
+flag_WR <= Rec.FIFO_Cfg(1);
+Rec.FIFO_Cfg(2) <= empty;
+Rec.FIFO_Cfg(3) <= full;
 
-    CONVERTER : entity Work.CNA_TabloC
-        port map(clk,rst,enable,Rec.CNA_Data,SYNC,SCLK,flag_sd,Data);
+    CONVERTER : entity Work.Top_FIFO
+        port map(clk,rst,flag_RE,flag_WR,Rec.FIFO_DataW,full,empty,Rec.FIFO_DataR);
 
 
     process(rst,clk)
     begin
         if(rst='0')then
-            Rec.CNA_Data <=  (others => '0');
+            Rec.FIFO_DataW <= (others => '0');
 
-        elsif(clk'event and clk='1')then 
+        elsif(clk'event and clk='1')then
         
 
     --APB Write OP
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                        Rec.CNA_Cfg(0) <= apbi.pwdata(0);
+                        Rec.FIFO_Cfg(0) <= apbi.pwdata(0);
+                        Rec.FIFO_Cfg(1) <= apbi.pwdata(4);
                     when "000001" =>
-                        Rec.CNA_Data <= apbi.pwdata(15 downto 0);
+                        Rec.FIFO_DataW <= apbi.pwdata(15 downto 0);
                     when others =>
                         null;
                 end case;
@@ -105,11 +105,17 @@ Rec.CNA_Cfg(1) <= flag_sd;
             if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                        Rdata(31 downto 2) <= X"ABCDEF5" & "00";
-                        Rdata(1 downto 0) <= Rec.CNA_Cfg;
+                        Rdata(3 downto 0)   <= "000" & Rec.FIFO_Cfg(0);
+                        Rdata(7 downto 4)   <= "000" & Rec.FIFO_Cfg(1);
+                        Rdata(11 downto 8)  <= "000" & Rec.FIFO_Cfg(2);
+                        Rdata(15 downto 12) <= "000" & Rec.FIFO_Cfg(3);
+                        Rdata(31 downto 16) <= X"AAAA";
                     when "000001" =>
-                        Rdata(31 downto 16) <= X"FD18";
-                        Rdata(15 downto 0) <= Rec.CNA_Data;
+                        Rdata(31 downto 16) <= X"AAAA";
+                        Rdata(15 downto 0)  <= Rec.FIFO_DataW;
+                    when "000010" =>
+                        Rdata(31 downto 16) <= X"AAAA";
+                        Rdata(15 downto 0)  <= Rec.FIFO_DataR;
                     when others =>
                         Rdata <= (others => '0');
                 end case;
@@ -120,4 +126,4 @@ Rec.CNA_Cfg(1) <= flag_sd;
     end process;
 
 apbo.prdata     <=   Rdata when apbi.penable = '1';
-end ar_APB_CNA;
+end ar_APB_FIFO;

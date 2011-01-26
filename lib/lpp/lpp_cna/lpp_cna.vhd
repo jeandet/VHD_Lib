@@ -15,17 +15,19 @@
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
--------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--                    Author : Martin Morlot
+--                     Mail : martin.morlot@lpp.polytechnique.fr
+------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 library grlib;
 use grlib.amba.all;
--- pragma translate_off
 use std.textio.all;
--- pragma translate_on
 library lpp;
 use lpp.lpp_amba.all;
 
+--! Package contenant tous les programmes qui forment le composant intégré dans le léon 
 
 package lpp_cna is
 

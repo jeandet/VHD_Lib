@@ -23,12 +23,14 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-Package Convertisseur_config is
+Package FIFO_Config is
 
 --===========================================================|
---============= Fréquence de sérialisation ==================|
---===========================================================|
-constant Freq_serial : integer := 5_000_000;
-constant nb_serial : integer := 30_000_000 / Freq_serial;
+--================= Generic de Config =======================|
+--===========================================================| 
+constant Data_sz : integer := 16;
+constant addr_sz : integer := 8;
+constant addr_max_int : integer := 256;
+
 
 end;

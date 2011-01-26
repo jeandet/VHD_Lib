@@ -15,44 +15,42 @@
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
--------------------------------------------------------------------------------
--- Gene_SYNC.vhd
+------------------------------------------------------------------------------
+--                    Author : Martin Morlot
+--                     Mail : martin.morlot@lpp.polytechnique.fr
+------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+--! Programme qui va permettre de générer le signal SYNC
+
 entity Gene_SYNC is
-
-port( 
-    SCLK,raz : in std_logic;
-    enable : in std_logic;
---    Sysclk : in std_logic;
-    OKAI_send : out std_logic;
-    SYNC : out std_logic
-);
-
+  port(
+    SCLK,raz : in std_logic;     --! Horloge systeme et Reset du composant
+    enable : in std_logic;       --! Autorise ou non l'utilisation du composant
+    OKAI_send : out std_logic;   --! Flag, Autorise l'envoi (sérialisation) d'une nouvelle donnée
+    SYNC : out std_logic         --! Signal de synchronisation du convertisseur généré
+    );
 end Gene_SYNC;
 
+--! @details NB: Ce programme est uniquement synchronisé sur l'horloge Systeme (sclk)
 
 architecture ar_Gene_SYNC of Gene_SYNC is
 
---signal Sysclk_reg : std_logic;
 signal count : integer;
-
 
 begin 
     process (SCLK,raz)
     begin
         if(raz='0')then
             SYNC <= '0';
---            Sysclk_reg <= '0'; 
             count <= 14;  
             OKAI_send <= '0';         
         
         elsif(SCLK' event and SCLK='1')then    
             if(enable='1')then
-            
---            Sysclk_reg <= Sysclk;
+
                 if(count=15)then
                     SYNC <= '1';
                     count <= count+1;
@@ -64,8 +62,8 @@ begin
                     count <= count+1;
                     OKAI_send <= '0';
                 end if;
+
             end if;
       	end if;
-  	end process;
-  	
+    end process;
 end ar_Gene_SYNC;

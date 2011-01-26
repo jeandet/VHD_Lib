@@ -15,22 +15,25 @@
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
--------------------------------------------------------------------------------
--- Serialize.vhd
+------------------------------------------------------------------------------
+--                    Author : Martin Morlot
+--                     Mail : martin.morlot@lpp.polytechnique.fr
+------------------------------------------------------------------------------
 library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
 
+--! Programme qui permet de sérialiser un vecteur
+
 entity Serialize is
-
-port(
-    clk,raz : in std_logic;
-    sclk    : in std_logic;
-    vectin  : in std_logic_vector(15 downto 0);
-    send    : in std_logic;
-    sended  : out std_logic;
-    Data    : out std_logic);
-
+  port(
+    clk,raz : in std_logic;                      --! Horloge et Reset du composant
+    sclk    : in std_logic;                      --! Horloge Systeme
+    vectin  : in std_logic_vector(15 downto 0);  --! Vecteur d'entrée
+    send    : in std_logic;                      --! Flag, Une nouvelle donnée est présente
+    sended  : out std_logic;                     --! Flag, La donnée a été sérialisée
+    Data    : out std_logic                      --! Donnée numérique sérialisé
+    );
 end Serialize;
 
 
