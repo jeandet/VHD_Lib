@@ -22,18 +22,19 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-use work.FIFO_Config.all;
 
 --! Programme de la FIFO d'écriture
 
 entity Fifo_Write is
+generic(
+    Addr_sz      : integer := 8;
+    addr_max_int : integer := 256);
 port( 
     clk,raz : in std_logic;                               --! Horloge et reset general du composant
     flag_WR : in std_logic;                               --! Flag, Demande l'écriture dans la mémoire
-    RAD     : in integer range 0 to addr_max_int;         --! Adresse du registre de lecture de la mémoire (forme entière)
+    Raddr   : in std_logic_vector(addr_sz-1 downto 0);    --! Adresse du registre de lecture de la mémoire
     full    : out std_logic;                              --! Flag, Mémoire pleine
-    WAD     : out integer range 0 to addr_max_int;        --! Adresse du registre d'écriture dans la mémoire (forme entière)
-    Waddr   : out std_logic_vector(addr_sz-1 downto 0)    --! Adresse du registre d'écriture dans la mémoire (forme vectorielle)
+    Waddr   : out std_logic_vector(addr_sz-1 downto 0)    --! Adresse du registre d'écriture dans la mémoire
     );
 end Fifo_Write;
 
@@ -41,35 +42,45 @@ end Fifo_Write;
 
 architecture ar_Fifo_Write of Fifo_Write is
 
-signal Wad_int : integer range 0 to addr_max_int;
-signal full_int : std_logic;
+signal Wad_int     : integer range 0 to addr_max_int;
+signal Wad_int_reg : integer range 0 to addr_max_int;
+signal Rad_int     : integer range 0 to addr_max_int;
+signal Rad_int_reg : integer range 0 to addr_max_int;
 
 begin 
     process (clk,raz)
     begin
         if(raz='0')then
             Wad_int  <= 0;
-            full_int <= '0';            
+            full     <= '0';
             
         elsif(clk' event and clk='1')then
+            Wad_int_reg <= Wad_int;
+            Rad_int_reg <= Rad_int;
+       
+
             if(flag_WR='1')then
-                if(Wad_int=addr_max_int)then
-                    Wad_int <= 0;
-                elsif(full_int='1')then
-                    Wad_int <= Wad_int;         
+                if(Wad_int=addr_max_int-1)then
+                    Wad_int <= 0;                    
                 else
-                    Wad_int <= Wad_int+1;                 
+                    Wad_int <= Wad_int+1;
                 end if;
             end if;
-            if(Wad_int=RAD-1 or (Wad_int=addr_max_int and RAD=0))then
-                full_int <= '1';
-            else
-                full_int <= '0';
+
+            if(Wad_int_reg /= Wad_int)then
+                if(Wad_int=Rad_int)then
+                    full <= '1';                
+                else
+                    full <= '0';
+                end if;
+            elsif(Rad_int_reg /= Rad_int)then
+                full <= '0';
             end if;
+
         end if;
     end process;
 
-full  <= full_int;
-WAD   <= Wad_int;
-Waddr <= std_logic_vector(to_unsigned(Wad_int,addr_sz));
+Rad_int  <= to_integer(unsigned(Raddr));
+Waddr    <= std_logic_vector(to_unsigned(Wad_int,addr_sz));
+
 end ar_Fifo_Write;

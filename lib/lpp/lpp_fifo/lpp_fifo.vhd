@@ -32,58 +32,173 @@ use work.FIFO_Config.all;
 
 package lpp_fifo is
 
+--===========================================================|
+--================= FIFOW SRAM FIFOR ========================|
+--===========================================================| 
+
 component APB_FIFO is
   generic (
-    pindex   : integer := 0;
-    paddr    : integer := 0;
-    pmask    : integer := 16#fff#;
-    pirq     : integer := 0;
-    abits    : integer := 8);
+    pindex       : integer := 0;
+    paddr        : integer := 0;
+    pmask        : integer := 16#fff#;
+    pirq         : integer := 0;
+    abits        : integer := 8;
+    Addr_sz      : integer := 8;
+    Data_sz      : integer := 16;
+    addr_max_int : integer := 256);
   port (
-    clk     : in  std_logic;
-    rst     : in  std_logic;
-    apbi    : in  apb_slv_in_type;
-    apbo    : out apb_slv_out_type
+    clk          : in  std_logic;
+    rst          : in  std_logic;
+    apbi         : in  apb_slv_in_type;
+    apbo         : out apb_slv_out_type
     );
 end component;
 
 
 component Top_FIFO is
+  generic(
+    Addr_sz      : integer := 8;
+    Data_sz      : integer := 16;
+    addr_max_int : integer := 256);
   port(
-    clk      : in std_logic;
-    raz      : in std_logic;
-    flag_RE  : in std_logic;
-    flag_WR  : in std_logic;
-    Data_in  : in std_logic_vector(Data_sz-1 downto 0);
-    full     : out std_logic;
-    empty    : out std_logic;
-    Data_out : out std_logic_vector(Data_sz-1 downto 0)
+    clk          : in std_logic;
+    raz          : in std_logic;
+    Send_RE      : in std_logic;
+    Send_WR      : in std_logic;
+    Data_in      : in std_logic_vector(Data_sz-1 downto 0);
+    Addr_RE      : out std_logic_vector(addr_sz-1 downto 0);
+    Addr_WR      : out std_logic_vector(addr_sz-1 downto 0);
+    full         : out std_logic;
+    empty        : out std_logic;
+    Data_out     : out std_logic_vector(Data_sz-1 downto 0)
     );
 end component;
 
 
 component Fifo_Read is
+  generic(
+    Addr_sz      : integer := 8;
+    addr_max_int : integer := 256);
   port(
-    clk      : in std_logic;
-    raz      : in std_logic;
-    flag_RE  : in std_logic;
-    WAD      : in integer range 0 to addr_max_int;
-    empty    : out std_logic;
-    RAD      : out integer range 0 to addr_max_int;
-    Raddr    : out std_logic_vector(addr_sz-1 downto 0)
+    clk          : in std_logic;
+    raz          : in std_logic;
+    flag_RE      : in std_logic;
+    Waddr        : in std_logic_vector(addr_sz-1 downto 0);
+    empty        : out std_logic;
+    Raddr        : out std_logic_vector(addr_sz-1 downto 0)
     );
 end component;
 
 
 component Fifo_Write is
+  generic(
+    Addr_sz      : integer := 8;
+    addr_max_int : integer := 256);
   port(
-    clk     : in std_logic;
-    raz     : in std_logic;
-    flag_WR : in std_logic;
-    RAD     : in integer range 0 to addr_max_int;
-    full    : out std_logic;
-    WAD     : out integer range 0 to addr_max_int;
-    Waddr   : out std_logic_vector(addr_sz-1 downto 0)
+    clk          : in std_logic;
+    raz          : in std_logic;
+    flag_WR      : in std_logic;
+    Raddr        : in std_logic_vector(addr_sz-1 downto 0);
+    full         : out std_logic;
+    Waddr        : out std_logic_vector(addr_sz-1 downto 0)
+    );
+end component;
+
+
+component Link_Reg is
+  generic(Data_sz : integer := 16);
+  port(
+    clk,raz       : in std_logic;
+    Data_one      : in std_logic_vector(Data_sz-1 downto 0);
+    Data_two      : in std_logic_vector(Data_sz-1 downto 0);
+    flag_RE       : in std_logic;
+    flag_WR       : in std_logic;
+    empty         : in std_logic;
+    Data_out      : out std_logic_vector(Data_sz-1 downto 0)
+    );
+end component;
+
+--===========================================================|
+--===================== FIFOW SRAM ==========================|
+--===========================================================|
+
+component APB_FifoWrite is
+  generic (
+    pindex       : integer := 0;
+    paddr        : integer := 0;
+    pmask        : integer := 16#fff#;
+    pirq         : integer := 0;
+    abits        : integer := 8;
+    Data_sz      : integer := 16;
+    Addr_sz      : integer := 8;
+    addr_max_int : integer := 256);
+  port (
+    clk          : in  std_logic;
+    rst          : in  std_logic;
+    apbi         : in  apb_slv_in_type;
+    apbo         : out apb_slv_out_type
+    );
+end component;
+
+
+component Top_FifoWrite is
+  generic(
+    Data_sz      : integer := 16;
+    Addr_sz      : integer := 8;
+    addr_max_int : integer := 256);
+  port(
+    clk          : in std_logic;
+    raz          : in std_logic;
+    flag_RE      : in std_logic;
+    flag_WR      : in std_logic;
+    Data_in      : in std_logic_vector(Data_sz-1 downto 0);
+    Raddr        : in std_logic_vector(addr_sz-1 downto 0);
+    full         : out std_logic;
+    empty        : out std_logic;
+    Waddr        : out std_logic_vector(addr_sz-1 downto 0);
+    Data_out     : out std_logic_vector(Data_sz-1 downto 0)
+    );
+end component;
+
+--===========================================================|
+--===================== SRAM FIFOR ==========================|
+--===========================================================|
+
+component APB_FifoRead is
+  generic (
+    pindex       : integer := 0;
+    paddr        : integer := 0;
+    pmask        : integer := 16#fff#;
+    pirq         : integer := 0;
+    abits        : integer := 8;
+    Data_sz      : integer := 16;
+    Addr_sz      : integer := 8;
+    addr_max_int : integer := 256);
+  port (
+    clk          : in  std_logic;
+    rst          : in  std_logic;
+    apbi         : in  apb_slv_in_type;
+    apbo         : out apb_slv_out_type
+    );
+end component;
+
+
+component Top_FifoRead is
+  generic(
+    Data_sz      : integer := 16;
+    Addr_sz      : integer := 8;
+    addr_max_int : integer := 256);
+  port(
+    clk          : in std_logic;
+    raz          : in std_logic;
+    flag_RE      : in std_logic;
+    flag_WR      : in std_logic;
+    Data_in      : in std_logic_vector(Data_sz-1 downto 0);
+    Waddr        : in std_logic_vector(addr_sz-1 downto 0);
+    full         : out std_logic;
+    empty        : out std_logic;
+    Raddr        : out std_logic_vector(addr_sz-1 downto 0);
+    Data_out     : out std_logic_vector(Data_sz-1 downto 0)
     );
 end component;
 

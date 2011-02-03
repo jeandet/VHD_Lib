@@ -25,10 +25,12 @@ all:
 	make all -C AMBA
 	make all -C LCD
 	make all -C DAC
+	make all -C FIFO
 
 
 cleanall:
 	make clean -C AMBA
 	make clean -C LCD
 	make clean -C DAC
+	make clean -C FIFO
 

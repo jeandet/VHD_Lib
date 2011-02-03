@@ -22,18 +22,19 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-use work.FIFO_Config.all;
 
 --! Programme de la FIFO de lecture
 
 entity Fifo_Read is
+generic(
+    Addr_sz      : integer := 8;
+    addr_max_int : integer := 256);
 port( 
-    clk,raz : in std_logic;                             --! Horloge et reset general du composant
-    flag_RE : in std_logic;                             --! Flag, Demande la lecture de la mémoire
-    WAD     : in integer range 0 to addr_max_int;       --! Adresse du registre d'écriture dans la mémoire (forme entière)
-    empty   : out std_logic;                            --! Flag, Mémoire vide
-    RAD     : out integer range 0 to addr_max_int;      --! Adresse du registre de lecture de la mémoire (forme entière)
-    Raddr   : out std_logic_vector(addr_sz-1 downto 0)  --! Adresse du registre de lecture de la mémoire (forme vectorielle)
+    clk,raz : in std_logic;                              --! Horloge et reset general du composant
+    flag_RE : in std_logic;                              --! Flag, Demande la lecture de la mémoire
+    Waddr   : in std_logic_vector(addr_sz-1 downto 0);   --! Adresse du registre d'écriture dans la mémoire
+    empty   : out std_logic;                             --! Flag, Mémoire vide
+    Raddr   : out std_logic_vector(addr_sz-1 downto 0)   --! Adresse du registre de lecture de la mémoire
     );
 end Fifo_Read;
 
@@ -41,7 +42,11 @@ end Fifo_Read;
 
 architecture ar_Fifo_Read of Fifo_Read is
 
-signal Rad_int : integer range 0 to addr_max_int;
+signal Rad_int      : integer range 0 to addr_max_int;
+signal Rad_int_reg  : integer range 0 to addr_max_int;
+signal Wad_int      : integer range 0 to addr_max_int;
+signal Wad_int_reg  : integer range 0 to addr_max_int;
+signal flag_reg     : std_logic;
 
 begin 
     process (clk,raz)
@@ -49,23 +54,33 @@ begin
         if(raz='0')then
             Rad_int <= 0;            
             empty   <= '1';
-            
+
         elsif(clk' event and clk='1')then
-            if(flag_RE='1')then
-                if(Rad_int=addr_max_int)then
+            Wad_int_reg <= Wad_int;
+            Rad_int_reg <= Rad_int;
+            flag_reg <= flag_RE;
+
+            if(flag_reg ='0' and flag_RE='1')then
+                if(Rad_int=addr_max_int-1)then
                     Rad_int <= 0;
                 else
                     Rad_int <= Rad_int+1;
                 end if;
             end if;
-            if(Rad_int=WAD)then
-                empty <= '1';
-            else
+
+            if(Rad_int_reg /= Rad_int)then
+                if(Rad_int=Wad_int)then
+                    empty <= '1';
+                else
+                    empty <= '0';
+                end if; 
+            elsif(Wad_int_reg /= Wad_int)then
                 empty <= '0';
             end if;
         end if;
     end process;
 
-RAD   <= Rad_int;
-Raddr <= std_logic_vector(to_unsigned(Rad_int,addr_sz));
+Wad_int  <= to_integer(unsigned(Waddr));
+Raddr    <= std_logic_vector(to_unsigned(Rad_int,addr_sz));
+
 end ar_Fifo_Read;

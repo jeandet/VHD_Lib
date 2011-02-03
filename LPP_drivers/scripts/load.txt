@@ -1,1 +1,1 @@
-load bin/APB_lcd_ctrlr.bin
+load bin/BenchFIFO.bin
