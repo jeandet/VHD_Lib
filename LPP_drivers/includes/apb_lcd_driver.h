@@ -67,7 +67,8 @@ typedef int lcd_err;
 /** structure representing the lcd registers */
 struct lcd_driver
 {
-    int cfg_reg;                    /**< Configuration register composed of Ready flag [10], CMD time Value [9:8], CMD to send [7:0]*/
+    int cfg_reg;                    /**< Configuration register composed of Ready flag [10], CMD time Value [9:8], 
+					CMD to send [7:0]*/
     int Frame_buff[lcdCharCnt];     /**< Frame Buffer space each address corresponds to a char on the lcd screen */
 };
 
