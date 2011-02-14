@@ -28,5 +28,11 @@ syntax: glob
 *~
 apb_devices_list.h
 apb_devices_list.vhd
-
-
+twiddle.vhd
+primitives.vhd
+fftSm.vhd
+fftDp.vhd
+fft_components.vhd
+CoreFFT.vhd
+actram.vhd
+actar.vhd

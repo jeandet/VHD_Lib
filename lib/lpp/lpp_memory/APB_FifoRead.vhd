@@ -28,68 +28,73 @@ use grlib.devices.all;
 library lpp;
 use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
-use lpp.lpp_fft.all;
+use lpp.lpp_fifo.all;
 
 --! Driver APB, va faire le lien entre l'IP VHDL de la FIFO et le bus Amba
 
-entity APB_FFT is
+entity APB_FifoRead is
   generic (
-    pindex   : integer := 0;
-    paddr    : integer := 0;
-    pmask    : integer := 16#fff#;
-    pirq     : integer := 0;
-    abits    : integer := 8);
+    pindex       : integer := 0;
+    paddr        : integer := 0;
+    pmask        : integer := 16#fff#;
+    pirq         : integer := 0;
+    abits        : integer := 8;
+    Data_sz      : integer := 16;
+    Addr_sz      : integer := 8;
+    addr_max_int : integer := 256);
   port (
-    clk     : in  std_logic;           --! Horloge du composant
-    rst     : in  std_logic;           --! Reset general du composant
-    apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
-    apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
+    clk     : in std_logic;                             --! Horloge du composant
+    rst     : in std_logic;                             --! Reset general du composant
+    apbi    : in apb_slv_in_type;                       --! Registre de gestion des entrées du bus
+    Flag_WR : in std_logic;                             --! Demande l'écriture dans la mémoire, géré hors de l'IP
+    Waddr   : in std_logic_vector(addr_sz-1 downto 0);  --! Adresse du registre d'écriture dans la mémoire
+    apbo    : out apb_slv_out_type                      --! Registre de gestion des sorties du bus
     );
-end APB_FFT;
+end APB_FifoRead;
 
 
-architecture ar_APB_FFT of APB_FFT is
+architecture ar_APB_FifoRead of APB_FifoRead is
 
 constant REVISION : integer := 1;
 
 constant pconfig : apb_config_type := (
-  0 => ahb_device_reg (VENDOR_LPP, LPP_FFT, 0, REVISION, 0),
+  0 => ahb_device_reg (VENDOR_LPP, LPP_FIFO, 0, REVISION, 0),
   1 => apb_iobar(paddr, pmask));
 
-type FFT_ctrlr_Reg is record
-     FFT_Cfg  : std_logic_vector(1 downto 0);
-     FFT_Data : std_logic_vector(15 downto 0); 
-     FFT_Reel : std_logic_vector(15 downto 0);
-     FFT_Img  : std_logic_vector(15 downto 0);
+type FIFO_ctrlr_Reg is record
+     FIFO_Cfg   : std_logic_vector(1 downto 0);
+     FIFO_DataW : std_logic_vector(15 downto 0);
+     FIFO_DataR : std_logic_vector(15 downto 0);
+     FIFO_AddrR : std_logic_vector(7 downto 0);
 end record;
 
-signal Rec    : FFT_ctrlr_Reg;
+signal Rec    : FIFO_ctrlr_Reg;
 signal Rdata  : std_logic_vector(31 downto 0);
 
-signal y_valid : std_logic;
-signal d_valid : std_logic;
+signal flag_RE : std_logic;
+signal empty   : std_logic;
+
 begin
 
+Rec.FIFO_Cfg(0) <= flag_RE;
+Rec.FIFO_Cfg(2) <= empty;
 
-Rec.FFT_Cfg(0) <= d_valid;
-Rec.FFT_Cfg(1) <= y_valid;
 
-    CONVERTER : entity Work.Top_FFT
-        port map(clk,rst,Rec.FFT_Data,y_valid,d_valid,Rec.FFT_Reel,Rec.FFT_Img);
+   MEMORY_READ : entity Work.Top_FifoRead
+        generic map(Data_sz,Addr_sz,addr_max_int)
+        port map(clk,rst,flag_RE,flag_WR,Rec.FIFO_DataW,Rec.FIFO_AddrR,full,Waddr,Rec.FIFO_DataR);
 
 
     process(rst,clk)
     begin
         if(rst='0')then
-            Rec.FFT_Data <= (others => '0');
-            
+            Rec.FIFO_AddrR <= (others => '0');
+
         elsif(clk'event and clk='1')then        
 
     --APB Write OP
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
-                    when "000001" =>
-                        Rec.FFT_Data <= apbi.pwdata(15 downto 0);
                     when others =>
                         null;
                 end case;
@@ -99,18 +104,15 @@ Rec.FFT_Cfg(1) <= y_valid;
             if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                        Rdata(3 downto 0)   <= "000" & Rec.FFT_Cfg(0);
-                        Rdata(7 downto 4)   <= "000" & Rec.FFT_Cfg(1);                        
-                        Rdata(31 downto 8) <= X"CCCCCC";
+                        Rdata(31 downto 16) <= X"DDDD";
+                        Rdata(15 downto 0)  <= Rec.FIFO_DataR;
                     when "000001" =>
-                        Rdata(31 downto 16) <= X"FFFF";
-                        Rdata(15 downto 0)  <= Rec.FFT_Data;
+                        Rdata(31 downto 8)  <= X"AAAAAA";
+                        Rdata(7 downto 0)   <= Rec.FIFO_AddrR;
                     when "000010" =>
-                        Rdata(31 downto 16) <= X"FFFF";
-                        Rdata(15 downto 0)  <= Rec.FFT_Reel;
-                    when "000011" =>
-                        Rdata(31 downto 16) <= X"FFFF";
-                        Rdata(15 downto 0)  <= Rec.FFT_Img;                     
+                        Rdata(3 downto 0)   <= "000" & Rec.FIFO_Cfg(0);
+                        Rdata(7 downto 4)   <= "000" & Rec.FIFO_Cfg(1);                        
+                        Rdata(31 downto 8)  <= X"CCCCCC";
                     when others =>
                         Rdata <= (others => '0');
                 end case;
@@ -122,4 +124,4 @@ Rec.FFT_Cfg(1) <= y_valid;
 
 apbo.prdata     <=   Rdata when apbi.penable = '1';
 
-end ar_APB_FFT;
+end ar_APB_FifoReade;

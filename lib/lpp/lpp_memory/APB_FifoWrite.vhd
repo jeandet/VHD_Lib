@@ -32,7 +32,7 @@ use lpp.lpp_fifo.all;
 
 --! Driver APB, va faire le lien entre l'IP VHDL de la FIFO et le bus Amba
 
-entity APB_FifoRead is
+entity APB_FifoWrite is
   generic (
     pindex       : integer := 0;
     paddr        : integer := 0;
@@ -46,14 +46,14 @@ entity APB_FifoRead is
     clk     : in std_logic;                             --! Horloge du composant
     rst     : in std_logic;                             --! Reset general du composant
     apbi    : in apb_slv_in_type;                       --! Registre de gestion des entrées du bus
-    Flag_WR : in std_logic;                             --! Demande l'écriture dans la mémoire, géré hors de l'IP
-    Waddr   : in std_logic_vector(addr_sz-1 downto 0);  --! Adresse du registre d'écriture dans la mémoire
+    Flag_RE : in std_logic;                             --! Demande de lecture de la mémoire, géré hors de l'IP
+    Raddr   : in std_logic_vector(addr_sz-1 downto 0);  --! Adresse du registre de lecture dans la mémoire
     apbo    : out apb_slv_out_type                      --! Registre de gestion des sorties du bus
     );
-end APB_FifoRead;
+end APB_FifoWrite;
 
 
-architecture ar_APB_FifoRead of APB_FifoRead is
+architecture ar_APB_FifoWrite of APB_FifoWrite is
 
 constant REVISION : integer := 1;
 
@@ -65,39 +65,43 @@ type FIFO_ctrlr_Reg is record
      FIFO_Cfg   : std_logic_vector(1 downto 0);
      FIFO_DataW : std_logic_vector(15 downto 0);
      FIFO_DataR : std_logic_vector(15 downto 0);
-     FIFO_AddrR : std_logic_vector(7 downto 0);
+     FIFO_AddrW : std_logic_vector(7 downto 0);
 end record;
 
 signal Rec    : FIFO_ctrlr_Reg;
 signal Rdata  : std_logic_vector(31 downto 0);
 
-signal flag_RE : std_logic;
-signal empty   : std_logic;
+signal flag_WR : std_logic;
+signal full    : std_logic;
 
 begin
 
-Rec.FIFO_Cfg(0) <= flag_RE;
-Rec.FIFO_Cfg(2) <= empty;
+Rec.FIFO_Cfg(0) <= flag_WR;
+Rec.FIFO_Cfg(1) <= full;
 
-
-   CONVERTER : entity Work.Top_FifoRead
+    MEMORY_WRITE : entity Work.Top_FifoWrite
         generic map(Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,flag_RE,flag_WR,Rec.FIFO_DataW,Rec.FIFO_AddrR,full,Waddr,Rec.FIFO_DataR);
+        port map(clk,rst,flag_RE,flag_WR,Rec.FIFO_DataW,Raddr,full,Rec.FIFO_AddrW,Rec.FIFO_DataR);
 
 
     process(rst,clk)
     begin
         if(rst='0')then
-            Rec.FIFO_AddrR <= (others => '0');
+            Rec.FIFO_DataW <= (others => '0');
 
         elsif(clk'event and clk='1')then        
 
     --APB Write OP
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
+                    when "000000" =>
+                        flag_WR        <= '1';
+                        Rec.FIFO_DataW <= apbi.pwdata(15 downto 0);                    
                     when others =>
                         null;
                 end case;
+            else
+                flag_WR <= '0';
             end if;
 
     --APB Read OP
@@ -108,7 +112,7 @@ Rec.FIFO_Cfg(2) <= empty;
                         Rdata(15 downto 0)  <= Rec.FIFO_DataR;
                     when "000001" =>
                         Rdata(31 downto 8)  <= X"AAAAAA";
-                        Rdata(7 downto 0)   <= Rec.FIFO_AddrR;
+                        Rdata(7 downto 0)   <= Rec.FIFO_AddrW;
                     when "000010" =>
                         Rdata(3 downto 0)   <= "000" & Rec.FIFO_Cfg(0);
                         Rdata(7 downto 4)   <= "000" & Rec.FIFO_Cfg(1);                        
@@ -122,6 +126,6 @@ Rec.FIFO_Cfg(2) <= empty;
         apbo.pconfig <= pconfig;
     end process;
 
-apbo.prdata     <=   Rdata when apbi.penable = '1';
+apbo.prdata <= Rdata when apbi.penable = '1';
 
-end ar_APB_FifoReade;
+end ar_APB_FifoWrite;

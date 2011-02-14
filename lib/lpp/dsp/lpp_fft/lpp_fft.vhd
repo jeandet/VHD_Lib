@@ -26,8 +26,9 @@ use grlib.amba.all;
 use std.textio.all;
 library lpp;
 use lpp.lpp_amba.all;
-use work.FFT_Config.all;
-USE work.fft_components.all;
+use lpp.lpp_memory.all;
+use work.fft_components.all;
+
 
 --! Package contenant tous les programmes qui forment le composant intégré dans le léon 
 
@@ -35,43 +36,19 @@ package lpp_fft is
 
 component APB_FFT is
   generic (
-    pindex   : integer := 0;
-    paddr    : integer := 0;
-    pmask    : integer := 16#fff#;
-    pirq     : integer := 0;
-    abits    : integer := 8);
+    pindex       : integer := 0;
+    paddr        : integer := 0;
+    pmask        : integer := 16#fff#;
+    pirq         : integer := 0;
+    abits        : integer := 8;
+    Data_sz      : integer := 16;
+    Addr_sz      : integer := 8;
+    addr_max_int : integer := 256);
   port (
     clk     : in  std_logic;
     rst     : in  std_logic;
     apbi    : in  apb_slv_in_type;
     apbo    : out apb_slv_out_type
-    );
-end component;
-
-
-component Top_FFT is
-  port(
-    clk,raz : in std_logic;
-    data    : in std_logic_vector(15 downto 0);   
-    y_valid : out std_logic;
-    d_valid : out std_logic;    
-    y_re    : out std_logic_vector(15 downto 0);
-    y_im    : out std_logic_vector(15 downto 0)
-    );
-end component; 
-
-
-component Driver_IN is
-  port(
-    clk,raz  : in std_logic;
-    load     : in std_logic;
-    data     : in std_logic_vector(15 downto 0);
-    start    : out std_logic;
-    read_y   : out std_logic;
-    d_valid  : out std_logic;
-    flag_RE  : out std_logic;
-    d_re     : out std_logic_vector(15 downto 0);
-    d_im     : out std_logic_vector(15 downto 0)
     );
 end component;
 
@@ -147,52 +124,6 @@ END component;
           A : IN std_logic_vector(gLOGPTS-2 DOWNTO 0);
           T : OUT std_logic_vector(gTDWIDTH-1 DOWNTO 0));
    END component;
-
-
---===========================================================|
---======================= Exemple ===========================|
---===========================================================|
-
-component APB_FFTexp is
-  generic (
-    pindex   : integer := 0;
-    paddr    : integer := 0;
-    pmask    : integer := 16#fff#;
-    pirq     : integer := 0;
-    abits    : integer := 8);
-  port (
-    clk     : in  std_logic;
-    rst     : in  std_logic;
-    apbi    : in  apb_slv_in_type;
-    apbo    : out apb_slv_out_type
-    );
-end component;
-
-
-component topFFTbis is
-  port(
-    clk,raz : in std_logic;    
-    y_valid : out std_logic;
-    y_rdy   : out std_logic;    
-    y_re    : out std_logic_vector(15 downto 0);
-    y_im    : out std_logic_vector(15 downto 0)
-    );
-end component;
-
-
-component Sinus_In is
-  port(
-    clk,raz  : in std_logic;
-    load     : in std_logic;
-    pong     : in std_logic;
-    start    : out std_logic;
-    read_y   : out std_logic;
-    d_valid  : out std_logic;
-    d_re     : out std_logic_vector(15 downto 0);
-    d_im     : out std_logic_vector(15 downto 0)
-    );
-end component;
-
 
 
 end;

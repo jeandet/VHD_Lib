@@ -26,11 +26,11 @@ use grlib.amba.all;
 use std.textio.all;
 library lpp;
 use lpp.lpp_amba.all;
-use work.FIFO_Config.all;
+
 
 --! Package contenant tous les programmes qui forment le composant intégré dans le léon 
 
-package lpp_fifo is
+package lpp_memory is
 
 --===========================================================|
 --================= FIFOW SRAM FIFOR ========================|
@@ -43,12 +43,40 @@ component APB_FIFO is
     pmask        : integer := 16#fff#;
     pirq         : integer := 0;
     abits        : integer := 8;
-    Addr_sz      : integer := 8;
     Data_sz      : integer := 16;
+    Addr_sz      : integer := 8;
     addr_max_int : integer := 256);
   port (
     clk          : in  std_logic;
     rst          : in  std_logic;
+    apbi         : in  apb_slv_in_type;
+    apbo         : out apb_slv_out_type
+    );
+end component;
+
+
+component ApbDriver is
+  generic (
+    pindex       : integer := 0;
+    paddr        : integer := 0;
+    pmask        : integer := 16#fff#;
+    pirq         : integer := 0;
+    abits        : integer := 8;
+    LPP_DEVICE   : integer;
+    Data_sz      : integer := 16;
+    Addr_sz      : integer := 8;    
+    addr_max_int : integer := 256);
+  port (
+    clk          : in  std_logic;     
+    rst          : in  std_logic;
+    ReadEnable   : in std_logic;
+    WriteEnable  : in std_logic;
+    FlagEmpty    : in std_logic;
+    FlagFull     : in std_logic;
+    DataIn       : out std_logic_vector(Data_sz-1 downto 0);
+    DataOut      : in std_logic_vector(Data_sz-1 downto 0);
+    AddrIn       : in std_logic_vector(Addr_sz-1 downto 0);
+    AddrOut      : in std_logic_vector(Addr_sz-1 downto 0);
     apbi         : in  apb_slv_in_type;
     apbo         : out apb_slv_out_type
     );

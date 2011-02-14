@@ -28,70 +28,77 @@ use grlib.devices.all;
 library lpp;
 use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
-use lpp.lpp_fifo.all;
 
---! Driver APB, va faire le lien entre l'IP VHDL de la FIFO et le bus Amba
 
-entity APB_FIFO is
+entity ApbDriver is
   generic (
     pindex       : integer := 0;
     paddr        : integer := 0;
     pmask        : integer := 16#fff#;
     pirq         : integer := 0;
     abits        : integer := 8;
+    LPP_DEVICE   : integer;
     Data_sz      : integer := 16;
     Addr_sz      : integer := 8;    
     addr_max_int : integer := 256);
   port (
-    clk     : in  std_logic;           --! Horloge du composant
-    rst     : in  std_logic;           --! Reset general du composant
-    apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
-    apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
+    clk          : in  std_logic;           --! Horloge du composant
+    rst          : in  std_logic;           --! Reset general du composant
+    ReadEnable   : out std_logic;
+    WriteEnable  : out std_logic;
+    FlagEmpty    : in std_logic;
+    FlagFull     : in std_logic;
+    DataIn       : out std_logic_vector(Data_sz-1 downto 0);
+    DataOut      : in std_logic_vector(Data_sz-1 downto 0);
+    AddrIn       : in std_logic_vector(Addr_sz-1 downto 0);
+    AddrOut      : in std_logic_vector(Addr_sz-1 downto 0);
+    apbi         : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
+    apbo         : out apb_slv_out_type     --! Registre de gestion des sorties du bus 
     );
-end APB_FIFO;
+end ApbDriver;
 
 
-architecture ar_APB_FIFO of APB_FIFO is
+architecture ar_ApbDriver of ApbDriver is
 
 constant REVISION : integer := 1;
 
 constant pconfig : apb_config_type := (
-  0 => ahb_device_reg (VENDOR_LPP, LPP_FIFO, 0, REVISION, 0),
+  0 => ahb_device_reg (VENDOR_LPP, LPP_DEVICE, 0, REVISION, 0),
   1 => apb_iobar(paddr, pmask));
 
-type FIFO_ctrlr_Reg is record
-     FIFO_Cfg   : std_logic_vector(3 downto 0);
-     FIFO_DataW : std_logic_vector(15 downto 0);
-     FIFO_DataR : std_logic_vector(15 downto 0);
-     FIFO_AddrW : std_logic_vector(7 downto 0);
-     FIFO_AddrR : std_logic_vector(7 downto 0);
+type DEVICE_ctrlr_Reg is record
+     DEVICE_Cfg   : std_logic_vector(3 downto 0);
+     DEVICE_DataW : std_logic_vector(Data_sz-1 downto 0);
+     DEVICE_DataR : std_logic_vector(Data_sz-1 downto 0);
+     DEVICE_AddrW : std_logic_vector(Addr_sz-1 downto 0);
+     DEVICE_AddrR : std_logic_vector(Addr_sz-1 downto 0);
 end record;
 
-signal Rec    : FIFO_ctrlr_Reg;
+signal Rec    : DEVICE_ctrlr_Reg;
 signal Rdata  : std_logic_vector(31 downto 0);
 
-signal flag_RE : std_logic;
-signal flag_WR : std_logic;
-signal full    : std_logic;
-signal empty   : std_logic;
+signal FlagRE : std_logic;
+signal FlagWR : std_logic;
 begin
 
-Rec.FIFO_Cfg(0) <= flag_RE;
-Rec.FIFO_Cfg(1) <= flag_WR;
-Rec.FIFO_Cfg(2) <= empty;
-Rec.FIFO_Cfg(3) <= full;
+Rec.DEVICE_Cfg(0) <= FlagRE;
+Rec.DEVICE_Cfg(1) <= FlagWR;
+Rec.DEVICE_Cfg(2) <= FlagEmpty;
+Rec.DEVICE_Cfg(3) <= FlagFull;
 
-    CONVERTER : entity Work.Top_FIFO
-        generic map(Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,flag_RE,flag_WR,Rec.FIFO_DataW,Rec.FIFO_AddrR,Rec.FIFO_AddrW,full,empty,Rec.FIFO_DataR);
+DataIn <= Rec.DEVICE_DataW;
+Rec.DEVICE_DataR <= DataOut;
+Rec.DEVICE_AddrW <= AddrIn;
+Rec.DEVICE_AddrR <= AddrOut;
+
 
 
     process(rst,clk)
     begin
         if(rst='0')then
-            Rec.FIFO_DataW <= (others => '0');
-            flag_WR <= '0';
-            flag_RE <= '0';
+            Rec.DEVICE_DataW <= (others => '0');
+            FlagWR <= '0';
+            FlagRE <= '0';
 
         elsif(clk'event and clk='1')then        
 
@@ -99,39 +106,39 @@ Rec.FIFO_Cfg(3) <= full;
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
                case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                         flag_WR <= '1';
-                         Rec.FIFO_DataW <= apbi.pwdata(15 downto 0);
+                         FlagWR <= '1';
+                         Rec.DEVICE_DataW <= apbi.pwdata(15 downto 0);
                     when others =>
                          null;
                end case;
             else
-                flag_WR <= '0';
+                FlagWR <= '0';
             end if;
 
     --APB Read OP
             if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
                case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                         flag_RE <= '1';
+                         FlagRE <= '1';
                          Rdata(31 downto 16) <= X"DDDD";
-                         Rdata(15 downto 0)  <= Rec.FIFO_DataR;
+                         Rdata(15 downto 0)  <= Rec.DEVICE_DataR;
                     when "000001" =>
                          Rdata(31 downto 8) <= X"AAAAAA";
-                         Rdata(7 downto 0)  <= Rec.FIFO_AddrR;
+                         Rdata(7 downto 0)  <= Rec.DEVICE_AddrR;
                     when "000101" =>
                          Rdata(31 downto 8) <= X"AAAAAA";
-                         Rdata(7 downto 0)  <= Rec.FIFO_AddrW;
+                         Rdata(7 downto 0)  <= Rec.DEVICE_AddrW;
                     when "000010" =>
-                         Rdata(3 downto 0)   <= "000" & Rec.FIFO_Cfg(0);
-                         Rdata(7 downto 4)   <= "000" & Rec.FIFO_Cfg(1);
-                         Rdata(11 downto 8)  <= "000" & Rec.FIFO_Cfg(2);
-                         Rdata(15 downto 12) <= "000" & Rec.FIFO_Cfg(3);
+                         Rdata(3 downto 0)   <= "000" & Rec.DEVICE_Cfg(0);
+                         Rdata(7 downto 4)   <= "000" & Rec.DEVICE_Cfg(1);
+                         Rdata(11 downto 8)  <= "000" & Rec.DEVICE_Cfg(2);
+                         Rdata(15 downto 12) <= "000" & Rec.DEVICE_Cfg(3);
                          Rdata(31 downto 16) <= X"CCCC";
                     when others =>
                          Rdata <= (others => '0');
                end case;
             else
-                flag_RE <= '0';
+                FlagRE <= '0';
             end if;
 
         end if;
@@ -139,5 +146,7 @@ Rec.FIFO_Cfg(3) <= full;
     end process;
 
 apbo.prdata     <=   Rdata when apbi.penable = '1';
+WriteEnable     <=   FlagWR;
+ReadEnable      <=   FlagRE;
 
-end ar_APB_FIFO;
+end ar_ApbDriver;
