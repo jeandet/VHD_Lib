@@ -7,4 +7,5 @@ Implemente a file info handler to cover author, license, contributors and ...
 recode LPP_UART
 Code CIC filter
 Code SM accelerator
-Code FFT accelerator
+~Code FFT accelerator
+Code Fx2 driver
