@@ -26,6 +26,7 @@ all:
 	make all -C LCD
 	make all -C DAC
 	make all -C FIFO
+	make all -C UART
 
 
 cleanall:
@@ -33,4 +34,5 @@ cleanall:
 	make clean -C LCD
 	make clean -C DAC
 	make clean -C FIFO
+	make clean -C UART
 

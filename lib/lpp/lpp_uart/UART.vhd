@@ -66,15 +66,15 @@ begin
 
 WDATA_int   <=  '1' & WDATA & '0'; 
 
-BaudGenerator : BaudGen
+BaudGenerator : entity work.BaudGen
     port map(clk,reset,Capture,Bclk,RXD,BTrigger);
 
 
-RX_REG  : Shift_REG
+RX_REG  : entity work.Shift_REG
     generic map(Data_sz+2)
     port map(clk,Bclk,reset,RXD,TXD_Dummy,receive,NwDat_int,zeroVect,RDATA_int);
 
-TX_REG  : Shift_REG
+TX_REG  : entity work.Shift_REG
     generic map(Data_sz+2)
     port map(clk,Bclk,reset,'1',TXD,Send,Sended,WDATA_int);
 

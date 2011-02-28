@@ -23,4 +23,5 @@ all:
 	make all -C ScanAPB
 	make all -C APB_lcd_ctrlr
 	make all -C BenchFIFO
+	make all -C BenchUART
 

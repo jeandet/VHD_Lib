@@ -90,9 +90,9 @@ begin
         if (Serialized_int = '0' and Serialize_reg ='1') then
             REG          <=  SIN & D(Data_sz-1 downto 1);
             SOUT         <=  D(0);
-        elsif CptBits_flag ='1' then
-            REG          <=  SIN & D(Data_sz-1 downto 1);
-            SOUT         <=  D(0);
+--        elsif CptBits_flag ='1' then
+--            REG          <=  SIN & D(Data_sz-1 downto 1);
+--            SOUT         <=  D(0);
         elsif Serialized_int = '0' then
             REG          <=  SIN & REG(Data_sz-1 downto 1);
             SOUT         <=  REG(0);
