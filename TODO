@@ -3,9 +3,11 @@ x Write a README
 x add app_simple_diode
 x add LCD_16x2_DRIVER.vhd
 ~ Write how_to_improve.pdf
-Implemente a file info handler to cover author, license, contributors and ... 
-recode LPP_UART
-Code CIC filter
-Code SM accelerator
-~Code FFT accelerator
-Code Fx2 driver
+Implemente a file info handler to cover author, license, contributors and ...       (low)
+X FIX LPP_UART
+Code CIC filter  (midle)
+Code SM accelerator   (high)
+~Code FFT accelerator => make it target independent (high)
+Code Fx2 driver  (midle)
+Fix frequency generator for output frequencies close to input frequencies    (low)
+improve ADC code => CNV pulse has to be adjusted  (low)
