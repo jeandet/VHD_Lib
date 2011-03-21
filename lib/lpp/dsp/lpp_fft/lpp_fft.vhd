@@ -53,6 +53,19 @@ component APB_FFT is
 end component;
 
 
+component Flag_Extremum is
+  port(
+    clk,raz    : in std_logic;
+    load       : in std_logic;
+    y_rdy      : in std_logic;
+    d_valid_WR : in std_logic;
+    read_y_RE  : in std_logic;
+    full       : out std_logic;
+    empty      : out std_logic    
+    );
+end component;
+
+
 component CoreFFT IS
   GENERIC (
     LOGPTS      : integer := gLOGPTS;

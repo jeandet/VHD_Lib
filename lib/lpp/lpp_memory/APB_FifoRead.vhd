@@ -52,76 +52,29 @@ entity APB_FifoRead is
     );
 end APB_FifoRead;
 
+--! @details Gestion de la FIFO uniquement en écriture
 
 architecture ar_APB_FifoRead of APB_FifoRead is
 
-constant REVISION : integer := 1;
-
-constant pconfig : apb_config_type := (
-  0 => ahb_device_reg (VENDOR_LPP, LPP_FIFO, 0, REVISION, 0),
-  1 => apb_iobar(paddr, pmask));
-
-type FIFO_ctrlr_Reg is record
-     FIFO_Cfg   : std_logic_vector(1 downto 0);
-     FIFO_DataW : std_logic_vector(15 downto 0);
-     FIFO_DataR : std_logic_vector(15 downto 0);
-     FIFO_AddrR : std_logic_vector(7 downto 0);
-end record;
-
-signal Rec    : FIFO_ctrlr_Reg;
-signal Rdata  : std_logic_vector(31 downto 0);
-
-signal flag_RE : std_logic;
-signal empty   : std_logic;
+signal ReadEnable   : std_logic;
+--signal WriteEnable  : std_logic;
+signal FlagEmpty    : std_logic;
+--signal FlagFull     : std_logic;
+signal DataIn       : std_logic_vector(Data_sz-1 downto 0);
+signal DataOut      : std_logic_vector(Data_sz-1 downto 0);
+--signal AddrIn       : std_logic_vector(Addr_sz-1 downto 0);
+signal AddrOut      : std_logic_vector(Addr_sz-1 downto 0);
 
 begin
 
-Rec.FIFO_Cfg(0) <= flag_RE;
-Rec.FIFO_Cfg(2) <= empty;
+    APB : ApbDriver
+        generic map(pindex,paddr,pmask,pirq,abits,LPP_FIFO,Data_sz,Addr_sz,addr_max_int)
+        port map(clk,rst,ReadEnable,open,FlagEmpty,open,DataIn,DataOut,open,AddrOut,apbi,apbo);
 
 
-   MEMORY_READ : entity Work.Top_FifoRead
+    MEMORY_READ : Top_FifoRead
         generic map(Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,flag_RE,flag_WR,Rec.FIFO_DataW,Rec.FIFO_AddrR,full,Waddr,Rec.FIFO_DataR);
+        port map(clk,rst,ReadEnable,flag_WR,DataIn,Waddr,FlagEmpty,AddrOut,DataOut);
 
-
-    process(rst,clk)
-    begin
-        if(rst='0')then
-            Rec.FIFO_AddrR <= (others => '0');
-
-        elsif(clk'event and clk='1')then        
-
-    --APB Write OP
-            if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
-                case apbi.paddr(abits-1 downto 2) is
-                    when others =>
-                        null;
-                end case;
-            end if;
-
-    --APB Read OP
-            if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
-                case apbi.paddr(abits-1 downto 2) is
-                    when "000000" =>
-                        Rdata(31 downto 16) <= X"DDDD";
-                        Rdata(15 downto 0)  <= Rec.FIFO_DataR;
-                    when "000001" =>
-                        Rdata(31 downto 8)  <= X"AAAAAA";
-                        Rdata(7 downto 0)   <= Rec.FIFO_AddrR;
-                    when "000010" =>
-                        Rdata(3 downto 0)   <= "000" & Rec.FIFO_Cfg(0);
-                        Rdata(7 downto 4)   <= "000" & Rec.FIFO_Cfg(1);                        
-                        Rdata(31 downto 8)  <= X"CCCCCC";
-                    when others =>
-                        Rdata <= (others => '0');
-                end case;
-            end if;
-
-        end if;
-        apbo.pconfig <= pconfig;
-    end process;
-
-apbo.prdata     <=   Rdata when apbi.penable = '1';
 
 end ar_APB_FifoReade;

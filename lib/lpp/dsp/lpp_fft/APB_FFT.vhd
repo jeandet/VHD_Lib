@@ -29,6 +29,7 @@ library lpp;
 use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
 use lpp.lpp_fft.all;
+use lpp.lpp_memory.all;
 use work.fft_components.all;
 
 --! Driver APB, va faire le lien entre l'IP VHDL de la FFT et le bus Amba
@@ -63,20 +64,24 @@ signal DataOut      : std_logic_vector(Data_sz-1 downto 0);
 signal AddrIn       : std_logic_vector(Addr_sz-1 downto 0);
 signal AddrOut      : std_logic_vector(Addr_sz-1 downto 0);
 
-signal X,Y,Z : std_logic;
---signal Pong : std_logic;
---signal Valid : std_logic;
+signal start   : std_logic;
+signal load    : std_logic;
+signal rdy     : std_logic;
 signal DummyIn : std_logic_vector(Data_sz-1 downto 0);
---signal DummyOut : std_logic_vector(Data_sz-1 downto 0);
+
  
 begin
 
-    APB : entity work.ApbDriver
+    APB : ApbDriver
         generic map(pindex,paddr,pmask,pirq,abits,LPP_FFT,Data_sz,Addr_sz,addr_max_int)
         port map(clk,rst,ReadEnable,WriteEnable,FlagEmpty,FlagFull,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
+        
 
+    Extremum : Flag_Extremum
+        port map(clk,raz,load,rdy,WriteEnable,ReadEnable,FlagFull,FlagEmpty);  
+        
 
-    DEVICE : entity work.CoreFFT       
+    DEVICE : CoreFFT
         generic map(
         LOGPTS      => gLOGPTS,
         LOGLOGPTS   => gLOGLOGPTS,
@@ -89,11 +94,11 @@ begin
         PTS         => gPTS,
         HALFPTS     => gHALFPTS,
         inBuf_RWDLY => gInBuf_RWDLY)        
-        port map(clk,X,rst,WriteEnable,ReadEnable,DummyIn,DataIn,Y,open,open,DataOut,open,Z);
+        port map(clk,start,rst,WriteEnable,ReadEnable,DummyIn,DataIn,load,open,open,DataOut,open,rdy);
 
-X <= not rst;
-Y <= not FlagFull;
-Z <= not FlagEmpty;
-DummyIn <= (others => '0');
+start     <= not rst;
+--FlagFull  <= not load;
+--FlagEmpty <= not rdy;
+DummyIn   <= (others => '0');
 
 end ar_APB_FFT;

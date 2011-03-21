@@ -85,20 +85,20 @@ end component;
 
 component Top_FIFO is
   generic(
-    Addr_sz      : integer := 8;
     Data_sz      : integer := 16;
-    addr_max_int : integer := 256);
+    Addr_sz      : integer := 8;    
+    addr_max_int : integer := 256
+    );
   port(
-    clk          : in std_logic;
-    raz          : in std_logic;
-    Send_RE      : in std_logic;
-    Send_WR      : in std_logic;
-    Data_in      : in std_logic_vector(Data_sz-1 downto 0);
-    Addr_RE      : out std_logic_vector(addr_sz-1 downto 0);
-    Addr_WR      : out std_logic_vector(addr_sz-1 downto 0);
-    full         : out std_logic;
-    empty        : out std_logic;
-    Data_out     : out std_logic_vector(Data_sz-1 downto 0)
+    clk,raz  : in std_logic;                             --! Horloge et reset general du composant
+    flag_RE  : in std_logic;                             --! Flag, Demande la lecture de la mémoire
+    flag_WR  : in std_logic;                             --! Flag, Demande l'écriture dans la mémoire
+    Data_in  : in std_logic_vector(Data_sz-1 downto 0);  --! Data en entrée du composant
+    Addr_RE  : out std_logic_vector(addr_sz-1 downto 0); --! Adresse d'écriture
+    Addr_WR  : out std_logic_vector(addr_sz-1 downto 0); --! Adresse de lecture
+    full     : out std_logic;                            --! Flag, Mémoire pleine
+    empty    : out std_logic;                            --! Flag, Mémoire vide
+    Data_out : out std_logic_vector(Data_sz-1 downto 0)  --! Data en sortie du composant
     );
 end component;
 

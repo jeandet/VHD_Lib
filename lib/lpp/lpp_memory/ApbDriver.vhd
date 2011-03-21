@@ -29,6 +29,7 @@ library lpp;
 use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
 
+--! Driver APB "Générique" qui va faire le lien entre le bus Amba et la FIFO
 
 entity ApbDriver is
   generic (
@@ -42,21 +43,22 @@ entity ApbDriver is
     Addr_sz      : integer := 8;    
     addr_max_int : integer := 256);
   port (
-    clk          : in  std_logic;           --! Horloge du composant
-    rst          : in  std_logic;           --! Reset general du composant
-    ReadEnable   : out std_logic;
-    WriteEnable  : out std_logic;
-    FlagEmpty    : in std_logic;
-    FlagFull     : in std_logic;
-    DataIn       : out std_logic_vector(Data_sz-1 downto 0);
-    DataOut      : in std_logic_vector(Data_sz-1 downto 0);
-    AddrIn       : in std_logic_vector(Addr_sz-1 downto 0);
-    AddrOut      : in std_logic_vector(Addr_sz-1 downto 0);
-    apbi         : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
-    apbo         : out apb_slv_out_type     --! Registre de gestion des sorties du bus 
+    clk          : in  std_logic;                              --! Horloge du composant
+    rst          : in  std_logic;                              --! Reset general du composant
+    ReadEnable   : out std_logic;                              --! Instruction de lecture en mémoire
+    WriteEnable  : out std_logic;                              --! Instruction d'écriture en mémoire
+    FlagEmpty    : in std_logic;                               --! Flag, Mémoire vide
+    FlagFull     : in std_logic;                               --! Flag, Mémoire pleine
+    DataIn       : out std_logic_vector(Data_sz-1 downto 0);   --! Registre de données en entrée
+    DataOut      : in std_logic_vector(Data_sz-1 downto 0);    --! Registre de données en sortie
+    AddrIn       : in std_logic_vector(Addr_sz-1 downto 0);    --! Registre d'addresse (écriture)
+    AddrOut      : in std_logic_vector(Addr_sz-1 downto 0);    --! Registre d'addresse (lecture)
+    apbi         : in  apb_slv_in_type;                        --! Registre de gestion des entrées du bus
+    apbo         : out apb_slv_out_type                        --! Registre de gestion des sorties du bus
     );
 end ApbDriver;
 
+--! @details Utilisable avec n'importe quelle IP VHDL de type FIFO
 
 architecture ar_ApbDriver of ApbDriver is
 

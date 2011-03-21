@@ -39,7 +39,6 @@ entity Top_FifoRead is
     flag_WR  : in std_logic;                             --! Flag, Demande l'écriture dans la mémoire
     Data_in  : in std_logic_vector(Data_sz-1 downto 0);  --! Data en entrée du composant
     Waddr    : in std_logic_vector(addr_sz-1 downto 0);  --! Adresse du registre d'écriture dans la mémoire
-    full     : out std_logic;                            --! Flag, Mémoire pleine
     empty    : out std_logic;                            --! Flag, Mémoire vide
     Raddr    : out std_logic_vector(addr_sz-1 downto 0); --! Adresse du registre de lecture de la mémoire
     Data_out : out std_logic_vector(Data_sz-1 downto 0)  --! Data en sortie du composant

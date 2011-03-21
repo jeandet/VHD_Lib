@@ -77,7 +77,7 @@ begin
 enable <= Rec.CNA_Cfg(0);
 Rec.CNA_Cfg(1) <= flag_sd;
 
-    CONVERTER : entity Work.CNA_TabloC
+    CONVERTER : CNA_TabloC
         port map(clk,rst,enable,Rec.CNA_Data,SYNC,SCLK,flag_sd,Data);
 
 

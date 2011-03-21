@@ -25,6 +25,7 @@ use IEEE.numeric_std.all;
 library techmap;
 use techmap.gencomp.all;
 use work.config.all;
+use lpp.lpp_memory.all;
 
 --! Programme de la FIFO
 
@@ -75,7 +76,7 @@ signal s_flag_WR : std_logic;
 
 begin
     
-    WR : entity work.Fifo_Write
+    WR : Fifo_Write
        generic map(Addr_sz,addr_max_int)
        port map(clk,raz,s_flag_WR,Raddr,s_full,Waddr);
 
@@ -85,11 +86,11 @@ begin
        port map(clk,s_flag_RE,Raddr,Data_int,clk,s_flag_WR,Waddr,Data_in);
 
 
-    link : entity work.Link_Reg
+    link : Link_Reg
        generic map(Data_sz)
        port map(clk,raz,Data_in,Data_int,s_flag_RE,s_flag_WR,s_empty,Data_out);
 
-    RE : entity work.Fifo_Read
+    RE : Fifo_Read
        generic map(Addr_sz,addr_max_int)
        port map(clk,raz,s_flag_RE,Waddr,s_empty,Raddr);
 

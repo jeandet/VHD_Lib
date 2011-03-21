@@ -83,7 +83,7 @@ Rec.UART_Cfg(1) <= Sended;
 Rec.UART_Cfg(2) <= NwData;
 
 
-    COM0 : entity work.UART
+    COM0 : UART
         generic map (Data_sz)
         port map (clk,rst,TXD,RXD,Capture,NwData,ACK,Send,Sended,Rec.UART_BTrig,Rec.UART_Rdata,Rec.UART_Wdata);
 

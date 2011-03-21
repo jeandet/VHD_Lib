@@ -28,7 +28,7 @@ use grlib.devices.all;
 library lpp;
 use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
-use lpp.lpp_fifo.all;
+use lpp.lpp_memory.all;
 
 --! Driver APB, va faire le lien entre l'IP VHDL de la FIFO et le bus Amba
 
@@ -64,12 +64,12 @@ signal AddrOut      : std_logic_vector(Addr_sz-1 downto 0);
 
 begin
 
-    APB : entity work.ApbDriver
+    APB : ApbDriver
         generic map(pindex,paddr,pmask,pirq,abits,LPP_FIFO,Data_sz,Addr_sz,addr_max_int)
         port map(clk,rst,ReadEnable,WriteEnable,FlagEmpty,FlagFull,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
 
 
-    DEVICE : entity work.Top_FIFO
+    DEVICE : Top_FIFO
         generic map(Data_sz,Addr_sz,addr_max_int)
         port map(clk,rst,ReadEnable,WriteEnable,DataIn,AddrOut,AddrIn,FlagFull,FlagEmpty,DataOut);
 

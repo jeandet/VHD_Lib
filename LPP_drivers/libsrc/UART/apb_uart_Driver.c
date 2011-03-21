@@ -27,7 +27,7 @@
 UART_Device* openUART(int count)
 {
     UART_Device* uart0;
-    uart0 = (UART_Device*) apbgetdevice(LPP_UART_CTRLR,VENDOR_LPP,count);
+    uart0 = (UART_Device*) apbgetdevice(LPP_UART,VENDOR_LPP,count);
     uart0->ConfigReg = BaudGenOnDuty;
     return uart0;
 }
