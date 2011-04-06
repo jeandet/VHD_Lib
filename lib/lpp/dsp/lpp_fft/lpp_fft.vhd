@@ -29,7 +29,6 @@ use lpp.lpp_amba.all;
 use lpp.lpp_memory.all;
 use work.fft_components.all;
 
-
 --! Package contenant tous les programmes qui forment le composant intégré dans le léon 
 
 package lpp_fft is
@@ -45,14 +44,10 @@ component APB_FFT is
     Addr_sz      : integer := 8;    
     addr_max_int : integer := 256);
   port (
-    clk     : in  std_logic;           --! Horloge du composant
-    rst     : in  std_logic;           --! Reset general du composant
-    full,empty : out std_logic;
-    WR,RE : out std_logic;
-    flg_load,flg_rdy : out std_logic;
-    RZ : out std_logic;
-    apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
-    apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
+    clk     : in  std_logic;
+    rst     : in  std_logic;
+    apbi    : in  apb_slv_in_type;
+    apbo    : out apb_slv_out_type
     );
 end component;
 
@@ -67,6 +62,10 @@ component Flag_Extremum is
     );
 end component;
 
+--==============================================================|
+--================== IP VHDL de la FFT actel ===================|
+--================ non partagé dans la VHD_Lib =================|
+--==============================================================|
 
 component CoreFFT IS
   GENERIC (

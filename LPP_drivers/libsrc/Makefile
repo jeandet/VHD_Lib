@@ -27,6 +27,7 @@ all:
 	make all -C DAC
 	make all -C FIFO
 	make all -C UART
+	make all -C FFT
 
 
 cleanall:
@@ -35,4 +36,5 @@ cleanall:
 	make clean -C DAC
 	make clean -C FIFO
 	make clean -C UART
+	make clean -C FFT
 

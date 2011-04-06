@@ -45,7 +45,6 @@ entity ApbDriver is
   port (
     clk          : in  std_logic;                              --! Horloge du composant
     rst          : in  std_logic;                              --! Reset general du composant
-    RZ : out std_logic;
     ReadEnable   : out std_logic;                              --! Instruction de lecture en mémoire
     WriteEnable  : out std_logic;                              --! Instruction d'écriture en mémoire
     FlagEmpty    : in std_logic;                               --! Flag, Mémoire vide
@@ -70,7 +69,7 @@ constant pconfig : apb_config_type := (
   1 => apb_iobar(paddr, pmask));
 
 type DEVICE_ctrlr_Reg is record
-     DEVICE_Cfg   : std_logic_vector(4 downto 0);
+     DEVICE_Cfg   : std_logic_vector(3 downto 0);
      DEVICE_DataW : std_logic_vector(Data_sz-1 downto 0);
      DEVICE_DataR : std_logic_vector(Data_sz-1 downto 0);
      DEVICE_AddrW : std_logic_vector(Addr_sz-1 downto 0);
@@ -82,13 +81,13 @@ signal Rdata  : std_logic_vector(31 downto 0);
 
 signal FlagRE : std_logic;
 signal FlagWR : std_logic;
+
 begin
 
 Rec.DEVICE_Cfg(0) <= FlagRE;
 Rec.DEVICE_Cfg(1) <= FlagWR;
 Rec.DEVICE_Cfg(2) <= FlagEmpty;
 Rec.DEVICE_Cfg(3) <= FlagFull;
-Rz <= Rec.DEVICE_Cfg(4);
 
 DataIn <= Rec.DEVICE_DataW;
 Rec.DEVICE_DataR <= DataOut;
@@ -101,7 +100,6 @@ Rec.DEVICE_AddrR <= AddrOut;
     begin
         if(rst='0')then
             Rec.DEVICE_DataW <= (others => '0');
-            Rec.DEVICE_Cfg(4) <= '0';
             FlagWR <= '0';
             FlagRE <= '0';
 
@@ -113,8 +111,6 @@ Rec.DEVICE_AddrR <= AddrOut;
                     when "000000" =>
                          FlagWR <= '1';
                          Rec.DEVICE_DataW <= apbi.pwdata(Data_sz-1 downto 0);
-                    when "000010" =>
-                         Rec.DEVICE_Cfg(4) <= apbi.pwdata(16);
                     when others =>
                          null;
                end case;
@@ -139,8 +135,7 @@ Rec.DEVICE_AddrR <= AddrOut;
                          Rdata(7 downto 4)   <= "000" & Rec.DEVICE_Cfg(1);
                          Rdata(11 downto 8)  <= "000" & Rec.DEVICE_Cfg(2);
                          Rdata(15 downto 12) <= "000" & Rec.DEVICE_Cfg(3);
-                         Rdata(19 downto 16) <= "000" & Rec.DEVICE_Cfg(4);
-                         Rdata(31 downto 20) <= X"CCC";
+                         Rdata(31 downto 16) <= X"CCCC";
                     when others =>
                          Rdata <= (others => '0');
                end case;

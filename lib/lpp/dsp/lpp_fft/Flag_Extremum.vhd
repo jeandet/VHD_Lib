@@ -24,42 +24,37 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.FFT_config.all;
 
+--! Programme qui va permettre de générer des flags utilisés au niveau du driver C
+
 entity Flag_Extremum is
   port(
-    clk,raz    : in std_logic;
-    load       : in std_logic;
-    y_rdy      : in std_logic;
-    full       : out std_logic;
-    empty      : out std_logic    
+    clk,raz    : in std_logic;    --! Horloge et Reset général du composant
+    load       : in std_logic;    --! Signal en provenance de CoreFFT
+    y_rdy      : in std_logic;    --! Signal en provenance de CoreFFT
+    full       : out std_logic;   --! Flag, Va permettre d'autoriser l'écriture (Driver C)
+    empty      : out std_logic    --! Flag, Va permettre d'autoriser la lecture (Driver C)
     );
 end Flag_Extremum;
 
+--! @details Flags générés a partir de signaux fourni par l'IP FFT d'actel
+
 architecture ar_Flag_Extremum of Flag_Extremum is
 
---type etat is (eA,eB,eC,e0,e1,e2);
---signal ect : etat;
-
-signal load_reg : std_logic;
-signal y_rdy_reg : std_logic;
-
-begin 
+begin
     process (clk,raz)
     begin
         if(raz='0')then
             full  <= '1';
             empty <= '1';            
---            ect   <= eA;        
-            
-        elsif(clk' event and clk='1')then       
---            load_reg  <= load;
---            y_rdy_reg <= y_rdy;
+
+        elsif(clk' event and clk='1')then
 
             if(load='1' and y_rdy='0')then
-                full <= '0';
+                full  <= '0';
                 empty <= '1';
             
             elsif(y_rdy='1')then
-                full <= '1';
+                full  <= '1';
                 empty <= '0';
 
             else
@@ -67,49 +62,6 @@ begin
                 empty <= '1';
 
             end if;
-
---            case ect is
-
---                when eA => 
---                    if(load_reg='0' and load='1')then
---                        full <= '0';
---                        ect <= eB;
---                    end if;
---                    
---                when eB =>
---                    if(load_reg='1' and load='0')then
---                        ect <= eC;
---                    end if;
---                    
---                when eC =>
---                    if(load_reg='1' and load='0')then
---                        full <= '1';
---                        ect <= e0;
---                    end if;
-
---===================================================================================
-
---                when e0 => 
---                    if(load_reg='0' and load='1')then
---                        full <= '0';
---                        ect <= e1;
---                    end if;
---                    
---                when e1 =>
---                    if(load_reg='1' and load='0')then
---                        full <= '1';
---                        empty <= '0';
---                        ect <= e2;
---                    end if;
---                    
---                when e2 => 
---                    if(y_rdy_reg='1' and y_rdy='0')then  
---                        empty <= '1';
---                        ect <= e0;
---                    end if;
---                        
---
---            end case;
         end if;
     end process;
 

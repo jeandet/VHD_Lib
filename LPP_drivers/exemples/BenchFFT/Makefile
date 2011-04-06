@@ -14,15 +14,31 @@
 #--
 #--  You should have received a copy of the GNU General Public License
 #--  along with this program; if not, write to the Free Software
-#--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+#--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #------------------------------------------------------------------------------
 
+include ../../rules.mk
+LIBDIR = ../../lib
+INCPATH = ../../includes
+SCRIPTDIR=../../scripts/
+LIBS=-lapb_fft_Driver -llpp_apb_functions -lapb_uart_Driver
+INPUTFILE=main.c
+EXEC=BenchFFT.bin
+OUTBINDIR=bin/
 
 
-all:
-	make all -C ScanAPB
-	make all -C APB_lcd_ctrlr
-	make all -C BenchFIFO
-	make all -C BenchUART
-	make all -C BenchFFT
+.PHONY:bin
+
+all:bin
+	@echo $(EXEC)" file created"
+
+clean:
+	rm -f *.{o,a}
+
+
+
+help:ruleshelp
+	@echo "          all      : makes an executable file called "$(EXEC)
+	@echo "                     in "$(OUTBINDIR)
+	@echo "          clean    : removes temporary files"
 

@@ -47,10 +47,6 @@ entity APB_FFT is
   port (
     clk     : in  std_logic;           --! Horloge du composant
     rst     : in  std_logic;           --! Reset general du composant
-    full,empty : out std_logic;
-    WR,RE : out std_logic;
-    flg_load,flg_rdy : out std_logic;
-    RZ : out std_logic;
     apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
     apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
     );
@@ -69,24 +65,22 @@ signal DataIn_im       : std_logic_vector(gWSIZE-1 downto 0);
 signal DataOut_im      : std_logic_vector(gWSIZE-1 downto 0);
 signal DataIn          : std_logic_vector(Data_sz-1 downto 0);
 signal DataOut         : std_logic_vector(Data_sz-1 downto 0);
-signal AddrIn       : std_logic_vector(Addr_sz-1 downto 0);
-signal AddrOut      : std_logic_vector(Addr_sz-1 downto 0);
+signal AddrIn          : std_logic_vector(Addr_sz-1 downto 0);
+signal AddrOut         : std_logic_vector(Addr_sz-1 downto 0);
 
 signal start   : std_logic;
 signal load    : std_logic;
 signal rdy     : std_logic;
-signal raz : std_logic;
-
 
 begin
 
     APB : ApbDriver
         generic map(pindex,paddr,pmask,pirq,abits,LPP_FFT,Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,raz,ReadEnable,WriteEnable,FlagEmpty,FlagFull,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
+        port map(clk,rst,ReadEnable,WriteEnable,FlagEmpty,FlagFull,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
 
 
     Extremum : Flag_Extremum
-        port map(clk,raz,load,rdy,FlagFull,FlagEmpty);
+        port map(clk,rst,load,rdy,FlagFull,FlagEmpty);
 
 
     DEVICE : CoreFFT
@@ -102,22 +96,12 @@ begin
         PTS         => gPTS,
         HALFPTS     => gHALFPTS,
         inBuf_RWDLY => gInBuf_RWDLY)        
-        port map(clk,start,raz,WriteEnable,ReadEnable,DataIn_im,DataIn_re,load,open,DataOut_im,DataOut_re,open,rdy);
+        port map(clk,start,rst,WriteEnable,ReadEnable,DataIn_im,DataIn_re,load,open,DataOut_im,DataOut_re,open,rdy);
 
-start   <= not rst;
+start <= not rst;
 
 DataIn_re <= DataIn(31 downto 16);
 DataIn_im <= DataIn(15 downto 0);
-DataOut <= DataOut_re & DataOut_im;
-
-
-full <= FlagFull;
-empty <= FlagEmpty;
-WR <= WriteEnable;
-RE <= ReadEnable;
-flg_load <= load;
-flg_rdy <= rdy;
-RZ <= raz;
-
+DataOut   <= DataOut_re & DataOut_im;
 
 end ar_APB_FFT;
