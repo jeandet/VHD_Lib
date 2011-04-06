@@ -29,9 +29,8 @@ library lpp;
 use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
 
---! Driver APB "Générique" qui va faire le lien entre le bus Amba et la FIFO
 
-entity ApbDriver is
+entity FFTDriver is
   generic (
     pindex       : integer := 0;
     paddr        : integer := 0;
@@ -45,7 +44,7 @@ entity ApbDriver is
   port (
     clk          : in  std_logic;                              --! Horloge du composant
     rst          : in  std_logic;                              --! Reset general du composant
-    RZ : out std_logic;
+    Rz     : out std_logic;
     ReadEnable   : out std_logic;                              --! Instruction de lecture en mémoire
     WriteEnable  : out std_logic;                              --! Instruction d'écriture en mémoire
     FlagEmpty    : in std_logic;                               --! Flag, Mémoire vide
@@ -57,11 +56,9 @@ entity ApbDriver is
     apbi         : in  apb_slv_in_type;                        --! Registre de gestion des entrées du bus
     apbo         : out apb_slv_out_type                        --! Registre de gestion des sorties du bus
     );
-end ApbDriver;
+end FFTDriver;
 
---! @details Utilisable avec n'importe quelle IP VHDL de type FIFO
-
-architecture ar_ApbDriver of ApbDriver is
+architecture ar_FFTDriver of FFTDriver is
 
 constant REVISION : integer := 1;
 
@@ -70,7 +67,7 @@ constant pconfig : apb_config_type := (
   1 => apb_iobar(paddr, pmask));
 
 type DEVICE_ctrlr_Reg is record
-     DEVICE_Cfg   : std_logic_vector(4 downto 0);
+     DEVICE_Cfg   : std_logic_vector(3 downto 0);
      DEVICE_DataW : std_logic_vector(Data_sz-1 downto 0);
      DEVICE_DataR : std_logic_vector(Data_sz-1 downto 0);
      DEVICE_AddrW : std_logic_vector(Addr_sz-1 downto 0);
@@ -80,15 +77,13 @@ end record;
 signal Rec    : DEVICE_ctrlr_Reg;
 signal Rdata  : std_logic_vector(31 downto 0);
 
-signal FlagRE : std_logic;
 signal FlagWR : std_logic;
 begin
 
-Rec.DEVICE_Cfg(0) <= FlagRE;
-Rec.DEVICE_Cfg(1) <= FlagWR;
+Rz <= Rec.DEVICE_Cfg(0);
+ReadEnable <= Rec.DEVICE_Cfg(1);
 Rec.DEVICE_Cfg(2) <= FlagEmpty;
 Rec.DEVICE_Cfg(3) <= FlagFull;
-Rz <= Rec.DEVICE_Cfg(4);
 
 DataIn <= Rec.DEVICE_DataW;
 Rec.DEVICE_DataR <= DataOut;
@@ -101,20 +96,21 @@ Rec.DEVICE_AddrR <= AddrOut;
     begin
         if(rst='0')then
             Rec.DEVICE_DataW <= (others => '0');
-            Rec.DEVICE_Cfg(4) <= '0';
+            Rec.DEVICE_Cfg(0) <= '0';
+            Rec.DEVICE_Cfg(1) <= '0';
             FlagWR <= '0';
-            FlagRE <= '0';
 
         elsif(clk'event and clk='1')then        
 
     --APB Write OP
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
                case apbi.paddr(abits-1 downto 2) is
-                    when "000000" =>
+                    when "000000" => 
                          FlagWR <= '1';
                          Rec.DEVICE_DataW <= apbi.pwdata(Data_sz-1 downto 0);
-                    when "000010" =>
-                         Rec.DEVICE_Cfg(4) <= apbi.pwdata(16);
+                    When "000010" =>
+                         Rec.DEVICE_Cfg(0) <= apbi.pwdata(0);
+                         Rec.DEVICE_Cfg(1) <= apbi.pwdata(4);
                     when others =>
                          null;
                end case;
@@ -125,8 +121,7 @@ Rec.DEVICE_AddrR <= AddrOut;
     --APB Read OP
             if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
                case apbi.paddr(abits-1 downto 2) is
-                    when "000000" =>
-                         FlagRE <= '1';
+                    when "000000" =>                        
                          Rdata(Data_sz-1 downto 0)  <= Rec.DEVICE_DataR;
                     when "000001" =>
                          Rdata(31 downto 8) <= X"AAAAAA";
@@ -139,13 +134,10 @@ Rec.DEVICE_AddrR <= AddrOut;
                          Rdata(7 downto 4)   <= "000" & Rec.DEVICE_Cfg(1);
                          Rdata(11 downto 8)  <= "000" & Rec.DEVICE_Cfg(2);
                          Rdata(15 downto 12) <= "000" & Rec.DEVICE_Cfg(3);
-                         Rdata(19 downto 16) <= "000" & Rec.DEVICE_Cfg(4);
-                         Rdata(31 downto 20) <= X"CCC";
+                         Rdata(31 downto 16) <= X"CCCC";
                     when others =>
                          Rdata <= (others => '0');
                end case;
-            else
-                FlagRE <= '0';
             end if;
 
         end if;
@@ -154,6 +146,5 @@ Rec.DEVICE_AddrR <= AddrOut;
 
 apbo.prdata     <=   Rdata when apbi.penable = '1';
 WriteEnable     <=   FlagWR;
-ReadEnable      <=   FlagRE;
 
-end ar_ApbDriver;
+end ar_FFTDriver;

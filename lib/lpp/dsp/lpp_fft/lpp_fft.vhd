@@ -40,15 +40,19 @@ component APB_FFT is
     paddr        : integer := 0;
     pmask        : integer := 16#fff#;
     pirq         : integer := 0;
-    abits        : integer := 8;
-    Data_sz      : integer := 16;
-    Addr_sz      : integer := 8;
+    abits        : integer := 8;    
+    Data_sz      : integer := 32;
+    Addr_sz      : integer := 8;    
     addr_max_int : integer := 256);
   port (
-    clk     : in  std_logic;
-    rst     : in  std_logic;
-    apbi    : in  apb_slv_in_type;
-    apbo    : out apb_slv_out_type
+    clk     : in  std_logic;           --! Horloge du composant
+    rst     : in  std_logic;           --! Reset general du composant
+    full,empty : out std_logic;
+    WR,RE : out std_logic;
+    flg_load,flg_rdy : out std_logic;
+    RZ : out std_logic;
+    apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
+    apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
     );
 end component;
 
@@ -58,8 +62,6 @@ component Flag_Extremum is
     clk,raz    : in std_logic;
     load       : in std_logic;
     y_rdy      : in std_logic;
-    d_valid_WR : in std_logic;
-    read_y_RE  : in std_logic;
     full       : out std_logic;
     empty      : out std_logic    
     );

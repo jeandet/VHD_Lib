@@ -69,6 +69,7 @@ component ApbDriver is
   port (
     clk          : in  std_logic;     
     rst          : in  std_logic;
+    RZ : out std_logic;
     ReadEnable   : in std_logic;
     WriteEnable  : in std_logic;
     FlagEmpty    : in std_logic;
