@@ -26,7 +26,14 @@
 #define lcdCharCnt 80
 
 
-/** @todo implemente some shift functions */
+/*! \file apb_lcd_driver.h
+    \brief APB char LCD driver.
+    
+    This library is written to work with apb_lcd VHDL module from LPP's VHDlib. It help you to drive char LCD.
+    
+    \author Alexis Jeandet
+    \todo implemente some shift functions
+*/
 
 
 /*===================================================
@@ -34,30 +41,31 @@
 ====================================================*/
 
 
-
-/** error type used for most of lcd functions */
-typedef int lcd_err;
-
 /** lcd error ennum for higher abstraction level when error decoding */
  enum lcd_error
 {
-    lcd_error_no_error,         /**< no error append while function execution */
-    lcd_error_not_ready,        /**< the lcd isn't available*/
-    lcd_error_not_openned,      /**< the device guiven to the function isn't opened*/
-    lcd_error_too_long          /**< the string guiven to the lcd is bigger than the lcd frame buffer memory */
+    lcd_error_no_error,         /**< \brief no error append while function execution */
+    lcd_error_not_ready,        /**< \brief the lcd isn't available*/
+    lcd_error_not_openned,      /**< \brief the device guiven to the function isn't opened*/
+    lcd_error_too_long          /**< \brief the string guiven to the lcd is bigger than the lcd frame buffer memory */
 };
 
+typedef enum lcd_error lcd_err;
 
-/** for each command sended to the lcd driver a time should be guiven according to the lcd datasheet */
+/** for each command sended to the lcd driver a time should be guiven according to the lcd datasheet.
+Don't worry about time, the lcd VHDL module should be aware of oscillator frequency.
+*/
  enum lcd_CMD_time
 {
-    lcd_4us     = 0x0FF,
+    lcd_4us     = 0x0FF,        
     lcd_100us   = 0x1FF,
     lcd_4ms     = 0x2FF,
     lcd_20ms    = 0x3FF
 };
 
-/** list of availiable lcd commands use whith an AND mask whith cmd time */
+/** list of availiable lcd commands use whith an AND mask whith cmd time 
+\todo implemente more commands.
+*/
  enum lcd_CMD
 {
     CursorON    = 0xF0E,
@@ -78,10 +86,24 @@ typedef struct lcd_driver lcd_device;
         F U N C T I O N S
 ====================================================*/
 
-/** says if the lcd is busy */
+/*! \fn int lcdbusy(lcd_device * lcd);
+    \brief Say if the lcd screen is busy
+     
+    \param lcd The lcd device to test.
+    \return True if the lcd is busy.
+*/
 int lcdbusy(lcd_device * lcd);
 
-/** Opens and returns the counth lcd found on APB bus else NULL */
+
+/*! \fn lcd_device* lcdopen(int count);
+    \brief Return counth LCD.
+    
+    This Function scans APB devices table and returns counth LCD.
+    
+    \param count The number of the LCD you whant to get. For example if you have 3 LCD on your SOC you whant 
+    to use LCD1 so count = 2.
+    \return The pointer to the device.
+*/
 lcd_device* lcdopen(int count);
 
 /** Sends a command to the given device, don't forget to guive the time of the cmd */
