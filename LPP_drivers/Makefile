@@ -17,7 +17,7 @@
 #--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 #------------------------------------------------------------------------------
 
-
+.PHONY:doc
 
 all:
 	mkdir -p lib/
@@ -36,6 +36,10 @@ lib:
 	mkdir -p includes/
 	make all -C libsrc
 
+doc:
+	rm -R Doc/html/*
+	cp -R Doc/ressources/* Doc/html/
+	doxygen Doxyfile
 
 clean:
 	rm lib/*

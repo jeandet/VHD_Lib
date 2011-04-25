@@ -36,8 +36,9 @@
     on the APB bus by providing scan functions, it extract information such as device Version, IRQ value, Address mask.
     You can use it to print the APB devices list on your SOC.
     
-    \author Alexis Jeandet
+    \author Alexis Jeandet  alexis.jeandet@lpp.polytechnique.fr
     \todo implemente a descriptor structure for any APB device
+
 */
 
 
@@ -93,6 +94,7 @@ int* apbgetdevice(int PID,int VID,int count);
     \param count The number of the device you whant to get. For example if you have 3 UARTS on your SOC you whant 
     to use UART1 so count = 2.
     \param devinfo The device information structure to be populated.
+    \example scanAPB.c
 */
 void apbgetdeviceinfofromid(int PID,int VID,int count,struct apbdevinfo* devinfo);
 

@@ -30,7 +30,8 @@ use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
 use lpp.lpp_uart.all;
 
---! Driver APB, va faire le lien entre l'IP VHDL de l'UART et le bus Amba
+--! This is an APB UART you should use it with a processor as UART and drive it with its register over AMBA bus.
+--! \author Martin Morlot martin.morlot@lpp.polytechnique.fr
 
 entity APB_UART is
   generic (
@@ -41,12 +42,12 @@ entity APB_UART is
     abits    : integer := 8;
     Data_sz  : integer := 8);
   port (
-    clk     : in  std_logic;            --! Horloge du composant
-    rst     : in  std_logic;            --! Reset general du composant
-    apbi    : in  apb_slv_in_type;      --! Registre de gestion des entrées du bus
-    apbo    : out apb_slv_out_type;     --! Registre de gestion des sorties du bus
-    TXD    :   out std_logic;           --! Transmission série, côté composant
-    RXD    :   in  std_logic            --! Reception série, côté composant
+    clk     : in  std_logic;            --! System clock
+    rst     : in  std_logic;            --! System reset
+    apbi    : in  apb_slv_in_type;      --! APB input signals see grlib.amba package
+    apbo    : out apb_slv_out_type;     --! APB input signals see grlib.amba package
+    TXD    :   out std_logic;           --! UART Transmission pin
+    RXD    :   in  std_logic            --! UART Reception pin
     );
 end APB_UART;
 

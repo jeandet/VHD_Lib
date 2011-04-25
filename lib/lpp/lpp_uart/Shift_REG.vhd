@@ -23,20 +23,25 @@ library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
 
---! Gestion Reception/Transmission
+--! \brief Universal shift register can be used to serialize or deserialize data.
+--!
+--! \Author Alexis Jeandet alexis.jeandet@lpp.polytechnique.fr
+--! \todo move to general purpose library, explain more in detail the code and add some schematic in doc.
 
 entity Shift_REG is
-generic(Data_sz     :   integer :=  10);
+generic(
+        Data_sz     :   integer :=  10 --! Width of the shift register
+);
 port(
-    clk         :   in  std_logic;
-    Sclk        :   in  std_logic;
-    reset       :   in  std_logic;
-    SIN         :   in  std_logic;
-    SOUT        :   out std_logic;
-    Serialize   :   in  std_logic;
-    Serialized  :   out std_logic;
-    D           :   in  std_logic_vector(Data_sz-1 downto 0);
-    Q           :   out std_logic_vector(Data_sz-1 downto 0)
+    clk         :   in  std_logic; --! System clock
+    Sclk        :   in  std_logic; --! Serial clock
+    reset       :   in  std_logic; --! System reset
+    SIN         :   in  std_logic; --! Serial data in
+    SOUT        :   out std_logic; --! Serial data out
+    Serialize   :   in  std_logic; --! Launch serialization
+    Serialized  :   out std_logic; --! Serialization complete
+    D           :   in  std_logic_vector(Data_sz-1 downto 0); --! Parallel data to be shifted out
+    Q           :   out std_logic_vector(Data_sz-1 downto 0)  --! Unserialized data
 );
 end entity;
 
@@ -90,9 +95,6 @@ begin
         if (Serialized_int = '0' and Serialize_reg ='1') then
             REG          <=  SIN & D(Data_sz-1 downto 1);
             SOUT         <=  D(0);
---        elsif CptBits_flag ='1' then
---            REG          <=  SIN & D(Data_sz-1 downto 1);
---            SOUT         <=  D(0);
         elsif Serialized_int = '0' then
             REG          <=  SIN & REG(Data_sz-1 downto 1);
             SOUT         <=  REG(0);

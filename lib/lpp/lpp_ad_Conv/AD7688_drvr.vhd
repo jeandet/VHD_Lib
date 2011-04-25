@@ -25,70 +25,79 @@ library lpp;
 use lpp.lpp_ad_conv.all;
 use lpp.general_purpose.Clk_divider;
 
+
+--! \brief AD7688 driver, generates all needed signal to drive this ADC.
+--!
+--! \author Alexis Jeandet alexis.jeandet@lpp.polytechnique.fr
+
 entity AD7688_drvr is
-    generic(ChanelCount	:	integer; 
-				clkkHz		:	integer);
-		 Port ( clk 	: in  STD_LOGIC;
-				  reset 	: in  STD_LOGIC;
-				  smplClk: in	STD_LOGIC;
-				  DataReady : out std_logic;
-				  smpout : out Samples_out(ChanelCount-1 downto 0);	
-				  AD_in	: in	AD7688_in(ChanelCount-1 downto 0);	
-				  AD_out : out AD7688_out);
+generic(
+        ChanelCount     :integer; --! Number of ADC you whant to drive
+        clkkHz          :integer  --! System clock frequency in kHz usefull to generate some pulses with good width.
+        );
+Port(
+        clk       : in  STD_LOGIC; --! System clock
+        reset     : in  STD_LOGIC; --! System reset
+        smplClk   : in  STD_LOGIC; --! Sampling clock 
+        DataReady : out std_logic; --! New sample available
+        smpout    : out Samples_out(ChanelCount-1 downto 0); --! Samples 	
+        AD_in     : in  AD7688_in(ChanelCount-1 downto 0);   --! Input signals for ADC see lpp.lpp_ad_conv
+        AD_out    : out AD7688_out                           --! Output signals for ADC see lpp.lpp_ad_conv
+);
 end AD7688_drvr;
 
 architecture ar_AD7688_drvr of AD7688_drvr is
 
-constant		convTrigger	:	integer:=  clkkHz*16/10000;  --tconv = 1.6µs
+constant        convTrigger     :       integer:=  clkkHz*16/10000;  --tconv = 1.6µs
 
-signal i					: integer range 0 to convTrigger :=0;
-signal clk_int			:	std_logic;
-signal smplClk_reg	:	std_logic;
-signal cnv_int			:	std_logic;
+signal i                : integer range 0 to convTrigger :=0;
+signal clk_int          : std_logic;
+signal smplClk_reg      : std_logic;
+signal cnv_int          : std_logic;
 
 begin
 
 clkdiv: if clkkHz>=66000 generate 
-	clkdivider: Clk_divider
-		 generic map(clkkHz*1000,60000000)
-		 Port map( clk ,reset,clk_int);
-end generate;
-		
-clknodiv: if clkkHz<66000 generate 
-nodiv:		 clk_int <=	clk;
+        clkdivider: Clk_divider
+                generic map(clkkHz*1000,60000000)
+                Port map( clk ,reset,clk_int);
 end generate;
 
-AD_out.CNV	<=	cnv_int;	
-AD_out.SCK	<=	clk_int;
+clknodiv: if clkkHz<66000 generate 
+nodiv:  clk_int <=      clk;
+end generate;
+
+AD_out.CNV      <=      cnv_int;	
+AD_out.SCK      <=      clk_int;
 
 
 sckgen: process(clk,reset)
 begin
-	if reset = '0' then
-		i <= 0;
-		cnv_int		<=	'0';
-		smplClk_reg	<=	'0';
-	elsif clk'event and clk = '1' then
-		if smplClk = '1' and smplClk_reg = '0' then
-			if i = convTrigger then
-				smplClk_reg	<=	'1';
-				i	<=	0;
-				cnv_int	<=	'0';
-			else
-				i	<=	i+1;
-				cnv_int	<=	'1';
-			end if;
-		elsif smplClk = '0' and smplClk_reg = '1' then
-			smplClk_reg	<=	'0';
-		end if;
-	end if;
+        if reset = '0' then
+                i <= 0;
+                cnv_int         <=      '0';
+                smplClk_reg     <=      '0';
+        elsif clk'event and clk = '1' then
+                if smplClk = '1' and smplClk_reg = '0' then
+                        if i = convTrigger then
+                                smplClk_reg     <=      '1';
+                                i       <=      0;
+                                cnv_int	<=      '0';
+                        else
+                                i       <=      i+1;
+                                cnv_int <=      '1';
+                        end if;
+                elsif smplClk = '0' and smplClk_reg = '1' then
+                        smplClk_reg     <=      '0';
+                end if;
+        end if;
 end process;
 
 
 
 spidrvr: AD7688_spi_if 
-   generic map(ChanelCount)
-   Port map(clk_int,reset,cnv_int,DataReady,AD_in,smpout);
+        generic map(ChanelCount)
+        Port map(clk_int,reset,cnv_int,DataReady,AD_in,smpout);
 
 
 

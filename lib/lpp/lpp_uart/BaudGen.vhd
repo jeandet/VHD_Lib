@@ -23,17 +23,19 @@ library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
 
---! Generateur de Bauds
+--! This is an automatic Baud generator. To synchronize baudrate, it measure the smalest time between two transitions of RXD. So to set baud rate, the device connected to this UART should send at least one data such as 0xA5 (0b10100101) witch gives a lot of transition of one bit length.
+
+--! \author Alexis Jeandet alexis.jeandet@lpp.polytechnique.fr
 
 entity BaudGen is
 
 port(
-    clk         :   in  std_logic;
-    reset       :   in  std_logic;
-    Capture     :   in  std_logic;
-    Bclk        :   out std_logic;
-    RXD         :   in  std_logic;
-    BTrigger    :   out std_logic_vector(11 downto 0)
+    clk         :   in  std_logic; --! System clock
+    reset       :   in  std_logic; --! System reset
+    Capture     :   in  std_logic; --! baudrate reset so if you want to synchronize again the baudrate generator, usefull if you whant to decrease speed.
+    Bclk        :   out std_logic; --! Output baud clock
+    RXD         :   in  std_logic; --! UART Reception pin used to sample baudrate
+    BTrigger    :   out std_logic_vector(11 downto 0) --! Current value of the frequency divider
 );
 end BaudGen;
 

@@ -61,7 +61,10 @@ Patched-dist: Patch-GRLIB
 
 
 doc:
+	cp doc/ressources/*.jpg doc/html/
+	cp doc/ressources/doxygen.css doc/html/
 	make -C lib/lpp doc
+	make -C LPP_drivers doc
 
 
 pdf: doc

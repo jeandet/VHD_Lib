@@ -25,29 +25,29 @@ use IEEE.std_logic_1164.all;
 library lpp;
 use lpp.lpp_uart.all;
 
---! Programme qui va gerer toute la communication entre le PC et le FPGA
+--! \brief A general purpose UART with automatic baudrate 
+--! 
+--! \author Alexis Jeandet alexis.jeandet@lpp.polytechnique.fr
 
 entity UART is 
-generic(Data_sz     :   integer :=  8);            --! Constante de taille pour un mot de donnee
+generic(Data_sz     :   integer :=  8);            --! Data width
 port(
-    clk         :   in  std_logic;                              --! Horloge a 25Mhz du systeme
-    reset       :   in  std_logic;                              --! Reset du systeme
-    TXD         :   out std_logic;                              --! Transmission, cote PC
-    RXD         :   in  std_logic;                              --! Reception, cote PC
-    Capture     :   in  std_logic;                              --! "Reset" cible pour le generateur de bauds, ici indissocie du reset global 
-    NwDat       :   out std_logic;                              --! Flag, Nouvelle donnee presente
-    ACK         :   in  std_logic;                              --! Flag, Reponse au flag precedent
-    Send        :   in  std_logic;                              --! Flag, Demande d'envoi sur le bus
-    Sended      :   out std_logic;                              --! Flag, Envoi termine
-    BTrigger    :   out std_logic_vector(11 downto 0);          --! Registre contenant la valeur du diviseur de frequence pour la transmission
-    RDATA       :   out std_logic_vector(Data_sz-1 downto 0);   --! Mot de donnee en provenance de l'utilisateur
-    WDATA       :   in  std_logic_vector(Data_sz-1 downto 0)    --! Mot de donnee a transmettre a l'utilisateur
+    clk         :   in  std_logic;                              --! System clock
+    reset       :   in  std_logic;                              --! System reset
+    TXD         :   out std_logic;                              --! UART Transmission pin
+    RXD         :   in  std_logic;                              --! UART Reception pin
+    Capture     :   in  std_logic;                              --! Automatic baudrate module reset
+    NwDat       :   out std_logic;                              --! New data flag, means that a new data have been received by the UART
+    ACK         :   in  std_logic;                              --! Acknowledge flag to clear NwDat flag
+    Send        :   in  std_logic;                              --! To send a data you have to set this flag
+    Sended      :   out std_logic;                              --! When this flag is set you can sed a new data
+    BTrigger    :   out std_logic_vector(11 downto 0);          --! Baudrate generator current value, could be usefull if you whant to know the current value of the baudrate or of the oscillator (it suppose that you know baudrate)
+    RDATA       :   out std_logic_vector(Data_sz-1 downto 0);   --! Current read word
+    WDATA       :   in  std_logic_vector(Data_sz-1 downto 0)    --! Put here the word you whant to send
 );
 end entity;
 
---! @details Gestion de la Reception/Transmission donc de la Vectorisation/Serialisation
---! ainsi que la detection et le reglage de le frequence de transmission optimale sur le bus (Generateur de Bauds)
- 
+
 architecture ar_UART of UART is
 signal  Bclk    :   std_logic;
 
