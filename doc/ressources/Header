@@ -10,5 +10,5 @@
 <body > 
 <div id="wrap">
 <div id="header">
-<h1><a href="../../index.html">Free VHDL library</a></h1>
+<h1><a href="../../index.html" TARGET="_top">Free VHDL library</a></h1>
 </div>

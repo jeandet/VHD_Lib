@@ -124,7 +124,8 @@ void apbprintdeviceinfo(struct apbdevinfo devinfo);
     \brief Print APB devices informations in stdout.
     
         This function list all devices on APB bus and print theirs informations.
-    
+
+    \example scanAPB.c
 */
 void apbprintdeviceslist();
 

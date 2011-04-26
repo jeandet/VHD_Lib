@@ -17,35 +17,15 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 -------------------------------------------------------------------------------*/
 #include "stdio.h"
+//remember to include:
 #include "lpp_apb_functions.h"
 
 
 
 int main()
 {
-    int d=0;
-    while(d!=10)
-    {
-        scanf("%d",&d);
-        switch(d)
-        {
-        case 0:
-            printf("cursor OFF        \n");
-            break;
-        case 1:
-            printf("cursor ON       \n");
-            break;
-        case 2:
-            break;
-        case 3:
-            apbprintdeviceslist();
-            break;
-        case 10:
-            return 0;
-            break;
-        default:
-            break;
-        }
-    }
-    return 0;
+        //to print devices lilst
+        apbprintdeviceslist();
+        //if you whant to get a second device with 0x01/0x02 as VID/PID
+        int * dev = apbgetdevice(0x02, 0x01, 1);
 }

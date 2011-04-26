@@ -10,7 +10,6 @@
 <body onload='searchBox.OnSelectItem(0);'> 
 <div id="wrap">
 <div id="header">
-<h1><a name="Free_VHDL_library" /><a href="../../">Free
-VHDL library<br />
+<h1><a href="../../" TARGET="_top">Free VHDL library<br />
 </a></h1>
 </div>
