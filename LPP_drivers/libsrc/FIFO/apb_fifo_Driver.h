@@ -22,21 +22,36 @@
 #ifndef APB_FIFO_DRIVER_H
 #define APB_FIFO_DRIVER_H
 
+/*! \file apb_fifo_Driver.h
+    \brief LPP FIFO driver.
+
+    This library is written to work with LPP_APB_FIFO VHDL module from LPP's FreeVHDLIB. It represents a standard FIFO working,
+    used in many type of application.
+
+    \todo Check "DEVICE1 => count = 2" function Open
+    \author Martin Morlot  martin.morlot@lpp.polytechnique.fr
+*/
 
 
 /*===================================================
         T Y P E S     D E F
 ====================================================*/
 
-/** Structure représentant le registre du FIFO */
+/*! \struct APB_FIFO_REG
+    \brief Sturcture representing the fifo registers
+*/
 struct APB_FIFO_REG
 {
-    int rwdata;   /**< Registre de configuration: Flag Ready [1] ; Flag Enable [0] */
-    int raddr;     /**< Registre de donnée sur 16 bits */
-    int cfgreg;
-    int dummy0;
-    int dummy1;
-    int waddr;
+    int rwdata;  /**< \brief Data register Write/Read */
+    int raddr;   /**< \brief Address register for the reading operation */
+    int cfgreg;  /**< \brief Configuration register composed of Read enable Flag [HEX 0]
+                                                                Write enable Flag [HEX 1]
+                                                                Empty Flag [HEX 2]
+                                                                Full Flag [HEX 3]
+                                                                Dummy "C" [HEX 4/5/6/7] */
+    int dummy0;  /**< \brief Unused register, aesthetic interest */
+    int dummy1;  /**< \brief Unused register, aesthetic interest */
+    int waddr;   /**< \brief Address register for the writing operation */
 };
 
 typedef struct APB_FIFO_REG APB_FIFO_Device;
@@ -45,9 +60,16 @@ typedef struct APB_FIFO_REG APB_FIFO_Device;
         F U N C T I O N S
 ====================================================*/
 
-/** Ouvre l'accé au FIFO */
-APB_FIFO_Device* apbfifoOpen(int count);
+/*! \fn APB_FIFO_Device* apbfifoOpen(int count);
+    \brief Return count FIFO.
 
+    This Function scans APB devices table and returns count FIFO.
+
+    \param count The number of the FIFO you whant to get. For example if you have 3 FIFOS on your SOC you want
+    to use FIFO1 so count = 2.
+    \return The pointer to the device.
+*/
+APB_FIFO_Device* apbfifoOpen(int count);
 
 
 
