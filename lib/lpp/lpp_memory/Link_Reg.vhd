@@ -32,6 +32,7 @@ port(
     clk,raz  : in std_logic;                             --! Horloge et reset general du composant
     Data_one : in std_logic_vector(Data_sz-1 downto 0);  --! Donnée en entrée de la FIFO, coté écriture
     Data_two : in std_logic_vector(Data_sz-1 downto 0);  --! Donnée en sortie de la FIFO, coté lecture
+    ReUse    : in std_logic;                             --! Flag, Permet de relire la mémoire du début
     flag_RE  : in std_logic;                             --! Flag, Demande la lecture de la mémoire
     flag_WR  : in std_logic;                             --! Flag, Demande l'écriture dans la mémoire
     empty    : in std_logic;                             --! Flag, Mémoire vide
@@ -57,6 +58,8 @@ begin
                     if(flag_WR='1')then
                         Data_out <= Data_one;
                         ect      <= e1;
+                    elsif(ReUse='1')then
+                        ect      <= e1;                 
                     end if;
 
                 when e1 =>

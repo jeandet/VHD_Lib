@@ -39,6 +39,7 @@ entity Top_FIFO is
     clk,raz  : in std_logic;                             --! Horloge et reset general du composant
     flag_RE  : in std_logic;                             --! Flag, Demande la lecture de la mémoire
     flag_WR  : in std_logic;                             --! Flag, Demande l'écriture dans la mémoire
+    ReUse    : in std_logic;                             --! Flag, Permet de relire la mémoire du début
     Data_in  : in std_logic_vector(Data_sz-1 downto 0);  --! Data en entrée du composant
     Addr_RE  : out std_logic_vector(addr_sz-1 downto 0); --! Adresse d'écriture
     Addr_WR  : out std_logic_vector(addr_sz-1 downto 0); --! Adresse de lecture
@@ -88,11 +89,11 @@ begin
 
     link : Link_Reg
        generic map(Data_sz)
-       port map(clk,raz,Data_in,Data_int,s_flag_RE,s_flag_WR,s_empty,Data_out);
+       port map(clk,raz,Data_in,Data_int,ReUse,s_flag_RE,s_flag_WR,s_empty,Data_out);
 
     RE : Fifo_Read
        generic map(Addr_sz,addr_max_int)
-       port map(clk,raz,s_flag_RE,Waddr,s_empty,Raddr);
+       port map(clk,raz,s_flag_RE,ReUse,Waddr,s_empty,Raddr);
 
     process(clk,raz)
     begin

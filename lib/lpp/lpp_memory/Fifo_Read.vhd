@@ -32,6 +32,7 @@ generic(
 port( 
     clk,raz : in std_logic;                              --! Horloge et reset general du composant
     flag_RE : in std_logic;                              --! Flag, Demande la lecture de la mémoire
+    ReUse   : in std_logic;                              --! Flag, Permet de relire la mémoire du début
     Waddr   : in std_logic_vector(addr_sz-1 downto 0);   --! Adresse du registre d'écriture dans la mémoire
     empty   : out std_logic;                             --! Flag, Mémoire vide
     Raddr   : out std_logic_vector(addr_sz-1 downto 0)   --! Adresse du registre de lecture de la mémoire
@@ -59,6 +60,7 @@ begin
             Wad_int_reg <= Wad_int;
             Rad_int_reg <= Rad_int;
             flag_reg <= flag_RE;
+    
 
             if(flag_reg ='0' and flag_RE='1')then
                 if(Rad_int=addr_max_int-1)then
@@ -68,15 +70,21 @@ begin
                 end if;
             end if;
 
-            if(Rad_int_reg /= Rad_int)then
-                if(Rad_int=Wad_int)then
-                    empty <= '1';
-                else
-                    empty <= '0';
-                end if; 
-            elsif(Wad_int_reg /= Wad_int)then
+            if(ReUse='1')then
+                Rad_int <= 0;
                 empty <= '0';
+            else
+                if(Rad_int_reg /= Rad_int)then
+                    if(Rad_int=Wad_int)then
+                        empty <= '1';
+                    else
+                        empty <= '0';
+                    end if; 
+                elsif(Wad_int_reg /= Wad_int)then
+                    empty <= '0';
+                end if;
             end if;
+
         end if;
     end process;
 

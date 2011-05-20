@@ -49,6 +49,7 @@ entity ApbDriver is
     WriteEnable  : out std_logic;                              --! Instruction d'écriture en mémoire
     FlagEmpty    : in std_logic;                               --! Flag, Mémoire vide
     FlagFull     : in std_logic;                               --! Flag, Mémoire pleine
+    ReUse        : out std_logic;                               --! Flag, Permet de relire la mémoire du début 
     DataIn       : out std_logic_vector(Data_sz-1 downto 0);   --! Registre de données en entrée
     DataOut      : in std_logic_vector(Data_sz-1 downto 0);    --! Registre de données en sortie
     AddrIn       : in std_logic_vector(Addr_sz-1 downto 0);    --! Registre d'addresse (écriture)
@@ -69,7 +70,7 @@ constant pconfig : apb_config_type := (
   1 => apb_iobar(paddr, pmask));
 
 type DEVICE_ctrlr_Reg is record
-     DEVICE_Cfg   : std_logic_vector(3 downto 0);
+     DEVICE_Cfg   : std_logic_vector(4 downto 0);
      DEVICE_DataW : std_logic_vector(Data_sz-1 downto 0);
      DEVICE_DataR : std_logic_vector(Data_sz-1 downto 0);
      DEVICE_AddrW : std_logic_vector(Addr_sz-1 downto 0);
@@ -88,6 +89,7 @@ Rec.DEVICE_Cfg(0) <= FlagRE;
 Rec.DEVICE_Cfg(1) <= FlagWR;
 Rec.DEVICE_Cfg(2) <= FlagEmpty;
 Rec.DEVICE_Cfg(3) <= FlagFull;
+ReUse <= Rec.DEVICE_Cfg(4);
 
 DataIn <= Rec.DEVICE_DataW;
 Rec.DEVICE_DataR <= DataOut;
@@ -102,6 +104,7 @@ Rec.DEVICE_AddrR <= AddrOut;
             Rec.DEVICE_DataW <= (others => '0');
             FlagWR <= '0';
             FlagRE <= '0';
+            Rec.DEVICE_Cfg(4)  <= '0';
 
         elsif(clk'event and clk='1')then        
 
@@ -111,6 +114,8 @@ Rec.DEVICE_AddrR <= AddrOut;
                     when "000000" =>
                          FlagWR <= '1';
                          Rec.DEVICE_DataW <= apbi.pwdata(Data_sz-1 downto 0);
+                    when "000010" =>
+                         Rec.DEVICE_Cfg(4) <= apbi.pwdata(16);
                     when others =>
                          null;
                end case;
@@ -135,7 +140,8 @@ Rec.DEVICE_AddrR <= AddrOut;
                          Rdata(7 downto 4)   <= "000" & Rec.DEVICE_Cfg(1);
                          Rdata(11 downto 8)  <= "000" & Rec.DEVICE_Cfg(2);
                          Rdata(15 downto 12) <= "000" & Rec.DEVICE_Cfg(3);
-                         Rdata(31 downto 16) <= X"CCCC";
+                         Rdata(19 downto 16) <= "000" & Rec.DEVICE_Cfg(4);   
+                         Rdata(31 downto 20) <= X"CCC";
                     when others =>
                          Rdata <= (others => '0');
                end case;

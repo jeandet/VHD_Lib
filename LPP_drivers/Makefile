@@ -37,8 +37,9 @@ lib:
 	make all -C libsrc
 
 doc:
-	rm -R Doc/html/*
-	cp -R Doc/ressources/* Doc/html/
+	mkdir -p Doc/ressources/
+	mkdir -p Doc/html/
+	cp -f -R Doc/ressources/* Doc/html/
 	doxygen Doxyfile
 
 clean:
