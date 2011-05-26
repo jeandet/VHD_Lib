@@ -28,7 +28,7 @@ use grlib.devices.all;
 library lpp;
 use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
-use lpp.lpp_fifo.all;
+use lpp.lpp_memory.all;
 
 --! Driver APB, va faire le lien entre l'IP VHDL de la FIFO et le bus Amba
 
@@ -43,38 +43,41 @@ entity APB_FifoRead is
     Addr_sz      : integer := 8;
     addr_max_int : integer := 256);
   port (
-    clk     : in std_logic;                             --! Horloge du composant
-    rst     : in std_logic;                             --! Reset general du composant
-    apbi    : in apb_slv_in_type;                       --! Registre de gestion des entrées du bus
-    Flag_WR : in std_logic;                             --! Demande l'écriture dans la mémoire, géré hors de l'IP
-    Waddr   : in std_logic_vector(addr_sz-1 downto 0);  --! Adresse du registre d'écriture dans la mémoire
-    apbo    : out apb_slv_out_type                      --! Registre de gestion des sorties du bus
+    clk         : in std_logic;                             --! Horloge du composant
+    rst         : in std_logic;                             --! Reset general du composant
+    apbi        : in apb_slv_in_type;                       --! Registre de gestion des entrées du bus
+    WriteEnable : in std_logic;                             --! Demande de lecture de la mémoire, géré hors de l'IP
+    DATA        : out std_logic_vector(Data_sz-1 downto 0); --! Données en sortie de la mémoire
+    apbo        : out apb_slv_out_type                      --! Registre de gestion des sorties du bus
     );
 end APB_FifoRead;
 
---! @details Gestion de la FIFO uniquement en écriture
+--! @details Gestion de la FIFO, écriture interne au FPGA, lecture via le bus APB 
 
 architecture ar_APB_FifoRead of APB_FifoRead is
 
+signal Low          : std_logic:='0';
 signal ReadEnable   : std_logic;
---signal WriteEnable  : std_logic;
 signal FlagEmpty    : std_logic;
---signal FlagFull     : std_logic;
+signal FlagFull     : std_logic;
+signal ReUse        : std_logic;
+signal Lock         : std_logic;
 signal DataIn       : std_logic_vector(Data_sz-1 downto 0);
 signal DataOut      : std_logic_vector(Data_sz-1 downto 0);
---signal AddrIn       : std_logic_vector(Addr_sz-1 downto 0);
+signal AddrIn       : std_logic_vector(Addr_sz-1 downto 0);
 signal AddrOut      : std_logic_vector(Addr_sz-1 downto 0);
 
 begin
 
     APB : ApbDriver
         generic map(pindex,paddr,pmask,pirq,abits,LPP_FIFO,Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,ReadEnable,open,FlagEmpty,open,DataIn,DataOut,open,AddrOut,apbi,apbo);
+        port map(clk,rst,ReadEnable,Low,FlagEmpty,FlagFull,ReUse,Lock,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
 
 
-    MEMORY_READ : Top_FifoRead
+    FIFO : Top_FIFO
         generic map(Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,ReadEnable,flag_WR,DataIn,Waddr,FlagEmpty,AddrOut,DataOut);
+        port map(clk,rst,ReadEnable,WriteEnable,ReUse,Lock,DataIn,AddrOut,AddrIn,FlagFull,FlagEmpty,DataOut);
 
+DATA <= DataOut;
 
-end ar_APB_FifoReade;
+end ar_APB_FifoRead;

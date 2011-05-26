@@ -30,17 +30,18 @@ entity ALU_Driver is
       Input_SZ_1      :   integer := 16;
       Input_SZ_2      :   integer := 16);
   port(
-      clk      :   in std_logic;                                --! Horloge du composant
-      reset    :   in std_logic;                                --! Reset general du composant
-      IN1      :   in std_logic_vector(Input_SZ_1-1 downto 0);  --! Donnée d'entrée
-      IN2      :   in std_logic_vector(Input_SZ_2-1 downto 0);  --! Donnée d'entrée
-      Take     :   in std_logic;                                --! Flag, opérande récupéré
-      Received :   in std_logic;                                --! Flag, Résultat bien ressu
-      Valid    :   out std_logic;                               --! Flag, Résultat disponible
-      Read     :   out std_logic;                               --! Flag, opérande disponible
-      CTRL     :   out std_logic_vector(4 downto 0);            --! Permet de sélectionner la/les opération désirée
-      OP1      :   out std_logic_vector(Input_SZ_1-1 downto 0); --! Premier Opérande
-      OP2      :   out std_logic_vector(Input_SZ_2-1 downto 0)  --! Second Opérande
+      clk       :   in std_logic;                                --! Horloge du composant
+      reset     :   in std_logic;                                --! Reset general du composant
+      IN1       :   in std_logic_vector(Input_SZ_1-1 downto 0);  --! Donnée d'entrée
+      IN2       :   in std_logic_vector(Input_SZ_2-1 downto 0);  --! Donnée d'entrée
+      Take      :   in std_logic;                                --! Flag, opérande récupéré
+      Received  :   in std_logic;                                --! Flag, Résultat bien ressu
+      Conjugate :   in std_logic;                                --! Flag, Calcul sur un complexe et son conjugué
+      Valid     :   out std_logic;                               --! Flag, Résultat disponible
+      Read      :   out std_logic;                               --! Flag, opérande disponible
+      CTRL      :   out std_logic_vector(4 downto 0);            --! Permet de sélectionner la/les opération désirée
+      OP1       :   out std_logic_vector(Input_SZ_1-1 downto 0); --! Premier Opérande
+      OP2       :   out std_logic_vector(Input_SZ_2-1 downto 0)  --! Second Opérande
 );
 end ALU_Driver;
 
@@ -66,13 +67,13 @@ begin
     begin
 
         if(reset='0')then
-            ect <= eX;
-            st <= e0;
-            go_st <= '0';
-            CTRL <= "10000";
-            Read <= '0';
-            Valid <= '0';
-            Take_reg <= '0';
+            ect          <= eX;
+            st           <= e0;
+            go_st        <= '0';
+            CTRL         <= "10000";
+            Read         <= '0';
+            Valid        <= '0';
+            Take_reg     <= '0';
             Received_reg <= '0';
 
         elsif(clk'event and clk='1')then
@@ -120,7 +121,11 @@ begin
                     CTRL  <= "00000";
                     go_st <= '1';
                     if(Received_reg='0' and Received='1')then
-                        ect <= e3;
+                        if(Conjugate='1')then     
+                            ect <= eX;
+                        else
+                            ect <= e3;
+                        end if;
                     end if;
 
                 when e3 =>
@@ -147,7 +152,7 @@ begin
                         ect <= eX;
                     end if;
             end case;
-
+---------------------------------------------------------------------------------
             case st is
                 when e0 =>                    
                     if(go_st='1')then                         
@@ -160,8 +165,12 @@ begin
 
                 when e2 =>
                     if(Received_reg='0' and Received='1')then
-                        Valid <= '0';                    
-                        st    <= idle;
+                        Valid <= '0';
+                        if(Conjugate='1')then
+                            st <= idle2;
+                        else
+                            st <= idle;
+                        end if;
                     end if;
 
                 when idle =>

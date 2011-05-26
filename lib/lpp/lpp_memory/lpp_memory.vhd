@@ -72,7 +72,8 @@ component ApbDriver is
     WriteEnable  : in std_logic;
     FlagEmpty    : in std_logic;
     FlagFull     : in std_logic;
-    ReUse        : in std_logic;
+    ReUse        : out std_logic;
+    Lock         : out std_logic;
     DataIn       : out std_logic_vector(Data_sz-1 downto 0);
     DataOut      : in std_logic_vector(Data_sz-1 downto 0);
     AddrIn       : in std_logic_vector(Addr_sz-1 downto 0);
@@ -94,6 +95,7 @@ component Top_FIFO is
     flag_RE  : in std_logic;
     flag_WR  : in std_logic;
     ReUse    : in std_logic;
+    Lock     : in std_logic;
     Data_in  : in std_logic_vector(Data_sz-1 downto 0);
     Addr_RE  : out std_logic_vector(addr_sz-1 downto 0);
     Addr_WR  : out std_logic_vector(addr_sz-1 downto 0);
@@ -167,29 +169,31 @@ component APB_FifoWrite is
     clk          : in  std_logic;
     rst          : in  std_logic;
     apbi         : in  apb_slv_in_type;
+    ReadEnable   : in  std_logic;
+    DATA         : out std_logic_vector(Data_sz-1 downto 0);
     apbo         : out apb_slv_out_type
     );
 end component;
 
 
-component Top_FifoWrite is
-  generic(
-    Data_sz      : integer := 16;
-    Addr_sz      : integer := 8;
-    addr_max_int : integer := 256);
-  port(
-    clk          : in std_logic;
-    raz          : in std_logic;
-    flag_RE      : in std_logic;
-    flag_WR      : in std_logic;
-    Data_in      : in std_logic_vector(Data_sz-1 downto 0);
-    Raddr        : in std_logic_vector(addr_sz-1 downto 0);
-    full         : out std_logic;
-    empty        : out std_logic;
-    Waddr        : out std_logic_vector(addr_sz-1 downto 0);
-    Data_out     : out std_logic_vector(Data_sz-1 downto 0)
-    );
-end component;
+--component Top_FifoWrite is
+--  generic(
+--    Data_sz      : integer := 16;
+--    Addr_sz      : integer := 8;
+--    addr_max_int : integer := 256);
+--  port(
+--    clk          : in std_logic;
+--    raz          : in std_logic;
+--    flag_RE      : in std_logic;
+--    flag_WR      : in std_logic;
+--    Data_in      : in std_logic_vector(Data_sz-1 downto 0);
+--    Raddr        : in std_logic_vector(addr_sz-1 downto 0);
+--    full         : out std_logic;
+--    empty        : out std_logic;
+--    Waddr        : out std_logic_vector(addr_sz-1 downto 0);
+--    Data_out     : out std_logic_vector(Data_sz-1 downto 0)
+--    );
+--end component;
 
 --===========================================================|
 --================== Demi FIFO Lecture ======================|
@@ -209,28 +213,30 @@ component APB_FifoRead is
     clk          : in  std_logic;
     rst          : in  std_logic;
     apbi         : in  apb_slv_in_type;
+    WriteEnable  : in std_logic;                            
+    DATA         : out std_logic_vector(Data_sz-1 downto 0);
     apbo         : out apb_slv_out_type
     );
 end component;
 
 
-component Top_FifoRead is
-  generic(
-    Data_sz      : integer := 16;
-    Addr_sz      : integer := 8;
-    addr_max_int : integer := 256);
-  port(
-    clk          : in std_logic;
-    raz          : in std_logic;
-    flag_RE      : in std_logic;
-    flag_WR      : in std_logic;
-    Data_in      : in std_logic_vector(Data_sz-1 downto 0);
-    Waddr        : in std_logic_vector(addr_sz-1 downto 0);
-    full         : out std_logic;
-    empty        : out std_logic;
-    Raddr        : out std_logic_vector(addr_sz-1 downto 0);
-    Data_out     : out std_logic_vector(Data_sz-1 downto 0)
-    );
-end component;
+--component Top_FifoRead is
+--  generic(
+--    Data_sz      : integer := 16;
+--    Addr_sz      : integer := 8;
+--    addr_max_int : integer := 256);
+--  port(
+--    clk          : in std_logic;
+--    raz          : in std_logic;
+--    flag_RE      : in std_logic;
+--    flag_WR      : in std_logic;
+--    Data_in      : in std_logic_vector(Data_sz-1 downto 0);
+--    Waddr        : in std_logic_vector(addr_sz-1 downto 0);
+--    full         : out std_logic;
+--    empty        : out std_logic;
+--    Raddr        : out std_logic_vector(addr_sz-1 downto 0);
+--    Data_out     : out std_logic_vector(Data_sz-1 downto 0)
+--    );
+--end component;
 
 end;

@@ -22,6 +22,8 @@
 library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
+use lpp.lpp_matrix.all;
+use lpp.general_purpose.all;
 
 --! Un MAC : Multiplier Accumulator Chip
 
@@ -79,7 +81,7 @@ begin
 --==============================================================
 --=============M A C  C O N T R O L E R=========================
 --==============================================================
-MAC_CONTROLER1 : entity work.MAC_CONTROLER
+MAC_CONTROLER1 : MAC_CONTROLER
 port map(
     ctrl        =>  MAC_MUL_ADD_2C_D(1 downto 0),
     MULT        =>  mult,
@@ -96,7 +98,7 @@ port map(
 --==============================================================
 --=============M U L T I P L I E R==============================
 --==============================================================
-Multiplieri_nst : entity work.Multiplier
+Multiplieri_nst : Multiplier
 generic map(
     Input_SZ_A     =>   Input_SZ_A,
     Input_SZ_B     =>   Input_SZ_B
@@ -118,7 +120,7 @@ port map(
 --==============================================================
 --======================A D D E R ==============================
 --==============================================================
-adder_inst : entity work.Adder
+adder_inst : Adder
 generic map(
     Input_SZ_A     =>   Input_SZ_A+Input_SZ_B,
     Input_SZ_B     =>   Input_SZ_A+Input_SZ_B
@@ -141,7 +143,7 @@ port map(
 --==============================================================
 --===================TWO COMPLEMENTERS==========================
 --==============================================================
-TWO_COMPLEMENTER1 : entity work.TwoComplementer
+TWO_COMPLEMENTER1 : TwoComplementer
 generic map(
     Input_SZ    =>   Input_SZ_A
 )
@@ -155,7 +157,7 @@ port map(
 );
 
 
-TWO_COMPLEMENTER2 : entity work.TwoComplementer
+TWO_COMPLEMENTER2 : TwoComplementer
 generic map(
     Input_SZ    =>   Input_SZ_B
 )
@@ -169,7 +171,7 @@ port map(
 );
 --==============================================================
 
-CTRL : entity work.MAC_REG
+CTRL : MAC_REG
 generic map(size    =>  2)
 port map(
     reset   =>  reset,
@@ -178,7 +180,7 @@ port map(
     Q    =>  MAC_MUL_ADD_2C_D(1 downto 0)
 );
 
-clr_MACREG1 : entity work.MAC_REG 
+clr_MACREG1 : MAC_REG
 generic map(size    =>  1)
 port map(
     reset   =>  reset,
@@ -187,7 +189,7 @@ port map(
     Q(0)    =>  clr_MAC_D
 );
 
-clr_MACREG2 : entity work.MAC_REG 
+clr_MACREG2 : MAC_REG
 generic map(size    =>  1)
 port map(
     reset   =>  reset,
@@ -196,7 +198,7 @@ port map(
     Q(0)    =>  clr_MAC_D_D
 );
 
-addREG : entity work.MAC_REG 
+addREG : MAC_REG
 generic map(size    =>  1)
 port map(
     reset   =>  reset,
@@ -206,7 +208,7 @@ port map(
 );
 
 
-OP1REG : entity work.MAC_REG 
+OP1REG : MAC_REG
 generic map(size    =>  Input_SZ_A)
 port map(
     reset   =>  reset,
@@ -216,7 +218,7 @@ port map(
 );
 
 
-OP2REG : entity work.MAC_REG 
+OP2REG : MAC_REG
 generic map(size    =>  Input_SZ_B)
 port map(
     reset   =>  reset,
@@ -226,7 +228,7 @@ port map(
 );
 
 
-MULToutREG : entity work.MAC_REG 
+MULToutREG : MAC_REG
 generic map(size    =>  Input_SZ_A+Input_SZ_B)
 port map(
     reset   =>  reset,
@@ -236,7 +238,7 @@ port map(
 );
 
 
-MACMUXselREG : entity work.MAC_REG 
+MACMUXselREG : MAC_REG
 generic map(size    =>  1)
 port map(
     reset   =>  reset,
@@ -247,7 +249,7 @@ port map(
 
 
 
-MACMUX2selREG : entity work.MAC_REG 
+MACMUX2selREG : MAC_REG
 generic map(size    =>  1)
 port map(
     reset   =>  reset,
@@ -257,7 +259,7 @@ port map(
 );
 
 
-MACMUX2selREG2 : entity work.MAC_REG 
+MACMUX2selREG2 : MAC_REG
 generic map(size    =>  1)
 port map(
     reset   =>  reset,
@@ -270,7 +272,7 @@ port map(
 --==============================================================
 --======================M A C  M U X ===========================
 --==============================================================
-MACMUX_inst : entity work.MAC_MUX 
+MACMUX_inst : MAC_MUX
 generic map(
     Input_SZ_A     =>   Input_SZ_A+Input_SZ_B,
     Input_SZ_B     =>   Input_SZ_A+Input_SZ_B
@@ -293,7 +295,7 @@ OP2_Resz  <=  std_logic_vector(resize(signed(OP2_2C_D),Input_SZ_A+Input_SZ_B));
 --==============================================================
 --======================M A C  M U X2 ==========================
 --==============================================================
-MAC_MUX2_inst   : entity work.MAC_MUX2
+MAC_MUX2_inst   : MAC_MUX2
 generic map(Input_SZ     => Input_SZ_A+Input_SZ_B)
 port map(
     sel     =>  MACMUX2sel_D_D,

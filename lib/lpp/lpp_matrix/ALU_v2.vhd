@@ -22,6 +22,7 @@
 library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
+use lpp.lpp_matrix.all;
 
 --! Une ALU : Arithmetic and logical unit, permettant de réaliser une ou plusieurs opération
 
@@ -58,7 +59,7 @@ begin
 clr_MAC   <=  '1' when    ctrl = "10000" else '0';
 
 arith : if Arith_en = 1 generate
-MACinst : entity work.MAC_v2  
+MACinst : MAC_v2
 generic map(Input_SZ_1,Input_SZ_2)
 port map(clk,reset,clr_MAC,ctrl(3 downto 0),OP1,OP2,RES);
 end generate;

@@ -47,19 +47,38 @@ component APB_Matrix is
 end component;
 
 
+component SpectralMatrix is
+generic(
+    Input_SZ  : integer := 16;
+    Result_SZ : integer := 32);
+port(
+    clk      : in std_logic;
+    reset    : in std_logic;
+    B1       : in std_logic_vector(Input_SZ-1 downto 0);
+    B2       : in std_logic_vector(Input_SZ-1 downto 0);
+    B3       : in std_logic_vector(Input_SZ-1 downto 0);
+    E1       : in std_logic_vector(Input_SZ-1 downto 0);
+    E2       : in std_logic_vector(Input_SZ-1 downto 0);
+    ReadFIFO : out std_logic_vector(4 downto 0);  --B1,B2,B3,E1,E2
+    Result   : out std_logic_vector(Result_SZ-1 downto 0)
+);
+end component;
+
+
 component Matrix is
   generic(
       Input_SZ : integer := 16);
   port(
-      clk      : in std_logic;
-      raz      : in std_logic;
-      IN1      : in std_logic_vector(Input_SZ-1 downto 0);
-      IN2      : in std_logic_vector(Input_SZ-1 downto 0);
-      Take     : in std_logic;
-      Received : in std_logic;
-      Valid    : out std_logic;
-      Read     : out std_logic;
-      Result   : out std_logic_vector(2*Input_SZ-1 downto 0)
+      clk        : in std_logic;
+      raz        : in std_logic;
+      IN1        : in std_logic_vector(Input_SZ-1 downto 0);
+      IN2        : in std_logic_vector(Input_SZ-1 downto 0);
+      Take       : in std_logic;
+      Received   : in std_logic;
+      Conjugate  : in std_logic;
+      Valid      : out std_logic;
+      Read       : out std_logic;
+      Result     : out std_logic_vector(2*Input_SZ-1 downto 0)
 );
 end component;
 
@@ -69,17 +88,18 @@ component ALU_Driver is
       Input_SZ_1      :   integer := 16;
       Input_SZ_2      :   integer := 16);
   port(
-      clk      :   in std_logic;
-      reset    :   in std_logic;
-      IN1      :   in std_logic_vector(Input_SZ_1-1 downto 0);
-      IN2      :   in std_logic_vector(Input_SZ_2-1 downto 0);
-      Take     :   in std_logic;
-      Received :   in std_logic;
-      Valid    :   out std_logic;
-      Read     :   out std_logic;
-      CTRL     :   out std_logic_vector(4 downto 0);
-      OP1      :   out std_logic_vector(Input_SZ_1-1 downto 0);
-      OP2      :   out std_logic_vector(Input_SZ_2-1 downto 0)
+      clk       :   in std_logic;
+      reset     :   in std_logic;
+      IN1       :   in std_logic_vector(Input_SZ_1-1 downto 0);
+      IN2       :   in std_logic_vector(Input_SZ_2-1 downto 0);
+      Take      :   in std_logic;
+      Received  :   in std_logic;
+      Conjugate :   in std_logic;
+      Valid     :   out std_logic;
+      Read      :   out std_logic;
+      CTRL      :   out std_logic_vector(4 downto 0);
+      OP1       :   out std_logic_vector(Input_SZ_1-1 downto 0);
+      OP2       :   out std_logic_vector(Input_SZ_2-1 downto 0)
 );
 end component;
 
@@ -129,5 +149,41 @@ port(
     RES     : out std_logic_vector(Input_SZ-1 downto 0)
 );
 end component; 
+
+
+component GetResult is
+generic(
+    Result_SZ : integer := 32);
+port(
+    clk       : in  std_logic;
+    raz       : in  std_logic;
+    Valid     : in  std_logic;
+    Conjugate : in  std_logic;
+    Res       : in  std_logic_vector(Result_SZ-1 downto 0);
+    Received  : out std_logic;
+    Result    : out std_logic_vector(Result_SZ-1 downto 0)
+);
+end component;
+
+
+component SelectInputs is
+generic(
+    Input_SZ : integer := 16);
+port(
+    clk       : in  std_logic;
+    raz       : in  std_logic;
+    Read      : in  std_logic;
+    B1        : in  std_logic_vector(Input_SZ-1 downto 0);
+    B2        : in  std_logic_vector(Input_SZ-1 downto 0);
+    B3        : in  std_logic_vector(Input_SZ-1 downto 0);
+    E1        : in  std_logic_vector(Input_SZ-1 downto 0);
+    E2        : in  std_logic_vector(Input_SZ-1 downto 0);
+    Conjugate : out std_logic;
+    Take      : out std_logic;
+    ReadFIFO  : out std_logic_vector(4 downto 0); --B1,B2,B3,E1,E2
+    OP1       : out std_logic_vector(Input_SZ-1 downto 0);
+    OP2       : out std_logic_vector(Input_SZ-1 downto 0)
+);
+end component;
 
 end;
