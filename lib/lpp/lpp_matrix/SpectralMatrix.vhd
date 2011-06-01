@@ -36,8 +36,13 @@ port(
     B3       : in std_logic_vector(Input_SZ-1 downto 0);
     E1       : in std_logic_vector(Input_SZ-1 downto 0);
     E2       : in std_logic_vector(Input_SZ-1 downto 0);
+    Empty : in std_logic_vector(4 downto 0);  --B1,B2,B3,E1,E2
+    Statu : out std_logic_vector(3 downto 0);
     ReadFIFO : out std_logic_vector(4 downto 0);  --B1,B2,B3,E1,E2
-    Result   : out std_logic_vector(Result_SZ-1 downto 0)
+    OP11          :  out std_logic_vector(Input_SZ-1 downto 0);
+    starting : out std_logic;
+    Conj : out std_logic;
+    Result       : out std_logic_vector(Result_SZ-1 downto 0)     
 );
 end SpectralMatrix;
 
@@ -49,26 +54,33 @@ signal Take         :   std_logic;
 signal Received     :   std_logic;
 signal Valid        :   std_logic;
 signal Conjugate    :   std_logic;
+signal Start        :   std_logic;
 signal OP1          :   std_logic_vector(Input_SZ-1 downto 0);
 signal OP2          :   std_logic_vector(Input_SZ-1 downto 0);
 signal Resultat     :   std_logic_vector(Result_SZ-1 downto 0);
 
-begin
 
+begin
+OP11 <= OP1;
+starting <= Start;
+conj <= Conjugate;
+
+ST0 : Starter
+    port map(clk,reset,Empty(4),Empty(3),Conjugate,Start);
 
 IN0 : SelectInputs
     generic map(Input_SZ)
-    port map(clk,reset,Read,B1,B2,B3,E1,E2,Conjugate,Take,ReadFIFO,OP1,OP2);
+    port map(clk,Start,Read,B1,B2,B3,E1,E2,Conjugate,Take,ReadFIFO,Statu,OP1,OP2);
 
 
 CALC0 : Matrix
     generic map(Input_SZ)
-    port map(clk,reset,OP1,OP2,Take,Received,Conjugate,Valid,Read,Resultat);
+    port map(clk,Start,OP1,OP2,Take,Received,Conjugate,Valid,Read,Resultat);
 
 
 RES0 : GetResult
     generic map(Result_SZ)
-    port map(clk,reset,Valid,Conjugate,Resultat,Received,Result);
+    port map(clk,Start,Valid,Conjugate,Resultat,Received,Result);
 
 
 end ar_SpectralMatrix;

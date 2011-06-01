@@ -170,6 +170,7 @@ component APB_FifoWrite is
     rst          : in  std_logic;
     apbi         : in  apb_slv_in_type;
     ReadEnable   : in  std_logic;
+    Empty        : out std_logic;
     DATA         : out std_logic_vector(Data_sz-1 downto 0);
     apbo         : out apb_slv_out_type
     );
@@ -213,7 +214,7 @@ component APB_FifoRead is
     clk          : in  std_logic;
     rst          : in  std_logic;
     apbi         : in  apb_slv_in_type;
-    WriteEnable  : in std_logic;                            
+    WriteEnable  : in std_logic;
     DATA         : out std_logic_vector(Data_sz-1 downto 0);
     apbo         : out apb_slv_out_type
     );

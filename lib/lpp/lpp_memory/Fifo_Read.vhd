@@ -64,14 +64,13 @@ begin
 
             if(flag_reg ='0' and flag_RE='1')then
                 if(Rad_int=addr_max_int-1)then
-                    Rad_int <= 0;
+                    Rad_int <= 0;               
                 else
                     Rad_int <= Rad_int+1;
                 end if;
             end if;
 
-            if(ReUse='1')then
-                Rad_int <= 0;
+            if(ReUse='1')then                
                 empty <= '0';
             else
                 if(Rad_int_reg /= Rad_int)then
@@ -82,7 +81,7 @@ begin
                     end if; 
                 elsif(Wad_int_reg /= Wad_int)then
                     empty <= '0';
-                end if;
+                end if;            
             end if;
 
         end if;

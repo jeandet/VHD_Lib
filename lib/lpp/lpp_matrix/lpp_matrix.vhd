@@ -59,7 +59,12 @@ port(
     B3       : in std_logic_vector(Input_SZ-1 downto 0);
     E1       : in std_logic_vector(Input_SZ-1 downto 0);
     E2       : in std_logic_vector(Input_SZ-1 downto 0);
+    Empty : in std_logic_vector(4 downto 0);  --B1,B2,B3,E1,E2
+    Statu : out std_logic_vector(3 downto 0);
     ReadFIFO : out std_logic_vector(4 downto 0);  --B1,B2,B3,E1,E2
+    OP11          :  out std_logic_vector(Input_SZ-1 downto 0);
+        starting : out std_logic;
+    Conj : out std_logic;
     Result   : out std_logic_vector(Result_SZ-1 downto 0)
 );
 end component;
@@ -181,8 +186,21 @@ port(
     Conjugate : out std_logic;
     Take      : out std_logic;
     ReadFIFO  : out std_logic_vector(4 downto 0); --B1,B2,B3,E1,E2
+    Statu : out std_logic_vector(3 downto 0);
     OP1       : out std_logic_vector(Input_SZ-1 downto 0);
     OP2       : out std_logic_vector(Input_SZ-1 downto 0)
+);
+end component;
+
+
+component Starter is
+port(
+    clk     : in  std_logic;
+    raz     : in  std_logic;
+    empty1    : in  std_logic;
+    empty2    : in  std_logic;
+    Conjugate : in std_logic;
+    Start    : out std_logic
 );
 end component;
 
