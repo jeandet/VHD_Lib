@@ -46,6 +46,10 @@ entity APB_FIFO is
     clk     : in  std_logic;           --! Horloge du composant
     rst     : in  std_logic;           --! Reset general du composant
     apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
+    Full    : out std_logic;
+    Empty   : out std_logic;
+    WR : out std_logic;
+    RE : out std_logic;
     apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
     );
 end APB_FIFO;
@@ -57,7 +61,8 @@ signal ReadEnable   : std_logic;
 signal WriteEnable  : std_logic;
 signal FlagEmpty    : std_logic;
 signal FlagFull     : std_logic;
-signal ReUse       : std_logic;
+signal ReUse        : std_logic;
+signal Lock         : std_logic;
 signal DataIn       : std_logic_vector(Data_sz-1 downto 0);
 signal DataOut      : std_logic_vector(Data_sz-1 downto 0);
 signal AddrIn       : std_logic_vector(Addr_sz-1 downto 0);
@@ -67,12 +72,16 @@ begin
 
     APB : ApbDriver
         generic map(pindex,paddr,pmask,pirq,abits,LPP_FIFO,Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,ReadEnable,WriteEnable,FlagEmpty,FlagFull,ReUse,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
+        port map(clk,rst,ReadEnable,WriteEnable,FlagEmpty,FlagFull,ReUse,Lock,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
 
 
     DEVICE : Top_FIFO
         generic map(Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,ReadEnable,WriteEnable,ReUse,DataIn,AddrOut,AddrIn,FlagFull,FlagEmpty,DataOut);
+        port map(clk,rst,ReadEnable,WriteEnable,ReUse,Lock,DataIn,AddrOut,AddrIn,FlagFull,FlagEmpty,DataOut);
 
+Empty <= FlagEmpty;
+Full <= FlagFull;
+WR <= WriteEnable;
+RE <= ReadEnable;
 
 end ar_APB_FIFO;

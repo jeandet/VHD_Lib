@@ -1,0 +1,107 @@
+#-- Synopsys, Inc.
+#-- Version D-2009.12A
+#-- Project file C:\opt\GRLIB\grlib-ft-fpga-1.0.21-b4003\designs\TEST-LEON-M7-LPP\synthesis\run_options.txt
+#-- Written on Tue Aug 23 13:18:18 2011
+
+
+#project files
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/misc/rstgen.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/grlib/stdlib/version.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/grlib/stdlib/stdlib.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/grlib/amba/amba.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/techmap/gencomp/gencomp.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/techmap/proasic3/clkgen_proasic3.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/techmap/maps/allclkgen.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/techmap/maps/clkgen.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/grlib/amba/devices.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/grlib/amba/ahbctrl.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/misc/misc.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/misc/ahbmst.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/uart/uart.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/uart/libdcom.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/uart/dcom_uart.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/uart/dcom.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/uart/ahbuart.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/techmap/maps/allpads.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/techmap/maps/inpad.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/techmap/maps/outpad.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/memctrl/memctrl.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/memctrl/sdmctrl.vhd"
+add_file -vhdl -lib esa "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/esa/memoryctrl/memoryctrl.vhd"
+add_file -vhdl -lib esa "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/esa/memoryctrl/mctrl.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/techmap/maps/iopad.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/leon3/leon3.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/leon3/irqmp.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/grlib/amba/apbctrl.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/misc/gptimer.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/gaisler/misc/grgpio.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/lpp/./lpp_amba/lpp_amba.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/lpp/./lpp_amba/apb_devices_list.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/lpp/./lpp_memory/ApbDriver.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/lpp/./lpp_memory/Fifo_Write.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/lpp/./lpp_memory/Fifo_Read.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/techmap/inferred/memory_inferred.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/techmap/proasic3/memory_apa3.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/techmap/maps/allmem.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/techmap/maps/syncram_2p.vhd"
+add_file -vhdl -lib work "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/config.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/lpp/./lpp_memory/lpp_memory.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/lpp/./lpp_memory/Top_FIFO.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/lpp/./lpp_memory/APB_FifoWrite.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/lpp/./lpp_usb/RWbuf.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/lpp/./lpp_memory/APB_FifoRead.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/../../lib/lpp/./lpp_usb/lpp_usb.vhd"
+add_file -vhdl -lib work "C:/opt/GRLIB/grlib-ft-fpga-1.0.21-b4003/designs/TEST-LEON-M7-LPP/leon3mp.vhd"
+
+
+#implementation: "synthesis"
+impl -add synthesis -type fpga
+
+#device options
+set_option -technology ProASIC3
+set_option -part M7A3P1000
+set_option -package FBGA144
+set_option -speed_grade -2
+set_option -part_companion ""
+
+#compilation/mapping options
+set_option -use_fsm_explorer 0
+set_option -top_module "work.top"
+
+# mapper_options
+set_option -frequency 100.000
+set_option -write_verilog 0
+set_option -write_vhdl 0
+
+# Actel 500K
+set_option -run_prop_extract 1
+set_option -maxfan 24
+set_option -maxfan_hard3 0
+set_option -disable_io_insertion 0
+set_option -retiming 0
+set_option -report_path 0
+set_option -opcond COMWC
+set_option -update_models_cp 0
+set_option -preserve_registers 0
+
+# Actel 500K
+set_option -globalthreshold 50
+
+# NFilter
+set_option -popfeed 0
+set_option -constprop 0
+set_option -createhierarchy 0
+
+# sequential_optimization_options
+set_option -symbolic_fsm_compiler 1
+
+# Compiler Options
+set_option -compiler_compatible 0
+set_option -resource_sharing 1
+
+#automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+
+#set result format/file last
+project -result_file "./top.edn"
+impl -active "synthesis"

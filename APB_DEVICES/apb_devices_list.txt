@@ -13,3 +13,4 @@ device LPP_IIR_CEL_FILTER 10
 device LPP_FIFO 11
 device LPP_FFT 12
 device LPP_MATRIX 13
+device LPP_BALISE 14

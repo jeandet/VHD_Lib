@@ -1,0 +1,122 @@
+##########################################################################
+#  FILE NAME   :  LFR-142200-DM-MINIAMBA.pdc
+#  DATA        :  July 19, 2011
+#  VERSION     :  1.0
+#
+#  DESCRIPTION :  Physical Constraints for LFR developpement model
+#
+#  MODIFICATION HISTORY:
+#    19/07/2011   1.0     Initial Release
+##########################################################################
+
+
+##########################################################################
+#  SYSTEM SIGNALS
+##########################################################################
+set_io clk50MHz           -pinname W17    -fixed yes
+set_io reset        -pinname W15    -fixed yes
+
+##########################################################################
+#  FLASH/SRAM MEMORY INTERFACE SIGNALS
+##########################################################################
+set_io romsn         -pinname B16    -fixed yes
+set_io oen              -pinname A16    -fixed yes
+set_io writen           -pinname A17    -fixed yes
+
+set_io sram_adsc        -pinname E19    -fixed yes
+set_io sram_adsp        -pinname F19    -fixed yes
+set_io sram_adv         -pinname G20    -fixed yes
+set_io sram_gwen        -pinname J16    -fixed yes
+set_io sram_pwrdwn      -pinname A18    -fixed yes
+set_io ramclk           -pinname F18    -fixed yes
+set_io ramsn         -pinname H17    -fixed yes
+set_io rwen          -pinname G19    -fixed yes
+set_io ramben\[0\]  -pinname J18
+set_io ramben\[1\]  -pinname J17
+set_io ramben\[2\]  -pinname H19
+set_io ramben\[3\]  -pinname H18
+set_io ramoen         -pinname G18    -fixed yes
+
+set_io address\[0\]    -pinname F12
+set_io address\[1\]    -pinname E12
+set_io address\[2\]    -pinname G12
+set_io address\[3\]    -pinname H12
+set_io address\[4\]    -pinname A12
+set_io address\[5\]    -pinname B12
+set_io address\[6\]    -pinname D13
+set_io address\[7\]    -pinname D12
+set_io address\[8\]    -pinname E14
+set_io address\[9\]    -pinname E13
+set_io address\[10\]   -pinname G13
+set_io address\[11\]   -pinname F13
+set_io address\[12\]   -pinname A13
+set_io address\[13\]   -pinname B13
+set_io address\[14\]   -pinname F14
+set_io address\[15\]   -pinname G14
+set_io address\[16\]   -pinname D15
+set_io address\[17\]   -pinname D14
+set_io address\[18\]   -pinname A15
+
+set_io data\[0\]    -pinname B5     -fixed yes
+set_io data\[1\]    -pinname B4     -fixed yes
+set_io data\[2\]    -pinname C7     -fixed yes
+set_io data\[3\]    -pinname C6     -fixed yes
+set_io data\[4\]    -pinname D8     -fixed yes
+set_io data\[5\]    -pinname E8     -fixed yes
+set_io data\[6\]    -pinname A5     -fixed yes
+set_io data\[7\]    -pinname A4     -fixed yes
+set_io data\[8\]    -pinname B7     -fixed yes
+set_io data\[9\]    -pinname B6     -fixed yes
+set_io data\[10\]   -pinname A7     -fixed yes
+set_io data\[11\]   -pinname A6     -fixed yes
+set_io data\[12\]   -pinname G10    -fixed yes
+set_io data\[13\]   -pinname G9     -fixed yes
+set_io data\[14\]   -pinname D9     -fixed yes
+set_io data\[15\]   -pinname E9     -fixed yes
+set_io data\[16\]   -pinname A8     -fixed yes
+set_io data\[17\]   -pinname B8     -fixed yes
+set_io data\[18\]   -pinname D10    -fixed yes
+set_io data\[19\]   -pinname E10    -fixed yes
+set_io data\[20\]   -pinname G11    -fixed yes
+set_io data\[21\]   -pinname H11    -fixed yes
+set_io data\[22\]   -pinname B10    -fixed yes
+set_io data\[23\]   -pinname C10    -fixed yes
+set_io data\[24\]   -pinname F11    -fixed yes
+set_io data\[25\]   -pinname F10    -fixed yes
+set_io data\[26\]   -pinname E11    -fixed yes
+set_io data\[27\]   -pinname D11    -fixed yes
+set_io data\[28\]   -pinname A9     -fixed yes
+set_io data\[29\]   -pinname B9     -fixed yes
+set_io data\[30\]   -pinname A11    -fixed yes
+set_io data\[31\]   -pinname A10    -fixed yes
+
+
+##########################################################################
+#  PUSH-BUTTON SWITCHES SIGNALS
+##########################################################################
+set_io gpio\[0\]          -pinname P7     -fixed yes
+set_io gpio\[1\]          -pinname R5     -fixed yes
+set_io gpio\[2\]          -pinname P6     -fixed yes
+set_io gpio\[3\]          -pinname R6     -fixed yes
+set_io gpio\[4\]          -pinname U3     -fixed yes
+set_io gpio\[5\]          -pinname T5     -fixed yes
+set_io gpio\[6\]          -pinname U2     -fixed yes
+#set_io gpio\[7\]          -pinname T4     -fixed yes
+
+
+##########################################################################
+#  LED SIGNALS
+##########################################################################
+set_io led\[0\]       -pinname R4     -fixed yes
+set_io led\[1\]         -pinname P5     -fixed yes
+set_io led\[2\]         -pinname R2     -fixed yes
+set_io led\[3\]         -pinname T2     -fixed yes
+set_io led\[4\]         -pinname P2     -fixed yes
+set_io led\[5\]         -pinname N2     -fixed yes
+
+
+##########################################################################
+#  RS-232 INTERFACE SIGNALS
+##########################################################################
+set_io ahbrxd            -pinname G21    -fixed yes
+set_io ahbtxd            -pinname B11    -fixed yes

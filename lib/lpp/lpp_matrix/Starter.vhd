@@ -27,9 +27,10 @@ entity Starter is
 port(
     clk     : in  std_logic;
     raz     : in  std_logic;
-    empty1    : in  std_logic;
-    empty2    : in  std_logic;
+    Full    : in  std_logic_vector(1 downto 0);
+    Empty    : in  std_logic_vector(1 downto 0);
     Conjugate : in std_logic;
+    received : in std_logic;
     Start    : out std_logic
 );
 end Starter;
@@ -37,29 +38,57 @@ end Starter;
 
 architecture ar_Starter of Starter is
 
+type etat is (eX,e0,e1);
+signal ect : etat;
+
+signal received_reg : std_logic;
+
 begin
     process(clk,raz)
     begin
     
         if(raz='0')then
             Start <= '0';
-                                
+            ect <= eX;
+
         elsif(clk'event and clk='1')then
+            received_reg <= received;
 
-            if(Conjugate='1')then
-                if(empty1='1')then
-                    Start <= '0';
-                else
-                    Start <= '1';
-                end if;
-            else
-                if(empty1='1' or empty2='1')then
-                    Start <= '0';
-                else
-                    Start <= '1';
-                end if;
+            case ect is
+               when eX =>
+                   if(Conjugate='0')then
+                       if(full="11")then
+                           Start <= '1';
+                           ect <= e0;
+                       end if;
+                   else
+                       if(full(0)='1')then
+                           Start <= '1';
+                           ect <= e0;
+                       end if;
+                   end if;
 
-            end if;
+                when e0 =>
+                   if(Conjugate='0')then
+                       if(empty="11")then
+                           --Start <= '0';
+                           ect <= e1;
+                       end if;
+                   else
+                       if(empty(0)='1')then
+                           --Start <= '0';
+                           ect <= e1;
+                       end if;
+                   end if;
+
+                when e1 =>
+                    if(received_reg='1' and received='0')then
+                        Start <= '0';
+                        ect <= eX;
+                    end if; 
+                    
+           end case;
+
         end if;
     end process;
 

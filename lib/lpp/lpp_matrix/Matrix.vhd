@@ -22,6 +22,7 @@
 library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
+use lpp.lpp_matrix.all;
 
 --! Programme de calcule de Matrice Spectral, composé d'une ALU et de son Driver
 
@@ -38,6 +39,8 @@ entity Matrix is
       Conjugate : in std_logic;                                --! Flag, Calcul sur un complexe et son conjugué
       Valid     : out std_logic;                               --! Flag, Résultat disponible
       Read      : out std_logic;                               --! Flag, opérande disponible
+      OPin1 : out std_logic_vector(3 downto 0);
+      OPin2 : out std_logic_vector(3 downto 0);
       Result    : out std_logic_vector(2*Input_SZ-1 downto 0)  --! Résultat du calcul
 );
 end Matrix;
@@ -50,13 +53,16 @@ signal OP1   : std_logic_vector(Input_SZ-1 downto 0);
 signal OP2   : std_logic_vector(Input_SZ-1 downto 0);
 
 begin
+OPin1 <= OP1(3 downto 0);
+OPin2 <= OP1(3 downto 0);
 
-DRIVE : entity work.ALU_Driver
+
+DRIVE : ALU_Driver
     generic map(Input_SZ,Input_SZ)
     port map(clk,raz,IN1,IN2,Take,Received,Conjugate,Valid,Read,CTRL,OP1,OP2);
 
 
-ALU : entity work.ALU_v2
+ALU : ALU_v2
     generic map(1,0,Input_SZ,Input_SZ)
     port map(clk,raz,CTRL,OP1,OP2,Result);  
 

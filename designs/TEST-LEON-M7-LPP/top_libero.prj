@@ -1,0 +1,778 @@
+KEY LIBERO "9.0"
+KEY CAPTURE "9.0.0.15"
+KEY DEFAULT_IMPORT_LOC "D:\GRLIB_BusAMBA\VHD_Lib\lib\lpp\lpp_matrix"
+KEY DEFAULT_OPEN_LOC ""
+KEY ProjectID "f91c9349-82d2-4d90-94a5-5c1ab23d9be4"
+KEY HDLTechnology "VHDL"
+KEY VendorTechnology_Family "ProASIC3"
+KEY VendorTechnology_Die "M7IS8X8M2"
+KEY VendorTechnology_Package "fg484"
+KEY ProjectLocation "D:\GRLIB_BusAMBA\VHD_Lib\designs\TEST-LEON-M7-LPP"
+KEY SimulationType "VHDL"
+KEY Vendor "Actel"
+KEY ActiveRoot "top::work"
+LIST REVISIONS
+VALUE="Impl1",NUM=1
+VALUE="Impl2",NUM=2
+CURREV=2
+ENDLIST
+LIST LIBRARIES
+grlib
+proasic3
+synplify
+techmap
+spw
+eth
+opencores
+gaisler
+esa
+fmf
+spansion
+gsi
+lpp
+cypress
+ENDLIST
+LIST LIBRARY_grlib
+ALIAS=grlib
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_proasic3
+ALIAS=proasic3
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_synplify
+ALIAS=synplify
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_techmap
+ALIAS=techmap
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_spw
+ALIAS=spw
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_eth
+ALIAS=eth
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_opencores
+ALIAS=opencores
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_gaisler
+ALIAS=gaisler
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_esa
+ALIAS=esa
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_fmf
+ALIAS=fmf
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_spansion
+ALIAS=spansion
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_gsi
+ALIAS=gsi
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_lpp
+ALIAS=lpp
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST LIBRARY_cypress
+ALIAS=cypress
+COMPILE_OPTION=COMPILE
+ENDLIST
+LIST FileManager
+VALUE "<project>\..\..\\boards\TEST-LEON-M7-LPP\TEST-LEON-M7-LPP.pdc,pdc"
+STATE="utd"
+TIME="1314098437"
+SIZE="5135"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\amba_lcd_16x2_ctrlr\amba_lcd_16x2_ctrlr.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="4857"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\amba_lcd_16x2_ctrlr\apb_lcd_ctrlr.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="4684"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\amba_lcd_16x2_ctrlr\FRAME_CLK.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="2063"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\amba_lcd_16x2_ctrlr\LCD_16x2_CFG.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="2262"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\amba_lcd_16x2_ctrlr\LCD_16x2_DRVR.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="4068"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\amba_lcd_16x2_ctrlr\LCD_16x2_ENGINE.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="5400"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\amba_lcd_16x2_ctrlr\LCD_2x16_DRIVER.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="4608"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\amba_lcd_16x2_ctrlr\LCD_CLK_GENERATOR.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="2035"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\amba_lcd_16x2_ctrlr\Top_LCD.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="3093"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\dsp\lpp_fft\actar.vhd,hdl"
+STATE="utd"
+TIME="1294746407"
+SIZE="141869"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\dsp\lpp_fft\actram.vhd,hdl"
+STATE="utd"
+TIME="1294746407"
+SIZE="4032"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\dsp\lpp_fft\APB_FFT.vhd,hdl"
+STATE="utd"
+TIME="1305730154"
+SIZE="4086"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\dsp\lpp_fft\CoreFFT.vhd,hdl"
+STATE="utd"
+TIME="1295516964"
+SIZE="12457"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\dsp\lpp_fft\fftDp.vhd,hdl"
+STATE="utd"
+TIME="1294746408"
+SIZE="25871"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\dsp\lpp_fft\fftSm.vhd,hdl"
+STATE="utd"
+TIME="1294746408"
+SIZE="32249"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\dsp\lpp_fft\fft_components.vhd,hdl"
+STATE="utd"
+TIME="1294746408"
+SIZE="5049"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\dsp\lpp_fft\Flag_Extremum.vhd,hdl"
+STATE="utd"
+TIME="1302081707"
+SIZE="2586"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\dsp\lpp_fft\lpp_fft.vhd,hdl"
+STATE="utd"
+TIME="1302081707"
+SIZE="5180"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\dsp\lpp_fft\primitives.vhd,hdl"
+STATE="utd"
+TIME="1294746408"
+SIZE="3997"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\dsp\lpp_fft\twiddle.vhd,hdl"
+STATE="utd"
+TIME="1294746408"
+SIZE="12080"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\Adder.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="2272"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\ADDRcntr.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="1930"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\ALU.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="2278"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\Clk_divider.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="1958"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\general_purpose.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="5897"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\MAC.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="7280"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\MAC_CONTROLER.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="1961"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\MAC_MUX.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="1985"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\MAC_MUX2.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="1710"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\MAC_REG.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="1775"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\Multiplier.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="2230"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\MUX2.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="1692"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\REG.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="1812"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\general_purpose\Shifter.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="2198"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_ad_Conv\AD7688_drvr.vhd,hdl"
+STATE="utd"
+TIME="1303904791"
+SIZE="3844"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_ad_Conv\AD7688_spi_if.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="2498"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_ad_Conv\ADS7886_drvr.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="2995"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_ad_Conv\lpp_ad_Conv.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="3758"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_ad_Conv\lpp_apb_ad_conv.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="4391"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_amba\apb_devices_list.vhd,hdl"
+STATE="utd"
+TIME="1313682708"
+SIZE="1231"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_amba\APB_MULTI_DIODE.vhd,hdl"
+STATE="utd"
+TIME="1292489754"
+SIZE="3238"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_amba\APB_SIMPLE_DIODE.vhd,hdl"
+STATE="utd"
+TIME="1292320842"
+SIZE="3455"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_amba\lpp_amba.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="2548"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_balise\APB_Balise.vhd,hdl"
+STATE="utd"
+TIME="1308741597"
+SIZE="4392"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_balise\lpp_balise.vhd,hdl"
+STATE="utd"
+TIME="1308732390"
+SIZE="1887"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_cna\APB_CNA.vhd,hdl"
+STATE="utd"
+TIME="1299077829"
+SIZE="4480"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_cna\CNA_TabloC.vhd,hdl"
+STATE="utd"
+TIME="1292494283"
+SIZE="3111"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_cna\Convertisseur_config.vhd,hdl"
+STATE="utd"
+TIME="1292494283"
+SIZE="1626"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_cna\Gene_SYNC.vhd,hdl"
+STATE="utd"
+TIME="1292494284"
+SIZE="2613"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_cna\lpp_cna.vhd,hdl"
+STATE="utd"
+TIME="1292494284"
+SIZE="2946"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_cna\Serialize.vhd,hdl"
+STATE="utd"
+TIME="1292494283"
+SIZE="3956"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_cna\Systeme_Clock.vhd,hdl"
+STATE="utd"
+TIME="1292494284"
+SIZE="2338"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_matrix\ALU_Driver.vhd,hdl"
+STATE="utd"
+TIME="1308820897"
+SIZE="8207"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_matrix\ALU_v2.vhd,hdl"
+STATE="utd"
+TIME="1306322020"
+SIZE="2878"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_matrix\APB_Matrix.vhd,hdl"
+STATE="utd"
+TIME="1308917006"
+SIZE="5106"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_matrix\DriveInputs.vhd,hdl"
+STATE="utd"
+TIME="1308820163"
+SIZE="4310"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_matrix\GetResult.vhd,hdl"
+STATE="utd"
+TIME="1308917814"
+SIZE="3184"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_matrix\lpp_matrix.vhd,hdl"
+STATE="utd"
+TIME="1308917006"
+SIZE="8444"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_matrix\MAC_v2.vhd,hdl"
+STATE="utd"
+TIME="1306322020"
+SIZE="9200"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_matrix\Matrix.vhd,hdl"
+STATE="utd"
+TIME="1308829820"
+SIZE="3039"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_matrix\SelectInputs.vhd,hdl"
+STATE="utd"
+TIME="1306760397"
+SIZE="5834"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_matrix\SpectralMatrix.vhd,hdl"
+STATE="utd"
+TIME="1308917006"
+SIZE="3817"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_matrix\Starter.vhd,hdl"
+STATE="utd"
+TIME="1308829152"
+SIZE="3160"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_matrix\TwoComplementer.vhd,hdl"
+STATE="utd"
+TIME="1305880030"
+SIZE="2848"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_memory\ApbDriver.vhd,hdl"
+STATE="utd"
+TIME="1306228083"
+SIZE="6880"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_memory\APB_FIFO.vhd,hdl"
+STATE="utd"
+TIME="1309421932"
+SIZE="3314"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_memory\APB_FifoRead.vhd,hdl"
+STATE="utd"
+TIME="1308907328"
+SIZE="3733"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_memory\APB_FifoWrite.vhd,hdl"
+STATE="utd"
+TIME="1308904922"
+SIZE="3758"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_memory\Fifo_Read.vhd,hdl"
+STATE="utd"
+TIME="1306853713"
+SIZE="3600"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_memory\Fifo_Write.vhd,hdl"
+STATE="utd"
+TIME="1296563772"
+SIZE="3277"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_memory\Link_Reg.vhd,hdl"
+STATE="utd"
+TIME="1305812571"
+SIZE="3623"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_memory\lpp_memory.vhd,hdl"
+STATE="utd"
+TIME="1309421932"
+SIZE="8299"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_memory\Top_FIFO.vhd,hdl"
+STATE="utd"
+TIME="1306854554"
+SIZE="5025"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_uart\APB_UART.vhd,hdl"
+STATE="utd"
+TIME="1303904791"
+SIZE="5120"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_uart\BaudGen.vhd,hdl"
+STATE="utd"
+TIME="1303904791"
+SIZE="3871"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_uart\lpp_uart.vhd,hdl"
+STATE="utd"
+TIME="1292248642"
+SIZE="3792"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_uart\Shift_REG.vhd,hdl"
+STATE="utd"
+TIME="1303904791"
+SIZE="4387"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_uart\UART.vhd,hdl"
+STATE="utd"
+TIME="1303904791"
+SIZE="4233"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_usb\lpp_usb.vhd,hdl"
+STATE="utd"
+TIME="1313594413"
+SIZE="2076"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\..\..\\lib\lpp\.\lpp_usb\RWbuf.vhd,hdl"
+STATE="utd"
+TIME="1313594403"
+SIZE="5458"
+LIBRARY="lpp"
+ENDFILE
+VALUE "<project>\ahbrom.vhd,hdl"
+STATE="utd"
+TIME="1313746419"
+SIZE="9014"
+ENDFILE
+VALUE "<project>\config.vhd,hdl"
+STATE="utd"
+TIME="1314090313"
+SIZE="6037"
+ENDFILE
+VALUE "<project>\designer\impl2\top.adb,adb"
+STATE="utd"
+TIME="1314098650"
+SIZE="3512320"
+ENDFILE
+VALUE "<project>\designer\impl2\top.pdb,pdb"
+STATE="ood"
+TIME="1314098642"
+SIZE="1590784"
+ENDFILE
+VALUE "<project>\designer\impl2\top_fp\top.pro,pro"
+STATE="utd"
+TIME="1314020735"
+SIZE="2023"
+ENDFILE
+VALUE "<project>\leon3mp.vhd,hdl"
+STATE="utd"
+TIME="1314100165"
+SIZE="9433"
+ENDFILE
+VALUE "<project>\synthesis\top.edn,syn_edn"
+STATE="utd"
+TIME="1314098325"
+SIZE="2040953"
+ENDFILE
+VALUE "<project>\synthesis\top_sdc.sdc,syn_sdc"
+STATE="utd"
+TIME="1314098324"
+SIZE="381"
+ENDFILE
+VALUE "C:\opt\GRLIB\grlib-ft-fpga-1.0.21-b4003\boards\TEST-LEON-M7-LPP\TEST-LEON-M7-LPP.pdc,pdc"
+STATE="utd"
+TIME="1314098437"
+SIZE="5135"
+IS_READONLY="TRUE"
+ENDFILE
+VALUE "D:\GRLIB_BusAMBA\VHD_Lib\boards\TEST-LEON-M7-LPP\TEST-LEON-M7-LPP.pdc,pdc"
+STATE="utd"
+TIME="1314098437"
+SIZE="5135"
+IS_READONLY="TRUE"
+ENDFILE
+ENDLIST
+LIST UsedFile
+ENDLIST
+LIST NewModulesInfo
+LIST "top::work"
+FILE "<project>\leon3mp.vhd,hdl"
+LIST ExcludePackageForSynthesis
+VALUE "<project>\config.vhd,hdl"
+VALUE "<project>\ahbrom.vhd,hdl"
+VALUE "<project>\leon3mp.vhd,hdl"
+ENDLIST
+LIST ProjectState5.1
+LIST Impl1
+LiberoState=Post_Synthesis
+ideSYNTHESIS(<project>\synthesis\top.edn,syn_edn)=StateSuccess
+LIST FlowOptions
+UsePhySynth=FALSE
+UseSynth=TRUE
+ENDLIST
+Used_File_List
+ENDUsed_File_List
+ENDLIST
+LIST Impl2
+LiberoState=Post_Synthesis
+ideSYNTHESIS(<project>\synthesis\top.edn,syn_edn)=StateSuccess
+LIST FlowOptions
+UsePhySynth=FALSE
+UseSynth=TRUE
+ENDLIST
+Used_File_List
+ENDUsed_File_List
+ENDLIST
+ENDLIST
+ENDLIST
+ENDLIST
+LIST AssociatedStimulus
+ENDLIST
+LIST Other_Association
+ENDLIST
+LIST SimulationOptions
+UseAutomaticDoFile=true
+IncludeWaveDo=false
+Type=max
+RunTime=1000ns
+Resolution=1ps
+VsimOpt=
+EntityName=testbench
+TopInstanceName=<top>_0
+DoFileName=
+DoFileName2=wave.do
+DoFileParams=
+DisplayDUTWave=false
+LogAllSignals=false
+DumpVCD=false
+VCDFileName=power.vcd
+ENDLIST
+LIST ModelSimLibPath
+UseCustomPath=FALSE
+LibraryPath=
+ENDLIST
+LIST GlobalFlowOptions
+GenerateHDLAfterSynthesis=FALSE
+GenerateHDLAfterPhySynthesis=FALSE
+RunDRCAfterSynthesis=FALSE
+AutoCheckConstraints=TRUE
+UpdateViewDrawIni=TRUE
+UpdateModelSimIni=TRUE
+NoIOMode=FALSE
+GenerateHDLFromSchematic=TRUE
+FlashProInputFile=pdb
+SmartGenCompileReport=T
+ENDLIST
+LIST PhySynthesisOptions
+ENDLIST
+LIST Profiles
+NAME="Synplify AE"
+FUNCTION="Synthesis"
+TOOL="Synplify"
+LOCATION="C:\Actel\Libero_v9.0\Synopsys\synplify_D200912A\bin\synplify_pro.exe"
+PARAM=""
+BATCH=0
+EndProfile
+NAME="ModelSim AE"
+FUNCTION="Simulation"
+TOOL="ModelSim"
+LOCATION="C:\Actel\Libero_v9.0\Model\win32acoem\modelsim.exe"
+PARAM=""
+BATCH=0
+EndProfile
+NAME="WFL"
+FUNCTION="Stimulus"
+TOOL="WFL"
+LOCATION="syncad.exe"
+PARAM="-pwflite"
+BATCH=0
+EndProfile
+NAME="FlashPro"
+FUNCTION="Program"
+TOOL="FlashPro"
+LOCATION="C:\Actel\Libero_v9.0\Designer\bin\FlashPro.exe"
+PARAM=""
+BATCH=0
+EndProfile
+ENDLIST
+LIST ProjectState5.1
+LIST "top::work"
+LIST Impl1
+LiberoState=Post_Synthesis
+ideSYNTHESIS(<project>\synthesis\top.edn,syn_edn)=StateSuccess
+LIST FlowOptions
+UsePhySynth=FALSE
+UseSynth=TRUE
+ENDLIST
+Used_File_List
+ENDUsed_File_List
+ENDLIST
+LIST Impl2
+LiberoState=Post_Synthesis
+ideSYNTHESIS(<project>\synthesis\top.edn,syn_edn)=StateSuccess
+LIST FlowOptions
+UsePhySynth=FALSE
+UseSynth=TRUE
+ENDLIST
+Used_File_List
+ENDUsed_File_List
+ENDLIST
+ENDLIST
+ENDLIST
+LIST ExcludePackageForSimulation
+ENDLIST
+LIST ExcludePackageForSynthesis
+LIST top
+VALUE "<project>\config.vhd,hdl"
+VALUE "<project>\ahbrom.vhd,hdl"
+VALUE "<project>\leon3mp.vhd,hdl"
+ENDLIST
+ENDLIST
+LIST IncludeModuleForSimulation
+ENDLIST
+LIST CDBOrder
+ENDLIST
+LIST UserCustomizedFileList
+ENDLIST
+LIST OpenedFileList
+DESIGNFLOW:
+FILE:<project>\leon3mp.vhd,hdl
+FILE:<project>\config.vhd,hdl
+FILE:<project>\..\..\\lib\techmap\gencomp\gencomp.vhd,hdl
+ACTIVE_VIEW:1
+ENDLIST

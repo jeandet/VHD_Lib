@@ -27,13 +27,15 @@ entity GetResult is
 generic(
     Result_SZ : integer := 32);
 port(
-    clk     : in  std_logic;
-    raz     : in  std_logic;
-    Valid    : in  std_logic;
-    Conjugate : in std_logic;
-    Res : in std_logic_vector(Result_SZ-1 downto 0);
+    clk         : in  std_logic;
+    raz         : in  std_logic;
+    Valid       : in  std_logic;
+    Conjugate   : in std_logic;
+    Res         : in std_logic_vector(Result_SZ-1 downto 0);
+--    Full        : in std_logic;
+    WriteFIFO : out std_logic;
     Received    : out std_logic;    
-    Result     : out std_logic_vector(Result_SZ-1 downto 0)
+    Result      : out std_logic_vector(Result_SZ-1 downto 0)
 );
 end GetResult;
 
@@ -52,6 +54,7 @@ begin
         if(raz='0')then
             Received <= '0';            
             Valid_reg <= '0';
+            WriteFIFO <= '0';
             ect <= st0;
             Result <= (others => '0');
                     
@@ -61,8 +64,10 @@ begin
             case ect is
                 when st0 =>
                     Received <= '0';
+                    WriteFIFO <= '0';
                     if(Valid_reg='0' and Valid='1')then
                         Result <= Res;
+                        WriteFIFO <= '1';
                         if(Conjugate='1')then
                             Received <= '1';
                             ect <= st0;
@@ -72,9 +77,11 @@ begin
                     end if;                
 
                 when st1 =>                    
-                    Received <= '1';                  
+                    Received <= '1';
+                    WriteFIFO <= '0';
                     if(Valid_reg='0' and Valid='1')then
                         Result <= Res;
+                        WriteFIFO <= '1';
                         ect <= st0;
                     end if;
 

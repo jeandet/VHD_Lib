@@ -46,17 +46,19 @@ entity APB_FifoRead is
     clk         : in std_logic;                             --! Horloge du composant
     rst         : in std_logic;                             --! Reset general du composant
     apbi        : in apb_slv_in_type;                       --! Registre de gestion des entrées du bus
-    WriteEnable : in std_logic;                             --! Demande de lecture de la mémoire, géré hors de l'IP
-    DATA        : out std_logic_vector(Data_sz-1 downto 0); --! Données en sortie de la mémoire
+    WriteEnable : in std_logic;                             --! Demande d'écriture dans la mémoire, géré hors de l'IP
+    Full        : out std_logic;                            --! Flag, Memoire pleine
+    Empty       : out std_logic;                            --! Flag, Memoire vide
+    DATA        : in std_logic_vector(Data_sz-1 downto 0);  --! Données en entrée de la mémoire
     apbo        : out apb_slv_out_type                      --! Registre de gestion des sorties du bus
     );
 end APB_FifoRead;
 
---! @details Gestion de la FIFO, écriture interne au FPGA, lecture via le bus APB 
+--! @details Gestion de la FIFO, écriture via le bus APB, lecture interne au FPGA
 
 architecture ar_APB_FifoRead of APB_FifoRead is
 
-signal Low          : std_logic:='0';
+signal Low          : std_logic:='0';          
 signal ReadEnable   : std_logic;
 signal FlagEmpty    : std_logic;
 signal FlagFull     : std_logic;
@@ -76,8 +78,9 @@ begin
 
     FIFO : Top_FIFO
         generic map(Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,ReadEnable,WriteEnable,ReUse,Lock,DataIn,AddrOut,AddrIn,FlagFull,FlagEmpty,DataOut);
+        port map(clk,rst,ReadEnable,WriteEnable,ReUse,Lock,DATA,AddrOut,AddrIn,FlagFull,FlagEmpty,DataOut);
 
-DATA <= DataOut;
+Empty <= FlagEmpty;
+Full <= FlagFull;
 
 end ar_APB_FifoRead;

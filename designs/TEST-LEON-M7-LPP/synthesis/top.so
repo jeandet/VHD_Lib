@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<SynplifyOutput>
+	<result>Success</result>
+	<design>top</design>
+	<target_edif>C:\opt\GRLIB\grlib-ft-fpga-1.0.21-b4003\designs\TEST-LEON-M7-LPP\synthesis\top.edn</target_edif>
+</SynplifyOutput>

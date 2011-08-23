@@ -89,7 +89,11 @@ begin
 
                 when e0 =>
                     OP1re <= IN1;
-                    OP2re <= IN2;
+                    if(Conjugate='1')then           --
+                        OP2re <= IN1;               --
+                    else                            --
+                        OP2re <= IN2;               -- modif 23/06/11
+                    end if;                         --
                     if(Take_reg='0' and Take='1')then
                         read <= '0'; 
                         ect  <= e1;
@@ -104,7 +108,11 @@ begin
               
                 when idle =>
                     OP1im <= IN1;
-                    OP2im <= IN2;
+                    if(Conjugate='1')then           --
+                        OP2im <= IN1;               --
+                    else                            --
+                        OP2im <= IN2;               -- modif 23/06/11
+                    end if;                         --
                     CTRL  <= "00000";
                     if(Take_reg='1' and Take='0')then
                         Read <= '0';
