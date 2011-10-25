@@ -28,6 +28,8 @@ all:
 	make all -C FIFO
 	make all -C UART
 	make all -C FFT
+	make all -C DELAY
+	make all -C GPIO
 
 
 cleanall:
@@ -37,4 +39,6 @@ cleanall:
 	make clean -C FIFO
 	make clean -C UART
 	make clean -C FFT
+	make clean -C DELAY
+	make clean -C GPIO
 

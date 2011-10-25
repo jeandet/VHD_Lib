@@ -1,4 +1,0 @@
-elaborate -ifmt vhdl -ifn config.vhd
-elaborate -ifmt vhdl -ifn ahbrom.vhd
-elaborate -ifmt vhdl -ifn leon3mp.vhd
-run -read_cores yes -fsm_extract no -iob true -ifn top.vhd -bus_delimiter () -ifmt vhdl -p A3PE3000L-""Std -ofn top -sd ../..//netlists/xilinx/PROASIC3/xst

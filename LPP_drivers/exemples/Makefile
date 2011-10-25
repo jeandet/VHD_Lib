@@ -25,4 +25,5 @@ all:
 	make all -C BenchFIFO
 	make all -C BenchUART
 	make all -C BenchFFT
+	make all -C BenchGPIO
 

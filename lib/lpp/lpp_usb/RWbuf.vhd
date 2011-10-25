@@ -10,16 +10,17 @@ entity RWbuf is
     port(
         clk         : in std_logic;
         rst         : in std_logic;
-        flagc       : in std_logic; 
-        flagb       : in std_logic; 
-        if_clk      : out std_logic;
+        flagC       : in std_logic;
+        flagB       : in std_logic;
+        IOselect    : in std_logic; 
+        ifclk       : out std_logic;
         sloe        : out std_logic;        
         slrd        : out std_logic;
         slwr        : out std_logic;
         pktend      : out std_logic;
         fifoadr     : out std_logic_vector(1 downto 0);
         fdbusrw     : inout std_logic_vector(7 downto 0)
-    ); 
+    );
 end entity;
 
 
@@ -33,7 +34,6 @@ signal state : etat;
 
 signal Yout         : std_logic_vector(7 downto 0);
 signal Sint         : std_logic_vector(7 downto 0);
-signal IOselect     : std_logic;
 signal index_data   : integer range 0 to DataMax := 0;
 signal index_data_read : integer range 0 to DataMax := 0;
 
@@ -55,23 +55,23 @@ io_buf5: BIBUF port map(PAD => fdbusrw(5), D=>Sint(5), E=>IOselect, Y=>Yout(5));
 io_buf6: BIBUF port map(PAD => fdbusrw(6), D=>Sint(6), E=>IOselect, Y=>Yout(6));
 io_buf7: BIBUF port map(PAD => fdbusrw(7), D=>Sint(7), E=>IOselect, Y=>Yout(7));
 
-if_clk      <= clk; 
+ifclk      <= clk; 
 
-   process(flagc,flagb)
-        begin
-        if(flagc='0' and flagb='1') then
-        IOselect<='1';
-        end if;
-        if (flagc='1'and flagb='0') then
-        IOselect<='0';
-        end if;
-        if(flagc='0'and flagb='0') then
-        IOselect<='1';
-        end if;
-        if (flagc='1'and flagb='1') then
-        IOselect<='0';
-        end if;
-   end process;
+--   process(flagc,flagb)
+--        begin
+--        if(flagc='0' and flagb='1') then
+--        IOselect<='1';
+--        end if;
+--        if (flagc='1'and flagb='0') then
+--        IOselect<='0';
+--        end if;
+--        if(flagc='0'and flagb='0') then
+--        IOselect<='1';
+--        end if;
+--        if (flagc='1'and flagb='1') then
+--        IOselect<='0';
+--        end if;
+--   end proces
 
    process(clk,IOselect,rst)
 
