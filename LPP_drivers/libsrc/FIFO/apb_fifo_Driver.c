@@ -24,12 +24,22 @@
 #include <stdio.h>
 
 
-APB_FIFO_Device* apbfifoOpen(int count)
+FIFO_Device* openFIFO(int count)
 {
-    APB_FIFO_Device* fifo0;
-    fifo0 = (APB_FIFO_Device*) apbgetdevice(LPP_FIFO,VENDOR_LPP,count);
+    FIFO_Device* fifo0;
+    fifo0 = (FIFO_Device*) apbgetdevice(LPP_FIFO,VENDOR_LPP,count);
     return fifo0;
 }
 
 
+int FillFifo(FIFO_Device* dev,int Tbl[],int A)
+{
+    int i=0;
+    while(i <= A)
+    {
+        dev->rwdata = Tbl[i];
+        i++;
+    }
 
+    return 0;
+}

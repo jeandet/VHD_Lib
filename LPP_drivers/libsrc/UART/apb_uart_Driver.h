@@ -28,7 +28,6 @@
     This library is written to work with LPP_APB_UART VHDL module from LPP's FreeVHDLIB. It help you to print and get,
     char or strings over uart.
 
-    \todo Check "DEVICE1 => count = 2" function Open
     \author Martin Morlot  martin.morlot@lpp.polytechnique.fr
 */
 
@@ -56,7 +55,7 @@ struct UART_Driver
     int DataRReg;  /**< \brief Data Read register */
 };
 
-typedef struct UART_Driver UART_Device;
+typedef volatile struct UART_Driver UART_Device;
 
 
 /*===================================================
@@ -69,7 +68,7 @@ typedef struct UART_Driver UART_Device;
     This Function scans APB devices table and returns count UART.
 
     \param count The number of the UART you whant to get. For example if you have 3 UARTS on your SOC you want
-    to use UART1 so count = 2.
+    to use UART1 so count = 1.
     \return The pointer to the device.
 */
 UART_Device* openUART(int count);

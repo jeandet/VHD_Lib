@@ -28,9 +28,12 @@
     This library is written to work with LPP_APB_FIFO VHDL module from LPP's FreeVHDLIB. It represents a standard FIFO working,
     used in many type of application.
 
-    \todo Check "DEVICE1 => count = 2" function Open
     \author Martin Morlot  martin.morlot@lpp.polytechnique.fr
 */
+#define FIFO_Empty 0x00000100 /**< Show that the FIFO is Empty */
+#define FIFO_Full  0x00001000 /**< Show that the FIFO is Full */
+#define Boucle     0x00110000 /**< Configuration for reused the same value of the FIFO */
+#define NoBoucle   0xFFEEFFFF /**< Unlock the previous configuration */
 
 
 /*===================================================
@@ -48,13 +51,15 @@ struct APB_FIFO_REG
                                                                 Write enable Flag [HEX 1]
                                                                 Empty Flag [HEX 2]
                                                                 Full Flag [HEX 3]
-                                                                Dummy "C" [HEX 4/5/6/7] */
+                                                                ReUse Flag [HEX 4]
+                                                                Lock Flag [HEX 5]
+                                                                Dummy "C" [HEX 6/7] */
     int dummy0;  /**< \brief Unused register, aesthetic interest */
     int dummy1;  /**< \brief Unused register, aesthetic interest */
     int waddr;   /**< \brief Address register for the writing operation */
 };
 
-typedef struct APB_FIFO_REG APB_FIFO_Device;
+typedef volatile struct APB_FIFO_REG FIFO_Device;
 
 /*===================================================
         F U N C T I O N S
@@ -66,11 +71,20 @@ typedef struct APB_FIFO_REG APB_FIFO_Device;
     This Function scans APB devices table and returns count FIFO.
 
     \param count The number of the FIFO you whant to get. For example if you have 3 FIFOS on your SOC you want
-    to use FIFO1 so count = 2.
+    to use FIFO1 so count = 1.
     \return The pointer to the device.
 */
-APB_FIFO_Device* apbfifoOpen(int count);
+FIFO_Device* openFIFO(int count);
 
+/*! \fn int FillFifo(FIFO_Device* dev,int Tbl[],int A);
+    \brief a Fill in FIFO function.
 
+    This Function fill in the FIFO with a table data.
+
+    \param dev The FFT pointer.
+    \param Tbl[] The data table.
+    \param A The data table size.
+*/
+int FillFifo(FIFO_Device* dev,int Tbl[],int A);
 
 #endif

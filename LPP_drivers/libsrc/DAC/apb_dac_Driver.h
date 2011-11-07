@@ -38,7 +38,7 @@ struct DAC_Driver
     int dataReg;     /**< Registre de donnée sur 16 bits */
 };
 
-typedef struct DAC_Driver DAC_Device;
+typedef volatile struct DAC_Driver DAC_Device;
 
 /*===================================================
         F U N C T I O N S

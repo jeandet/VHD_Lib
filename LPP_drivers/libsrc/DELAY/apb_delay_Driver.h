@@ -19,21 +19,33 @@
 --                      Author : Martin Morlot
 --                     Mail : martin.morlot@lpp.polytechnique.fr
 -----------------------------------------------------------------------------*/
-#ifndef APB_FIFO_DRIVER_H
-#define APB_FIFO_DRIVER_H
+#ifndef APB_DELAY_DRIVER_H
+#define APB_DELAY_DRIVER_H
 
+/*! \file apb_delay_Driver.h
+    \brief LPP Interupt driver.
 
-#define Delay_End 0x111
+    This library is written to work with LPP_APB_DELAY VHDL module from LPP's FreeVHDLIB.
+
+    \author Martin Morlot  martin.morlot@lpp.polytechnique.fr
+*/
+
+#define Delay_End 0x00001000 /**< Used to know when the VHDL delay counter stoped counting  */
 
 /*===================================================
         T Y P E S     D E F
 ====================================================*/
-
+/*! \struct DELAY_REG
+    \brief Sturcture representing the Delay registers
+*/
 struct DELAY_REG
 {
-    int Cfg;
-    int Fboard;
-    int Timer;
+    int Cfg; /**< \brief Configuration register composed of Reset function      [HEX 0]
+                                                            Start Flag          [HEX 1]
+                                                            End Flag Received   [HEX 2]
+                                                            End Flag            [HEX 3] */
+    int Fboard; /**< \brief Board Frequency register */
+    int Timer;  /**< \brief Delay duration register */
 };
 
 typedef volatile struct DELAY_REG DELAY_Device;
@@ -41,12 +53,61 @@ typedef volatile struct DELAY_REG DELAY_Device;
 /*===================================================
         F U N C T I O N S
 ====================================================*/
+/*! \fn DELAY_Device* openDELAY(int count);
+    \brief Return count Delay.
 
+    This Function scans APB devices table and returns count Delay.
+
+    \param count The number of the Delay you whant to get. For example if you have 3 Delays on your SOC you want
+    to use Delay1 so count = 1.
+    \return The pointer to the device.
+*/
 DELAY_Device* openDELAY(int count);
-int Delay_us(DELAY_Device* dev,int T);
-int Delay_ms(DELAY_Device* dev,int T);
-int Delay_s(DELAY_Device* dev,int T);
+
+/*! \fn int Setup(DELAY_Device* dev,int X);
+    \brief Setup the device
+
+    This function setup the device, reset and Board frequency.
+
+    \param dev The Delay pointer.
+    \param X the Board frequency.
+*/
 int Setup(DELAY_Device* dev,int X);
+
+/*! \fn int Delay_us(DELAY_Device* dev,int T);
+    \brief Generate delay
+
+    This function genrate a delay in microsecond.
+
+    \param dev The Delay pointer.
+    \param T the Delay duration in us.
+*/
+int Delay_us(DELAY_Device* dev,int T);
+
+/*! \fn int Delay_ms(DELAY_Device* dev,int T);
+    \brief Generate delay
+
+    This function genrate a delay in milisecond.
+
+    \param dev The Delay pointer.
+    \param T the Delay duration in ms.
+*/
+int Delay_ms(DELAY_Device* dev,int T);
+
+/*! \fn int Delay_s(DELAY_Device* dev,int T);
+    \brief Generate delay
+
+    This function genrate a delay in second.
+
+    \param dev The Delay pointer.
+    \param T the Delay duration in s.
+*/
+int Delay_s(DELAY_Device* dev,int T);
+
+
+
+
+
 
 
 #endif

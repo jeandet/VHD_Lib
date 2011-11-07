@@ -26,8 +26,8 @@ int main()
 {
     int d=0;
     int i=0;
-    APB_FIFO_Device* FIFO0;
-    FIFO0 = apbfifoOpen(0);
+    FIFO_Device* FIFO0;
+    FIFO0 = openFIFO(0);
 
     for(i=0;i<1024;i++)
     {

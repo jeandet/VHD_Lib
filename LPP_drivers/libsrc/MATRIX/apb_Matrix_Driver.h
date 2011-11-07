@@ -19,41 +19,45 @@
 --                      Author : Martin Morlot
 --                     Mail : martin.morlot@lpp.polytechnique.fr
 -----------------------------------------------------------------------------*/
-#ifndef APB_CNA_DRIVER_H
-#define APB_CNA_DRIVER_H
+#ifndef APB_MATRIX_DRIVER_H
+#define APB_MATRIX_DRIVER_H
 
-#define DAC_ready 3
-#define DAC_enable 1
-#define DAC_disable 0
+/*! \file apb_Matrix_Driver.h
+    \brief LPP MATRIX driver.
+
+    This library is written to work with LPP_APB_MATRIX VHDL module from LPP's FreeVHDLIB.
+
+    \author Martin Morlot  martin.morlot@lpp.polytechnique.fr
+*/
 
 
 /*===================================================
         T Y P E S     D E F
 ====================================================*/
-
-/** Structure représentant le registre du CNA */
-struct DAC_Driver
+/*! \struct APB_MATRIX_REG
+    \brief Sturcture representing the Matrix registers
+*/
+struct APB_MATRIX_REG
 {
-    int configReg;   /**< Registre de configuration: Flag Ready [1] ; Flag Enable [0] */
-    int dataReg;     /**< Registre de donnée sur 16 bits */
+    int Statu;  /**< \brief Statu register, To know wich matrix calcul is doing */
 };
 
-typedef volatile struct DAC_Driver DAC_Device;
+typedef volatile struct  APB_MATRIX_REG MATRIX_Device;
 
 /*===================================================
         F U N C T I O N S
 ====================================================*/
+/*! \fn MATRIX_Device* openMatrix(int count);
+    \brief Return count Matrix.
 
-/** Ouvre l'accé au CNA */
-DAC_Device* DacOpen(int count);
+    This Function scans APB devices table and returns count Matrix.
 
-//DAC_Device* DacClose(int count);
+    \param count The number of the Matrix you whant to get. For example if you have 3 Matrixs on your SOC you want
+    to use Matrix0 so count = 0.
+    \return The pointer to the device.
+*/
+MATRIX_Device* openMatrix(int count);
 
-/** Les données sont lus a partir d'un tableau pour obtenir le signal de CAL (10Khz + 625hz) */
-int DacTable();
-
-/** Les données sont entrée par l'utilisateur, la conversion se fait a chaque nouvelle donnée */
-int DacConst();
 
 
 

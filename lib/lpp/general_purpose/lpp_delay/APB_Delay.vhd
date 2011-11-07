@@ -57,7 +57,7 @@ constant pconfig : apb_config_type := (
   1 => apb_iobar(paddr, pmask));
 
 type DELAY_ctrlr_Reg is record
-    Delay_CFG : std_logic_vector(2 downto 0);
+    Delay_CFG : std_logic_vector(3 downto 0);
     Delay_FreqBoard : std_logic_vector(25 downto 0);
     Delay_Timer : std_logic_vector(25 downto 0);
 end record;
@@ -67,25 +67,28 @@ signal Rdata : std_logic_vector(31 downto 0);
 
 signal Flag_st : std_logic;
 signal Flag_end : std_logic;
+signal Flag_OKend : std_logic;
 signal Rz : std_logic;
 signal Raz : std_logic;
 
 begin
 
 Flag_st <= Rec.Delay_CFG(1);
-Rec.Delay_CFG(2) <= Flag_end;
+Rec.Delay_CFG(3) <= Flag_end;
 Rz <= Rec.Delay_CFG(0);
+Flag_OKend <= Rec.Delay_CFG(2);
 
 Raz <= rst and Rz;
 
 Delay0 : TimerDelay
-    port map(clk,Raz,Flag_st,Flag_end,Rec.Delay_Timer);
+    port map(clk,Raz,Flag_st,Flag_OKend,Flag_end,Rec.Delay_Timer);
 
     process(rst,clk)
     begin
         if(rst='0')then
             Rec.Delay_FreqBoard <= (others => '0');
             Rec.Delay_Timer <= (others => '0');
+            Rec.Delay_CFG(2 downto 0) <= (others => '0');
             
         elsif(clk'event and clk='1')then 
 
@@ -95,8 +98,9 @@ Delay0 : TimerDelay
                     when "000000" =>
                         Rec.Delay_CFG(0) <= apbi.pwdata(0); 
                         Rec.Delay_CFG(1) <= apbi.pwdata(4);
+                        Rec.Delay_CFG(2) <= apbi.pwdata(8);
                     when "000001" =>                             
-                        Rec.Delay_FreqBoard <= apbi.pwdata(25 downto 0); 
+                        Rec.Delay_FreqBoard <= apbi.pwdata(25 downto 0);
                     when "000010" =>                             
                         Rec.Delay_Timer <= apbi.pwdata(25 downto 0);                      
                     when others =>
@@ -104,11 +108,12 @@ Delay0 : TimerDelay
                 end case;
             end if;
 
-    --APB READ OP
+    --APB Read OP
             if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                        Rdata(31 downto 12) <= (others => '0');
+                        Rdata(31 downto 16) <= (others => '0');
+                        Rdata(15 downto 12) <= "000" & Rec.Delay_CFG(3);
                         Rdata(11 downto 8) <= "000" & Rec.Delay_CFG(2);
                         Rdata(7 downto 4) <= "000" & Rec.Delay_CFG(1);
                         Rdata(3 downto 0) <= "000" & Rec.Delay_CFG(0);

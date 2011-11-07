@@ -28,7 +28,6 @@
     This library is written to work with LPP_APB_FFT VHDL module from LPP's FreeVHDLIB. It calculate a fast fourier transforms,
     from an input data table.
 
-    \todo Check "DEVICE1 => count = 2" function Open
     \author Martin Morlot  martin.morlot@lpp.polytechnique.fr
 */
 
@@ -56,7 +55,7 @@ struct FFT_Driver
     int WriteAddrReg; /**< \brief Address register for the writing operation */
 };
 
-typedef struct FFT_Driver FFT_Device;
+typedef volatile struct FFT_Driver FFT_Device;
 
 
 /*===================================================
@@ -68,7 +67,7 @@ typedef struct FFT_Driver FFT_Device;
     This Function scans APB devices table and returns count FFT.
 
     \param count The number of the FFT you whant to get. For example if you have 3 FFTS on your SOC you want
-    to use FFT1 so count = 2.
+    to use FFT1 so count = 1.
     \return The pointer to the device.
 */
 FFT_Device* openFFT(int count);

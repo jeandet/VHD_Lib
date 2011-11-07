@@ -50,9 +50,10 @@ component TimerDelay is
 port(
     clk     : in  std_logic;
     raz     : in  std_logic;
-    Start : in std_logic;
-    Fin : out std_logic;
-    Cpt : in std_logic_vector(25 downto 0)
+    Start   : in std_logic;
+    OKfin   : in std_logic;
+    Fin     : out std_logic;
+    Cpt     : in std_logic_vector(25 downto 0)
 );
 end component;
 

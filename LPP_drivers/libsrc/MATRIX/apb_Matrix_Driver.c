@@ -19,42 +19,17 @@
 --                      Author : Martin Morlot
 --                     Mail : martin.morlot@lpp.polytechnique.fr
 -----------------------------------------------------------------------------*/
-#ifndef APB_CNA_DRIVER_H
-#define APB_CNA_DRIVER_H
-
-#define DAC_ready 3
-#define DAC_enable 1
-#define DAC_disable 0
+#include "lpp_apb_functions.h"
+#include "apb_Matrix_Driver.h"
+#include <stdio.h>
 
 
-/*===================================================
-        T Y P E S     D E F
-====================================================*/
-
-/** Structure représentant le registre du CNA */
-struct DAC_Driver
+MATRIX_Device* openMatrix(int count)
 {
-    int configReg;   /**< Registre de configuration: Flag Ready [1] ; Flag Enable [0] */
-    int dataReg;     /**< Registre de donnée sur 16 bits */
-};
-
-typedef volatile struct DAC_Driver DAC_Device;
-
-/*===================================================
-        F U N C T I O N S
-====================================================*/
-
-/** Ouvre l'accé au CNA */
-DAC_Device* DacOpen(int count);
-
-//DAC_Device* DacClose(int count);
-
-/** Les données sont lus a partir d'un tableau pour obtenir le signal de CAL (10Khz + 625hz) */
-int DacTable();
-
-/** Les données sont entrée par l'utilisateur, la conversion se fait a chaque nouvelle donnée */
-int DacConst();
+    MATRIX_Device* Mspec0;
+    Mspec0 = (MATRIX_Device*) apbgetdevice(LPP_MATRIX,VENDOR_LPP,count);
+    return Mspec0;
+}
 
 
 
-#endif

@@ -22,24 +22,41 @@
 #ifndef APB_GPIO_DRIVER_H
 #define APB_GPIO_DRIVER_H
 
+/*! \file apb_gpio_Driver.h
+    \brief Gaisler GPIO driver.
+
+    This library is written to work with Gaisler GPIO VHDL module.
+
+    \author Martin Morlot  martin.morlot@lpp.polytechnique.fr
+*/
 
 /*===================================================
         T Y P E S     D E F
 ====================================================*/
-
+/*! \struct GPIO_REG
+    \brief Sturcture representing the gpio registers
+*/
 struct GPIO_REG
 {
-    int Din;
-    int Dout;
-    int oen;
+    int Din;    /**< \brief Input GPIO register */
+    int Dout;   /**< \brief Output GPIO register */
+    int oen;    /**< \brief Enable GPIO register */
 };
 
-typedef struct GPIO_REG GPIO_Device;
+typedef volatile struct GPIO_REG GPIO_Device;
 
 /*===================================================
         F U N C T I O N S
 ====================================================*/
+/*! \fn GPIO_Device* openGPIO(int count);
+    \brief Return count GPIO.
 
+    This Function scans APB devices table and returns count GPIO.
+
+    \param count The number of the GPIO you whant to get. For example if you have 3 GPIOs on your SOC you want
+    to use GPIO1 so count = 1.
+    \return The pointer to the device.
+*/
 GPIO_Device* openGPIO(int count);
 
 

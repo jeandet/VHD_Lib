@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #--  This file is a part of the LPP VHDL IP LIBRARY
-#--  Copyright (C) 2010, Laboratory of Plasmas Physic - CNRS
+#--  Copyright (C) 2009 - 2010, Laboratory of Plasmas Physic - CNRS
 #--
 #--  This program is free software; you can redistribute it and/or modify
 #--  it under the terms of the GNU General Public License as published by
@@ -16,15 +16,10 @@
 #--  along with this program; if not, write to the Free Software
 #--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 #------------------------------------------------------------------------------
+FILE = apb_Matrix_Driver
+LIB = liblpp_Matrix_Driver.a
 
+include ../../rules.mk
 
-
-all:
-	make all -C ScanAPB
-	make all -C APB_lcd_ctrlr
-	make all -C BenchFIFO
-	make all -C BenchUART
-	make all -C BenchFFT
-	make all -C BenchGPIO
-        make all -C BenchMatrix
-
+all: $(FILE).a
+	@echo $(FILE)".a created"

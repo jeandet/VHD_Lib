@@ -34,6 +34,7 @@ DELAY_Device* openDELAY(int count)
 int Setup(DELAY_Device* dev,int X)
 {
     dev->Fboard = X;
+    dev->Cfg = 0x001;
     return dev->Fboard;
 }
 
@@ -41,9 +42,9 @@ int Setup(DELAY_Device* dev,int X)
 int Delay_s(DELAY_Device* dev,int T)
 {
     dev->Timer = dev->Fboard * T;
-    dev->Cfg = 0x11;
-    while(dev->Cfg != Delay_End);
-    dev->Cfg = 0x01;
+    dev->Cfg = 0x011;
+    while((dev->Cfg & Delay_End)!= Delay_End); // TANT QUE  end a 0  RIEN
+    dev->Cfg = 0x101;
     return dev->Cfg;
 }
 
@@ -51,9 +52,9 @@ int Delay_s(DELAY_Device* dev,int T)
 int Delay_ms(DELAY_Device* dev,int T)
 {
     dev->Timer = (dev->Fboard / 1000) * T;
-    dev->Cfg = 0x11;
-    while(dev->Cfg != Delay_End);
-    dev->Cfg = 0x01;
+    dev->Cfg = 0x011;
+    while((dev->Cfg & Delay_End)!= Delay_End); // TANT QUE  end a 0  RIEN
+    dev->Cfg = 0x101;
     return dev->Cfg;
 }
 
@@ -61,9 +62,9 @@ int Delay_ms(DELAY_Device* dev,int T)
 int Delay_us(DELAY_Device* dev,int T)
 {
     dev->Timer = (dev->Fboard / 1000000) * T;
-    dev->Cfg = 0x11;
-    while(dev->Cfg != Delay_End);
-    dev->Cfg = 0x01;
+    dev->Cfg = 0x011;
+    while((dev->Cfg & Delay_End)!= Delay_End); // TANT QUE  end a 0  RIEN
+    dev->Cfg = 0x101;
     return dev->Cfg;
 }
 
