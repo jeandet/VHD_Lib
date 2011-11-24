@@ -38,7 +38,7 @@ port(
     Statu : in std_logic_vector(3 downto 0);
     ReadFIFO : out std_logic_vector(1 downto 0);
     WriteFIFO : out std_logic;
---    Start : out std_logic;
+    Start : out std_logic;
 --    Read : out std_logic;
 --    Take : out std_logic;
 --    Valid : out std_logic;
@@ -97,7 +97,7 @@ With Statu select
                      '1' when "1111",
                      '0' when others;
 
---Start <= Start_int;
+Start <= Start_int;
 --Read <= Read_int;
 --Take <= Take_int;
 --Received <= Received_int;

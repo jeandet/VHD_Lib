@@ -46,6 +46,7 @@ signal Wad_int     : integer range 0 to addr_max_int;
 signal Wad_int_reg : integer range 0 to addr_max_int;
 signal Rad_int     : integer range 0 to addr_max_int;
 signal Rad_int_reg : integer range 0 to addr_max_int;
+signal flag_reg     : std_logic;
 
 begin 
     process (clk,raz)
@@ -53,13 +54,15 @@ begin
         if(raz='0')then
             Wad_int  <= 0;
             full     <= '0';
+            flag_reg <= '0';
             
         elsif(clk' event and clk='1')then
             Wad_int_reg <= Wad_int;
             Rad_int_reg <= Rad_int;
+            flag_reg    <= flag_WR;
        
 
-            if(flag_WR='1')then
+            if(flag_reg ='0' and flag_WR='1')then
                 if(Wad_int=addr_max_int-1)then
                     Wad_int <= 0;                    
                 else

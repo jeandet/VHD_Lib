@@ -76,8 +76,9 @@ component ApbDriver is
     WriteEnable  : out std_logic;
     FlagEmpty    : in std_logic;
     FlagFull     : in std_logic;
-    ReUse        : out std_logic;
-    Lock         : out std_logic;
+--    ReUse        : out std_logic;
+--    Lock         : out std_logic;
+--    RstMem       : out std_logic;
     DataIn       : out std_logic_vector(Data_sz-1 downto 0);
     DataOut      : in std_logic_vector(Data_sz-1 downto 0);
     AddrIn       : in std_logic_vector(Addr_sz-1 downto 0);
@@ -98,8 +99,9 @@ component Top_FIFO is
     clk,raz  : in std_logic;
     flag_RE  : in std_logic;
     flag_WR  : in std_logic;
-    ReUse    : in std_logic;
-    Lock     : in std_logic;
+--    ReUse    : in std_logic;
+--    Lock     : in std_logic;
+--    RstMem   : in std_logic;
     Data_in  : in std_logic_vector(Data_sz-1 downto 0);
     Addr_RE  : out std_logic_vector(addr_sz-1 downto 0);
     Addr_WR  : out std_logic_vector(addr_sz-1 downto 0);
@@ -118,7 +120,7 @@ component Fifo_Read is
     clk          : in std_logic;
     raz          : in std_logic;
     flag_RE      : in std_logic;
-    ReUse        : in std_logic;
+--    ReUse        : in std_logic;
     Waddr        : in std_logic_vector(addr_sz-1 downto 0);
     empty        : out std_logic;
     Raddr        : out std_logic_vector(addr_sz-1 downto 0)
@@ -141,13 +143,13 @@ component Fifo_Write is
 end component;
 
 
-component Link_Reg is
+component Pipeline is
   generic(Data_sz : integer := 16);
   port(
     clk,raz       : in std_logic;
     Data_one      : in std_logic_vector(Data_sz-1 downto 0);
     Data_two      : in std_logic_vector(Data_sz-1 downto 0);
-    ReUse         : in std_logic;
+--    ReUse         : in std_logic;
     flag_RE       : in std_logic;
     flag_WR       : in std_logic;
     empty         : in std_logic;

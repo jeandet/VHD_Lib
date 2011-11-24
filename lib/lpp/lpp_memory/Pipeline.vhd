@@ -22,27 +22,26 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-use work.FIFO_Config.all;
 
 --! Programme qui va permettre de "pipeliner" la FIFO, donnée disponible en sortie dé son écriture en entrée de la FIFO
 
-entity Link_Reg is
+entity Pipeline is
 generic(Data_sz : integer := 16);
 port( 
     clk,raz  : in std_logic;                             --! Horloge et reset general du composant
     Data_one : in std_logic_vector(Data_sz-1 downto 0);  --! Donnée en entrée de la FIFO, coté écriture
     Data_two : in std_logic_vector(Data_sz-1 downto 0);  --! Donnée en sortie de la FIFO, coté lecture
-    ReUse    : in std_logic;                             --! Flag, Permet de relire la mémoire du début
+--    ReUse    : in std_logic;                             --! Flag, Permet de relire la mémoire du début
     flag_RE  : in std_logic;                             --! Flag, Demande la lecture de la mémoire
     flag_WR  : in std_logic;                             --! Flag, Demande l'écriture dans la mémoire
     empty    : in std_logic;                             --! Flag, Mémoire vide
     Data_out : out std_logic_vector(Data_sz-1 downto 0)  --! Donnée en sortie, pipelinée
     );
-end Link_Reg;
+end Pipeline;
 
-architecture ar_Link_Reg of Link_Reg is
+architecture ar_Pipeline of Pipeline is
 
-type etat is (e0,e1,e2,e3);
+type etat is (e0,e1,e2,eX);
 signal ect : etat;
 
 begin 
@@ -58,33 +57,36 @@ begin
                     if(flag_WR='1')then
                         Data_out <= Data_one;
                         ect      <= e1;
-                    elsif(ReUse='1')then
-                        ect      <= e1;                 
+                   -- elsif(ReUse='1')then
+                   --     ect      <= e1;
                     end if;
 
                 when e1 =>
                     if(flag_RE='1')then
-                        Data_out <= Data_two;
-                        ect      <= e2;
+                        --Data_out <= Data_two;
+                        ect      <= eX;
                     end if;
-                
+
+                when eX =>
+                    --Data_out <= Data_two;
+                    ect      <= e2;
+
                 when e2 =>
+                    Data_out <= Data_two;
                     if(empty='1')then
-                        ect <= e3;
+                        ect <= e0;
                     else
-                        Data_out <= Data_two;
+                        --Data_out <= Data_two;
                         ect      <= e2;
                     end if;
 
-                when e3 =>
-                    Data_out <= Data_two;
-                    ect      <= e0;
+
 
             end case;                        
         end if;
     end process;
     
-end ar_Link_Reg;
+end ar_Pipeline;
 
 
 

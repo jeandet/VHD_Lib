@@ -50,6 +50,7 @@ component APB_Matrix is
     ReadFIFO : out std_logic_vector(1 downto 0);
     WriteFIFO : out std_logic;
     Result       : out std_logic_vector(Result_SZ-1 downto 0);
+    Start : out std_logic;
     apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
     apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
 );
@@ -70,6 +71,7 @@ port(
     Statu : in std_logic_vector(3 downto 0);
     ReadFIFO : out std_logic_vector(1 downto 0);
     WriteFIFO : out std_logic;
+    Start : out std_logic;
     Result       : out std_logic_vector(Result_SZ-1 downto 0)
 );
 end component;

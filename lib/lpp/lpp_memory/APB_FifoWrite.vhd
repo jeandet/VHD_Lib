@@ -47,7 +47,7 @@ entity APB_FifoWrite is
     rst         : in std_logic;                             --! Reset general du composant
     apbi        : in apb_slv_in_type;                       --! Registre de gestion des entrées du bus
     ReadEnable  : in std_logic;                             --! Demande de lecture de la mémoire, géré hors de l'IP
-    Empty       : out std_logic;                            --! Flag, Memoire vide 
+    Empty       : out std_logic;                            --! Flag, Memoire vide
     Full        : out std_logic;                            --! Flag, Memoire pleine
     DATA        : out std_logic_vector(Data_sz-1 downto 0); --! Données en sortie de la mémoire
     apbo        : out apb_slv_out_type                      --! Registre de gestion des sorties du bus
@@ -62,8 +62,9 @@ signal Low          : std_logic:='0';
 signal WriteEnable  : std_logic;
 signal FlagEmpty    : std_logic;
 signal FlagFull     : std_logic;
-signal ReUse        : std_logic;
-signal Lock         : std_logic;
+--signal ReUse        : std_logic;
+--signal Lock         : std_logic;
+--signal RstMem       : std_logic;
 signal DataIn       : std_logic_vector(Data_sz-1 downto 0);
 signal DataOut      : std_logic_vector(Data_sz-1 downto 0);
 signal AddrIn       : std_logic_vector(Addr_sz-1 downto 0);
@@ -73,12 +74,12 @@ begin
 
     APB : ApbDriver
         generic map(pindex,paddr,pmask,pirq,abits,LPP_FIFO,Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,Low,WriteEnable,FlagEmpty,FlagFull,ReUse,Lock,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
+        port map(clk,rst,Low,WriteEnable,FlagEmpty,FlagFull,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
 
 
     FIFO : Top_FIFO
         generic map(Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,ReadEnable,WriteEnable,ReUse,Lock,DataIn,AddrOut,AddrIn,FlagFull,FlagEmpty,DataOut);
+        port map(clk,rst,ReadEnable,WriteEnable,DataIn,AddrOut,AddrIn,FlagFull,FlagEmpty,DataOut);
 
 DATA <= DataOut;
 Empty <= FlagEmpty;
