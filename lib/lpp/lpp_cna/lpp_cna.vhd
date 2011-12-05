@@ -27,7 +27,7 @@ use std.textio.all;
 library lpp;
 use lpp.lpp_amba.all;
 
---! Package contenant tous les programmes qui forment le composant intégré dans le léon 
+--! Package contenant tous les programmes qui forment le composant intégré dans le léon
 
 package lpp_cna is
 
@@ -54,12 +54,10 @@ component CNA_TabloC is
     port(
         clock       : in std_logic;
         rst         : in std_logic;
-        flag_nw     : in std_logic;
-        bp          : in std_logic;
+        enable      : in std_logic;
         Data_C      : in std_logic_vector(15 downto 0);
         SYNC        : out std_logic;
         SCLK        : out std_logic;
-        Rz          : out std_logic;
         flag_sd     : out std_logic;
         Data        : out std_logic
         );

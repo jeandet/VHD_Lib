@@ -55,7 +55,7 @@ entity APB_Matrix is
 --    Read : out std_logic;
 --    Take : out std_logic;
 --    Valid : out std_logic;
---    Received : out std_logic;
+Res       : out std_logic_vector(Result_SZ-1 downto 0);
 --    Conjugate : out std_logic;
 --    OP1 : out std_logic_vector(3 downto 0);
 --    OP2 : out std_logic_vector(3 downto 0);
@@ -84,7 +84,7 @@ begin
 
 Mspec0 : SpectralMatrix
     generic map (Input_SZ,Result_SZ)
-    port map(clk,rst,FIFO1,FIFO2,Full,Empty,Rec.MATRIX_Statu,ReadFIFO,WriteFIFO,Start,Result);       --Start,Read,Take,Valid,Received,Conjugate,OP1,OP2
+    port map(clk,rst,FIFO1,FIFO2,Full,Empty,Rec.MATRIX_Statu,ReadFIFO,WriteFIFO,Start,Res,Result);       --Start,Read,Take,Valid,Received,Conjugate,OP1,OP2
 
     process(rst,clk)
     begin

@@ -135,7 +135,9 @@ Rec.DEVICE_AddrR <= AddrOut;
             if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
                case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                         FlagRE <= '1';
+                         if(apbi.penable = '1')then
+                             FlagRE <= '1';
+                         end if;
                          Rdata(Data_sz-1 downto 0)  <= Rec.DEVICE_DataR;
                     when "000001" =>
 --                         Rdata(31 downto 8) <= X"AAAAAA";
@@ -166,6 +168,6 @@ Rec.DEVICE_AddrR <= AddrOut;
 
 apbo.prdata     <=   Rdata when apbi.penable = '1';
 WriteEnable     <=   FlagWR;
-ReadEnable      <=   FlagRE;
+ReadEnable      <=   FlagRE; --when apbi.penable = '1';
 
 end ar_ApbDriver;

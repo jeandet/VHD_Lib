@@ -71,7 +71,7 @@ end component;
 
 signal Raddr     : std_logic_vector(addr_sz-1 downto 0);
 signal Waddr     : std_logic_vector(addr_sz-1 downto 0);
---signal Data_int  : std_logic_vector(Data_sz-1 downto 0);
+signal Data_int  : std_logic_vector(Data_sz-1 downto 0);
 signal s_empty   : std_logic;
 signal s_full    : std_logic;
 --signal s_full2   : std_logic;
@@ -93,12 +93,12 @@ begin
 
     SRAM : syncram_2p
        generic map(CFG_MEMTECH,Addr_sz,Data_sz)
-       port map(clk,s_flag_RE,Raddr,Data_out,clk,s_flag_WR,Waddr,Data_in);
+       port map(clk,s_flag_RE,Raddr,Data_int,clk,s_flag_WR,Waddr,Data_in);
 
 
---    Pipe : Pipeline
---       generic map(Data_sz)
---       port map(clk,raz,Data_in,Data_int,s_flag_RE,s_flag_WR,s_empty,Data_out);
+    Pipe : Pipeline
+       generic map(Data_sz)
+       port map(clk,raz,Data_in,Data_int,s_flag_RE,s_flag_WR,s_empty,Data_out);
 
 
     RE : Fifo_Read

@@ -71,13 +71,12 @@ signal AddrOut         : std_logic_vector(Addr_sz-1 downto 0);
 signal start   : std_logic;
 signal load    : std_logic;
 signal rdy     : std_logic;
-signal zero    : std_logic;
 
 begin
 
     APB : ApbDriver
         generic map(pindex,paddr,pmask,pirq,abits,LPP_FFT,Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,ReadEnable,WriteEnable,FlagEmpty,FlagFull,zero,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
+        port map(clk,rst,ReadEnable,WriteEnable,FlagEmpty,FlagFull,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
 
 
     Extremum : Flag_Extremum
@@ -100,7 +99,6 @@ begin
         port map(clk,start,rst,WriteEnable,ReadEnable,DataIn_im,DataIn_re,load,open,DataOut_im,DataOut_re,open,rdy);
 
 start <= not rst;
-zero  <= '0';
 
 DataIn_re <= DataIn(31 downto 16);
 DataIn_im <= DataIn(15 downto 0);

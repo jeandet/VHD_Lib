@@ -47,6 +47,7 @@ entity APB_FifoRead is
     rst         : in std_logic;                             --! Reset general du composant
     apbi        : in apb_slv_in_type;                       --! Registre de gestion des entrées du bus
     WriteEnable : in std_logic;                             --! Demande d'écriture dans la mémoire, géré hors de l'IP
+    RE          : out std_logic;
     Full        : out std_logic;                            --! Flag, Memoire pleine
     Empty       : out std_logic;                            --! Flag, Memoire vide
     DATA        : in std_logic_vector(Data_sz-1 downto 0);  --! Données en entrée de la mémoire
@@ -83,5 +84,6 @@ begin
 
 Empty <= FlagEmpty;
 Full <= FlagFull;
+RE <= ReadEnable;
 
 end ar_APB_FifoRead;

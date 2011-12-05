@@ -42,6 +42,7 @@ port(
 --    Read : out std_logic;
 --    Take : out std_logic;
 --    Valid : out std_logic;
+      Res       : out std_logic_vector(Result_SZ-1 downto 0); 
 --    Received : out std_logic;
 --    Conjugate : out std_logic;
 --    OP1 : out std_logic_vector(3 downto 0);
@@ -103,6 +104,6 @@ Start <= Start_int;
 --Received <= Received_int;
 --Valid <= Valid_int;
 --Conjugate <= Conjugate_int;
---Result <= Resultat;
+Res <= Resultat;
 
 end ar_SpectralMatrix;

@@ -222,6 +222,7 @@ component APB_FifoRead is
     rst          : in  std_logic;
     apbi         : in  apb_slv_in_type;
     WriteEnable  : in std_logic;
+    RE           : out std_logic;
     Full         : out std_logic;
     Empty        : out std_logic;
     DATA         : in std_logic_vector(Data_sz-1 downto 0);
