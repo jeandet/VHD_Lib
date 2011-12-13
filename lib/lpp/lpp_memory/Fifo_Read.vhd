@@ -32,6 +32,7 @@ generic(
 port( 
     clk,raz : in std_logic;                              --! Horloge et reset general du composant
     flag_RE : in std_logic;                              --! Flag, Demande la lecture de la mémoire
+--    flag_WR : in std_logic;
 --    ReUse   : in std_logic;                              --! Flag, Permet de relire la mémoire du début
     Waddr   : in std_logic_vector(addr_sz-1 downto 0);   --! Adresse du registre d'écriture dans la mémoire
     empty   : out std_logic;                             --! Flag, Mémoire vide
@@ -47,48 +48,54 @@ signal Rad_int      : integer range 0 to addr_max_int;
 signal Rad_int_reg  : integer range 0 to addr_max_int;
 signal Wad_int      : integer range 0 to addr_max_int;
 signal Wad_int_reg  : integer range 0 to addr_max_int;
-signal flag_reg     : std_logic;
+signal s_empty     : std_logic;
 
 begin 
     process (clk,raz)
     begin
         if(raz='0')then
-            Rad_int    <= 0;
-            empty      <= '1';
-            flag_reg   <= '0';
+            Rad_int <= 0;            
+            s_empty   <= '1';
 
         elsif(clk' event and clk='1')then
             Wad_int_reg <= Wad_int;
             Rad_int_reg <= Rad_int;
-            flag_reg    <= flag_RE;
     
 
-            if(flag_reg ='0' and flag_RE='1')then
-                if(Rad_int=addr_max_int-1)then
-                    Rad_int <= 0;               
-                else
-                    Rad_int <= Rad_int+1;
+            if(flag_RE='1')then
+
+                if(s_empty = '0')then
+                    if(Rad_int=addr_max_int-1)then
+                        Rad_int <= 0;               
+--                    elsif(Rad_int=Wad_int-1)then
+--                        Rad_int <= Rad_int+1;
+--                        s_empty <= '1';
+                    else
+                        Rad_int <= Rad_int+1;
+                    end if;
+                end if;
+                
+                if(Rad_int=Wad_int-1)then
+                    s_empty <= '1';
+                elsif(Rad_int=addr_max_int-1 and Wad_int=0)then
+                    s_empty <= '1';
+                end if;
+            
+            end if;          
+            
+            
+            if(Wad_int_reg /= Wad_int)then
+                if(s_empty='1')then
+                    s_empty <= '0';
                 end if;
             end if;
+                        
+        end if;
 
---            if(ReUse='1')then
---                empty <= '0';
---            else
-                if(Rad_int_reg /= Rad_int)then
-                    if(Rad_int=Wad_int)then
-                        empty <= '1';
-                    else
-                        empty <= '0';
-                    end if; 
-                elsif(Wad_int_reg /= Wad_int)then
-                    empty <= '0';
-                end if;            
-            end if;
-
---        end if;
     end process;
 
 Wad_int  <= to_integer(unsigned(Waddr));
 Raddr    <= std_logic_vector(to_unsigned(Rad_int,addr_sz));
+empty <= s_empty;
 
 end ar_Fifo_Read;

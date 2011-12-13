@@ -39,14 +39,14 @@ port(
     ReadFIFO : out std_logic_vector(1 downto 0);
     WriteFIFO : out std_logic;
     Start : out std_logic;
---    Read : out std_logic;
---    Take : out std_logic;
---    Valid : out std_logic;
-      Res       : out std_logic_vector(Result_SZ-1 downto 0); 
---    Received : out std_logic;
+    Read : out std_logic;
+    Take : out std_logic;
+    Valid : out std_logic;
+    Received : out std_logic;
+    Res       : out std_logic_vector(Result_SZ-1 downto 0);
 --    Conjugate : out std_logic;
---    OP1 : out std_logic_vector(3 downto 0);
---    OP2 : out std_logic_vector(3 downto 0);
+    OP1 : out std_logic_vector(3 downto 0);
+    OP2 : out std_logic_vector(3 downto 0);
     Result       : out std_logic_vector(Result_SZ-1 downto 0)     
 );
 end SpectralMatrix;
@@ -82,7 +82,7 @@ IN1 : DriveInputs
 
 CALC0 : Matrix
     generic map(Input_SZ)
-    port map(clk,Start_int,FIFO1,FIFO2,Take_int,Received_int,Conjugate_int,Valid_int,Read_int,Resultat);
+    port map(clk,Start_int,FIFO1,FIFO2,Take_int,Received_int,Conjugate_int,Valid_int,Read_int,OP1,OP2,Resultat);
 
 
 RES0 : GetResult
@@ -99,10 +99,10 @@ With Statu select
                      '0' when others;
 
 Start <= Start_int;
---Read <= Read_int;
---Take <= Take_int;
---Received <= Received_int;
---Valid <= Valid_int;
+Read <= Read_int;
+Take <= Take_int;
+Received <= Received_int;
+Valid <= Valid_int;
 --Conjugate <= Conjugate_int;
 Res <= Resultat;
 

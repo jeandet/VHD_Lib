@@ -51,7 +51,7 @@ entity ApbDriver is
     FlagFull     : in std_logic;                               --! Flag, Mémoire pleine
 --    ReUse        : out std_logic;                              --! Flag, Permet de relire la mémoire en boucle sans nouvelle données
 --    Lock         : out std_logic;                              --! Flag, Permet de bloquer l'écriture dans la mémoire
---    RstMem       : out std_logic;                              --! Flag, Reset "manuel" spécifique au composant
+    RstMem       : out std_logic;                              --! Flag, Reset "manuel" spécifique au composant
     DataIn       : out std_logic_vector(Data_sz-1 downto 0);   --! Registre de données en entrée
     DataOut      : in std_logic_vector(Data_sz-1 downto 0);    --! Registre de données en sortie
     AddrIn       : in std_logic_vector(Addr_sz-1 downto 0);    --! Registre d'addresse (écriture)
@@ -72,7 +72,7 @@ constant pconfig : apb_config_type := (
   1 => apb_iobar(paddr, pmask));
 
 type DEVICE_ctrlr_Reg is record
-     DEVICE_Cfg   : std_logic_vector(3 downto 0);
+     DEVICE_Cfg   : std_logic_vector(4 downto 0);
      DEVICE_DataW : std_logic_vector(Data_sz-1 downto 0);
      DEVICE_DataR : std_logic_vector(Data_sz-1 downto 0);
      DEVICE_AddrW : std_logic_vector(Addr_sz-1 downto 0);
@@ -87,13 +87,13 @@ signal FlagWR : std_logic;
 
 begin
 
-Rec.DEVICE_Cfg(0) <= FlagRE;
+Rec.DEVICE_Cfg(2) <= FlagRE;
 Rec.DEVICE_Cfg(1) <= FlagWR;
-Rec.DEVICE_Cfg(2) <= FlagEmpty;
-Rec.DEVICE_Cfg(3) <= FlagFull;
+Rec.DEVICE_Cfg(3) <= FlagEmpty;
+Rec.DEVICE_Cfg(4) <= FlagFull;
 --ReUse    <= Rec.DEVICE_Cfg(4);
 --Lock     <= Rec.DEVICE_Cfg(5);
---RstMem   <= Rec.DEVICE_Cfg(7);
+RstMem   <= Rec.DEVICE_Cfg(0);
 
 DataIn <= Rec.DEVICE_DataW;
 Rec.DEVICE_DataR <= DataOut;
@@ -108,7 +108,7 @@ Rec.DEVICE_AddrR <= AddrOut;
             Rec.DEVICE_DataW <= (others => '0');
             FlagWR <= '0';
             FlagRE <= '0';
---            Rec.DEVICE_Cfg(4)  <= '0';
+            Rec.DEVICE_Cfg(0)  <= '0';
 --            Rec.DEVICE_Cfg(5)  <= '0';
 --            Rec.DEVICE_Cfg(7)  <= '0';
 
@@ -120,8 +120,8 @@ Rec.DEVICE_AddrR <= AddrOut;
                     when "000000" =>
                          FlagWR <= '1';
                          Rec.DEVICE_DataW <= apbi.pwdata(Data_sz-1 downto 0);
---                    when "000010" =>
---                         Rec.DEVICE_Cfg(7) <= apbi.pwdata(28);
+                    when "000010" =>
+                         Rec.DEVICE_Cfg(0) <= apbi.pwdata(0);
 --                         Rec.DEVICE_Cfg(5) <= apbi.pwdata(20);
 --                         Rec.DEVICE_Cfg(6) <= apbi.pwdata(24);
                     when others =>
@@ -150,11 +150,11 @@ Rec.DEVICE_AddrR <= AddrOut;
                          Rdata(7 downto 4)   <= "000" & Rec.DEVICE_Cfg(1);
                          Rdata(11 downto 8)  <= "000" & Rec.DEVICE_Cfg(2);
                          Rdata(15 downto 12) <= "000" & Rec.DEVICE_Cfg(3);
---                         Rdata(27 downto 16) <= X"000";
+                         Rdata(19 downto 16) <= "000" & Rec.DEVICE_Cfg(4);
 --                         Rdata(31 downto 28) <= "000" & Rec.DEVICE_Cfg(7);
 --                         Rdata(23 downto 20) <= "000" & Rec.DEVICE_Cfg(5);
 --                         Rdata(27 downto 24) <= "000" & Rec.DEVICE_Cfg(6);
-                         Rdata(31 downto 16) <= X"CCCC";
+                         Rdata(31 downto 20) <= X"CCC";
                     when others =>
                          Rdata <= (others => '0');
                end case;

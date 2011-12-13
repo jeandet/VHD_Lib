@@ -51,6 +51,7 @@ entity APB_FifoRead is
     Full        : out std_logic;                            --! Flag, Memoire pleine
     Empty       : out std_logic;                            --! Flag, Memoire vide
     DATA        : in std_logic_vector(Data_sz-1 downto 0);  --! Données en entrée de la mémoire
+    dataTEST : out std_logic_vector(Data_sz-1 downto 0);
     apbo        : out apb_slv_out_type                      --! Registre de gestion des sorties du bus
     );
 end APB_FifoRead;
@@ -65,7 +66,7 @@ signal FlagEmpty    : std_logic;
 signal FlagFull     : std_logic;
 --signal ReUse        : std_logic;
 --signal Lock         : std_logic;
---signal RstMem       : std_logic;
+signal RstMem       : std_logic;
 signal DataIn       : std_logic_vector(Data_sz-1 downto 0);
 signal DataOut      : std_logic_vector(Data_sz-1 downto 0);
 signal AddrIn       : std_logic_vector(Addr_sz-1 downto 0);
@@ -75,15 +76,16 @@ begin
 
     APB : ApbDriver
         generic map(pindex,paddr,pmask,pirq,abits,LPP_FIFO,Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,ReadEnable,Low,FlagEmpty,FlagFull,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
+        port map(clk,rst,ReadEnable,Low,FlagEmpty,FlagFull,RstMem,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
 
 
     FIFO : Top_FIFO
         generic map(Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,ReadEnable,WriteEnable,DATA,AddrOut,AddrIn,FlagFull,FlagEmpty,DataOut);
+        port map(clk,rst,ReadEnable,WriteEnable,RstMem,DATA,AddrOut,AddrIn,FlagFull,FlagEmpty,DataOut);
 
 Empty <= FlagEmpty;
 Full <= FlagFull;
 RE <= ReadEnable;
+dataTEST <= DataOut;
 
 end ar_APB_FifoRead;

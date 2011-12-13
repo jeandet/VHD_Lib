@@ -52,13 +52,14 @@ entity APB_Matrix is
     WriteFIFO : out std_logic;
     Result       : out std_logic_vector(Result_SZ-1 downto 0);
     Start : out std_logic;
---    Read : out std_logic;
---    Take : out std_logic;
---    Valid : out std_logic;
+    Read : out std_logic;
+    Take : out std_logic;
+    Valid : out std_logic;
+    Received : out std_logic;
 Res       : out std_logic_vector(Result_SZ-1 downto 0);
 --    Conjugate : out std_logic;
---    OP1 : out std_logic_vector(3 downto 0);
---    OP2 : out std_logic_vector(3 downto 0);
+    OP1 : out std_logic_vector(3 downto 0);
+    OP2 : out std_logic_vector(3 downto 0);
     apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
     apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
 );
@@ -84,7 +85,7 @@ begin
 
 Mspec0 : SpectralMatrix
     generic map (Input_SZ,Result_SZ)
-    port map(clk,rst,FIFO1,FIFO2,Full,Empty,Rec.MATRIX_Statu,ReadFIFO,WriteFIFO,Start,Res,Result);       --Start,Read,Take,Valid,Received,Conjugate,OP1,OP2
+    port map(clk,rst,FIFO1,FIFO2,Full,Empty,Rec.MATRIX_Statu,ReadFIFO,WriteFIFO,Start,Read,Take,Valid,Received,Res,OP1,OP2,Result);       --Start,Read,Take,Valid,Received,Conjugate,OP1,OP2
 
     process(rst,clk)
     begin

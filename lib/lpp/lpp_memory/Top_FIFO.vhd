@@ -39,9 +39,7 @@ entity Top_FIFO is
     clk,raz  : in std_logic;                             --! Horloge et reset general du composant
     flag_RE  : in std_logic;                             --! Flag, Demande la lecture de la mémoire
     flag_WR  : in std_logic;                             --! Flag, Demande l'écriture dans la mémoire
---    ReUse    : in std_logic;                             --! Flag, Permet de relire la mémoire en boucle sans nouvelle données
---    Lock     : in std_logic;                             --! Permet de bloquer l'écriture dans la mémoire
---    RstMem   : in std_logic;                             --! Flag, Reset "manuel" spécifique au composant
+    RstMem   : in std_logic;
     Data_in  : in std_logic_vector(Data_sz-1 downto 0);  --! Data en entrée du composant
     Addr_RE  : out std_logic_vector(addr_sz-1 downto 0); --! Adresse d'écriture
     Addr_WR  : out std_logic_vector(addr_sz-1 downto 0); --! Adresse de lecture
@@ -72,78 +70,49 @@ end component;
 signal Raddr     : std_logic_vector(addr_sz-1 downto 0);
 signal Waddr     : std_logic_vector(addr_sz-1 downto 0);
 signal Data_int  : std_logic_vector(Data_sz-1 downto 0);
+signal Data_svg  : std_logic_vector(Data_sz-1 downto 0);
 signal s_empty   : std_logic;
 signal s_full    : std_logic;
---signal s_full2   : std_logic;
+signal Data1     : std_logic;
+signal Data2     : std_logic;
 signal s_flag_RE : std_logic;
 signal s_flag_WR : std_logic;
-signal Flag_WR_reg : std_logic;
---signal rst       : std_logic;
---signal RstMem_inv  : std_logic;
+signal rstf      : std_logic;
 
 begin
 
---RstMem_inv <= not RstMem;
---rst <= raz and RstMem_inv;
+    Reset : entity LocalReset
+        port map(clk,raz,RstMem,rstf);
 
-    WR : Fifo_Write
-       generic map(Addr_sz,addr_max_int)
-       port map(clk,raz,s_flag_WR,Raddr,s_full,Waddr);
-
+    WR : entity Fifo_Write
+        generic map(Addr_sz,addr_max_int)
+        port map(clk,rstf,s_flag_WR,Raddr,s_full,Waddr);
 
     SRAM : syncram_2p
-       generic map(CFG_MEMTECH,Addr_sz,Data_sz)
-       port map(clk,s_flag_RE,Raddr,Data_int,clk,s_flag_WR,Waddr,Data_in);
+        generic map(CFG_MEMTECH,Addr_sz,Data_sz)
+        port map(clk,s_flag_RE,Raddr,Data_int,clk,s_flag_WR,Waddr,Data_in);
+ 
+    RE : entity Fifo_Read
+        generic map(Addr_sz,addr_max_int)
+        port map(clk,rstf,s_flag_RE,Waddr,s_empty,Raddr);
+
+    PIPE : entity PipeLine
+        generic map(Data_sz)
+        port map(clk,rstf,Data_in,s_flag_RE,s_flag_WR,s_empty,Data_svg,Data1,Data2);
 
 
-    Pipe : Pipeline
-       generic map(Data_sz)
-       port map(clk,raz,Data_in,Data_int,s_flag_RE,s_flag_WR,s_empty,Data_out);
+Data_out <= Data_svg when Data1='1' else
+            Data_int when Data2='1';
 
-
-    RE : Fifo_Read
-       generic map(Addr_sz,addr_max_int)
-       port map(clk,raz,s_flag_RE,Waddr,s_empty,Raddr);
-
-    process(clk,raz)
-    begin
-        if(raz='0')then
-            s_flag_RE <= '0';
-            s_flag_WR <= '0';
---            s_full2   <= s_full;
-            Flag_WR_reg <= '0';
-
-        elsif(clk'event and clk='1')then
-            Flag_WR_reg <= Flag_WR;
-
-            if(s_full='0')then         --2
-                if(s_empty='1')then
-                    s_flag_WR <= Flag_WR_reg;
-                else
-                    s_flag_WR <= Flag_WR;
-                end if;
-            else
-                s_flag_WR <= '0';
-            end if;
-
-            if(s_empty='0')then
-                s_flag_RE <= Flag_RE;
-            else
-                s_flag_RE <= '0';
-            end if;
-           
---            if(Lock='1')then
---                s_full2 <= '1';
---            else
---                s_full2 <= s_full;
---            end if;
-
-        end if;
-    end process;
-
-full    <= s_full;     --2
+full    <= s_full;
 empty   <= s_empty;
 Addr_RE <= Raddr;
 Addr_WR <= Waddr;
+
+s_flag_WR <= Flag_WR when s_full='0' else
+             '0';
+
+s_flag_RE <= Flag_RE when s_empty='0' else
+             '0';
 
 end ar_Top_FIFO;

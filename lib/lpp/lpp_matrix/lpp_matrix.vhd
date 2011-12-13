@@ -51,7 +51,14 @@ component APB_Matrix is
     WriteFIFO : out std_logic;
     Result       : out std_logic_vector(Result_SZ-1 downto 0);
     Start : out std_logic;
-    Res       : out std_logic_vector(Result_SZ-1 downto 0);
+     Read : out std_logic;
+    Take : out std_logic;
+    Valid : out std_logic;
+    Received : out std_logic;
+Res       : out std_logic_vector(Result_SZ-1 downto 0);
+--    Conjugate : out std_logic;
+    OP1 : out std_logic_vector(3 downto 0);
+    OP2 : out std_logic_vector(3 downto 0);
     apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
     apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
 );
@@ -72,8 +79,15 @@ port(
     Statu : in std_logic_vector(3 downto 0);
     ReadFIFO : out std_logic_vector(1 downto 0);
     WriteFIFO : out std_logic;
-    Start : out std_logic;
+     Start : out std_logic;
+    Read : out std_logic;
+    Take : out std_logic;
+    Valid : out std_logic;
+    Received : out std_logic;
     Res       : out std_logic_vector(Result_SZ-1 downto 0);
+--    Conjugate : out std_logic;
+    OP1 : out std_logic_vector(3 downto 0);
+    OP2 : out std_logic_vector(3 downto 0);
     Result       : out std_logic_vector(Result_SZ-1 downto 0)
 );
 end component;
@@ -92,6 +106,8 @@ component Matrix is
       Conjugate  : in std_logic;
       Valid      : out std_logic;
       Read       : out std_logic;
+            OPin1 : out std_logic_vector(3 downto 0);
+      OPin2 : out std_logic_vector(3 downto 0);
       Result     : out std_logic_vector(2*Input_SZ-1 downto 0)
 );
 end component;

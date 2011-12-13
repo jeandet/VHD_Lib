@@ -64,7 +64,7 @@ signal FlagEmpty    : std_logic;
 signal FlagFull     : std_logic;
 --signal ReUse        : std_logic;
 --signal Lock         : std_logic;
---signal RstMem       : std_logic;
+signal RstMem       : std_logic;
 signal DataIn       : std_logic_vector(Data_sz-1 downto 0);
 signal DataOut      : std_logic_vector(Data_sz-1 downto 0);
 signal AddrIn       : std_logic_vector(Addr_sz-1 downto 0);
@@ -74,12 +74,12 @@ begin
 
     APB : ApbDriver
         generic map(pindex,paddr,pmask,pirq,abits,LPP_FIFO,Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,Low,WriteEnable,FlagEmpty,FlagFull,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
+        port map(clk,rst,Low,WriteEnable,FlagEmpty,FlagFull,RstMem,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
 
 
     FIFO : Top_FIFO
         generic map(Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,ReadEnable,WriteEnable,DataIn,AddrOut,AddrIn,FlagFull,FlagEmpty,DataOut);
+        port map(clk,rst,ReadEnable,WriteEnable,RstMem,DataIn,AddrOut,AddrIn,FlagFull,FlagEmpty,DataOut);
 
 DATA <= DataOut;
 Empty <= FlagEmpty;

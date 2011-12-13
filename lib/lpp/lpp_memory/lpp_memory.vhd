@@ -78,7 +78,7 @@ component ApbDriver is
     FlagFull     : in std_logic;
 --    ReUse        : out std_logic;
 --    Lock         : out std_logic;
---    RstMem       : out std_logic;
+    RstMem       : out std_logic;
     DataIn       : out std_logic_vector(Data_sz-1 downto 0);
     DataOut      : in std_logic_vector(Data_sz-1 downto 0);
     AddrIn       : in std_logic_vector(Addr_sz-1 downto 0);
@@ -92,7 +92,7 @@ end component;
 component Top_FIFO is
   generic(
     Data_sz      : integer := 16;
-    Addr_sz      : integer := 8;    
+    Addr_sz      : integer := 8;
     addr_max_int : integer := 256
     );
   port(
@@ -101,7 +101,7 @@ component Top_FIFO is
     flag_WR  : in std_logic;
 --    ReUse    : in std_logic;
 --    Lock     : in std_logic;
---    RstMem   : in std_logic;
+    RstMem   : in std_logic;
     Data_in  : in std_logic_vector(Data_sz-1 downto 0);
     Addr_RE  : out std_logic_vector(addr_sz-1 downto 0);
     Addr_WR  : out std_logic_vector(addr_sz-1 downto 0);
@@ -120,7 +120,6 @@ component Fifo_Read is
     clk          : in std_logic;
     raz          : in std_logic;
     flag_RE      : in std_logic;
---    ReUse        : in std_logic;
     Waddr        : in std_logic_vector(addr_sz-1 downto 0);
     empty        : out std_logic;
     Raddr        : out std_logic_vector(addr_sz-1 downto 0)
@@ -143,20 +142,29 @@ component Fifo_Write is
 end component;
 
 
-component Pipeline is
+component PipeLine is
   generic(Data_sz : integer := 16);
   port(
-    clk,raz       : in std_logic;
-    Data_one      : in std_logic_vector(Data_sz-1 downto 0);
-    Data_two      : in std_logic_vector(Data_sz-1 downto 0);
---    ReUse         : in std_logic;
-    flag_RE       : in std_logic;
-    flag_WR       : in std_logic;
-    empty         : in std_logic;
-    Data_out      : out std_logic_vector(Data_sz-1 downto 0)
+    clk,raz  : in std_logic;                             --! Horloge et reset general du composant
+    Data_in  : in std_logic_vector(Data_sz-1 downto 0);  --! Donnée en entrée de la FIFO, coté écriture
+    flag_RE  : in std_logic;                             --! Flag, Demande la lecture de la mémoire
+    flag_WR  : in std_logic;                             --! Flag, Demande l'écriture dans la mémoire
+    empty    : in std_logic;                             --! Flag, Mémoire vide
+    Data_svg : out std_logic_vector(Data_sz-1 downto 0);
+    Data1 : out std_logic;
+    Data2 : out std_logic
     );
 end component;
 
+
+component LocalReset is
+    port(
+        clk         : in  std_logic;
+        raz         : in std_logic;
+        Rz          : in  std_logic;
+        rstf        : out  std_logic        
+    );
+end component;
 --===========================================================|
 --================= Demi FIFO Ecriture ======================|
 --===========================================================|
@@ -226,6 +234,7 @@ component APB_FifoRead is
     Full         : out std_logic;
     Empty        : out std_logic;
     DATA         : in std_logic_vector(Data_sz-1 downto 0);
+    dataTEST : out std_logic_vector(Data_sz-1 downto 0);
     apbo         : out apb_slv_out_type
     );
 end component;
