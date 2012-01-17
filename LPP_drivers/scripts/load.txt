@@ -1,1 +1,1 @@
-load bin/BenchFIFO.bin
+load bin/hello.bin

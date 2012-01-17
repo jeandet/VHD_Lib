@@ -14,31 +14,13 @@
 --
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
--------------------------------------------------------------------------------
---                      Author : Martin Morlot
---                     Mail : martin.morlot@lpp.polytechnique.fr
------------------------------------------------------------------------------*/
-#include "lpp_apb_functions.h"
-#include "apb_fifo_Driver.h"
-#include <stdio.h>
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+-------------------------------------------------------------------------------*/
+#include "stdio.h"
 
 
-FIFO_Device* openFIFO(int count)
+int main()
 {
-    FIFO_Device* fifo0;
-    fifo0 = (FIFO_Device*) apbgetdevice(LPP_FIFO_PID,VENDOR_LPP,count);
-    return fifo0;
-}
-
-
-int FillFifo(FIFO_Device* dev,int ID,int Tbl[])
-{
-    int i=0;
-    while((dev->FIFOreg[(2*ID)+FIFO_Ctrl] & FIFO_Full) != FIFO_Full) // TANT QUE  full a 0  ALORS
-    {
-        dev->FIFOreg[(2*ID)+FIFO_RWdata] = Tbl[i];
-        i++;
-    }
+    printf("hello World\n");
     return 0;
 }

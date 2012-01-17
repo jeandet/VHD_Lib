@@ -26,237 +26,93 @@ use grlib.amba.all;
 use std.textio.all;
 library lpp;
 use lpp.lpp_amba.all;
+library gaisler;
+use gaisler.misc.all;
+use gaisler.memctrl.all;
+library techmap;
+use techmap.gencomp.all;
 
 --! Package contenant tous les programmes qui forment le composant intégré dans le léon 
 
 package lpp_memory is
 
---===========================================================|
---=================== FIFO Complète =========================|
---===========================================================| 
-
 component APB_FIFO is
-  generic (
+generic (
+    tech         : integer := apa3;
     pindex       : integer := 0;
     paddr        : integer := 0;
     pmask        : integer := 16#fff#;
     pirq         : integer := 0;
     abits        : integer := 8;
+    FifoCnt      : integer := 2;
     Data_sz      : integer := 16;
-    Addr_sz      : integer := 8;
-    addr_max_int : integer := 256);
+    Addr_sz      : integer := 9;
+    R            : integer := 1;
+    W            : integer := 1
+    );
   port (
-    clk          : in  std_logic;
-    rst          : in  std_logic;
-    apbi         : in  apb_slv_in_type;
-    Full    : out std_logic;
-    Empty   : out std_logic;
-    WR : out std_logic;
-    RE : out std_logic;
-    apbo         : out apb_slv_out_type
+    clk          : in  std_logic;                              --! Horloge du composant
+    rst          : in  std_logic;                              --! Reset general du composant
+    rclk         : in  std_logic; 
+    wclk         : in  std_logic; 
+    REN          : in std_logic_vector(FifoCnt-1 downto 0);   --! Instruction de lecture en mémoire
+    WEN          : in std_logic_vector(FifoCnt-1 downto 0);   --! Instruction d'écriture en mémoire
+    Empty        : out std_logic_vector(FifoCnt-1 downto 0);    --! Flag, Mémoire vide
+    Full         : out std_logic_vector(FifoCnt-1 downto 0);    --! Flag, Mémoire pleine
+    RDATA        : out std_logic_vector((FifoCnt*Data_sz)-1 downto 0);   --! Registre de données en entrée
+    WDATA        : in std_logic_vector((FifoCnt*Data_sz)-1 downto 0);    --! Registre de données en sortie
+    WADDR        : out std_logic_vector((FifoCnt*Addr_sz)-1 downto 0);    --! Registre d'addresse (écriture)
+    RADDR        : out std_logic_vector((FifoCnt*Addr_sz)-1 downto 0);    --! Registre d'addresse (lecture)
+    apbi         : in  apb_slv_in_type;                        --! Registre de gestion des entrées du bus
+    apbo         : out apb_slv_out_type                        --! Registre de gestion des sorties du bus
     );
 end component;
 
 
-component ApbDriver is
-  generic (
-    pindex       : integer := 0;
-    paddr        : integer := 0;
-    pmask        : integer := 16#fff#;
-    pirq         : integer := 0;
-    abits        : integer := 8;
-    LPP_DEVICE   : integer;
-    Data_sz      : integer := 16;
-    Addr_sz      : integer := 8;    
-    addr_max_int : integer := 256);
-  port (
-    clk          : in  std_logic;     
-    rst          : in  std_logic;
-    ReadEnable   : out std_logic;
-    WriteEnable  : out std_logic;
-    FlagEmpty    : in std_logic;
-    FlagFull     : in std_logic;
---    ReUse        : out std_logic;
---    Lock         : out std_logic;
-    RstMem       : out std_logic;
-    DataIn       : out std_logic_vector(Data_sz-1 downto 0);
-    DataOut      : in std_logic_vector(Data_sz-1 downto 0);
-    AddrIn       : in std_logic_vector(Addr_sz-1 downto 0);
-    AddrOut      : in std_logic_vector(Addr_sz-1 downto 0);
-    apbi         : in  apb_slv_in_type;
-    apbo         : out apb_slv_out_type
+component lpp_fifo is
+generic(
+    tech    :   integer := 0;
+    DataSz  :   integer range 1 to 32 := 8;
+    abits   :   integer range 2 to 12 := 8
     );
+port(
+    rstn    :   in std_logic;
+    rclk    :   in std_logic;
+    ren     :   in std_logic;
+    rdata   :   out std_logic_vector(DataSz-1 downto 0);
+    empty   :   out std_logic;
+    raddr   :   out std_logic_vector(abits-1 downto 0);
+    wclk    :   in std_logic;
+    wen     :   in std_logic;
+    wdata   :   in std_logic_vector(DataSz-1 downto 0);
+    full    :   out std_logic;
+    waddr   :   out std_logic_vector(abits-1 downto 0)
+);
 end component;
 
-
-component Top_FIFO is
-  generic(
-    Data_sz      : integer := 16;
-    Addr_sz      : integer := 8;
-    addr_max_int : integer := 256
-    );
-  port(
-    clk,raz  : in std_logic;
-    flag_RE  : in std_logic;
-    flag_WR  : in std_logic;
---    ReUse    : in std_logic;
---    Lock     : in std_logic;
-    RstMem   : in std_logic;
-    Data_in  : in std_logic_vector(Data_sz-1 downto 0);
-    Addr_RE  : out std_logic_vector(addr_sz-1 downto 0);
-    Addr_WR  : out std_logic_vector(addr_sz-1 downto 0);
-    full     : out std_logic;
-    empty    : out std_logic;
-    Data_out : out std_logic_vector(Data_sz-1 downto 0)
-    );
+component ssram_plugin is
+generic (tech : integer := 0);
+port
+(
+    clk             : in  std_logic;
+    mem_ctrlr_o     : in  memory_out_type;
+    SSRAM_CLK       : out std_logic;
+    nBWa            : out std_logic;
+    nBWb            : out std_logic;
+    nBWc            : out std_logic;
+    nBWd            : out std_logic;
+    nBWE            : out std_logic;
+    nADSC           : out std_logic;
+    nADSP           : out std_logic;
+    nADV            : out std_logic;
+    nGW             : out std_logic;
+    nCE1            : out std_logic;
+    CE2             : out std_logic;
+    nCE3            : out std_logic;
+    nOE             : out std_logic;
+    MODE            : out std_logic;
+    ZZ              : out std_logic
+);
 end component;
-
-
-component Fifo_Read is
-  generic(
-    Addr_sz      : integer := 8;
-    addr_max_int : integer := 256);
-  port(
-    clk          : in std_logic;
-    raz          : in std_logic;
-    flag_RE      : in std_logic;
-    Waddr        : in std_logic_vector(addr_sz-1 downto 0);
-    empty        : out std_logic;
-    Raddr        : out std_logic_vector(addr_sz-1 downto 0)
-    );
-end component;
-
-
-component Fifo_Write is
-  generic(
-    Addr_sz      : integer := 8;
-    addr_max_int : integer := 256);
-  port(
-    clk          : in std_logic;
-    raz          : in std_logic;
-    flag_WR      : in std_logic;
-    Raddr        : in std_logic_vector(addr_sz-1 downto 0);
-    full         : out std_logic;
-    Waddr        : out std_logic_vector(addr_sz-1 downto 0)
-    );
-end component;
-
-
-component PipeLine is
-  generic(Data_sz : integer := 16);
-  port(
-    clk,raz  : in std_logic;                             --! Horloge et reset general du composant
-    Data_in  : in std_logic_vector(Data_sz-1 downto 0);  --! Donnée en entrée de la FIFO, coté écriture
-    flag_RE  : in std_logic;                             --! Flag, Demande la lecture de la mémoire
-    flag_WR  : in std_logic;                             --! Flag, Demande l'écriture dans la mémoire
-    empty    : in std_logic;                             --! Flag, Mémoire vide
-    Data_svg : out std_logic_vector(Data_sz-1 downto 0);
-    Data1 : out std_logic;
-    Data2 : out std_logic
-    );
-end component;
-
-
-component LocalReset is
-    port(
-        clk         : in  std_logic;
-        raz         : in std_logic;
-        Rz          : in  std_logic;
-        rstf        : out  std_logic        
-    );
-end component;
---===========================================================|
---================= Demi FIFO Ecriture ======================|
---===========================================================|
-
-component APB_FifoWrite is
-  generic (
-    pindex       : integer := 0;
-    paddr        : integer := 0;
-    pmask        : integer := 16#fff#;
-    pirq         : integer := 0;
-    abits        : integer := 8;
-    Data_sz      : integer := 16;
-    Addr_sz      : integer := 8;
-    addr_max_int : integer := 256);
-  port (
-    clk          : in  std_logic;
-    rst          : in  std_logic;
-    apbi         : in  apb_slv_in_type;
-    ReadEnable   : in  std_logic;
-    Empty        : out std_logic;
-    Full         : out std_logic;
-    DATA         : out std_logic_vector(Data_sz-1 downto 0);
-    apbo         : out apb_slv_out_type
-    );
-end component;
-
-
---component Top_FifoWrite is
---  generic(
---    Data_sz      : integer := 16;
---    Addr_sz      : integer := 8;
---    addr_max_int : integer := 256);
---  port(
---    clk          : in std_logic;
---    raz          : in std_logic;
---    flag_RE      : in std_logic;
---    flag_WR      : in std_logic;
---    Data_in      : in std_logic_vector(Data_sz-1 downto 0);
---    Raddr        : in std_logic_vector(addr_sz-1 downto 0);
---    full         : out std_logic;
---    empty        : out std_logic;
---    Waddr        : out std_logic_vector(addr_sz-1 downto 0);
---    Data_out     : out std_logic_vector(Data_sz-1 downto 0)
---    );
---end component;
-
---===========================================================|
---================== Demi FIFO Lecture ======================|
---===========================================================|
-
-component APB_FifoRead is
-  generic (
-    pindex       : integer := 0;
-    paddr        : integer := 0;
-    pmask        : integer := 16#fff#;
-    pirq         : integer := 0;
-    abits        : integer := 8;
-    Data_sz      : integer := 16;
-    Addr_sz      : integer := 8;
-    addr_max_int : integer := 256);
-  port (
-    clk          : in  std_logic;
-    rst          : in  std_logic;
-    apbi         : in  apb_slv_in_type;
-    WriteEnable  : in std_logic;
-    RE           : out std_logic;
-    Full         : out std_logic;
-    Empty        : out std_logic;
-    DATA         : in std_logic_vector(Data_sz-1 downto 0);
-    dataTEST : out std_logic_vector(Data_sz-1 downto 0);
-    apbo         : out apb_slv_out_type
-    );
-end component;
-
-
---component Top_FifoRead is
---  generic(
---    Data_sz      : integer := 16;
---    Addr_sz      : integer := 8;
---    addr_max_int : integer := 256);
---  port(
---    clk          : in std_logic;
---    raz          : in std_logic;
---    flag_RE      : in std_logic;
---    flag_WR      : in std_logic;
---    Data_in      : in std_logic_vector(Data_sz-1 downto 0);
---    Waddr        : in std_logic_vector(addr_sz-1 downto 0);
---    full         : out std_logic;
---    empty        : out std_logic;
---    Raddr        : out std_logic_vector(addr_sz-1 downto 0);
---    Data_out     : out std_logic_vector(Data_sz-1 downto 0)
---    );
---end component;
 
 end;
