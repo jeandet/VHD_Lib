@@ -42,26 +42,15 @@ entity APB_Matrix is
     Input_SZ : integer := 16;
     Result_SZ : integer := 32);
   port (
-    clk     : in  std_logic;           --! Horloge du composant
-    rst     : in  std_logic;           --! Reset general du composant
-    FIFO1       : in std_logic_vector(Input_SZ-1 downto 0);
-    FIFO2       : in std_logic_vector(Input_SZ-1 downto 0);
-    Full   : in std_logic_vector(1 downto 0);
-    Empty   : in std_logic_vector(1 downto 0);
-    ReadFIFO : out std_logic_vector(1 downto 0);
+    clk       : in  std_logic;           --! Horloge du composant
+    rst       : in  std_logic;           --! Reset general du composant
+    FIFO1     : in std_logic_vector(Input_SZ-1 downto 0);
+    FIFO2     : in std_logic_vector(Input_SZ-1 downto 0);
+    ReadFIFO  : out std_logic_vector(1 downto 0);
     WriteFIFO : out std_logic;
-    Result       : out std_logic_vector(Result_SZ-1 downto 0);
-    Start : out std_logic;
-    Read : out std_logic;
-    Take : out std_logic;
-    Valid : out std_logic;
-    Received : out std_logic;
-Res       : out std_logic_vector(Result_SZ-1 downto 0);
---    Conjugate : out std_logic;
-    OP1 : out std_logic_vector(3 downto 0);
-    OP2 : out std_logic_vector(3 downto 0);
-    apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
-    apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
+    Result    : out std_logic_vector(Result_SZ-1 downto 0);
+    apbi      : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
+    apbo      : out apb_slv_out_type     --! Registre de gestion des sorties du bus
 );
 end APB_Matrix;
 
@@ -75,22 +64,27 @@ constant pconfig : apb_config_type := (
   1 => apb_iobar(paddr, pmask));
 
 type MATRIX_ctrlr_Reg is record
-     MATRIX_Statu : std_logic_vector(3 downto 0);
+     MATRIX_Ctrl : std_logic_vector(4 downto 0);
 end record;
 
 signal Rec : MATRIX_ctrlr_Reg;
 signal Rdata : std_logic_vector(31 downto 0);
+signal Start : std_logic;
+signal statu : std_logic_vector(3 downto 0);
 
 begin
 
 Mspec0 : SpectralMatrix
     generic map (Input_SZ,Result_SZ)
-    port map(clk,rst,FIFO1,FIFO2,Full,Empty,Rec.MATRIX_Statu,ReadFIFO,WriteFIFO,Start,Read,Take,Valid,Received,Res,OP1,OP2,Result);       --Start,Read,Take,Valid,Received,Conjugate,OP1,OP2
+    port map(clk,rst,Start,FIFO1,FIFO2,Statu,ReadFIFO,WriteFIFO,Result);
+
+Statu <= Rec.MATRIX_Ctrl(3 downto 0);
+Start <= Rec.MATRIX_Ctrl(4);
 
     process(rst,clk)
     begin
         if(rst='0')then
-            Rec.MATRIX_Statu <= (others => '0');
+            Rec.MATRIX_Ctrl <= (others => '0');
             
         elsif(clk'event and clk='1')then 
 
@@ -98,26 +92,18 @@ Mspec0 : SpectralMatrix
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>                         
-                         Rec.MATRIX_Statu <= apbi.pwdata(3 downto 0);                   
+                         Rec.MATRIX_Ctrl <= apbi.pwdata(4 downto 0);
                     when others =>
                         null;
                 end case;
             end if;
 
-    --APB READ OP
+    --APB Read OP
             if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                         Rdata(31 downto 4) <= (others => '0');
-                         Rdata(3 downto 0) <= Rec.MATRIX_Statu;
-                    --when "000001" =>
-                    --     Rdata(3 downto 0) <= "000" & Rec.MATRIX_Cfg(0);
-                    --     Rdata(7 downto 4) <= "000" & Rec.MATRIX_Cfg(1);
-                    --     Rdata(11 downto 8) <= "000" & Rec.MATRIX_Cfg(2);
-                    --     Rdata(15 downto 12) <= "000" & Rec.MATRIX_Cfg(3);
-                    --     Rdata(19 downto 16) <= "000" & Rec.MATRIX_Cfg(4);
-                    --     Rdata(23 downto 20) <= "000" & Rec.MATRIX_Cfg(5);
-                    --     Rdata(31 downto 24) <= X"CC";
+                         Rdata(31 downto 5) <= (others => '0');
+                         Rdata(4 downto 0) <= Rec.MATRIX_Ctrl;
                     when others =>
                         Rdata <= (others => '0');
                 end case;

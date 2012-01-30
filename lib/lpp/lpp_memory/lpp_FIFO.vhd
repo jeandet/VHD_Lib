@@ -35,6 +35,7 @@ generic(
     );
 port(
     rstn    :   in std_logic;
+    ReUse   :   in std_logic;   --27/01/12
     rclk    :   in std_logic;
     ren     :   in std_logic;
     rdata   :   out std_logic_vector(DataSz-1 downto 0);
@@ -84,7 +85,9 @@ begin
         Raddr_vect_d <=  (others =>'1');
         sempty  <= '1';
     elsif(rclk'event and rclk='1')then
-        if(Raddr_vect=Waddr_vect_d and REN = '0' and sempty = '0')then
+        if(ReUse = '1')then   --27/01/12
+            sempty  <= '0';    --27/01/12
+        elsif(Raddr_vect=Waddr_vect_d and REN = '0' and sempty = '0')then
             sempty  <= '1';
         elsif(Raddr_vect/=Waddr_vect) then
             sempty  <= '0';
@@ -109,7 +112,9 @@ begin
         Waddr_vect_d <=  (others =>'1');
         sfull        <=   '0';
     elsif(wclk'event and wclk='1')then
-        if(Raddr_vect_d=Waddr_vect and WEN = '0' and sfull = '0')then
+        if(ReUse = '1')then   --27/01/12
+            sfull  <= '1';    --27/01/12
+        elsif(Raddr_vect_d=Waddr_vect and WEN = '0' and sfull = '0')then
             sfull  <= '1';
         elsif(Raddr_vect/=Waddr_vect) then
             sfull  <= '0';

@@ -101,7 +101,8 @@ signal sRen_APB  : std_logic_vector(FifoCnt-1 downto 0);
 signal sRDATA    : fifodatabus;   
 signal sWDATA    : fifodatabus;    
 signal sWADDR    : fifoaddressbus;   
-signal sRADDR    : fifoaddressbus;    
+signal sRADDR    : fifoaddressbus;
+signal ReUse     : std_logic_vector(FifoCnt-1 downto 0);   --27/01/12
 
 type state_t is (idle,Read);
 signal fiforeadfsmst : state_t;
@@ -153,9 +154,13 @@ ctrlregs: for i in 0 to FifoCnt-1 generate
     RADDR((Addr_sz*(i+1))-1 downto (Addr_sz)*i) <= sRADDR(i);
     WADDR((Addr_sz*(i+1))-1 downto (Addr_sz)*i) <= sWADDR(i);
     Rec(i).FIFO_Ctrl(16) <= sFull(i);
-    Rec(i).FIFO_Ctrl(Addr_sz downto 1) <= sRADDR(i);
-    Rec(i).FIFO_Ctrl((Addr_sz+16) downto 17) <= sWADDR(i);  ---|free|Waddrs|Full||free|Raddrs|empty|
-end generate;                                                  -- 31         17  16 15          1     0
+    --Rec(i).FIFO_Ctrl(17) <= Rec(i).FIFO_Ctrl(1); --27/01/12
+    ReUse(i) <= Rec(i).FIFO_Ctrl(1); --27/01/12
+    Rec(i).FIFO_Ctrl(3 downto 2) <= "00"; --27/01/12
+    Rec(i).FIFO_Ctrl(19 downto 17) <= "000"; --27/01/12
+    Rec(i).FIFO_Ctrl(Addr_sz+3 downto 4) <= sRADDR(i);
+    Rec(i).FIFO_Ctrl((Addr_sz+19) downto 20) <= sWADDR(i);  ---|free|Waddrs|Full||free|Raddrs|empty|
+end generate;                                               -- 31         17  16 15          1     0
 
 Empty <= sEmpty;
 Full <= sFull;
@@ -164,7 +169,7 @@ Full <= sFull;
 fifos: for i in 0 to FifoCnt-1 generate
     FIFO0 : lpp_fifo
         generic map (tech,Data_sz,Addr_sz)
-        port map(rst,srclk,sRen(i),sRDATA(i),sEmpty(i),sRADDR(i),swclk,sWen(i),sWDATA(i),sFull(i),sWADDR(i));
+        port map(rst,ReUse(i),srclk,sRen(i),sRDATA(i),sEmpty(i),sRADDR(i),swclk,sWen(i),sWDATA(i),sFull(i),sWADDR(i));
 end generate;
 
     process(rst,clk)
@@ -172,14 +177,19 @@ end generate;
         if(rst='0')then
         rstloop1: for i in 0 to FifoCnt-1 loop
             Rec(i).FIFO_Wdata <=  (others => '0');
+            Rec(i).FIFO_Ctrl(1) <= '0'; --27/01/12
+            --Rec(i).FIFO_Ctrl(17) <= '0';
             sWen_APB(i) <= '1';
         end loop;
         elsif(clk'event and clk='1')then
     --APB Write OP
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
-                   writelp: for i in 0 to FifoCnt-1 loop  
-                        if(conv_integer(apbi.paddr(abits-1 downto 2))=((2*i)+2)) then
-                            Rec(i).FIFO_Wdata <= apbi.pwdata(Data_sz-1 downto 0); 
+                   writelp: for i in 0 to FifoCnt-1 loop
+                        if(conv_integer(apbi.paddr(abits-1 downto 2))=((2*i)+1)) then
+                            Rec(i).FIFO_Ctrl(1) <= apbi.pwdata(1);
+                            --Rec(i).FIFO_Ctrl(17) <= apbi.pwdata(17);
+                        elsif(conv_integer(apbi.paddr(abits-1 downto 2))=((2*i)+2)) then
+                            Rec(i).FIFO_Wdata <= apbi.pwdata(Data_sz-1 downto 0);
                             sWen_APB(i) <= '0';
                         end if;
                    end loop; 
@@ -195,7 +205,7 @@ end generate;
                         if(conv_integer(apbi.paddr(abits-1 downto 2))=((2*i)+1)) then
                             PRdata   <= Rec(i).FIFO_Ctrl;
                         elsif(conv_integer(apbi.paddr(abits-1 downto 2))=((2*i)+2)) then
-                            PRdata(Data_sz-1 downto 0)  <= Rec(i).FIFO_rdata; 
+                            PRdata(Data_sz-1 downto 0)  <= Rec(i).FIFO_rdata;
                         end if;
                    end loop; 
                 end if;       

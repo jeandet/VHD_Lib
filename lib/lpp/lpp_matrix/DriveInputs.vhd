@@ -25,17 +25,12 @@ use IEEE.std_logic_1164.all;
 
 entity DriveInputs is
 port(
-    clk     : in  std_logic;
-    raz     : in  std_logic;
-    Read    : in  std_logic;
---    FIFO1      : in std_logic_vector(Input_SZ-1 downto 0);
---    FIFO2      : in std_logic_vector(Input_SZ-1 downto 0);
---    Statu : in std_logic_vector(3 downto 0);
-    Conjugate : in std_logic;
-    Take    : out std_logic;
-    ReadFIFO : out std_logic_vector(1 downto 0)
---    OP1     : out std_logic_vector(Input_SZ-1 downto 0);    
---    OP2     : out std_logic_vector(Input_SZ-1 downto 0)
+    clk            : in  std_logic;
+    raz            : in  std_logic;
+    Read           : in  std_logic;
+    Conjugate      : in std_logic;
+    Take           : out std_logic;
+    ReadFIFO       : out std_logic_vector(1 downto 0)
 );
 end DriveInputs;
 
@@ -43,9 +38,7 @@ end DriveInputs;
 architecture ar_DriveInputs of DriveInputs is
 
 signal Read_reg : std_logic;
-signal i : integer range 0 to 128;
---signal j : integer range 0 to 15;
---signal Read_int : std_logic_vector(4 downto 0);
+signal i : integer range 0 to 128;  
 
 type state is (stX,sta,stb,st1,st2,idl1,idl2);
 signal ect : state;
@@ -58,7 +51,6 @@ begin
             Take <= '0';
             i <= 0;
             ReadFIFO <= "00";
---            j <= 0;
             Read_reg <= '0';
             ect <= stX;
         
@@ -70,11 +62,6 @@ begin
                 when stX =>
                     i <= 1;                    
                     if(Read_reg='0' and Read='1')then
---                        if(j=15)then
---                            j <= 1;
---                        else
---                            j<= j+1;
---                        end if;
                         ect <= idl1;
                     end if;                
 
@@ -109,7 +96,7 @@ begin
                     ect <= stb;
                 
                 when stb =>
-                    Take <= '0';                     
+                    Take <= '0';
                     if(i=128)then                        
                         ect <= stX;
                     elsif(Read_reg='0' and Read='1')then

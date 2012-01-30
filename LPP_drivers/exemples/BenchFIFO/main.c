@@ -26,17 +26,16 @@ int main()
 {
     int d=0;
     int i=0;
-    FIFO_Device* FIFO0;
-    FIFO0 = openFIFO(0);
+    FIFO_Device* FIFO0 = openFIFO(0);
 
     for(i=0;i<1024;i++)
     {
-        FIFO0->rwdata = i;
+        FIFO0->FIFOreg[(2*0)+FIFO_RWdata] = i;
     }
 
     for(i=0;i<1024;i++)
     {
-        printf("%x",FIFO0->rwdata);
+        printf("%x",FIFO0->FIFOreg[(2*0)+FIFO_RWdata]);
     }
 
 

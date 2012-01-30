@@ -77,6 +77,7 @@ generic(
     );
 port(
     rstn    :   in std_logic;
+    ReUse   :   in std_logic;   --27/01/12
     rclk    :   in std_logic;
     ren     :   in std_logic;
     rdata   :   out std_logic_vector(DataSz-1 downto 0);

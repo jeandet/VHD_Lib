@@ -33,8 +33,11 @@
 */
 #define FIFO_Ctrl 0
 #define FIFO_RWdata 1
+
 #define FIFO_Full 0x00010000
 #define FIFO_Empty 0x00000001
+#define FIFO_ReUse 0x00000002
+
 #define Mask_2hex 0x000000FF
 #define Mask_4hex 0x0000FFFF
 
@@ -50,7 +53,6 @@ struct APB_FIFO_REG
 {
     int IDreg;
     int FIFOreg[2*8];
-
 };
 
 typedef volatile struct APB_FIFO_REG FIFO_Device;

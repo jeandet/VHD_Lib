@@ -32,8 +32,8 @@ port(
     Valid       : in  std_logic;
     Conjugate   : in std_logic;
     Res         : in std_logic_vector(Result_SZ-1 downto 0);
---    Full        : in std_logic;
-    WriteFIFO : out std_logic;
+    Full        : in std_logic;
+    WriteFIFO   : out std_logic;
     Received    : out std_logic;    
     Result      : out std_logic_vector(Result_SZ-1 downto 0)
 );
@@ -44,7 +44,7 @@ architecture ar_GetResult of GetResult is
 
 signal Valid_reg : std_logic;
 
-type state is (st0,st1);
+type state is (st0,st1,stX,stY);
 signal ect : state;
 
 begin
@@ -63,25 +63,37 @@ begin
 
             case ect is
                 when st0 =>
-                    Received <= '0';
-                    WriteFIFO <= '0';
-                    if(Valid_reg='0' and Valid='1')then
+                    if(Full='0' and Valid='1')then
                         Result <= Res;
                         WriteFIFO <= '1';
+                        Received <= '1';
+                        ect <= stX;                            
+                    end if;
+
+                when stX =>                    
+                    WriteFIFO <= '0';
+                    if(Conjugate='1')then
+                        Received <= '0';
+                    end if;
+                    if(Valid_reg='1' and Valid='0')then
                         if(Conjugate='1')then
-                            Received <= '1';
                             ect <= st0;
                         else
                             ect <= st1;
-                        end if;
-                    end if;                
-
-                when st1 =>                    
-                    Received <= '1';
-                    WriteFIFO <= '0';
-                    if(Valid_reg='0' and Valid='1')then
+                        end if;                        
+                    end if;        
+                
+                when st1 =>
+                    if(Full='0' and Valid='1')then
                         Result <= Res;
                         WriteFIFO <= '1';
+                        Received <= '0';
+                        ect <= stY;
+                    end if;
+                
+                 when stY =>                    
+                    WriteFIFO <= '0';
+                    if(Valid_reg='1' and Valid='0')then
                         ect <= st0;
                     end if;
 
