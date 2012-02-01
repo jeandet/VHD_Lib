@@ -37,29 +37,30 @@ use lpp.lpp_memory.all;
 
 entity APB_FIFO is
 generic (
-    tech         : integer := apa3;
-    pindex       : integer := 0;
-    paddr        : integer := 0;
-    pmask        : integer := 16#fff#;
-    pirq         : integer := 0;
-    abits        : integer := 8;
-    FifoCnt      : integer := 2;
-    Data_sz      : integer := 16;
-    Addr_sz      : integer := 9;
-    R            : integer := 1;
-    W            : integer := 1
+    tech           : integer := apa3;
+    pindex         : integer := 0;
+    paddr          : integer := 0;
+    pmask          : integer := 16#fff#;
+    pirq           : integer := 0;
+    abits          : integer := 8;
+    FifoCnt        : integer := 2;
+    Data_sz        : integer := 16;
+    Addr_sz        : integer := 9;
+    Enable_ReUse   : std_logic := '0';
+    R              : integer := 1;
+    W              : integer := 1
     );
   port (
     clk          : in  std_logic;                              --! Horloge du composant
     rst          : in  std_logic;                              --! Reset general du composant
     rclk         : in  std_logic; 
     wclk         : in  std_logic; 
-    REN          : in std_logic_vector(FifoCnt-1 downto 0);   --! Instruction de lecture en mémoire
-    WEN          : in std_logic_vector(FifoCnt-1 downto 0);   --! Instruction d'écriture en mémoire
+    REN          : in  std_logic_vector(FifoCnt-1 downto 0);   --! Instruction de lecture en mémoire
+    WEN          : in  std_logic_vector(FifoCnt-1 downto 0);   --! Instruction d'écriture en mémoire
     Empty        : out std_logic_vector(FifoCnt-1 downto 0);    --! Flag, Mémoire vide
     Full         : out std_logic_vector(FifoCnt-1 downto 0);    --! Flag, Mémoire pleine
     RDATA        : out std_logic_vector((FifoCnt*Data_sz)-1 downto 0);   --! Registre de données en entrée
-    WDATA        : in std_logic_vector((FifoCnt*Data_sz)-1 downto 0);    --! Registre de données en sortie
+    WDATA        : in  std_logic_vector((FifoCnt*Data_sz)-1 downto 0);    --! Registre de données en sortie
     WADDR        : out std_logic_vector((FifoCnt*Addr_sz)-1 downto 0);    --! Registre d'addresse (écriture)
     RADDR        : out std_logic_vector((FifoCnt*Addr_sz)-1 downto 0);    --! Registre d'addresse (lecture)
     apbi         : in  apb_slv_in_type;                        --! Registre de gestion des entrées du bus
@@ -168,7 +169,7 @@ Full <= sFull;
 
 fifos: for i in 0 to FifoCnt-1 generate
     FIFO0 : lpp_fifo
-        generic map (tech,Data_sz,Addr_sz)
+        generic map (tech,Enable_ReUse,Data_sz,Addr_sz)
         port map(rst,ReUse(i),srclk,sRen(i),sRDATA(i),sEmpty(i),sRADDR(i),swclk,sWen(i),sWDATA(i),sFull(i),sWADDR(i));
 end generate;
 

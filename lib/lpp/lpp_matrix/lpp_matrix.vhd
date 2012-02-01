@@ -41,18 +41,39 @@ component APB_Matrix is
     Input_SZ : integer := 16;
     Result_SZ : integer := 32);
   port (
-    clk       : in  std_logic;           --! Horloge du composant
-    rst       : in  std_logic;           --! Reset general du composant
+    clk       : in std_logic;
+    rst     : in std_logic;
     FIFO1     : in std_logic_vector(Input_SZ-1 downto 0);
     FIFO2     : in std_logic_vector(Input_SZ-1 downto 0);
+    Full      : in std_logic_vector(1 downto 0);
+    Empty     : in std_logic_vector(1 downto 0);
     ReadFIFO  : out std_logic_vector(1 downto 0);
+    FullFIFO  : in std_logic;
     WriteFIFO : out std_logic;
     Result    : out std_logic_vector(Result_SZ-1 downto 0);
-    apbi      : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
-    apbo      : out apb_slv_out_type     --! Registre de gestion des sorties du bus
+    apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
+    apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
 );
 end component;
 
+component Top_MatrixSpec is
+generic(
+    Input_SZ  : integer := 16;
+    Result_SZ : integer := 32);
+port(
+    clk       : in std_logic;
+    reset     : in std_logic;
+    Statu     : in std_logic_vector(3 downto 0);
+    FIFO1     : in std_logic_vector(Input_SZ-1 downto 0);
+    FIFO2     : in std_logic_vector(Input_SZ-1 downto 0);
+    Full      : in std_logic_vector(1 downto 0);
+    Empty     : in std_logic_vector(1 downto 0);
+    ReadFIFO  : out std_logic_vector(1 downto 0);
+    FullFIFO  : in std_logic;
+    WriteFIFO : out std_logic;
+    Result    : out std_logic_vector(Result_SZ-1 downto 0)
+);
+end component;
 
 component SpectralMatrix is
 generic(
@@ -138,6 +159,17 @@ port(
 );
 end component;
 
+component Starter is
+port(
+    clk     : in  std_logic;
+    raz     : in  std_logic;
+    Full    : in  std_logic_vector(1 downto 0);
+    Empty   : in  std_logic_vector(1 downto 0);
+    Statu   : in std_logic_vector(3 downto 0);
+    Write   : in std_logic;
+    Start   : out std_logic
+);
+end component;
 
 component ALU_Driver is
   generic(

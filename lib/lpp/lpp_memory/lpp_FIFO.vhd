@@ -29,9 +29,10 @@ use techmap.gencomp.all;
 
 entity lpp_fifo is
 generic(
-    tech    :   integer := 0;
-    DataSz  :   integer range 1 to 32 := 8;
-    abits   :   integer range 2 to 12 := 8
+    tech          :   integer := 0;
+    Enable_ReUse  :   std_logic := '0';
+    DataSz        :   integer range 1 to 32 := 8;
+    abits         :   integer range 2 to 12 := 8
     );
 port(
     rstn    :   in std_logic;
@@ -85,7 +86,7 @@ begin
         Raddr_vect_d <=  (others =>'1');
         sempty  <= '1';
     elsif(rclk'event and rclk='1')then
-        if(ReUse = '1')then   --27/01/12
+        if(ReUse = '1' and Enable_ReUse='1')then   --27/01/12
             sempty  <= '0';    --27/01/12
         elsif(Raddr_vect=Waddr_vect_d and REN = '0' and sempty = '0')then
             sempty  <= '1';
@@ -112,7 +113,7 @@ begin
         Waddr_vect_d <=  (others =>'1');
         sfull        <=   '0';
     elsif(wclk'event and wclk='1')then
-        if(ReUse = '1')then   --27/01/12
+        if(ReUse = '1' and Enable_ReUse='1')then   --27/01/12
             sfull  <= '1';    --27/01/12
         elsif(Raddr_vect_d=Waddr_vect and WEN = '0' and sfull = '0')then
             sfull  <= '1';

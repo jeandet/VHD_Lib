@@ -3,10 +3,9 @@
 #include "apb_fifo_Driver.h"
 #include "apb_Matrix_Driver.h"
 #include "apb_uart_Driver.h"
-#include "apb_delay_Driver.h"
 #include "apb_gpio_Driver.h"
 
-// Matrix With 2 FIFO Input
+///////////// Matrix With 2 FIFO Input /////////////////////////////////////////////
 int main()
 {
     int i=0,save;
@@ -20,7 +19,6 @@ int main()
 
 
     FIFO_Device* fifoX = openFIFO(0);
-    DELAY_Device* delay0 = openDELAY(0);
     UART_Device* uart0 = openUART(0);
     FIFO_Device* fifoIn = openFIFO(1);
     MATRIX_Device* mspec = openMatrix(0);
@@ -29,7 +27,6 @@ int main()
 
     printf("\nDebut Main\n\n");
 
-    Setup(delay0,30000000);
     gpio0->oen = 0x3;
     gpio0->Dout = 0x0;
 
@@ -61,7 +58,6 @@ int main()
     mspec->Statu = 1;
     FillFifo(fifoIn,0,TblB1);
     gpio0->Dout = 0x1;
-    Delay_us(delay0,20);
     while((fifoOut->FIFOreg[(2*0)+FIFO_Ctrl] & FIFO_Empty) != FIFO_Empty) // TANT QUE  empty a 0  ALORS
     {
         Table[i] = fifoOut->FIFOreg[(2*0)+FIFO_RWdata];
@@ -109,7 +105,7 @@ int main()
 }
 
 
-// Matrix With 5 FIFO Input
+///////////// Matrix With 5 FIFO Input /////////////////////////////////////////////
 int main2()
 {
     int save1,save2;

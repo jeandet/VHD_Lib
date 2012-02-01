@@ -46,7 +46,8 @@ generic (
     abits        : integer := 8;
     FifoCnt      : integer := 2;
     Data_sz      : integer := 16;
-    Addr_sz      : integer := 9;
+    Addr_sz        : integer := 9;
+    Enable_ReUse   : std_logic := '0';
     R            : integer := 1;
     W            : integer := 1
     );
@@ -71,9 +72,10 @@ end component;
 
 component lpp_fifo is
 generic(
-    tech    :   integer := 0;
-    DataSz  :   integer range 1 to 32 := 8;
-    abits   :   integer range 2 to 12 := 8
+    tech          :   integer := 0;
+    Enable_ReUse  :   std_logic := '0';
+    DataSz        :   integer range 1 to 32 := 8;
+    abits         :   integer range 2 to 12 := 8
     );
 port(
     rstn    :   in std_logic;
