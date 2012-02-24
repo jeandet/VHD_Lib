@@ -29,7 +29,6 @@ library lpp;
 use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
 use lpp.lpp_fft.all;
-use lpp.lpp_memory.all;
 use work.fft_components.all;
 
 --! Driver APB, va faire le lien entre l'IP VHDL de la FFT et le bus Amba
@@ -41,12 +40,13 @@ entity APB_FFT is
     pmask        : integer := 16#fff#;
     pirq         : integer := 0;
     abits        : integer := 8;    
-    Data_sz      : integer := 32;
-    Addr_sz      : integer := 8;    
-    addr_max_int : integer := 256);
+    Data_sz      : integer := 16
+    );
   port (
     clk     : in  std_logic;           --! Horloge du composant
     rst     : in  std_logic;           --! Reset general du composant
+    eload   : out std_logic;
+    eready  :out std_logic;
     apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
     apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
     );
@@ -55,35 +55,48 @@ end APB_FFT;
 
 architecture ar_APB_FFT of APB_FFT is
 
-signal ReadEnable      : std_logic;
-signal WriteEnable     : std_logic;
-signal FlagEmpty       : std_logic;
-signal FlagFull        : std_logic;
-signal DataIn_re       : std_logic_vector(gWSIZE-1 downto 0);
-signal DataOut_re      : std_logic_vector(gWSIZE-1 downto 0);
-signal DataIn_im       : std_logic_vector(gWSIZE-1 downto 0);
-signal DataOut_im      : std_logic_vector(gWSIZE-1 downto 0);
-signal DataIn          : std_logic_vector(Data_sz-1 downto 0);
-signal DataOut         : std_logic_vector(Data_sz-1 downto 0);
-signal AddrIn          : std_logic_vector(Addr_sz-1 downto 0);
-signal AddrOut         : std_logic_vector(Addr_sz-1 downto 0);
+constant REVISION : integer := 1;
 
-signal start   : std_logic;
-signal load    : std_logic;
-signal rdy     : std_logic;
+constant pconfig : apb_config_type := (
+  0 => ahb_device_reg (VENDOR_LPP, LPP_FFT, 0, REVISION, 0),
+  1 => apb_iobar(paddr, pmask));
 
+signal Ren          : std_logic;
+signal Wen          : std_logic;
+signal load         : std_logic;
+signal d_valid      : std_logic;
+signal y_rdy        : std_logic;
+signal read_y       : std_logic;
+signal fill         : std_logic;
+signal ready        : std_logic;
+signal start        : std_logic;
+signal DataIn_re    : std_logic_vector(Data_sz-1 downto 0);
+signal DataIn_im    : std_logic_vector(Data_sz-1 downto 0);
+signal DataOut_re   : std_logic_vector(Data_sz-1 downto 0);
+signal DataOut_im   : std_logic_vector(Data_sz-1 downto 0);
+
+type FFT_ctrlr_Reg is record
+     FFT_Cfg   : std_logic_vector(1 downto 0);
+     FFT_Rdata  : std_logic_vector((2*Data_sz)-1 downto 0);
+     FFT_Wdata  : std_logic_vector((2*Data_sz)-1 downto 0);
+end record;
+
+signal Rec      : FFT_ctrlr_Reg;
+signal Rdata    : std_logic_vector(31 downto 0);
+ 
 begin
 
-    APB : ApbDriver
-        generic map(pindex,paddr,pmask,pirq,abits,LPP_FFT,Data_sz,Addr_sz,addr_max_int)
-        port map(clk,rst,ReadEnable,WriteEnable,FlagEmpty,FlagFull,DataIn,DataOut,AddrIn,AddrOut,apbi,apbo);
+Rec.FFT_Cfg(0) <= fill;
+Rec.FFT_Cfg(1) <= ready;
+eload <= fill;
+eready      <=  ready;
 
-
-    Extremum : Flag_Extremum
-        port map(clk,rst,load,rdy,FlagFull,FlagEmpty);
-
-
-    DEVICE : CoreFFT
+DataIn_im <= Rec.FFT_Wdata(Data_sz-1 downto 0);
+DataIn_re <= Rec.FFT_Wdata((2*Data_sz)-1 downto Data_sz);
+Rec.FFT_Rdata(Data_sz-1 downto 0) <= DataOut_im;
+Rec.FFT_Rdata((2*Data_sz)-1 downto Data_sz) <= DataOut_re;
+ 
+    Actel_FFT : CoreFFT       
         generic map(
         LOGPTS      => gLOGPTS,
         LOGLOGPTS   => gLOGLOGPTS,
@@ -96,12 +109,61 @@ begin
         PTS         => gPTS,
         HALFPTS     => gHALFPTS,
         inBuf_RWDLY => gInBuf_RWDLY)        
-        port map(clk,start,rst,WriteEnable,ReadEnable,DataIn_im,DataIn_re,load,open,DataOut_im,DataOut_re,open,rdy);
+        port map(clk,start,rst,d_valid,read_y,DataIn_im,DataIn_re,load,open,DataOut_im,DataOut_re,open,y_rdy);
 
-start <= not rst;
+    Flags : Flag_Extremum
+        port map(clk,rst,load,y_rdy,fill,ready);
 
-DataIn_re <= DataIn(31 downto 16);
-DataIn_im <= DataIn(15 downto 0);
-DataOut   <= DataOut_re & DataOut_im;
+    process(rst,clk)
+    begin
+        if(rst='0')then
+            Rec.FFT_Wdata <= (others => '0');
+            Wen <= '1';
+            Ren <= '1';
+
+        elsif(clk'event and clk='1')then        
+
+    --APB Write OP
+            if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
+                case apbi.paddr(abits-1 downto 2) is                            
+                    when "000001" =>   
+                        Wen <= '0';
+                        Rec.FFT_Wdata(Data_sz-1 downto 0) <= (others => '0');
+                        Rec.FFT_Wdata((2*Data_sz)-1 downto Data_sz) <= apbi.pwdata(Data_sz-1 downto 0);
+
+                    when others =>
+                        null;
+               end case;
+            else
+                Wen <= '1';
+            end if;
+
+    --APB Read OP
+            if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
+                case apbi.paddr(abits-1 downto 2) is
+                    when "000000" =>
+                        Rdata(3 downto 0)   <= "000" & Rec.FFT_Cfg(0);
+                        Rdata(7 downto 4)   <= "000" & Rec.FFT_Cfg(1);
+                        Rdata(31 downto 8) <= (others => '0');
+
+                    when "000001" =>   
+                        Ren <= '0';
+                        Rdata(31 downto 0) <= Rec.FFT_Rdata((2*Data_sz)-1 downto 0);
+
+                    when others =>
+                        Rdata <= (others => '0');
+               end case;
+            else
+                Ren <= '1';
+            end if;
+
+        end if;
+        apbo.pconfig <= pconfig;
+    end process;
+
+apbo.prdata <= Rdata when apbi.penable = '1';
+d_valid     <= not Wen;
+read_y      <= not Ren;
+start       <= not rst;
 
 end ar_APB_FFT;

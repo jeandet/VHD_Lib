@@ -45,20 +45,21 @@ component APB_FFT is
     addr_max_int : integer := 256);
   port (
     clk     : in  std_logic;
-    rst     : in  std_logic;
+    rst     : in  std_logic;           --! Reset general du composant
+    eload   : out std_logic;
+    eready  :out std_logic;
     apbi    : in  apb_slv_in_type;
     apbo    : out apb_slv_out_type
     );
 end component;
 
-
 component Flag_Extremum is
   port(
-    clk,raz    : in std_logic;
-    load       : in std_logic;
-    y_rdy      : in std_logic;
-    full       : out std_logic;
-    empty      : out std_logic    
+    clk,raz    : in std_logic;    --! Horloge et Reset général du composant
+    load       : in std_logic;    --! Signal en provenance de CoreFFT
+    y_rdy      : in std_logic;    --! Signal en provenance de CoreFFT
+    fill       : out std_logic;   --! Flag, Va permettre d'autoriser l'écriture (Driver C)
+    ready      : out std_logic    --! Flag, Va permettre d'autoriser la lecture (Driver C)
     );
 end component;
 
@@ -99,7 +100,7 @@ END component;
     component actram is
         port( DI : in std_logic_vector(31 downto 0); DO : out
             std_logic_vector(31 downto 0);WRB, RDB : in std_logic; 
-            WADDR : in std_logic_vector(6 downto 0); RADDR : in 
+            WADDR : in std_logic_vector(6 downto 0); RADDR : in
             std_logic_vector(6 downto 0);WCLOCK, RCLOCK : in 
             std_logic) ;
     end component;

@@ -2,6 +2,7 @@
 #include "lpp_apb_functions.h"
 #include "apb_uart_Driver.h"
 #include "apb_fft_Driver.h"
+#include "apb_delay_Driver.h"
 
 
 int main()
@@ -16,6 +17,7 @@ int main()
     printf("Debut Main\n\n");
     UART_Device* uart0 = openUART(0);
     FFT_Device* fft0 = openFFT(0);
+    DELAY_Device* delay     = openDELAY(0);
 
     printf("addr_fft: %x\n",(unsigned int)fft0);
     printf("addr_uart: %x\n\n",(unsigned int)uart0);
@@ -24,7 +26,7 @@ int main()
 
     while(1)
     {
-        FftInput(Tablo,fft0);
+        FftInput(Tablo,fft0,delay);
        /* for (i = 0 ; i < 256 ; i++)
         {
             sprintf(temp,"%x/in",Tablo[i]);

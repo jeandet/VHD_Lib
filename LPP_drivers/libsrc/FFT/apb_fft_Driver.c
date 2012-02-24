@@ -22,6 +22,7 @@
 #include "apb_fft_Driver.h"
 #include "lpp_apb_functions.h"
 #include <stdio.h>
+#include "apb_delay_Driver.h"
 
 
 FFT_Device* openFFT(int count)
@@ -32,51 +33,35 @@ FFT_Device* openFFT(int count)
 }
 
 
-int FftInput(int * Tbl,FFT_Device* fft)
+int FftInput(int * Tbl,FFT_Device* fft,DELAY_Device* delay)
 {
-    int i;
-    printf("\nFftInput\n\n");
+    int i=0;
 
-    while((fft->ConfigReg & FFT_Full) != FFT_Full) // full a 0
+    while((fft->ConfigReg & FFT_Fill) == FFT_Fill) // fill a 1
     {
-        printf("\nWrite\n\n");
-        for (i = 0 ; i < 256 ; i++)
-        {
-            fft->RWDataReg = Tbl[i];
-            if((fft->ConfigReg & FFT_Full) == FFT_Full) // full a 1
-            {
-                printf("\nBreak\n\n");
-                break;
-            }
-        }
+        fft->RWDataReg = Tbl[i];
+        i++;
+        Delay_us(delay,1);
     }
 
-    printf("\nFULL\n\n");
     return 0;
 }
 
 
 int FftOutput(int * Tbl, FFT_Device* fft)
 {
-    int i;
-    printf("\nFftOutput\n\n");
+    int i=0;
+    int data;
 
-    while((fft->ConfigReg & FFT_Empty) != FFT_Empty) // empty a 0
+    while((fft->ConfigReg & FFT_Ready) == FFT_Ready) // ready a 1
     {
-        printf("\nRead\n\n");
-        for (i = 0 ; i < 256 ; i++)
-        {
-            //printf("\noutFor%d\n\n",i);
-            Tbl[i] = fft->RWDataReg;
-            if((fft->ConfigReg & FFT_Empty) == FFT_Empty) // empty a 1
-            {
-                printf("\nBreak\n\n");
-                break;
-            }
-        }
+         data = fft->RWDataReg;
+         Tbl[i] = (data >> 16) & Mask;
+         Tbl[i+1] = data & Mask;
+         i = i+2;
     }
-    printf("\nEMPTY\n\n");
-    return 0;
+
+    return i;
 }
 
 

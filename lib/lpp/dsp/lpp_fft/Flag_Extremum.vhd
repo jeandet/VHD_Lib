@@ -31,8 +31,8 @@ entity Flag_Extremum is
     clk,raz    : in std_logic;    --! Horloge et Reset général du composant
     load       : in std_logic;    --! Signal en provenance de CoreFFT
     y_rdy      : in std_logic;    --! Signal en provenance de CoreFFT
-    full       : out std_logic;   --! Flag, Va permettre d'autoriser l'écriture (Driver C)
-    empty      : out std_logic    --! Flag, Va permettre d'autoriser la lecture (Driver C)
+    fill       : out std_logic;   --! Flag, Va permettre d'autoriser l'écriture (Driver C)
+    ready      : out std_logic    --! Flag, Va permettre d'autoriser la lecture (Driver C)
     );
 end Flag_Extremum;
 
@@ -44,22 +44,22 @@ begin
     process (clk,raz)
     begin
         if(raz='0')then
-            full  <= '1';
-            empty <= '1';            
+            fill  <= '0';
+            ready <= '0';
 
         elsif(clk' event and clk='1')then
 
             if(load='1' and y_rdy='0')then
-                full  <= '0';
-                empty <= '1';
+                fill  <= '1';
+                ready <= '0';
             
             elsif(y_rdy='1')then
-                full  <= '1';
-                empty <= '0';
+                fill  <= '0';
+                ready <= '1';
 
             else
-                full  <= '1';
-                empty <= '1';
+                fill  <= '0';
+                ready <= '0';
 
             end if;
         end if;

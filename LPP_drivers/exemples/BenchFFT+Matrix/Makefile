@@ -21,9 +21,9 @@ include ../../rules.mk
 LIBDIR = ../../lib
 INCPATH = ../../includes
 SCRIPTDIR=../../scripts/
-LIBS=-lapb_fft_Driver -llpp_apb_functions -lapb_uart_Driver -lapb_delay_Driver
+LIBS=-lapb_fft_Driver -llpp_apb_functions -lapb_delay_Driver -lapb_fifo_Driver -lapb_uart_Driver -lapb_gpio_Driver
 INPUTFILE=main.c
-EXEC=BenchFFT.bin
+EXEC=BenchFFT+Matrix.bin
 OUTBINDIR=bin/
 
 
