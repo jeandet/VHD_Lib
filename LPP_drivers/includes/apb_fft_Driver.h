@@ -23,15 +23,6 @@
 #define APB_FFT_DRIVER_H
 #include "apb_delay_Driver.h"
 
-/*! \file apb_fft_Driver.h
-    \brief LPP FFT driver.
-
-    This library is written to work with LPP_APB_FFT VHDL module from LPP's FreeVHDLIB. It calculate a fast fourier transforms,
-    from an input data table.
-
-    \author Martin Morlot  martin.morlot@lpp.polytechnique.fr
-*/
-
 #define FFT_Fill    0x00000001
 #define FFT_Ready   0x00000010
 #define Mask        0x0000FFFF
@@ -40,9 +31,7 @@
 /*===================================================
         T Y P E S     D E F
 ====================================================*/
-/*! \struct FFT_Driver
-    \brief Sturcture representing the fft registers
-*/
+
 struct FFT_Driver
 {
     int ConfigReg;
@@ -55,18 +44,11 @@ typedef struct FFT_Driver FFT_Device;
 /*===================================================
         F U N C T I O N S
 ====================================================*/
-/*! \fn FFT_Device* openFFT(int count);
-    \brief Return count FFT.
 
-    This Function scans APB devices table and returns count FFT.
-
-    \param count The number of the FFT you whant to get. For example if you have 3 FFTS on your SOC you want
-    to use FFT1 so count = 1.
-    \return The pointer to the device.
-*/
 FFT_Device* openFFT(int count);
 int FftInput(int Tbl[],FFT_Device*,DELAY_Device*);
 int FftOutput(int Tbl[],FFT_Device*);
+
 
 
 #endif

@@ -40,18 +40,41 @@ component APB_FFT is
     pmask        : integer := 16#fff#;
     pirq         : integer := 0;
     abits        : integer := 8;    
-    Data_sz      : integer := 32;
-    Addr_sz      : integer := 8;    
-    addr_max_int : integer := 256);
+    Data_sz      : integer := 16
+    );
   port (
     clk     : in  std_logic;
     rst     : in  std_logic;           --! Reset general du composant
-    eload   : out std_logic;
-    eready  :out std_logic;
     apbi    : in  apb_slv_in_type;
     apbo    : out apb_slv_out_type
     );
 end component;
+
+
+component APB_FFT_half is
+  generic (
+    pindex       : integer := 0;
+    paddr        : integer := 0;
+    pmask        : integer := 16#fff#;
+    pirq         : integer := 0;
+    abits        : integer := 8;    
+    Data_sz      : integer := 16
+    );
+  port (
+    clk     : in  std_logic;           --! Horloge du composant
+    rst     : in  std_logic;           --! Reset general du composant
+    Ren     : in std_logic;
+    ready   : out std_logic;
+    valid   : out std_logic;
+    DataOut_re   : out std_logic_vector(Data_sz-1 downto 0);
+    DataOut_im   : out std_logic_vector(Data_sz-1 downto 0);
+    OUTfill : out std_logic;
+    OUTwrite : out std_logic;
+    apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
+    apbo    : out apb_slv_out_type     --! Registre de gestion des sorties du bus
+    );
+end component;
+
 
 component Flag_Extremum is
   port(
@@ -61,6 +84,26 @@ component Flag_Extremum is
     fill       : out std_logic;   --! Flag, Va permettre d'autoriser l'écriture (Driver C)
     ready      : out std_logic    --! Flag, Va permettre d'autoriser la lecture (Driver C)
     );
+end component;
+
+
+component Linker_FFT_FIFO is
+generic(
+    Data_sz  : integer range 1 to 32 := 16
+    );
+port(
+    clk         : in std_logic;
+    rstn        : in std_logic;
+    Ready       : in std_logic;
+    Valid       : in std_logic;
+    Full        : in std_logic_vector(4 downto 0);
+    Data_re     : in std_logic_vector(Data_sz-1 downto 0);
+    Data_im     : in std_logic_vector(Data_sz-1 downto 0);
+    Read        : out std_logic;
+    Write       : out std_logic_vector(4 downto 0);
+    ReUse       : out std_logic_vector(4 downto 0);
+    DATA        : out std_logic_vector((5*Data_sz)-1 downto 0)
+);
 end component;
 
 --==============================================================|

@@ -93,6 +93,29 @@ port(
 );
 end component;
 
+
+component SM_5lppFIFO is
+generic(
+    tech          :   integer := 0;
+    Data_sz       :   integer range 1 to 32 := 16;
+    Addr_sz       :   integer range 2 to 12 := 8;
+    Enable_ReUse  :   std_logic := '0'
+    );
+port(
+    rst     :   in std_logic;
+    wclk    :   in std_logic;    
+    rclk    :   in std_logic;
+    ReUse   :   in std_logic_vector(4 downto 0);
+    wen     :   in std_logic_vector(4 downto 0); 
+    ren     :   in std_logic_vector(4 downto 0);
+    wdata   :   in std_logic_vector((5*Data_sz)-1 downto 0);
+    rdata   :   out std_logic_vector((5*Data_sz)-1 downto 0);
+    full    :   out std_logic_vector(4 downto 0);
+    empty   :   out std_logic_vector(4 downto 0)    
+);
+end component;
+
+
 component ssram_plugin is
 generic (tech : integer := 0);
 port

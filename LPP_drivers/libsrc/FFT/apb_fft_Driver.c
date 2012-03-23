@@ -35,21 +35,24 @@ FFT_Device* openFFT(int count)
 
 int FftInput(int * Tbl,FFT_Device* fft,DELAY_Device* delay)
 {
+    //printf("\nFftInput\n\n");
     int i=0;
 
-    while((fft->ConfigReg & FFT_Fill) == FFT_Fill) // fill a 1
+    while((fft->ConfigReg & FFT_Fill) == FFT_Fill)// && (i<256)) // fill a 1
     {
         fft->RWDataReg = Tbl[i];
         i++;
-        Delay_us(delay,1);
+        //Delay_us(delay,1);
     }
 
+    //printf("\nEnd In %d\n\n",i);
     return 0;
 }
 
 
 int FftOutput(int * Tbl, FFT_Device* fft)
 {
+    //printf("\nFftOutput\n\n");
     int i=0;
     int data;
 
@@ -61,6 +64,7 @@ int FftOutput(int * Tbl, FFT_Device* fft)
          i = i+2;
     }
 
+    //printf("\nEnd Out %d\n\n",i);
     return i;
 }
 
