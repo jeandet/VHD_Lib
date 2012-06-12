@@ -27,19 +27,19 @@ use lpp.general_purpose.Clk_divider;
 
 entity AD7688_spi_if is
 	 generic(ChanelCount	:	integer);
-    Port(    clk      : in  STD_LOGIC;
-             reset    : in  STD_LOGIC;
-             cnv      : in  STD_LOGIC;
-				 DataReady:	out std_logic;
-             sdi      : in	AD7688_in(ChanelCount-1 downto 0);
-             smpout   :  out Samples_out(ChanelCount-1 downto 0)
+    Port(   clk       : in  STD_LOGIC;
+            reset     : in  STD_LOGIC;
+            cnv       : in  STD_LOGIC;
+	    DataReady : out std_logic;
+            sdi       : in  AD7688_in(ChanelCount-1 downto 0);
+            smpout    : out Samples_out(ChanelCount-1 downto 0)
      );
 end AD7688_spi_if;
 
 architecture ar_AD7688_spi_if of AD7688_spi_if is
 
 signal	shift_reg	:	Samples_out(ChanelCount-1 downto 0);
-signal	i	:	integer range 0 to 15 :=0;
+signal	i	:	integer range 0 to 16 :=0;
 signal	cnv_reg	:	std_logic := '0';
 
 begin
@@ -56,7 +56,7 @@ begin
 		cnv_reg		<=	'0';
 	elsif clk'event and clk = '1' then
 		if cnv = '0' and cnv_reg = '0' then
-			if i = 15 then
+			if i = 16 then
 				i				<=	0;
 				cnv_reg		<=	'1';
 			else

@@ -87,7 +87,7 @@ component Flag_Extremum is
 end component;
 
 
-component Linker_FFT_FIFO is
+component Linker_FFT is
 generic(
     Data_sz  : integer range 1 to 32 := 16
     );
@@ -103,6 +103,25 @@ port(
     Write       : out std_logic_vector(4 downto 0);
     ReUse       : out std_logic_vector(4 downto 0);
     DATA        : out std_logic_vector((5*Data_sz)-1 downto 0)
+);
+end component;
+
+
+component Driver_FFT is
+generic(
+    Data_sz  : integer range 1 to 32 := 16
+    );
+port(
+    clk         : in std_logic;
+    rstn        : in std_logic;
+    Load        : in std_logic;
+    Empty       : in std_logic_vector(4 downto 0);
+    Full        : in std_logic_vector(4 downto 0);
+    DATA        : in std_logic_vector((5*Data_sz)-1 downto 0);
+    Valid       : out std_logic;
+    Read        : out std_logic_vector(4 downto 0);
+    Data_re     : out std_logic_vector(Data_sz-1 downto 0);
+    Data_im     : out std_logic_vector(Data_sz-1 downto 0)
 );
 end component;
 

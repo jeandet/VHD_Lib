@@ -14,7 +14,7 @@
 --
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ------------------------------------------------------------------------------
 --                        Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@lpp.polytechnique.fr
@@ -54,7 +54,8 @@ generic (
     clk          : in  std_logic;                              --! Horloge du composant
     rst          : in  std_logic;                              --! Reset general du composant
     rclk         : in  std_logic; 
-    wclk         : in  std_logic; 
+    wclk         : in  std_logic;
+    ReUse        : in  std_logic_vector(FifoCnt-1 downto 0);
     REN          : in  std_logic_vector(FifoCnt-1 downto 0);   --! Instruction de lecture en mémoire
     WEN          : in  std_logic_vector(FifoCnt-1 downto 0);   --! Instruction d'écriture en mémoire
     Empty        : out std_logic_vector(FifoCnt-1 downto 0);    --! Flag, Mémoire vide
@@ -103,7 +104,8 @@ signal sRDATA    : fifodatabus;
 signal sWDATA    : fifodatabus;    
 signal sWADDR    : fifoaddressbus;   
 signal sRADDR    : fifoaddressbus;
-signal ReUse     : std_logic_vector(FifoCnt-1 downto 0);   --27/01/12
+signal sReUse    : std_logic_vector(FifoCnt-1 downto 0);   --05/06/12
+signal sReUse_APB  : std_logic_vector(FifoCnt-1 downto 0);    --05/06/12
 
 type state_t is (idle,Read);
 signal fiforeadfsmst : state_t;
@@ -118,6 +120,7 @@ FIFO_ID(23 downto 16) <= std_logic_vector(to_unsigned(Addr_sz,8));
 Write : if W /= 0 generate 
     FIFO_ID(4) <= '1';
     sWen   <= sWen_APB;
+    sReUse <= sReUse_APB;
     sWclk  <=  clk;
     Wrapb: for i in 0 to FifoCnt-1 generate
         sWDATA(i) <= Rec(i).FIFO_Wdata;
@@ -127,6 +130,7 @@ end generate;
 Writeext : if W = 0 generate 
     FIFO_ID(4) <= '0';
     sWen   <=  WEN;
+    sReUse <= ReUse;
     sWclk  <=  Wclk;
     Wrext: for i in 0 to FifoCnt-1 generate
         sWDATA(i) <= WDATA((Data_sz*(i+1)-1) downto (Data_sz)*i);
@@ -156,7 +160,7 @@ ctrlregs: for i in 0 to FifoCnt-1 generate
     WADDR((Addr_sz*(i+1))-1 downto (Addr_sz)*i) <= sWADDR(i);
     Rec(i).FIFO_Ctrl(16) <= sFull(i);
     --Rec(i).FIFO_Ctrl(17) <= Rec(i).FIFO_Ctrl(1); --27/01/12
-    ReUse(i) <= Rec(i).FIFO_Ctrl(1); --27/01/12
+    sReUse_APB(i) <= Rec(i).FIFO_Ctrl(1); --27/01/12
     Rec(i).FIFO_Ctrl(3 downto 2) <= "00"; --27/01/12
     Rec(i).FIFO_Ctrl(19 downto 17) <= "000"; --27/01/12
     Rec(i).FIFO_Ctrl(Addr_sz+3 downto 4) <= sRADDR(i);
@@ -170,7 +174,7 @@ Full <= sFull;
 fifos: for i in 0 to FifoCnt-1 generate
     FIFO0 : lpp_fifo
         generic map (tech,Enable_ReUse,Data_sz,Addr_sz)
-        port map(rst,ReUse(i),srclk,sRen(i),sRDATA(i),sEmpty(i),sRADDR(i),swclk,sWen(i),sWDATA(i),sFull(i),sWADDR(i));
+        port map(rst,sReUse(i),srclk,sRen(i),sRDATA(i),sEmpty(i),sRADDR(i),swclk,sWen(i),sWDATA(i),sFull(i),sWADDR(i));
 end generate;
 
     process(rst,clk)

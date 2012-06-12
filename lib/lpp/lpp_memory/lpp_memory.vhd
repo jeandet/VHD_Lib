@@ -55,7 +55,8 @@ generic (
     clk          : in  std_logic;                              --! Horloge du composant
     rst          : in  std_logic;                              --! Reset general du composant
     rclk         : in  std_logic; 
-    wclk         : in  std_logic; 
+    wclk         : in  std_logic;
+    ReUse        : in  std_logic_vector(FifoCnt-1 downto 0);
     REN          : in std_logic_vector(FifoCnt-1 downto 0);   --! Instruction de lecture en mémoire
     WEN          : in std_logic_vector(FifoCnt-1 downto 0);   --! Instruction d'écriture en mémoire
     Empty        : out std_logic_vector(FifoCnt-1 downto 0);    --! Flag, Mémoire vide
@@ -94,7 +95,7 @@ port(
 end component;
 
 
-component SM_5lppFIFO is
+component lppFIFOx5 is
 generic(
     tech          :   integer := 0;
     Data_sz       :   integer range 1 to 32 := 16;

@@ -23,7 +23,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity Linker_FFT_FIFO is
+entity Linker_FFT is
 generic(
     Data_sz  : integer range 1 to 32 := 8
     );
@@ -43,13 +43,13 @@ port(
 end entity;
 
 
-architecture ar_Linker of Linker_FFT_FIFO is
+architecture ar_Linker of Linker_FFT is
 
 type etat is (eX,e0,e1,e2,e3);
 signal ect : etat;
 
 signal FifoCpt  : integer;
-signal DataTmp    : std_logic_vector(Data_sz-1 downto 0);
+signal DataTmp  : std_logic_vector(Data_sz-1 downto 0);
 
 signal sFull    : std_logic;
 signal sData    : std_logic_vector(Data_sz-1 downto 0);
@@ -61,7 +61,7 @@ begin
     begin
         if(rstn='0')then 
             ect <= e0;
-            Read <= '1';
+            Read <= '0';
             Write <= (others => '1');
             Reuse <= (others => '0');
             FifoCpt <= 1;
@@ -75,12 +75,12 @@ begin
                 when e0 =>
                     Write(FifoCpt-1) <= '1';
                     if(sReady='0' and Ready='1' and sfull='0')then
-                        Read <= '0';
+                        Read <= '1';
                         ect <= e1;
                     end if;
 
                 when e1 =>
-                    Read <= '1';
+                    Read <= '0';
                     if(Valid='1' and sfull='0')then
                         DataTmp <= Data_im;
                         sDATA <= Data_re;
@@ -98,12 +98,12 @@ begin
                 when e3 =>
                     Write(FifoCpt-1) <= '1';
                     if(Ready='1' and sfull='0')then
-                        Read <= '0';
+                        Read <= '1';
                         ect <= e1;
                     end if;
                                
                 when eX =>
-                    if(FifoCpt=6)then
+                    if(FifoCpt=5)then
                         FifoCpt <= 1;
                     else
                         FifoCpt <= FifoCpt+1;
@@ -123,9 +123,7 @@ with FifoCpt select
                 Full(3) when 4,
                 Full(4) when 5,
                 '1' when others;
+                           
 
 end architecture;
-
-
-
 

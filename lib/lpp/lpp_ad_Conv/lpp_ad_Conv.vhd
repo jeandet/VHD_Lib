@@ -54,7 +54,8 @@ package lpp_ad_conv is
 		    generic(ChanelCount	:	integer; 
 				clkkHz		:	integer);
 		 Port ( clk 	: in  STD_LOGIC;
-				  reset 	: in  STD_LOGIC;
+                                rstn        :      in  STD_LOGIC;
+                                enable      :      in  std_logic;
 				  smplClk: in	STD_LOGIC;
 				  DataReady : out std_logic;
 				  smpout : out Samples_out(ChanelCount-1 downto 0);	
@@ -68,7 +69,7 @@ component AD7688_spi_if is
     Port(    clk      : in  STD_LOGIC;
              reset    : in  STD_LOGIC;
              cnv      : in  STD_LOGIC;
-				 DataReady:	out std_logic;
+	     DataReady:	out std_logic;
              sdi      : in	AD7688_in(ChanelCount-1 downto 0);
              smpout   :  out Samples_out(ChanelCount-1 downto 0)
      );
@@ -100,7 +101,7 @@ component ADS7886_drvr is
             clkkHz      :      integer);
     Port ( 
             clk         :      in  STD_LOGIC;
-            reset       :      in  STD_LOGIC;
+             reset 	: in  STD_LOGIC;
             smplClk     :      in  STD_LOGIC;
             DataReady   :      out std_logic;
             smpout      :      out Samples_out(ChanelCount-1 downto 0);	
@@ -109,6 +110,17 @@ component ADS7886_drvr is
            );
 end component;
 
+component WriteGen_ADC is
+    port(
+        clk         : in std_logic;
+        rstn        : in std_logic;
+        SmplCLK     : in std_logic;
+        DataReady   : in std_logic;
+        Full        : in std_logic_vector(4 downto 0);
+        ReUse       : out std_logic_vector(4 downto 0);
+        Write       : out std_logic_vector(4 downto 0)
+    );
+end component;
 
 end lpp_ad_conv;
 

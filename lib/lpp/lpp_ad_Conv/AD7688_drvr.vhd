@@ -25,7 +25,6 @@ library lpp;
 use lpp.lpp_ad_conv.all;
 use lpp.general_purpose.Clk_divider;
 
-
 --! \brief AD7688 driver, generates all needed signal to drive this ADC.
 --!
 --! \author Alexis Jeandet alexis.jeandet@lpp.polytechnique.fr
@@ -37,8 +36,9 @@ generic(
         );
 Port(
         clk       : in  STD_LOGIC; --! System clock
-        reset     : in  STD_LOGIC; --! System reset
-        smplClk   : in  STD_LOGIC; --! Sampling clock 
+        rstn      : in  STD_LOGIC; --! System reset
+        enable    : in std_logic;  --! Negative enable
+        smplClk   : in  STD_LOGIC; --! Sampling clock
         DataReady : out std_logic; --! New sample available
         smpout    : out Samples_out(ChanelCount-1 downto 0); --! Samples 	
         AD_in     : in  AD7688_in(ChanelCount-1 downto 0);   --! Input signals for ADC see lpp.lpp_ad_conv
@@ -52,13 +52,15 @@ constant        convTrigger     :       integer:=  clkkHz*16/10000;  --tconv = 1
 
 signal i                : integer range 0 to convTrigger :=0;
 signal clk_int          : std_logic;
+signal clk_int_inv      : std_logic;
 signal smplClk_reg      : std_logic;
 signal cnv_int          : std_logic;
+signal reset            : std_logic;
 
 begin
 
 clkdiv: if clkkHz>=66000 generate 
-        clkdivider: Clk_divider
+        clkdivider: entity work.Clk_divider
                 generic map(clkkHz*1000,60000000)
                 Port map( clk ,reset,clk_int);
 end generate;
@@ -67,9 +69,11 @@ clknodiv: if clkkHz<66000 generate
 nodiv:  clk_int <=      clk;
 end generate;
 
+clk_int_inv     <=      not clk_int;
+
 AD_out.CNV      <=      cnv_int;	
 AD_out.SCK      <=      clk_int;
-
+reset           <=      rstn and enable;
 
 sckgen: process(clk,reset)
 begin
@@ -95,9 +99,9 @@ end process;
 
 
 
-spidrvr: AD7688_spi_if 
+spidrvr: entity work.AD7688_spi_if 
         generic map(ChanelCount)
-        Port map(clk_int,reset,cnv_int,DataReady,AD_in,smpout);
+        Port map(clk_int_inv,reset,cnv_int,DataReady,AD_in,smpout);
 
 
 
