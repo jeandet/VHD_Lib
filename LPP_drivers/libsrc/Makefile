@@ -30,6 +30,7 @@ all:
 	make all -C FFT
 	make all -C DELAY
 	make all -C GPIO
+	make all -C ADC
 	make all -C MATRIX
 
 
@@ -42,5 +43,6 @@ cleanall:
 	make clean -C FFT
 	make clean -C DELAY
 	make clean -C GPIO
+	make clean -C ADC
 	make clean -C MATRIX
 

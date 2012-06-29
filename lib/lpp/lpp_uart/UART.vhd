@@ -51,56 +51,52 @@ end entity;
 architecture ar_UART of UART is
 signal  Bclk    :   std_logic;
 
-signal  RDATA_int       :   std_logic_vector(Data_sz+1 downto 0);
-signal  WDATA_int       :   std_logic_vector(Data_sz+1 downto 0);
+signal  RDATA_int   :   std_logic_vector(Data_sz+1 downto 0);
+signal  WDATA_int   :   std_logic_vector(Data_sz+1 downto 0);
 
-signal  TXD_Dummy       :   std_logic;
-signal  NwDat_int       :   std_logic;
-signal  NwDat_int_reg   :   std_logic;
-signal  receive         :   std_logic;
-constant zeroVect       :   std_logic_vector(Data_sz+1 downto 0) := (others => '0');
+signal  Take        :   std_logic;
+signal  Taken       :   std_logic;
+signal  Taken_reg   :   std_logic;
+
+constant Dummy      :   std_logic_vector(Data_sz+1 downto 0) := (others => '1');
 
 begin
 
+NwDat    <= '0' when (ack = '1') else '1' when (Taken_reg='0' and Taken='1');
+WDATA_int     <= '1' & WDATA & '0';
 
-
-WDATA_int   <=  '1' & WDATA & '0'; 
-
-BaudGenerator : entity work.BaudGen
+BaudGenerator : BaudGen
     port map(clk,reset,Capture,Bclk,RXD,BTrigger);
 
-
-RX_REG  : entity work.Shift_REG
+RX_REG  : Shift_Reg
     generic map(Data_sz+2)
-    port map(clk,Bclk,reset,RXD,TXD_Dummy,receive,NwDat_int,zeroVect,RDATA_int);
+    port map(Bclk,RXD,open,Take,Taken,Dummy,RDATA_int);
 
-TX_REG  : entity work.Shift_REG
+TX_REG  : Shift_Reg
     generic map(Data_sz+2)
-    port map(clk,Bclk,reset,'1',TXD,Send,Sended,WDATA_int);
-
-
+    port map(Bclk,Dummy(0),TXD,Send,Sended,WDATA_int,open);
 
 process(clk,reset)
 begin
-    if reset = '0' then
-        NwDat   <=  '0';
-    elsif clk'event and clk = '1' then
-        NwDat_int_reg   <=  NwDat_int;
-        if RXD = '1' and NwDat_int = '1' then
-            receive <=  '0';
-        elsif RXD = '0' then
-            receive <=  '1';
+    if(reset ='0')then
+        Take   <=  '0';
+
+    elsif(clk'event and clk ='1')then
+        Taken_reg <= Taken;
+
+        if(RXD ='0' and Taken ='1')then
+            Take <=  '1';
+        elsif(Taken ='0')then
+            Take <=  '0';
         end if;
-        if NwDat_int_reg = '0' and NwDat_int = '1' then
-            NwDat   <=  '1';
-				RDATA   <=  RDATA_int(8 downto 1);
-        elsif ack = '1' then
-            NwDat   <=  '0';
+
+        if (Taken_reg ='0' and Taken ='1') then
+			RDATA   <=  RDATA_int(8 downto 1);
         end if;
+
     end if;
 end process;
 
-end ar_UART;
-
+end architecture;
 
 

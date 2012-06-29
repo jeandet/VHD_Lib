@@ -41,25 +41,24 @@ port(
     Send        :   in  std_logic;                              --! Flag, Demande d'envoi sur le bus
     Sended      :   out std_logic;                              --! Flag, Envoi termine
     BTrigger    :   out std_logic_vector(11 downto 0);          --! Registre contenant la valeur du diviseur de frequence pour la transmission
-    RDATA       :   out std_logic_vector(Data_sz-1 downto 0);   --! Mot de donnee en provenance de l'utilisateur
+    RDATA       :   out std_logic_vector(Data_sz-1 downto 0);   --! Current read word
     WDATA       :   in  std_logic_vector(Data_sz-1 downto 0)    --! Mot de donnee a transmettre a l'utilisateur
 );
 end component;
 
 
-component Shift_REG is
-generic(Data_sz     :   integer :=  10);
+component Shift_Reg is
+generic(
+        Data_sz     :   integer :=  10 --! Width of the shift register
+);
 port(
-    clk         :   in  std_logic;
-    Sclk        :   in  std_logic;
-    reset       :   in  std_logic;
-    SIN         :   in  std_logic;
-    SOUT        :   out std_logic;
-    Serialize   :   in  std_logic;
-    Serialized  :   out std_logic;
-    D           :   in  std_logic_vector(Data_sz-1 downto 0);
-    Q           :   out std_logic_vector(Data_sz-1 downto 0)
-
+    Sclk        :   in  std_logic; --! Serial clock
+    SIN         :   in  std_logic; --! Serial data in
+    SOUT        :   out std_logic; --! Serial data out
+    Serialize   :   in  std_logic; --! Launch serialization
+    Serialized  :   out std_logic; --! Serialization complete
+    D           :   in  std_logic_vector(Data_sz-1 downto 0); --! Parallel data to be shifted out
+    Q           :   out std_logic_vector(Data_sz-1 downto 0)  --! Unserialized data
 );
 end component;
 

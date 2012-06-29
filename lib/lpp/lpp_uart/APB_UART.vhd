@@ -93,15 +93,9 @@ Rec.UART_Cfg(2) <= NwData;
     begin
         if(rst='0')then
             Rec.UART_Wdata <=  (others => '0');
-            
+            Send <=	'0';
 
         elsif(clk'event and clk='1')then
-           temp_ND <= NwData;
-            if(NwData='1' and temp_ND='1')then
-                ACK <= '1';
-            else
-                ACK <= '0';
-            end if;
 
     --APB Write OP
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
@@ -109,13 +103,13 @@ Rec.UART_Cfg(2) <= NwData;
                     when "000000" =>
                         Rec.UART_Cfg(0) <= apbi.pwdata(0);
                     when "000001" =>
-                        Rec.UART_Wdata(7 downto 0) <= apbi.pwdata(7 downto 0);
-			Send <=	'1';
+                        Rec.UART_Wdata(7 downto 0) <= apbi.pwdata(7 downto 0); 
+                        Send <=	'1';
                     when others =>
                         null;
                 end case;
-	    else
-	        Send <=	'0';
+            elsif(Sended = '0')then
+                Send <=	'0';
             end if;
 
     --APB READ OP
@@ -133,9 +127,12 @@ Rec.UART_Cfg(2) <= NwData;
                     when "000010" =>
                         Rdata(31 downto 8) <= X"EEEEEE";
                         Rdata(7 downto 0) <= Rec.UART_Rdata;
+                        ACK <= '1';
                     when others =>
                         Rdata <= (others => '0');
                 end case;
+            else
+                ACK <= '0';
             end if;
 
         end if;

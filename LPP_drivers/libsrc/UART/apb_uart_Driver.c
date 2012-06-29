@@ -38,7 +38,6 @@ void uartputc(UART_Device* dev,char c)
     //while (!(dev->ConfigReg & (1<<5)));
     while (!((dev->ConfigReg & DataSended) == DataSended));
     dev->DataWReg = c;
-    printf(" ");
 }
 
 void uartputs(UART_Device* dev,char* s)

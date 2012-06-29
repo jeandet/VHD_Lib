@@ -7,13 +7,8 @@ int main()
 {
     printf("Debut Main\n\n");
     UART_Device* dev = openUART(0);
-    printf("addr: %x\n",(unsigned int)dev);
-    printf("cfg: %x\n",dev->ConfigReg);
-    char* a = "hello world\n";
-    uartputs(dev,a);
-    printf("Try #1 done\n");
-    uartputs(dev,"salut monde\n");
-    printf("Try #2 done\n");
+    while(1){
+        uartputc(dev,uartgetc(dev));
+    }
     return 0;
 }
-
