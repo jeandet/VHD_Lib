@@ -1,0 +1,9 @@
+KEY IDE_DES_TOOL "Ide"
+KEY IDE_DES_ADB_PATH "C:\opt\GRLIB\grlib-gpl-1.1.0-b4108\designs\Projet-LeonLFR-A3P3K-Sheldon\designer\impl2\leon3mp.adb"
+LIST SOURCE_FILES
+VALUE "C:\opt\GRLIB\grlib-gpl-1.1.0-b4108\designs\Projet-LeonLFR-A3P3K-Sheldon\synthesis\leon3mp_sdc.sdc;sdc"
+ENDLIST
+LIST OPTIONAL_FILES
+ENDLIST
+LIST VCD_FILES
+ENDLIST

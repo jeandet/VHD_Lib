@@ -1,0 +1,7 @@
+JDF B
+PROJECT top
+DESIGN top Normal
+DEVKIT PROASIC3Std""
+ENTRY EDIF
+MODULE ./synplify/top.edf
+MODSTYLE top Normal

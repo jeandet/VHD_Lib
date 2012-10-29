@@ -45,6 +45,7 @@ port(
     regs_out    :   in  out_IIR_CEL_reg;
     sample_in   :   in  samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
     sample_out  :   out samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
+    GOtest : out std_logic;
     coefs       :   in  std_logic_vector((Coef_SZ*CoefCntPerCel*Cels_count)-1 downto 0)
     
 );
@@ -69,6 +70,7 @@ port map(
     sample_in   =>  sample_in,
     sample_out  =>  sample_out,
     virg_pos    =>  virg_pos,
+    GOtest => GOtest,
     coefs       =>  coefs
 );
 

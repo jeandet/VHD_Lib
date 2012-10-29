@@ -80,8 +80,12 @@ REN <=  not read;
 --==============================================================
 --=========================R A M================================
 --==============================================================
---memRAM :   if Mem_use = use_RAM generate
---RAMblk :RAM
+--memRAM :   if (Mem_use = use_RAM or Mem_use = use_CEL)generate
+--RAMblk : entity work.RAM
+--    generic map
+--    (
+--        Input_SZ_1
+--    )
 --    port map(
 --    WD      =>  WD_D,
 --    RD      =>  RD,
@@ -149,7 +153,7 @@ port map(
 
 
 WADDR_backreg :REG
-generic map(size    => 8,initial_VALUE =>ChanelsCNT*Cels_count*4-2)
+generic map(size    => 8,initial_VALUE =>ChanelsCouNT*Cels_count*4-2)
 port map(
     reset   =>  reset,
     clk     =>  SVG_ADDR,

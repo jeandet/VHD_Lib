@@ -1,7 +1,0 @@
-JDF B
-PROJECT leon3mp
-DESIGN leon3mp Normal
-DEVKIT PROASIC3Std""
-ENTRY EDIF
-MODULE ./synplify/leon3mp.edf
-MODSTYLE leon3mp Normal

@@ -46,6 +46,7 @@ port(
     sample_in   :   in  samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
     sample_out  :   out samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
     virg_pos    :   in  integer;
+    GOtest : out std_logic;
     coefs       :   in  std_logic_vector((Coef_SZ*CoefCntPerCel*Cels_count)-1 downto 0)
 );
 end IIR_CEL_CTRLR;
@@ -97,7 +98,7 @@ type    fsmIIR_CEL_T is (waiting,pipe1,computeb1,computeb2,computea1,computea2,n
 signal  IIR_CEL_STATE   :   fsmIIR_CEL_T;
 
 begin
-
+GOtest <= GO_0;
 
 --coefsConnectL0: for z in 0 to Cels_count-1 generate
 --     coefsConnectL1: for y in 0 to (CoefCntPerCel/2)-1 generate
