@@ -103,6 +103,7 @@ PACKAGE lpp_dma_pkg IS
       ready_matrix_f2               : IN  STD_LOGIC;
       error_anticipating_empty_fifo : IN  STD_LOGIC;
       error_bad_component_error     : IN  STD_LOGIC;
+      debug_reg                     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
       -- OUT
       status_ready_matrix_f0_0             : OUT STD_LOGIC;

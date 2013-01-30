@@ -28,7 +28,7 @@ USE grlib.amba.ALL;
 USE grlib.stdlib.ALL;
 USE grlib.devices.ALL;
 USE GRLIB.DMA2AHB_Package.ALL;
---USE GRLIB.DMA2AHB_TestPackage.ALL;
+
 LIBRARY lpp;
 USE lpp.lpp_amba.ALL;
 USE lpp.apb_devices_list.ALL;
@@ -136,6 +136,8 @@ ARCHITECTURE Behavioral OF lpp_dma IS
   SIGNAL fifo_ren_trash     : STD_LOGIC;
   SIGNAL component_fifo_ren : STD_LOGIC;
 
+  SIGNAL debug_reg : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  
 BEGIN
 
   -----------------------------------------------------------------------------
@@ -149,7 +151,7 @@ BEGIN
       deviceid => 0,
       version  => 0,
       syncrst  => 1,
-      boundary => 0)
+      boundary => 1)                    -- set TO TEST
     PORT MAP (
       HCLK    => HCLK,
       HRESETn => HRESETn,
@@ -158,6 +160,25 @@ BEGIN
       AHBIn   => AHB_Master_In,
       AHBOut  => AHB_Master_Out);
 
+
+  debug_info: PROCESS (HCLK, HRESETn)
+  BEGIN  -- PROCESS debug_info
+    IF HRESETn = '0' THEN               -- asynchronous reset (active low)
+      debug_reg <= (OTHERS => '0');                  
+    ELSIF HCLK'event AND HCLK = '1' THEN  -- rising clock edge
+      debug_reg(0) <= debug_reg(0) OR (DMAOut.Retry );
+      debug_reg(1) <= debug_reg(1) OR (DMAOut.Grant AND DMAOut.Retry) ;
+      IF state = TRASH_FIFO THEN debug_reg(2) <= '1'; END IF;
+      debug_reg(3) <= debug_reg(3) OR (header_send_ko);
+      debug_reg(4) <= debug_reg(4) OR (header_send_ok);
+      debug_reg(5) <= debug_reg(5) OR (component_send_ko);
+      debug_reg(6) <= debug_reg(6) OR (component_send_ok);
+      
+      debug_reg(31 DOWNTO 7) <= (OTHERS => '1');
+    END IF;
+  END PROCESS debug_info;
+    
+  
   matrix_type    <= header(1 DOWNTO 0);
   component_type <= header(5 DOWNTO 2);
 
@@ -312,7 +333,6 @@ BEGIN
       HRESETn => HRESETn,
       DMAIn   => component_dmai,
       DMAOut  => DMAOut,
-
       send    => component_send,      
       address => address,            
       data    => fifo_data,
@@ -343,9 +363,11 @@ BEGIN
       ready_matrix_f0_0                      => ready_matrix_f0_0,  
       ready_matrix_f0_1                      => ready_matrix_f0_1,  
       ready_matrix_f1                        => ready_matrix_f1,    
-      ready_matrix_f2                        => ready_matrix_f2,    
+      ready_matrix_f2                        => ready_matrix_f2,  
       error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
       error_bad_component_error              => error_bad_component_error,
+      --
+      debug_reg                              => debug_reg,
       -- OUT
       status_ready_matrix_f0_0               => status_ready_matrix_f0_0,  
       status_ready_matrix_f0_1               => status_ready_matrix_f0_1,  
@@ -360,7 +382,6 @@ BEGIN
       addr_matrix_f1                         => addr_matrix_f1,     
       addr_matrix_f2                         => addr_matrix_f2);    
 
-  -----------------------------------------------------------------------------
+ -----------------------------------------------------------------------------
 
 END Behavioral;
-
