@@ -61,6 +61,7 @@ Patched-dist: Patch-GRLIB
 
 
 doc:
+	mkdir -p doc/html
 	cp doc/ressources/*.jpg doc/html/
 	cp doc/ressources/doxygen.css doc/html/
 	make -C lib/lpp doc
