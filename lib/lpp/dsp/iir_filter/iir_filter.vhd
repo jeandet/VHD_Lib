@@ -102,7 +102,7 @@ end component;
 
 component Top_IIR is
 generic(
-        Sample_SZ : integer := 20;
+        Sample_SZ : integer := 18;
 		  ChanelsCount : integer := 1;
 		  Coef_SZ      : integer := 9;
 		  CoefCntPerCel: integer := 6;
@@ -112,8 +112,8 @@ generic(
         clk         :   in  std_logic;
         sample_clk  :   in  std_logic;
  --       BP : in std_logic;
-        BPinput       :   in std_logic_vector(3 downto 0);
-        LVLinput       :   in std_logic_vector(11 downto 0);
+ --       BPinput       :   in std_logic_vector(3 downto 0);
+        LVLinput       :   in std_logic_vector(15 downto 0);
         INsample      :   out samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0);
         OUTsample      :   out samplT(ChanelsCount-1 downto 0,Sample_SZ-1 downto 0)
     ); 

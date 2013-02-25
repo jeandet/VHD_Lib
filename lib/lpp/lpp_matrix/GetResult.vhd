@@ -32,7 +32,7 @@ port(
     Valid       : in  std_logic;
     Conjugate   : in std_logic;
     Res         : in std_logic_vector(Result_SZ-1 downto 0);
-    Full        : in std_logic;
+--    Full        : in std_logic;
     WriteFIFO   : out std_logic;
     Received    : out std_logic;    
     Result      : out std_logic_vector(Result_SZ-1 downto 0)
@@ -63,7 +63,7 @@ begin
 
             case ect is
                 when st0 =>
-                    if(Full='0' and Valid='1')then
+                    if(Valid='1')then--if(Full='0' and Valid='1')then
                         Result <= Res;
                         WriteFIFO <= '1';
                         Received <= '1';
@@ -84,7 +84,7 @@ begin
                     end if;        
                 
                 when st1 =>
-                    if(Full='0' and Valid='1')then
+                    if(Valid='1')then--if(Full='0' and Valid='1')then
                         Result <= Res;
                         WriteFIFO <= '1';
                         Received <= '0';

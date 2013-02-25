@@ -36,7 +36,7 @@ package FILTERcfg is
 --Bus Width and chanels number|
 --____________________________|
 constant ChanelsCount :   integer :=  1;
-constant Sample_SZ    :   integer := 20;
+constant Sample_SZ    :   integer := 18;
 constant Coef_SZ    :   integer := 9;
 constant CoefCntPerCel:   integer := 6;
 constant Cels_count :   integer := 5;

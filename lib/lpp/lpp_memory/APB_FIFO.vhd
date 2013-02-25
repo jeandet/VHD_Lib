@@ -87,37 +87,41 @@ type FIFO_ctrlr_Reg_Vec is array(FifoCnt-1 downto 0) of FIFO_ctrlr_Reg;
 type fifodatabus is array(FifoCnt-1 downto 0) of std_logic_vector(Data_sz-1 downto 0); 
 type fifoaddressbus is array(FifoCnt-1 downto 0) of std_logic_vector(Addr_sz-1 downto 0); 
 
-signal Rec      : FIFO_ctrlr_Reg_Vec;
-signal PRdata    : std_logic_vector(31 downto 0);
-signal FIFO_ID  : std_logic_vector(31 downto 0);
-signal autoloaded : std_logic_vector(FifoCnt-1 downto 0);
-signal sFull     : std_logic_vector(FifoCnt-1 downto 0);
-signal sEmpty    : std_logic_vector(FifoCnt-1 downto 0);
-signal sEmpty_d  : std_logic_vector(FifoCnt-1 downto 0);
-signal sWen      : std_logic_vector(FifoCnt-1 downto 0);
-signal sRen      : std_logic_vector(FifoCnt-1 downto 0);
-signal sRclk     : std_logic;
-signal sWclk     : std_logic;
-signal sWen_APB  : std_logic_vector(FifoCnt-1 downto 0);
-signal sRen_APB  : std_logic_vector(FifoCnt-1 downto 0);
-signal sRDATA    : fifodatabus;   
-signal sWDATA    : fifodatabus;    
-signal sWADDR    : fifoaddressbus;   
-signal sRADDR    : fifoaddressbus;
-signal sReUse    : std_logic_vector(FifoCnt-1 downto 0);   --05/06/12
-signal sReUse_APB  : std_logic_vector(FifoCnt-1 downto 0);    --05/06/12
+signal Rec           : FIFO_ctrlr_Reg_Vec;
+signal PRdata        : std_logic_vector(31 downto 0);
+signal FIFO_ID       : std_logic_vector(31 downto 0);
+signal autoloaded    : std_logic_vector(FifoCnt-1 downto 0);
+signal sFull         : std_logic_vector(FifoCnt-1 downto 0);
+signal sEmpty        : std_logic_vector(FifoCnt-1 downto 0);
+signal sEmpty_d      : std_logic_vector(FifoCnt-1 downto 0);
+signal sWen          : std_logic_vector(FifoCnt-1 downto 0);
+signal sRen          : std_logic_vector(FifoCnt-1 downto 0);
+signal sRclk         : std_logic;
+signal sWclk         : std_logic;
+signal sWen_APB      : std_logic_vector(FifoCnt-1 downto 0);
+signal sRen_APB      : std_logic_vector(FifoCnt-1 downto 0);
+signal sRDATA        : fifodatabus;
+signal sWDATA        : fifodatabus;
+signal sWADDR        : fifoaddressbus;
+signal sRADDR        : fifoaddressbus;
+signal sReUse        : std_logic_vector(FifoCnt-1 downto 0);
+signal sReUse_APB    : std_logic_vector(FifoCnt-1 downto 0);
+
+signal regDataValid  : std_logic_vector(FifoCnt-1 downto 0);
+signal regData       : fifodatabus;
+signal regREN        : std_logic_vector(FifoCnt-1 downto 0);
 
 type state_t is (idle,Read);
 signal fiforeadfsmst : state_t;
 
 begin
 
-FIFO_ID(3 downto 0) <= std_logic_vector(to_unsigned(FifoCnt,4));
-FIFO_ID(15 downto 8) <= std_logic_vector(to_unsigned(Data_sz,8));
-FIFO_ID(23 downto 16) <= std_logic_vector(to_unsigned(Addr_sz,8));
+FIFO_ID(3 downto 0)     <= std_logic_vector(to_unsigned(FifoCnt,4));
+FIFO_ID(15 downto 8)    <= std_logic_vector(to_unsigned(Data_sz,8));
+FIFO_ID(23 downto 16)   <= std_logic_vector(to_unsigned(Addr_sz,8));
 
 
-Write : if W /= 0 generate 
+Writeint : if W /= 0 generate
     FIFO_ID(4) <= '1';
     sWen   <= sWen_APB;
     sReUse <= sReUse_APB;
@@ -137,7 +141,7 @@ Writeext : if W = 0 generate
     end generate;
 end generate;
 
-Read : if R /= 0 generate 
+Readint : if R /= 0 generate 
  FIFO_ID(5) <= '1';
  sRen   <=  sRen_APB;
  srclk  <=  clk;
@@ -159,17 +163,15 @@ ctrlregs: for i in 0 to FifoCnt-1 generate
     RADDR((Addr_sz*(i+1))-1 downto (Addr_sz)*i) <= sRADDR(i);
     WADDR((Addr_sz*(i+1))-1 downto (Addr_sz)*i) <= sWADDR(i);
     Rec(i).FIFO_Ctrl(16) <= sFull(i);
-    --Rec(i).FIFO_Ctrl(17) <= Rec(i).FIFO_Ctrl(1); --27/01/12
-    sReUse_APB(i) <= Rec(i).FIFO_Ctrl(1); --27/01/12
-    Rec(i).FIFO_Ctrl(3 downto 2) <= "00"; --27/01/12
-    Rec(i).FIFO_Ctrl(19 downto 17) <= "000"; --27/01/12
+    sReUse_APB(i) <= Rec(i).FIFO_Ctrl(1);
+    Rec(i).FIFO_Ctrl(3 downto 2) <= "00";
+    Rec(i).FIFO_Ctrl(19 downto 17) <= "000";
     Rec(i).FIFO_Ctrl(Addr_sz+3 downto 4) <= sRADDR(i);
-    Rec(i).FIFO_Ctrl((Addr_sz+19) downto 20) <= sWADDR(i);  ---|free|Waddrs|Full||free|Raddrs|empty|
-end generate;                                               -- 31         17  16 15          1     0
+    Rec(i).FIFO_Ctrl((Addr_sz+19) downto 20) <= sWADDR(i);
+end generate;
 
 Empty <= sEmpty;
 Full <= sFull;
-
 
 fifos: for i in 0 to FifoCnt-1 generate
     FIFO0 : lpp_fifo
@@ -182,17 +184,16 @@ end generate;
         if(rst='0')then
         rstloop1: for i in 0 to FifoCnt-1 loop
             Rec(i).FIFO_Wdata <=  (others => '0');
-            Rec(i).FIFO_Ctrl(1) <= '0'; --27/01/12
-            --Rec(i).FIFO_Ctrl(17) <= '0';
+            Rec(i).FIFO_Ctrl(1) <= '0'; -- ReUse
             sWen_APB(i) <= '1';
         end loop;
         elsif(clk'event and clk='1')then
+
     --APB Write OP
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
                    writelp: for i in 0 to FifoCnt-1 loop
                         if(conv_integer(apbi.paddr(abits-1 downto 2))=((2*i)+1)) then
                             Rec(i).FIFO_Ctrl(1) <= apbi.pwdata(1);
-                            --Rec(i).FIFO_Ctrl(17) <= apbi.pwdata(17);
                         elsif(conv_integer(apbi.paddr(abits-1 downto 2))=((2*i)+2)) then
                             Rec(i).FIFO_Wdata <= apbi.pwdata(Data_sz-1 downto 0);
                             sWen_APB(i) <= '0';
@@ -201,6 +202,7 @@ end generate;
             else
                 sWen_APB <= (others =>'1');
             end if;
+
  --APB Read OP
             if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
                if(apbi.paddr(abits-1 downto 2)="000000") then
@@ -212,15 +214,15 @@ end generate;
                         elsif(conv_integer(apbi.paddr(abits-1 downto 2))=((2*i)+2)) then
                             PRdata(Data_sz-1 downto 0)  <= Rec(i).FIFO_rdata;
                         end if;
-                   end loop; 
-                end if;       
+                   end loop;
+                end if;
             end if;
     end if;
+
     apbo.pconfig <= pconfig;
+
 end process;
 apbo.prdata     <=   PRdata when apbi.penable = '1';
-
-
 
 process(rst,clk)
     begin
@@ -256,35 +258,6 @@ process(rst,clk)
                     fiforeadfsmst <= idle;
             end case;
         end if;
-end process;
-
+end process; 
 
 end ar_APB_FIFO;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

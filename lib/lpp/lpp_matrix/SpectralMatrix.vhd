@@ -35,7 +35,7 @@ port(
     FIFO1      : in std_logic_vector(Input_SZ-1 downto 0);
     FIFO2      : in std_logic_vector(Input_SZ-1 downto 0);
     Statu      : in std_logic_vector(3 downto 0);
-    FullFIFO   : in std_logic;
+--    FullFIFO   : in std_logic;
     ReadFIFO   : out std_logic_vector(1 downto 0);
     WriteFIFO  : out std_logic;
     Result     : out std_logic_vector(Result_SZ-1 downto 0)
@@ -70,7 +70,7 @@ CALC0 : Matrix
 
 RES0 : GetResult
     generic map(Result_SZ)
-    port map(clk,RaZ,Valid_int,Conjugate_int,Resultat,FullFIFO,WriteFIFO,Received_int,Result);
+    port map(clk,RaZ,Valid_int,Conjugate_int,Resultat,WriteFIFO,Received_int,Result);--Resultat,FullFIFO,WriteFIFO
 
 
 With Statu select
