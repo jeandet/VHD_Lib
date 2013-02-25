@@ -66,7 +66,7 @@ signal  RADDR       :   std_logic_vector(7 downto 0);
 signal  WADDR       :   std_logic_vector(7 downto 0);
 signal  WADDR_D     :   std_logic_vector(7 downto 0);
 
-
+SIGNAL WADDR_back_s : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
 begin
 
@@ -150,25 +150,42 @@ port map(
 );
 
 
+    WADDR_backreg : REG
+    generic map(size    => 8,initial_VALUE =>ChanelsCount*Cels_count*4-2)
+    port map(
+      reset   =>  reset,
+      clk     =>  clk,         --SVG_ADDR,
+      D       =>  WADDR_back_s,--RADDR,
+      Q       =>  WADDR_back
+    );
+  WADDR_back_s <= RADDR WHEN SVG_ADDR = '1' ELSE WADDR_back;
 
+  WADDR_backreg2 :entity work.REG
+    generic map(size    => 8)
+    port map(
+      reset   =>  reset,
+      clk     =>  clk,         --SVG_ADDR,
+      D       =>  WADDR_back,
+      Q       =>  WADDR_back_D
+      );
 
-WADDR_backreg :REG
-generic map(size    => 8,initial_VALUE =>ChanelsCouNT*Cels_count*4-2)
-port map(
-    reset   =>  reset,
-    clk     =>  SVG_ADDR,
-    D       =>  RADDR,
-    Q       =>  WADDR_back
-);
-
-WADDR_backreg2 :REG
-generic map(size    => 8)
-port map(
-    reset   =>  reset,
-    clk     =>  SVG_ADDR,
-    D       =>  WADDR_back,
-    Q       =>  WADDR_back_D
-);
+--WADDR_backreg :REG
+--generic map(size    => 8,initial_VALUE =>ChanelsCouNT*Cels_count*4-2)
+--port map(
+--    reset   =>  reset,
+--    clk     =>  SVG_ADDR,
+--    D       =>  RADDR,
+--    Q       =>  WADDR_back
+--);
+--
+--WADDR_backreg2 :REG
+--generic map(size    => 8)
+--port map(
+--    reset   =>  reset,
+--    clk     =>  SVG_ADDR,
+--    D       =>  WADDR_back,
+--    Q       =>  WADDR_back_D
+--
 
 WDRreg :REG
 generic map(size    => Input_SZ_1)

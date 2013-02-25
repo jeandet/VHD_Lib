@@ -125,6 +125,42 @@ port(
 );
 end component;
 
+component FFTamont is
+generic(
+    Data_sz  : integer range 1 to 32 := 16
+    );
+port(
+    clk         : in std_logic;
+    rstn        : in std_logic;
+    Load        : in std_logic;
+    Empty       : in std_logic;
+    Full        : in std_logic;
+    DATA        : in std_logic_vector(Data_sz-1 downto 0);
+    Valid       : out std_logic;
+    Read        : out std_logic;
+    Data_re     : out std_logic_vector(Data_sz-1 downto 0);
+    Data_im     : out std_logic_vector(Data_sz-1 downto 0)
+);
+end component;
+
+component FFTaval is
+generic(
+    Data_sz  : integer range 1 to 32 := 8
+    );
+port(
+    clk         : in std_logic;
+    rstn        : in std_logic;
+    Ready       : in std_logic;
+    Valid       : in std_logic;
+    Full        : in std_logic;
+    Data_re     : in std_logic_vector(Data_sz-1 downto 0);
+    Data_im     : in std_logic_vector(Data_sz-1 downto 0);
+    Read        : out std_logic;
+    Write       : out std_logic;
+    ReUse       : out std_logic;
+    DATA        : out std_logic_vector(Data_sz-1 downto 0)
+);
+end component;
 --==============================================================|
 --================== IP VHDL de la FFT actel ===================|
 --================ non partagé dans la VHD_Lib =================|

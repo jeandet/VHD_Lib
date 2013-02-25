@@ -63,6 +63,8 @@ begin
             Read <= (others => '1');
             Valid <= '0';
             FifoCpt <= 1;
+            Data_re <= (others => '0');
+            Data_im <= (others => '0');
             
         elsif(clk'event and clk='1')then
 
