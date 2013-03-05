@@ -42,59 +42,80 @@ begin
             DataCount <= 0;
             
         elsif(clk'event and clk='1')then
-
             case ect is
 
-                when e0 =>                    
+                when e0 =>
                     if(Load='1' and Empty='0')then
                         Read <= '0';
-                        ect <= eX;                       
+                        ect <= e1;                       
                     end if;
 
-                when eX =>
-                    ect <= e1;               
-
-                when e1 =>                    
+                when e1 =>
+                    Valid <= '0';
+                    Read <= '1';
+                    ect <= e2;
+                    
+                when e2 =>
                     Data_re <= DATA;
                     Data_im <= (others => '0');
                     Valid <= '1';
-                    if(DataCount=NbData-2)then
-                        Read <= '1';
-                        DataCount <= DataCount + 1;
-                    elsif(DataCount=NbData)then
-                        Valid <= '0';
+                    if(DataCount=NbData-1)then
                         DataCount <= 0;
-                        ect <= e0;
+                        ect <= eX;
                     else
                         DataCount <= DataCount + 1;
-                    end if;  
-               
+                        if(Load='1' and Empty='0')then
+                            Read <= '0';
+                            ect <= e1;
+                        else
+                            ect <= eX;
+                        end if;                        
+                    end if;
+
+                when eX =>
+                    Valid <= '0';
+                    ect <= e0;
+
                 when others =>
-                    null;                                           
+                    null; 
 
             end case;
+
+--***********************************************************
+--          Chargement Rapide (toutes a la suite)
+--***********************************************************
+--            case ect is
+--
+--                when e0 =>                    
+--                    if(Load='1' and Empty='0')then
+--                        Read <= '0';
+--                        ect <= eX;                       
+--                    end if;
+--
+--                when eX =>
+--                    ect <= e1;               
+--
+--                when e1 =>                    
+--                    Data_re <= DATA;
+--                    Data_im <= (others => '0');
+--                    Valid <= '1';
+--                    if(DataCount=NbData-2)then
+--                        Read <= '1';
+--                        DataCount <= DataCount + 1;
+--                    elsif(DataCount=NbData)then
+--                        Valid <= '0';
+--                        DataCount <= 0;
+--                        ect <= e0;
+--                    else
+--                        DataCount <= DataCount + 1;
+--                    end if;  
+--               
+--                when others =>
+--                    null;                                           
+--
+--            end case;
+--***********************************************************
         end if;
     end process;
 
 end architecture;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -319,10 +319,9 @@ SPW2_EN <= '0';
 --        generic map (pindex => 8, paddr => 8, FifoCnt => 1, Data_sz => 16, Addr_sz => 8, Enable_ReUse => '0', R => 0, W => 1)
 --        port map (clkm,rstn,clkm,clkm,(others => '0'),Drive_Read,(others =>'1'),FifoIN_Empty,FifoIN_Full,FifoIN_Data,(others => '0'),open,open,apbi,apbo(8));
 --
-test(0) <= gpio(1);
+
 Start <= '0';
-rstnFFT <= gpio(0);
---
+
     DRIVE : FFTamont
         generic map(Data_sz => 16,NbData => 256)
         port map(clkm,rstn,FFT_Load,FifoIN_Empty(0),FifoIN_Data,Drive_Write,Drive_Read(0),Drive_DataRE,Drive_DataIM); 
@@ -343,7 +342,7 @@ rstnFFT <= gpio(0);
         PTS         => gPTS,
         HALFPTS     => gHALFPTS,
         inBuf_RWDLY => gInBuf_RWDLY)        
-        port map(clkm,start,rstnFFT,Drive_Write,Link_Read,Drive_DataIM,Drive_DataRE,FFT_Load,open,FFT_DataIM,FFT_DataRE,FFT_Valid,FFT_Ready); 
+        port map(clkm,start,rstn,Drive_Write,Link_Read,Drive_DataIM,Drive_DataRE,FFT_Load,open,FFT_DataIM,FFT_DataRE,FFT_Valid,FFT_Ready); 
 --   
 --    LINK : Linker_FFT
 --        generic map(Data_sz => 16)
