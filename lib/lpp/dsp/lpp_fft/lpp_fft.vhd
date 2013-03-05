@@ -127,14 +127,14 @@ end component;
 
 component FFTamont is
 generic(
-    Data_sz  : integer range 1 to 32 := 16
+    Data_sz  : integer range 1 to 32 := 16;
+    NbData : integer range 1 to 512 := 256
     );
 port(
     clk         : in std_logic;
     rstn        : in std_logic;
     Load        : in std_logic;
     Empty       : in std_logic;
-    Full        : in std_logic;
     DATA        : in std_logic_vector(Data_sz-1 downto 0);
     Valid       : out std_logic;
     Read        : out std_logic;
@@ -145,7 +145,8 @@ end component;
 
 component FFTaval is
 generic(
-    Data_sz  : integer range 1 to 32 := 8
+    Data_sz  : integer range 1 to 32 := 8;
+    NbData : integer range 1 to 512 := 256
     );
 port(
     clk         : in std_logic;

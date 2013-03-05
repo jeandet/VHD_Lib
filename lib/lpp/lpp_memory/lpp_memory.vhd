@@ -138,20 +138,14 @@ port(
 end component;
 
 component Bridge is
-generic(
-    Data_sz  : integer range 1 to 32 := 16
-    );
-port(
-    clk         : in std_logic;
-    raz        : in std_logic;
-    Start : in std_logic;
-    FullUp : in std_logic;
-    EmptyUp : in std_logic;
-    FullDown : in std_logic;
-    EmptyDown : in std_logic;
-    Write : out std_logic;
-    Read : out std_logic
-);
+    port(
+        clk         : in std_logic;
+        raz        : in std_logic;
+        EmptyUp : in std_logic;
+        FullDwn : in std_logic;
+        WriteDwn : out std_logic;
+        ReadUp : out std_logic
+        );
 end component;
 
 component ssram_plugin is
