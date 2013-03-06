@@ -170,15 +170,15 @@ signal dsuo     : dsu_out_type;
 ---  AJOUT TEST ------------------------Signaux----------------------
 ---------------------------------------------------------------------
 -- FIFOs
-signal FifoIN_Full      : std_logic_vector(0 downto 0);--
-signal FifoIN_Empty     : std_logic_vector(0 downto 0);--
-signal FifoIN_Data      : std_logic_vector(15 downto 0);--
+signal FifoIN_Full      : std_logic_vector(4 downto 0);--
+signal FifoIN_Empty     : std_logic_vector(4 downto 0);--
+signal FifoIN_Data      : std_logic_vector(79 downto 0);--
 
 signal FifoINT_Full     : std_logic_vector(4 downto 0);
 signal FifoINT_Data     : std_logic_vector(79 downto 0);
 
 signal FifoOUT_FullV    : std_logic;
-signal FifoOUT_Full     : std_logic_vector(0 downto 0);--
+signal FifoOUT_Full     : std_logic_vector(4 downto 0);--
 signal Matrix_WriteV    : std_logic_vector(0 downto 0);
 
 -- MATRICE SPECTRALE
@@ -200,7 +200,7 @@ signal Dma_acq : std_logic;
 
 -- FFT
 signal Drive_Write      : std_logic;
-signal Drive_Read       : std_logic_vector(0 downto 0);--
+signal Drive_Read       : std_logic_vector(4 downto 0);--
 signal Drive_DataRE     : std_logic_vector(15 downto 0);
 signal Drive_DataIM     : std_logic_vector(15 downto 0);
 
@@ -213,9 +213,9 @@ signal FFT_DataRE       : std_logic_vector(15 downto 0);
 signal FFT_DataIM       : std_logic_vector(15 downto 0);
 
 signal Link_Read        : std_logic;
-signal Link_Write       : std_logic_vector(0 downto 0);--
-signal Link_ReUse       : std_logic_vector(0 downto 0);-- 
-signal Link_Data        : std_logic_vector(15 downto 0);--
+signal Link_Write       : std_logic_vector(4 downto 0);--
+signal Link_ReUse       : std_logic_vector(4 downto 0);-- 
+signal Link_Data        : std_logic_vector(79 downto 0);--
 
 -- ADC
 signal SmplClk          : std_logic;
@@ -237,7 +237,7 @@ signal TXDint : std_logic;
 signal sample_clk_out  :   std_logic;
 
 signal Rd : std_logic_vector(0 downto 0);--
-signal Ept : std_logic_vector(0 downto 0);--
+signal Ept : std_logic_vector(4 downto 0);--
 
 signal Bwr : std_logic_vector(0 downto 0);
 signal Bre : std_logic_vector(0 downto 0);
@@ -313,7 +313,7 @@ SPW2_EN <= '0';
 --- FFT -------------------------------------------------------------
     
     MemIn : APB_FIFO
-        generic map (pindex => 8, paddr => 8, FifoCnt => 1, Data_sz => 16, Addr_sz => 8, Enable_ReUse => '1', R => 0, W => 1)
+        generic map (pindex => 8, paddr => 8, FifoCnt => 5, Data_sz => 16, Addr_sz => 8, Enable_ReUse => '0', R => 0, W => 1)
         port map (clkm,rstn,clkm,clkm,(others => '0'),Drive_Read,(others => '1'),FifoIN_Empty,FifoIN_Full,FifoIN_Data,(others => '0'),open,open,apbi,apbo(8));
 --    MemIn : APB_FIFO
 --        generic map (pindex => 8, paddr => 8, FifoCnt => 1, Data_sz => 16, Addr_sz => 8, Enable_ReUse => '0', R => 0, W => 1)
@@ -322,12 +322,12 @@ SPW2_EN <= '0';
 
 Start <= '0';
 
-    DRIVE : FFTamont
-        generic map(Data_sz => 16,NbData => 256)
-        port map(clkm,rstn,FFT_Load,FifoIN_Empty(0),FifoIN_Data,Drive_Write,Drive_Read(0),Drive_DataRE,Drive_DataIM); 
---    DRIVE : Driver_FFT
---        generic map(Data_sz => 16)
---        port map(clkm,rstn,FFT_Load,FifoIN_Empty,FifoIN_Full,FifoIN_Data,Drive_Write,Drive_Read,Drive_DataRE,Drive_DataIM);    
+--    DRIVE : FFTamont
+--        generic map(Data_sz => 16,NbData => 256)
+--        port map(clkm,rstn,FFT_Load,FifoIN_Empty(0),FifoIN_Data,Drive_Write,Drive_Read(0),Drive_DataRE,Drive_DataIM); 
+    DRIVE : Driver_FFT
+        generic map(Data_sz => 16)
+        port map(clkm,rstn,FFT_Load,FifoIN_Empty,FifoIN_Data,Drive_Write,Drive_Read,Drive_DataRE,Drive_DataIM);    
 --
     FFT : CoreFFT     
         generic map(
@@ -344,17 +344,17 @@ Start <= '0';
         inBuf_RWDLY => gInBuf_RWDLY)        
         port map(clkm,start,rstn,Drive_Write,Link_Read,Drive_DataIM,Drive_DataRE,FFT_Load,open,FFT_DataIM,FFT_DataRE,FFT_Valid,FFT_Ready); 
 --   
---    LINK : Linker_FFT
---        generic map(Data_sz => 16)
---        port map(clkm,rstn,FFT_Ready,FFT_Valid,FifoOUT_Full,FFT_DataRE,FFT_DataIM,Link_Read,Link_Write,Link_ReUse,Link_Data);--FifoOUT_Full/FifoINT_Full
-    LINK : FFTaval
-        generic map(Data_sz => 16,NbData => 256)
-        port map(clkm,rstn,FFT_Ready,FFT_Valid,FifoOUT_Full(0),FFT_DataRE,FFT_DataIM,Link_Read,Link_Write(0),Link_ReUse(0),Link_Data);
+    LINK : Linker_FFT
+        generic map(Data_sz => 16)
+        port map(clkm,rstn,FFT_Ready,FFT_Valid,FifoOUT_Full,FFT_DataRE,FFT_DataIM,Link_Read,Link_Write,Link_ReUse,Link_Data);--FifoOUT_Full/FifoINT_Full
+--    LINK : FFTaval
+--        generic map(Data_sz => 16,NbData => 256)
+--        port map(clkm,rstn,FFT_Ready,FFT_Valid,FifoOUT_Full(0),FFT_DataRE,FFT_DataIM,Link_Read,Link_Write(0),Link_ReUse(0),Link_Data);
 --
 ----- MATRICE SPECTRALE ---------------------5 FIFO Input---------------
 --
     MemOut : APB_FIFO
-        generic map (pindex => 9, paddr => 9, FifoCnt => 1, Data_sz => 16, Addr_sz => 8, Enable_ReUse => '0', R => 1, W => 0)
+        generic map (pindex => 9, paddr => 9, FifoCnt => 5, Data_sz => 16, Addr_sz => 8, Enable_ReUse => '1', R => 1, W => 0)
         port map (clkm,rstn,clkm,clkm,Link_ReUse,(others =>'1'),Link_Write,Ept,FifoOUT_Full,open,Link_Data,open,open,apbi,apbo(9));
 
 
