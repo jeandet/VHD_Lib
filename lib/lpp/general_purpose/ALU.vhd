@@ -19,54 +19,50 @@
 --                    Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@lpp.polytechnique.fr
 ----------------------------------------------------------------------------
-library IEEE;
-use IEEE.numeric_std.all;
-use IEEE.std_logic_1164.all;
-library lpp;
-use lpp.general_purpose.all;
---IDLE =0000 MAC =0001 MULT =0010 ADD =0011 CLRMAC =0100
---NOT =0101 AND =0110 OR =0111 XOR =1000 
---SHIFTleft =1001 SHIFTright =1010
-
-entity ALU is
-generic(
-    Arith_en        :   integer := 1;
-    Logic_en        :   integer := 1;
-    Input_SZ_1      :   integer := 16;
-    Input_SZ_2      :   integer := 9
-
-);
-port(
-    clk     :   in  std_logic;
-    reset   :   in  std_logic;
-    ctrl    :   in  std_logic_vector(3 downto 0);
-    OP1     :   in  std_logic_vector(Input_SZ_1-1 downto 0);
-    OP2     :   in  std_logic_vector(Input_SZ_2-1 downto 0);
-    RES     :   out std_logic_vector(Input_SZ_1+Input_SZ_2-1 downto 0)
-);
-end entity;
+LIBRARY IEEE;
+USE IEEE.numeric_std.ALL;
+USE IEEE.std_logic_1164.ALL;
+LIBRARY lpp;
+USE lpp.general_purpose.ALL;
+--IDLE                  = 0000
+--MAC                   = 0001
+--MULT                  = 0010 and set MULT in ADD reg
+--ADD                   = 0011
+--CLRMAC                = 0100
 
 
+ENTITY ALU IS
+  GENERIC(
+    Arith_en   : INTEGER := 1;
+    Logic_en   : INTEGER := 1;
+    Input_SZ_1 : INTEGER := 16;
+    Input_SZ_2 : INTEGER := 9
 
-architecture    ar_ALU of ALU is
+    );
+  PORT(
+    clk   : IN  STD_LOGIC;
+    reset : IN  STD_LOGIC;
+    ctrl  : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
+    OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_2-1 DOWNTO 0);
+    RES   : OUT STD_LOGIC_VECTOR(Input_SZ_1+Input_SZ_2-1 DOWNTO 0)
+    );
+END ENTITY;
 
+ARCHITECTURE ar_ALU OF ALU IS
 
+  SIGNAL clr_MAC : STD_LOGIC := '1';
+  
+BEGIN
+  clr_MAC <= '1' WHEN ctrl = "0100" OR ctrl = "0101" OR ctrl = "0110"  ELSE '0';
 
-signal clr_MAC          :   std_logic:='1';
+  arith : IF Arith_en = 1 GENERATE
+    MACinst : MAC
+      GENERIC MAP(Input_SZ_1, Input_SZ_2)
+      PORT MAP(clk, reset, clr_MAC, ctrl(1 DOWNTO 0), OP1, OP2, RES);
+  END GENERATE;
 
-
-begin
-
-clr_MAC     <=  '1' when    ctrl = "0100" else '0';
-
-
-arith : if Arith_en = 1 generate
-MACinst : MAC  
-generic map(Input_SZ_1,Input_SZ_2)
-port map(clk,reset,clr_MAC,ctrl(1 downto 0),OP1,OP2,RES);
-end generate;
-
-end architecture;
+END ARCHITECTURE;
 
 
 
