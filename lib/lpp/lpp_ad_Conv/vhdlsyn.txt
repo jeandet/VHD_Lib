@@ -1,6 +1,0 @@
-AD7688_drvr.vhd
-AD7688_spi_if.vhd
-ADS7886_drvr.vhd
-WriteGen_ADC.vhd
-lpp_ad_Conv.vhd
-lpp_apb_ad_conv.vhd
