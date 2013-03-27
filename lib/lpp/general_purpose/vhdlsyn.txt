@@ -8,7 +8,9 @@ MAC_MUX.vhd
 MAC_MUX2.vhd
 MAC_REG.vhd
 MUX2.vhd
+MUXN.vhd
 Multiplier.vhd
 REG.vhd
 Shifter.vhd
+SYNC_FF.vhd
 general_purpose.vhd
