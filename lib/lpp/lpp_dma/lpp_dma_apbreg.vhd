@@ -33,6 +33,7 @@ USE lpp.apb_devices_list.ALL;
 USE lpp.lpp_memory.ALL;
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
+
 ENTITY lpp_dma_apbreg IS
   GENERIC (
     pindex : INTEGER := 4;
@@ -55,6 +56,7 @@ ENTITY lpp_dma_apbreg IS
     ready_matrix_f2               : IN STD_LOGIC;
     error_anticipating_empty_fifo : IN STD_LOGIC;
     error_bad_component_error     : IN STD_LOGIC;
+    debug_reg                     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     -- OUT
     status_ready_matrix_f0_0             : OUT STD_LOGIC;
@@ -162,32 +164,35 @@ BEGIN  -- beh
           WHEN "000011" => prdata <= reg.addr_matrix_f0_1;
           WHEN "000100" => prdata <= reg.addr_matrix_f1;
           WHEN "000101" => prdata <= reg.addr_matrix_f2;
+          WHEN "000110" => prdata <= debug_reg;
           WHEN OTHERS   => NULL;
         END CASE;
         IF (apbi.pwrite AND apbi.penable) = '1' THEN
           -- APB DMA WRITE --
           CASE paddr(7 DOWNTO 2) IS
             WHEN "000000" => reg.config_active_interruption_onNewMatrix <= apbi.pwdata(0);
-                             reg.config_active_interruption_onError     <= apbi.pwdata(1);
-            WHEN "000001" => reg.status_ready_matrix_f0_0               <= apbi.pwdata(0);
-                             reg.status_ready_matrix_f0_1               <= apbi.pwdata(1);
-                             reg.status_ready_matrix_f1                 <= apbi.pwdata(2);
-                             reg.status_ready_matrix_f2                 <= apbi.pwdata(3);
-                             reg.status_error_anticipating_empty_fifo   <= apbi.pwdata(4);
-                             reg.status_error_bad_component_error       <= apbi.pwdata(5);
-            WHEN "000010" => reg.addr_matrix_f0_0                       <= apbi.pwdata;
-            WHEN "000011" => reg.addr_matrix_f0_1                       <= apbi.pwdata;
-            WHEN "000100" => reg.addr_matrix_f1                         <= apbi.pwdata;
-            WHEN "000101" => reg.addr_matrix_f2                         <= apbi.pwdata;
+                             reg.config_active_interruption_onError <= apbi.pwdata(1);
+            WHEN "000001" => reg.status_ready_matrix_f0_0 <= apbi.pwdata(0);
+                             reg.status_ready_matrix_f0_1             <= apbi.pwdata(1);
+                             reg.status_ready_matrix_f1               <= apbi.pwdata(2);
+                             reg.status_ready_matrix_f2               <= apbi.pwdata(3);
+                             reg.status_error_anticipating_empty_fifo <= apbi.pwdata(4);
+                             reg.status_error_bad_component_error     <= apbi.pwdata(5);
+            WHEN "000010" => reg.addr_matrix_f0_0 <= apbi.pwdata;
+            WHEN "000011" => reg.addr_matrix_f0_1 <= apbi.pwdata;
+            WHEN "000100" => reg.addr_matrix_f1   <= apbi.pwdata;
+            WHEN "000101" => reg.addr_matrix_f2   <= apbi.pwdata;
             WHEN OTHERS   => NULL;
           END CASE;
         END IF;
       END IF;
     END IF;
   END PROCESS lpp_dma_apbreg;
+
   apbo.pirq    <= (OTHERS => '0');
   apbo.pindex  <= pindex;
   apbo.pconfig <= pconfig;
   apbo.prdata  <= prdata;
+
 
 END beh;

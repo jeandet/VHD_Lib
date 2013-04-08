@@ -24,6 +24,7 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 library lpp;
 use lpp.lpp_memory.all;
+use lpp.iir_filter.all;
 library techmap;
 use techmap.gencomp.all;
 
@@ -36,7 +37,7 @@ generic(
     );
 port(
     rstn    :   in std_logic;
-    ReUse   :   in std_logic;   --27/01/12
+    ReUse   :   in std_logic;
     rclk    :   in std_logic;
     ren     :   in std_logic;
     rdata   :   out std_logic_vector(DataSz-1 downto 0);
@@ -53,85 +54,94 @@ end entity;
 
 architecture ar_lpp_fifo of lpp_fifo is
 
-signal sFull        : std_logic:='0';
-signal sEmpty       : std_logic:='1';
-signal sREN         : std_logic:='0';
-signal sWEN         : std_logic:='0';
+signal sFull        : std_logic;
+signal sFull_s      : std_logic;
+signal sEmpty_s     : std_logic;
+
+signal sEmpty       : std_logic;
+signal sREN         : std_logic;
+signal sWEN         : std_logic;
+signal sRE          : std_logic;
+signal sWE          : std_logic;
 
 signal Waddr_vect   : std_logic_vector(abits-1 downto 0):=(others =>'0');
 signal Raddr_vect   : std_logic_vector(abits-1 downto 0):=(others =>'0');
-signal Waddr_vect_d : std_logic_vector(abits-1 downto 0):=(others =>'0');
-signal Raddr_vect_d : std_logic_vector(abits-1 downto 0):=(others =>'0');
+signal Waddr_vect_s : std_logic_vector(abits-1 downto 0):=(others =>'0');
+signal Raddr_vect_s : std_logic_vector(abits-1 downto 0):=(others =>'0');
 
 begin
 
+--==================================================================================
+-- /!\ syncram_2p Write et Read actif a l'état haut /!\
+-- A l'inverse de RAM_CEL !!!
+--==================================================================================
 SRAM : syncram_2p
-generic map(tech,abits,DataSz)
-port map(RCLK,sREN,Raddr_vect,rdata,WCLK,sWEN,Waddr_vect,wdata);
-
+    generic map(tech,abits,DataSz)
+    port map(RCLK,sRE,Raddr_vect,rdata,WCLK,sWE,Waddr_vect,wdata);
+--================================================================================== 
 --RAM0: entity work.RAM_CEL
---    generic map(abits, DataSz)
---    port map(wdata, rdata, sWEN, sREN, Waddr_vect, Raddr_vect, RCLK, WCLK, rstn);
-
+--    port map(wdata, rdata, sWEN, sREN, Waddr_vect, Raddr_vect, WCLK, rstn);
+--================================================================================== 
 
 --=============================
 --     Read section
 --=============================
-sREN    <= not REN and not sempty;
+sREN    <= REN or sEmpty;
+sRE     <= not sREN;
+
+sEmpty_s <= '0' when ReUse = '1' and Enable_ReUse='1' else
+            '1' when sEmpty = '1' and Wen = '1' else
+            '1' when sEmpty = '0' and (Wen = '1' and Ren = '0' and Raddr_vect_s = Waddr_vect) else
+            '0';
+
+Raddr_vect_s   <= std_logic_vector(unsigned(Raddr_vect) +1);
 
 process (rclk,rstn)
 begin
     if(rstn='0')then
         Raddr_vect   <=  (others =>'0');
-        Raddr_vect_d <=  (others =>'1');
         sempty  <= '1';
-    elsif(rclk'event and rclk='1')then
-        if(ReUse = '1' and Enable_ReUse='1')then   --27/01/12
-            sempty  <= '0';    --27/01/12
-        elsif(Raddr_vect=Waddr_vect_d and REN = '0' and sempty = '0')then
-            sempty  <= '1';
-        elsif(Raddr_vect/=Waddr_vect) then
-            sempty  <= '0';
+    elsif(rclk'event and rclk='1')then 
+        sEmpty <= sempty_s;
+        
+        if(sREN='0' and sempty = '0')then
+            Raddr_vect  <= Raddr_vect_s;
         end if;
-        if(sREN='1' and sempty = '0') then
-            Raddr_vect  <= std_logic_vector(unsigned(Raddr_vect) + 1);
-            Raddr_vect_d  <=  Raddr_vect;
-        end if;
-                            
+
     end if;
 end process;
 
 --=============================
 --     Write section
 --=============================
-sWEN    <= not WEN and not sfull;
+sWEN    <= WEN or sFull;
+sWE     <= not sWEN;
+
+sFull_s <= '1' when ReUse = '1' and Enable_ReUse='1' else
+           '1' when Waddr_vect_s = Raddr_vect and REN = '1' and WEN = '0' else
+           '1' when sFull = '1' and REN = '1' else
+           '0';
+           
+Waddr_vect_s   <= std_logic_vector(unsigned(Waddr_vect) +1);
 
 process (wclk,rstn)
 begin
     if(rstn='0')then
         Waddr_vect   <=  (others =>'0');
-        Waddr_vect_d <=  (others =>'1');
         sfull        <=   '0';
     elsif(wclk'event and wclk='1')then
-        if(ReUse = '1' and Enable_ReUse='1')then   --27/01/12
-            sfull  <= '1';    --27/01/12
-        elsif(Raddr_vect_d=Waddr_vect and WEN = '0' and sfull = '0')then
-            sfull  <= '1';
-        elsif(Raddr_vect/=Waddr_vect) then
-            sfull  <= '0';
-        end if;
-        if(sWEN='1' and sfull='0') then
-            Waddr_vect   <= std_logic_vector(unsigned(Waddr_vect) +1);
-            Waddr_vect_d <= Waddr_vect;
-        end if;
+        sfull <= sfull_s;
 
-                   
+        if(sWEN='0' and sfull='0')then
+            Waddr_vect <= Waddr_vect_s;
+        end if;
+        
     end if;
 end process;
 
 
-full    <= sFull;
-empty   <= sEmpty;
+full    <= sFull_s;
+empty   <= sEmpty_s;
 waddr   <= Waddr_vect;
 raddr   <= Raddr_vect;
 

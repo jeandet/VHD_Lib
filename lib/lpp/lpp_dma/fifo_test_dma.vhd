@@ -27,7 +27,7 @@ USE grlib.amba.ALL;
 USE grlib.stdlib.ALL;
 USE grlib.devices.ALL;
 USE GRLIB.DMA2AHB_Package.ALL;
---USE GRLIB.DMA2AHB_TestPackage.ALL;
+
 LIBRARY lpp;
 USE lpp.lpp_amba.ALL;
 USE lpp.apb_devices_list.ALL;

@@ -19,62 +19,60 @@
 --                    Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@lpp.polytechnique.fr
 ----------------------------------------------------------------------------
-library IEEE;
-use IEEE.numeric_std.all;
-use IEEE.std_logic_1164.all;
-library lpp;
-use lpp.iir_filter.all;
-use lpp.FILTERcfg.all;
-use lpp.general_purpose.all;
-library techmap;
-use techmap.gencomp.all;
+LIBRARY IEEE;
+USE IEEE.numeric_std.ALL;
+USE IEEE.std_logic_1164.ALL;
+LIBRARY lpp;
+USE lpp.iir_filter.ALL;
+USE lpp.FILTERcfg.ALL;
+USE lpp.general_purpose.ALL;
+LIBRARY techmap;
+USE techmap.gencomp.ALL;
 
 --TODO amliorer la flexibilit de la config de la RAM.
 
-entity  RAM_CTRLR2 is
-generic(
-        tech : integer := 0;
-    Input_SZ_1      :   integer := 16;
-	 Mem_use         :   integer := use_RAM
+ENTITY RAM_CTRLR2 IS
+  GENERIC(
+    tech       : INTEGER := 0;
+    Input_SZ_1 : INTEGER := 16;
+    Mem_use    : INTEGER := use_RAM
 
-);
-port(
-    reset       :   in  std_logic;
-    clk         :   in  std_logic;
-    WD_sel      :   in  std_logic;
-    Read        :   in  std_logic;
-    WADDR_sel   :   in  std_logic;
-    count       :   in  std_logic;
-    SVG_ADDR    :   in  std_logic;
-    Write       :   in  std_logic;
-    GO_0        :   in  std_logic;
-    sample_in   :   in  std_logic_vector(Input_SZ_1-1 downto 0);
-    sample_out  :   out std_logic_vector(Input_SZ_1-1 downto 0)
-);
-end RAM_CTRLR2;
-
-
-architecture ar_RAM_CTRLR2 of RAM_CTRLR2 is
-
-signal  WD          :   std_logic_vector(Input_SZ_1-1 downto 0);
-signal  WD_D        :   std_logic_vector(Input_SZ_1-1 downto 0);
-signal  RD          :   std_logic_vector(Input_SZ_1-1 downto 0);
-signal  WEN, REN    :   std_logic; 
-signal  WADDR_back  :   std_logic_vector(7 downto 0); 
-signal  WADDR_back_D:   std_logic_vector(7 downto 0); 
-signal  RADDR       :   std_logic_vector(7 downto 0); 
-signal  WADDR       :   std_logic_vector(7 downto 0);
-signal  WADDR_D     :   std_logic_vector(7 downto 0);
+    );
+  PORT(
+    reset      : IN  STD_LOGIC;
+    clk        : IN  STD_LOGIC;
+    WD_sel     : IN  STD_LOGIC;
+    Read       : IN  STD_LOGIC;
+    WADDR_sel  : IN  STD_LOGIC;
+    count      : IN  STD_LOGIC;
+    SVG_ADDR   : IN  STD_LOGIC;
+    Write      : IN  STD_LOGIC;
+    GO_0       : IN  STD_LOGIC;
+    sample_in  : IN  STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
+    sample_out : OUT STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0)
+    );
+END RAM_CTRLR2;
 
 
+ARCHITECTURE ar_RAM_CTRLR2 OF RAM_CTRLR2 IS
 
-begin
+  SIGNAL WD           : STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
+  SIGNAL WD_D         : STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
+  SIGNAL RD           : STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
+  SIGNAL WEN, REN     : STD_LOGIC;
+  SIGNAL WADDR_back   : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL WADDR_back_D : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL RADDR        : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL WADDR        : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL WADDR_D      : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
-sample_out  <=  RD(Input_SZ_1-1 downto 0);
+  SIGNAL WADDR_back_s : STD_LOGIC_VECTOR(7 DOWNTO 0);
+
+BEGIN
+
+  sample_out <= RD(Input_SZ_1-1 DOWNTO 0);
 
 
-WEN <=  not Write;
-REN <=  not read;
 
 
 --==============================================================
@@ -98,128 +96,98 @@ REN <=  not read;
 --        ) ;
 --end generate;
 
---memCEL :   if Mem_use = use_CEL generate
---RAMblk :RAM_CEL
---    port map(
---    WD      =>  WD_D,
---    RD      =>  RD,
---    WEN     =>  WEN,
---    REN     =>  REN,
---   WADDR   =>  WADDR,
---    RADDR   =>  RADDR,
---    RWCLK   =>  clk,
---   RESET   =>  reset
---        ) ;
---end generate;
+  memCEL : IF Mem_use = use_CEL GENERATE
+    WEN <=  not Write;
+    REN <=  not read;
+   RAMblk : RAM_CEL
+      GENERIC MAP( Input_SZ_1)
+      PORT MAP(
+        WD    => WD_D,
+        RD    => RD,
+        WEN   => WEN,
+        REN   => REN,
+        WADDR => WADDR,
+        RADDR => RADDR,
+        RWCLK => clk,
+        RESET => reset
+        ) ;
+  END GENERATE;
 
+  memRAM : IF Mem_use = use_RAM GENERATE
     SRAM : syncram_2p
-       generic map(tech,8,Input_SZ_1)
-       port map(clk,not REN,RADDR,RD,clk,not WEN,WADDR,WD_D);
+      GENERIC MAP(tech, 8, Input_SZ_1)
+      PORT MAP(clk, read, RADDR, RD, clk, write, WADDR, WD_D);
+  END GENERATE;
+
+--       port map(clk,REN,RADDR,RD,clk,WEN,WADDR,WD_D);
+
 --==============================================================
 --==============================================================
 
 
-ADDRcntr_inst : ADDRcntr 
-port map(
-    clk     =>  clk,
-    reset   =>  reset,
-    count   =>  count,
-    clr     =>  GO_0,
-    Q       =>  RADDR
-);
+  ADDRcntr_inst : ADDRcntr
+    PORT MAP(
+      clk   => clk,
+      reset => reset,
+      count => count,
+      clr   => GO_0,
+      Q     => RADDR
+      );
 
+  MUX2_inst1 : MUX2
+    GENERIC MAP(Input_SZ => Input_SZ_1)
+    PORT MAP(
+      sel => WD_sel,
+      IN1 => sample_in,
+      IN2 => RD(Input_SZ_1-1 DOWNTO 0),
+      RES => WD(Input_SZ_1-1 DOWNTO 0)
+      );
 
+  MUX2_inst2 : MUX2
+    GENERIC MAP(Input_SZ => 8)
+    PORT MAP(
+      sel => WADDR_sel,
+      IN1 => WADDR_D,
+      IN2 => WADDR_back_D,
+      RES => WADDR
+      );
 
-MUX2_inst1 :MUX2 
-generic map(Input_SZ    => Input_SZ_1)
-port map(
-    sel     =>  WD_sel,
-    IN1     =>  sample_in,
-    IN2     =>  RD(Input_SZ_1-1 downto 0),
-    RES     =>  WD(Input_SZ_1-1 downto 0)
-);
+  WADDR_backreg : REG
+    GENERIC MAP(size => 8, initial_VALUE => ChanelsCount*Cels_count*4-2)
+    PORT MAP(
+      reset => reset,
+      clk   => clk,                     --SVG_ADDR,
+      D     => WADDR_back_s,            --RADDR,
+      Q     => WADDR_back
+      );
 
+  WADDR_back_s <= RADDR WHEN SVG_ADDR = '1' ELSE WADDR_back;
 
-MUX2_inst2 :MUX2 
-generic map(Input_SZ    => 8)
-port map(
-    sel     =>  WADDR_sel,
-    IN1     =>  WADDR_D,
-    IN2     =>  WADDR_back_D,
-    RES     =>  WADDR
-);
+  WADDR_backreg2 : REG
+    GENERIC MAP(size => 8)
+    PORT MAP(
+      reset => reset,
+      clk   => clk,                     --SVG_ADDR,
+      D     => WADDR_back,
+      Q     => WADDR_back_D
+      );
 
+  WDRreg : REG
+    GENERIC MAP(size => Input_SZ_1)
+    PORT MAP(
+      reset => reset,
+      clk   => clk,
+      D     => WD(Input_SZ_1-1 DOWNTO 0),
+      Q     => WD_D(Input_SZ_1-1 DOWNTO 0)
+      );
 
+  ADDRreg : REG
+    GENERIC MAP(size => 8)
+    PORT MAP(
+      reset => reset,
+      clk   => clk,
+      D     => RADDR,
+      Q     => WADDR_D
+      );
 
-
-WADDR_backreg :REG
-generic map(size    => 8,initial_VALUE =>ChanelsCouNT*Cels_count*4-2)
-port map(
-    reset   =>  reset,
-    clk     =>  SVG_ADDR,
-    D       =>  RADDR,
-    Q       =>  WADDR_back
-);
-
-WADDR_backreg2 :REG
-generic map(size    => 8)
-port map(
-    reset   =>  reset,
-    clk     =>  SVG_ADDR,
-    D       =>  WADDR_back,
-    Q       =>  WADDR_back_D
-);
-
-WDRreg :REG
-generic map(size    => Input_SZ_1)
-port map(
-    reset   =>  reset,
-    clk     =>  clk,
-    D       =>  WD(Input_SZ_1-1 downto 0),
-    Q       =>  WD_D(Input_SZ_1-1 downto 0)
-);
-
-
-
-
-ADDRreg :REG
-generic map(size    => 8)
-port map(
-    reset   =>  reset,
-    clk     =>  clk,
-    D       =>  RADDR,
-    Q       =>  WADDR_D
-);
-
-
-
-end ar_RAM_CTRLR2;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+END ar_RAM_CTRLR2;

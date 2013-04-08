@@ -19,54 +19,57 @@
 --                    Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@lpp.polytechnique.fr
 ----------------------------------------------------------------------------
-library IEEE;
-use IEEE.numeric_std.all;
-use IEEE.std_logic_1164.all;
-library lpp;
-use lpp.general_purpose.all;
+LIBRARY IEEE;
+USE IEEE.numeric_std.ALL;
+USE IEEE.std_logic_1164.ALL;
+LIBRARY lpp;
+USE lpp.general_purpose.ALL;
 
 
 
-entity Adder is 
-generic(
-    Input_SZ_A     :   integer := 16;
-    Input_SZ_B     :   integer := 16
+ENTITY Adder IS
+  GENERIC(
+    Input_SZ_A : INTEGER := 16;
+    Input_SZ_B : INTEGER := 16
 
-);
-port(
-    clk     :   in  std_logic;
-    reset   :   in  std_logic;
-    clr     :   in  std_logic;
-    add     :   in  std_logic;
-    OP1     :   in  std_logic_vector(Input_SZ_A-1 downto 0);
-    OP2     :   in  std_logic_vector(Input_SZ_B-1 downto 0);
-    RES     :   out std_logic_vector(Input_SZ_A-1 downto 0)
-);
-end entity;
+    );
+  PORT(
+    clk   : IN  STD_LOGIC;
+    reset : IN  STD_LOGIC;
+    clr   : IN  STD_LOGIC;
+    load  : IN  STD_LOGIC;
+    add   : IN  STD_LOGIC;
+    OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+    OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
+    RES   : OUT STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0)
+    );
+END ENTITY;
 
 
 
 
-architecture ar_Adder of Adder is
+ARCHITECTURE ar_Adder OF Adder IS
 
-signal  REG     :   std_logic_vector(Input_SZ_A-1 downto 0);
-signal  RESADD  :   std_logic_vector(Input_SZ_A-1 downto 0);
+  SIGNAL REG    : STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+  SIGNAL RESADD : STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
 
-begin
+BEGIN
 
-RES     <=  REG;
-RESADD  <=  std_logic_vector(resize(signed(OP1)+signed(OP2),Input_SZ_A));
+  RES    <= REG;
+  RESADD <= STD_LOGIC_VECTOR(resize(SIGNED(OP1)+SIGNED(OP2), Input_SZ_A));
 
-process(clk,reset)
-begin
-if reset = '0' then
-    REG     <=  (others => '0');
-elsif clk'event and clk ='1' then
-    if clr = '1' then
-        REG     <=  (others => '0');
-    elsif add = '1' then
-        REG     <=  RESADD;
-    end if;
-end if;
-end process;
-end ar_Adder;
+  PROCESS(clk, reset)
+  BEGIN
+    IF reset = '0' THEN
+      REG <= (OTHERS => '0');
+    ELSIF clk'EVENT AND clk = '1' then
+      IF clr = '1' THEN
+        REG <= (OTHERS => '0');
+      ELSIF add = '1' THEN
+        REG <= RESADD;
+      ELSIF load = '1' THEN
+        REG <= OP2;
+      END IF;
+    END IF;
+  END PROCESS;
+END ar_Adder;

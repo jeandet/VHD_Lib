@@ -24,8 +24,8 @@ use ieee.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity RAM_CEL is 
-    port( WD : in std_logic_vector(35 downto 0); RD : out 
-        std_logic_vector(35 downto 0);WEN, REN : in std_logic; 
+    port( WD : in std_logic_vector(15 downto 0); RD : out
+        std_logic_vector(15 downto 0);WEN, REN : in std_logic;
         WADDR : in std_logic_vector(7 downto 0); RADDR : in 
         std_logic_vector(7 downto 0);RWCLK, RESET : in std_logic
         ) ;
@@ -34,9 +34,9 @@ end RAM_CEL;
 
 
 architecture ar_RAM_CEL of RAM_CEL is
-type    RAMarrayT   is array (0 to 255) of std_logic_vector(35 downto 0);
-signal  RAMarray           :   RAMarrayT:=(others => X"000000000");
-signal  RD_int       :   std_logic_vector(35 downto 0);
+type    RAMarrayT   is array (0 to 255) of std_logic_vector(15 downto 0);
+signal  RAMarray           :   RAMarrayT:=(others => X"0000");
+signal  RD_int       :   std_logic_vector(15 downto 0);
 
 begin
 
@@ -46,7 +46,7 @@ RD_int  <=  RAMarray(to_integer(unsigned(RADDR)));
 process(RWclk,reset)
 begin
 if reset = '0' then
-	RD <= (X"000000000");
+	RD <= (X"0000");
 rst:for i in 0 to 255 loop
         RAMarray(i)    <=  (others => '0');
       end loop;

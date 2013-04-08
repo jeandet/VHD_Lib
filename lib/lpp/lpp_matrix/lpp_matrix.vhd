@@ -86,7 +86,7 @@ port(
     FIFO1      : in std_logic_vector(Input_SZ-1 downto 0);
     FIFO2      : in std_logic_vector(Input_SZ-1 downto 0);
     Statu      : in std_logic_vector(3 downto 0);
-    FullFIFO   : in std_logic;
+--    FullFIFO   : in std_logic;
     ReadFIFO   : out std_logic_vector(1 downto 0);
     WriteFIFO  : out std_logic;
     Result     : out std_logic_vector(Result_SZ-1 downto 0)
@@ -120,7 +120,7 @@ port(
     Valid     : in  std_logic;
     Conjugate : in  std_logic;
     Res       : in std_logic_vector(Result_SZ-1 downto 0);
-    Full      : in std_logic;
+--    Full      : in std_logic;
     WriteFIFO : out std_logic;
     Received  : out std_logic;
     Result    : out std_logic_vector(Result_SZ-1 downto 0)
@@ -144,6 +144,24 @@ port(
     Start       : out std_logic;
     Read        : out std_logic_vector(4 downto 0);
     Statu       : out std_logic_vector(3 downto 0)  
+);
+end component;
+
+
+component Dispatch is
+generic(
+    Data_SZ  : integer := 32);
+port(
+    clk         : in std_logic;
+    reset       : in std_logic;
+    Acq         : in std_logic;
+    Data        : in std_logic_vector(Data_SZ-1 downto 0);
+    Write       : in std_logic;
+    Full        : in std_logic_vector(1 downto 0);
+    FifoData    : out std_logic_vector(2*Data_SZ-1 downto 0);
+    FifoWrite   : out std_logic_vector(1 downto 0);
+    Pong        : out std_logic;
+    Error       : out std_logic
 );
 end component;
 
