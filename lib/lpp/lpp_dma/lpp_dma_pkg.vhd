@@ -160,5 +160,45 @@ PACKAGE lpp_dma_pkg IS
       dma_empty  : OUT STD_LOGIC;
       dma_ren    : IN  STD_LOGIC);
   END COMPONENT;
+
+  COMPONENT lpp_dma_ip
+    GENERIC (
+      tech   : INTEGER;
+      hindex : INTEGER;
+      pindex : INTEGER;
+      paddr  : INTEGER;
+      pmask  : INTEGER;
+      pirq   : INTEGER);
+    PORT (
+      HCLK                                   : IN  STD_ULOGIC;
+      HRESETn                                : IN  STD_ULOGIC;
+      AHB_Master_In                          : IN  AHB_Mst_In_Type;
+      AHB_Master_Out                         : OUT AHB_Mst_Out_Type;
+      fifo_data                              : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      fifo_empty                             : IN  STD_LOGIC;
+      fifo_ren                               : OUT STD_LOGIC;
+      header                                 : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      header_val                             : IN  STD_LOGIC;
+      header_ack                             : OUT STD_LOGIC;
+      ready_matrix_f0_0                      : OUT STD_LOGIC;
+      ready_matrix_f0_1                      : OUT STD_LOGIC;
+      ready_matrix_f1                        : OUT STD_LOGIC;
+      ready_matrix_f2                        : OUT STD_LOGIC;
+      error_anticipating_empty_fifo          : OUT STD_LOGIC;
+      error_bad_component_error              : OUT STD_LOGIC;
+      debug_reg                              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      status_ready_matrix_f0_0               : IN  STD_LOGIC;
+      status_ready_matrix_f0_1               : IN  STD_LOGIC;
+      status_ready_matrix_f1                 : IN  STD_LOGIC;
+      status_ready_matrix_f2                 : IN  STD_LOGIC;
+      status_error_anticipating_empty_fifo   : IN  STD_LOGIC;
+      status_error_bad_component_error       : IN  STD_LOGIC;
+      config_active_interruption_onNewMatrix : IN  STD_LOGIC;
+      config_active_interruption_onError     : IN  STD_LOGIC;
+      addr_matrix_f0_0                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      addr_matrix_f0_1                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      addr_matrix_f1                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      addr_matrix_f2                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
+  END COMPONENT;
   
 END;
