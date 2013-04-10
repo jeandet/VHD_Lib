@@ -1,4 +1,4 @@
-GRLIB=../..
+#GRLIB=../..
 TOP=top
 BOARD=LeonLPP-M7A3P1k
 include $(GRLIB)/boards/$(BOARD)/Makefile.inc
