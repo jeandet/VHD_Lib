@@ -140,6 +140,52 @@ PACKAGE lpp_ad_conv IS
   --    );
   --END COMPONENT;
 
+
+--===========================================================|
+--=======================  ADS 127X =========================|
+--===========================================================|
+
+Type ADS127X_FORMAT_Type is array(2 downto 0) of std_logic;
+constant ADS127X_SPI_FORMAT     : ADS127X_FORMAT_Type := "010";
+constant ADS127X_FSYNC_FORMAT   : ADS127X_FORMAT_Type := "101";
+
+Type ADS127X_MODE_Type is array(1 downto 0) of std_logic;
+constant ADS127X_MODE_low_power         : ADS127X_MODE_Type := "10";
+constant ADS127X_MODE_low_speed         : ADS127X_MODE_Type := "11";
+constant ADS127X_MODE_high_resolution   : ADS127X_MODE_Type := "01";
+
+Type ADS127X_config is
+    record
+        SYNC    : std_logic;
+        CLKDIV  : std_logic;
+        FORMAT  : ADS127X_FORMAT_Type;
+        MODE    : ADS127X_MODE_Type;
+end record;
+
+COMPONENT ADS1274_DRIVER is 
+generic(modeCfg : ADS127X_MODE_Type := ADS127X_MODE_low_power; formatCfg : ADS127X_FORMAT_Type := ADS127X_FSYNC_FORMAT);
+port(
+    Clk     :   in  std_logic;
+    reset   :   in  std_logic;
+    SpiClk  :   out std_logic;
+    DIN     :   in  std_logic_vector(3 downto 0);
+    Ready   :   in  std_logic;
+    Format  :   out std_logic_vector(2 downto 0);
+    Mode    :   out std_logic_vector(1 downto 0);
+    ClkDiv  :   out std_logic;
+    PWDOWN  :   out std_logic_vector(3 downto 0);
+    SmplClk :   in  std_logic;
+    OUT0    :   out std_logic_vector(23 downto 0);
+    OUT1    :   out std_logic_vector(23 downto 0);
+    OUT2    :   out std_logic_vector(23 downto 0);
+    OUT3    :   out std_logic_vector(23 downto 0);
+    FSynch  :   out std_logic;
+    test    :   out std_logic
+);
+end COMPONENT;
+
+
+
 END lpp_ad_conv;
 
 

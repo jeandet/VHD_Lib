@@ -1,4 +1,4 @@
-GRLIB=../..
+#GRLIB=../..
 TOP=top
 BOARD=Projet-LeonLFR-A3P3K-Sheldon
 include $(GRLIB)/boards/$(BOARD)/Makefile.inc
@@ -9,7 +9,7 @@ EFFORT=high
 XSTOPT=
 SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_constraint 0"
 VHDLSYNFILES=config.vhd ahbrom.vhd leon3mp.vhd
-VHDLSIMFILES=testbench.vhd 
+VHDLSIMFILES=testbench.vhd
 SIMTOP=testbench
 SDCFILE=$(GRLIB)/boards/$(BOARD)/synplify.sdc
 SDC=$(GRLIB)/boards/$(BOARD)/leon3mp.sdc
