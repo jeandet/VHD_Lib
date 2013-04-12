@@ -25,17 +25,14 @@ echo
 echo
 echo 
 
-# Absolute path to this script. /home/user/bin/foo.sh
-#SCRIPT=$(readlink -f $0)
-# Absolute path this script is in. /home/user/bin
 
-#LPP_PATCHPATH=`dirname $SCRIPT`
-LPP_PATCHPATH=`pwd -L`
-
+VHDLIB_LIB_PATH=`pwd -L`
+source $VHDLIB_LIB_PATH/scripts/lpp_bash_functions.sh
 GRLIBPATH=$1
 
-echo $LPP_PATCHPATH
 if [ -d "$GRLIBPATH" ]; then
+        LPP_PATCHPATH=`relpath $GRLIBPATH $VHDLIB_LIB_PATH`
+        echo $LPP_PATCHPATH
 	if [ -d "$GRLIBPATH/lib" ]; then
 		if [ -d "$GRLIBPATH/designs" ]; then
 			if [ -d "$GRLIBPATH/boards" ]; then
