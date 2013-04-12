@@ -15,3 +15,4 @@
 ./dsp/lpp_fft
 ./dsp/lpp_downsampling
 ./lpp_uart
+./lpp_top_lfr
