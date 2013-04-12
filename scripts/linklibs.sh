@@ -31,7 +31,7 @@ source $VHDLIB_LIB_PATH/scripts/lpp_bash_functions.sh
 GRLIBPATH=$1
 
 if [ -d "$GRLIBPATH" ]; then
-        LPP_PATCHPATH=`relpath $GRLIBPATH $VHDLIB_LIB_PATH`
+        LPP_PATCHPATH=`relpath $GRLIBPATH/lib $VHDLIB_LIB_PATH`
         echo $LPP_PATCHPATH
 	if [ -d "$GRLIBPATH/lib" ]; then
 		if [ -d "$GRLIBPATH/designs" ]; then
