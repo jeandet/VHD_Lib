@@ -1,7 +1,8 @@
 fifo_latency_correction.vhd
-lpp_dma.vhd
 lpp_dma_apbreg.vhd
 lpp_dma_fsm.vhd
+lpp_dma_ip.vhd
 lpp_dma_pkg.vhd
 lpp_dma_send_16word.vhd
 lpp_dma_send_1word.vhd
+lpp_dma.vhd

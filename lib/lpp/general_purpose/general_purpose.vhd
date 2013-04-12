@@ -43,6 +43,13 @@ PACKAGE general_purpose IS
   END COMPONENT;
 
 
+  COMPONENT Clk_divider2 IS
+    generic(N : integer := 16);
+    port(
+    clk_in  :   in  std_logic;
+    clk_out :   out std_logic);
+  END COMPONENT;
+
   COMPONENT Adder IS
     GENERIC(
       Input_SZ_A : INTEGER := 16;

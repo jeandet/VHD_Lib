@@ -33,8 +33,9 @@ USE esa.memoryctrl.ALL;
 USE esa.pcicomp.ALL;
 USE work.config.ALL;
 LIBRARY lpp;
+USE lpp.lpp_bootloader_pkg.ALL;
 USE lpp.lpp_dma_pkg.ALL;
-use lpp.lpp_memory.all;
+USE lpp.lpp_memory.ALL;
 
 ENTITY leon3mp IS
   GENERIC (
@@ -55,24 +56,24 @@ ENTITY leon3mp IS
     address : OUT   STD_LOGIC_VECTOR(27 DOWNTO 0);
     data    : INOUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-    dsutx   : OUT   STD_ULOGIC;         -- DSU tx data
-    dsurx   : IN    STD_ULOGIC;         -- DSU rx data
-    dsuen   : IN    STD_ULOGIC;
-    dsubre  : IN    STD_ULOGIC;
-    dsuact  : OUT   STD_ULOGIC;
-    txd1    : OUT   STD_ULOGIC;         -- UART1 tx data
-    rxd1    : IN    STD_ULOGIC;         -- UART1 rx data
-    txd2    : OUT   STD_ULOGIC;         -- UART2 tx data
-    rxd2    : IN    STD_ULOGIC;         -- UART2 rx data
-    ramsn   : OUT   STD_LOGIC_VECTOR (4 DOWNTO 0);
-    ramoen  : OUT   STD_LOGIC_VECTOR (4 DOWNTO 0);
-    rwen    : OUT   STD_LOGIC_VECTOR (3 DOWNTO 0);
-    oen     : OUT   STD_ULOGIC;
-    writen  : OUT   STD_ULOGIC;
-    read    : OUT   STD_ULOGIC;
-    iosn    : OUT   STD_ULOGIC;
-    romsn   : OUT   STD_LOGIC_VECTOR (1 DOWNTO 0);
-    gpio    : INOUT STD_LOGIC_VECTOR(CFG_GRGPIO_WIDTH-1 DOWNTO 0);  -- I/O port
+    dsutx  : OUT   STD_ULOGIC;          -- DSU tx data
+    dsurx  : IN    STD_ULOGIC;          -- DSU rx data
+    dsuen  : IN    STD_ULOGIC;
+    dsubre : IN    STD_ULOGIC;
+    dsuact : OUT   STD_ULOGIC;
+    txd1   : OUT   STD_ULOGIC;          -- UART1 tx data
+    rxd1   : IN    STD_ULOGIC;          -- UART1 rx data
+    txd2   : OUT   STD_ULOGIC;          -- UART2 tx data
+    rxd2   : IN    STD_ULOGIC;          -- UART2 rx data
+    ramsn  : OUT   STD_LOGIC_VECTOR (4 DOWNTO 0);
+    ramoen : OUT   STD_LOGIC_VECTOR (4 DOWNTO 0);
+    rwen   : OUT   STD_LOGIC_VECTOR (3 DOWNTO 0);
+    oen    : OUT   STD_ULOGIC;
+    writen : OUT   STD_ULOGIC;
+    read   : OUT   STD_ULOGIC;
+    iosn   : OUT   STD_ULOGIC;
+    romsn  : OUT   STD_LOGIC_VECTOR (1 DOWNTO 0);
+    gpio   : INOUT STD_LOGIC_VECTOR(CFG_GRGPIO_WIDTH-1 DOWNTO 0);  -- I/O port
 
     emddis  : OUT STD_LOGIC;
     epwrdwn : OUT STD_ULOGIC;
@@ -101,35 +102,35 @@ ENTITY leon3mp IS
     pci_arb_req : IN    STD_LOGIC_VECTOR(0 TO 3);
     pci_arb_gnt : OUT   STD_LOGIC_VECTOR(0 TO 3);
 
-    spw_clk       : IN  STD_ULOGIC;
-    spw_rxd       : IN  STD_LOGIC_VECTOR(0 TO 2);
-    spw_rxdn      : IN  STD_LOGIC_VECTOR(0 TO 2);
-    spw_rxs       : IN  STD_LOGIC_VECTOR(0 TO 2);
-    spw_rxsn      : IN  STD_LOGIC_VECTOR(0 TO 2);
-    spw_txd       : OUT STD_LOGIC_VECTOR(0 TO 2);
-    spw_txdn      : OUT STD_LOGIC_VECTOR(0 TO 2);
-    spw_txs       : OUT STD_LOGIC_VECTOR(0 TO 2);
-    spw_txsn      : OUT STD_LOGIC_VECTOR(0 TO 2);
+    spw_clk  : IN  STD_ULOGIC;
+    spw_rxd  : IN  STD_LOGIC_VECTOR(0 TO 2);
+    spw_rxdn : IN  STD_LOGIC_VECTOR(0 TO 2);
+    spw_rxs  : IN  STD_LOGIC_VECTOR(0 TO 2);
+    spw_rxsn : IN  STD_LOGIC_VECTOR(0 TO 2);
+    spw_txd  : OUT STD_LOGIC_VECTOR(0 TO 2);
+    spw_txdn : OUT STD_LOGIC_VECTOR(0 TO 2);
+    spw_txs  : OUT STD_LOGIC_VECTOR(0 TO 2);
+    spw_txsn : OUT STD_LOGIC_VECTOR(0 TO 2);
 
-    ramclk : OUT STD_LOGIC; 
+    ramclk : OUT STD_LOGIC;
 
-    nBWa        : out std_logic;
-    nBWb        : out std_logic;
-    nBWc        : out std_logic;
-    nBWd        : out std_logic;
-    nBWE        : out std_logic;
-    nADSC       : out std_logic;
-    nADSP       : out std_logic;
-    nADV        : out std_logic;
-    nGW         : out std_logic;
-    nCE1        : out std_logic;
-    CE2         : out std_logic;
-    nCE3        : out std_logic;
-    nOE         : out std_logic;		
-    MODE        : out std_logic;        
-    SSRAM_CLK   : out std_logic;
-    ZZ          : out std_logic;
-    
+    nBWa      : OUT STD_LOGIC;
+    nBWb      : OUT STD_LOGIC;
+    nBWc      : OUT STD_LOGIC;
+    nBWd      : OUT STD_LOGIC;
+    nBWE      : OUT STD_LOGIC;
+    nADSC     : OUT STD_LOGIC;
+    nADSP     : OUT STD_LOGIC;
+    nADV      : OUT STD_LOGIC;
+    nGW       : OUT STD_LOGIC;
+    nCE1      : OUT STD_LOGIC;
+    CE2       : OUT STD_LOGIC;
+    nCE3      : OUT STD_LOGIC;
+    nOE       : OUT STD_LOGIC;
+    MODE      : OUT STD_LOGIC;
+    SSRAM_CLK : OUT STD_LOGIC;
+    ZZ        : OUT STD_LOGIC;
+
     tck, tms, tdi : IN  STD_ULOGIC;
     tdo           : OUT STD_ULOGIC
     );
@@ -206,20 +207,20 @@ ARCHITECTURE rtl OF leon3mp IS
 
   -----------------------------------------------------------------------------
 
-  SIGNAL fifo_data      : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL fifo_empty     : STD_LOGIC;
-  SIGNAL fifo_ren       : STD_LOGIC;
-  SIGNAL dma_data       : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL dma_empty      : STD_LOGIC;
-  SIGNAL dma_ren        : STD_LOGIC;
-  SIGNAL header         : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL header_val     : STD_LOGIC;
-  SIGNAL header_ack     : STD_LOGIC;
+  SIGNAL fifo_data  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL fifo_empty : STD_LOGIC;
+  SIGNAL fifo_ren   : STD_LOGIC;
+  SIGNAL dma_data   : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL dma_empty  : STD_LOGIC;
+  SIGNAL dma_ren    : STD_LOGIC;
+  SIGNAL header     : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL header_val : STD_LOGIC;
+  SIGNAL header_ack : STD_LOGIC;
 
-  signal lclk2x   : std_ulogic;
-  signal clk2x    : std_ulogic;
-  
-  constant boardfreq : integer := 50000;
+  SIGNAL lclk2x : STD_ULOGIC;
+  SIGNAL clk2x  : STD_ULOGIC;
+
+  CONSTANT boardfreq : INTEGER := 50000;
   
 BEGIN
 
@@ -232,30 +233,24 @@ BEGIN
   cgi.pllctrl <= "00";
   cgi.pllrst  <= rstraw;
 
-  pllref_pad  : clkpad GENERIC MAP (tech => padtech)                 PORT MAP (pllref, cgi.pllref);
+  pllref_pad : clkpad GENERIC MAP (tech => padtech) PORT MAP (pllref, cgi.pllref);
 
---  clk_pad     : clkpad GENERIC MAP (tech => padtech)                 PORT MAP (clk, lclk);
-  clk_pad     : clkpad GENERIC MAP (tech => padtech)                 PORT MAP (clk, lclk2x);
-  
-  process(lclk2x)
+  clk_pad : clkpad GENERIC MAP (tech => padtech) PORT MAP (clk, lclk2x);
+
+  PROCESS(lclk2x)
   BEGIN
-    if lclk2x'event and lclk2x = '1' then
-      lclk <= not lclk;
-    end if;
-  end process;
+    IF lclk2x'EVENT AND lclk2x = '1' THEN
+      lclk <= NOT lclk;
+    END IF;
+  END PROCESS;
 
   pci_clk_pad : clkpad GENERIC MAP (tech => padtech, level => pci33) PORT MAP (pci_clk, pci_lclk);
 
-  --clkgen0 : clkgen                      -- clock generator
-  --  GENERIC MAP (clktech, CFG_CLKMUL, CFG_CLKDIV, CFG_SDEN,
-  --               CFG_CLK_NOFB, CFG_PCI, CFG_PCIDLL, CFG_PCISYSCLK)
-  --  PORT MAP (lclk, pci_lclk, clkm, OPEN, OPEN, sdclkl, pciclk, cgi, cgo);
+  clkgen0 : clkgen                      -- clock generator
+    GENERIC MAP (clktech, CFG_CLKMUL, CFG_CLKDIV, CFG_MCTRL_SDEN, CFG_CLK_NOFB, 0, 0, 0, boardfreq, 0, 0, CFG_OCLKDIV)
+    PORT MAP (lclk, lclk, clkm, OPEN, clk2x, sdclkl, pciclk, cgi, cgo);
   
-  clkgen0 : clkgen  		-- clock generator
-    generic map (clktech, CFG_CLKMUL, CFG_CLKDIV, CFG_MCTRL_SDEN, CFG_CLK_NOFB, 0, 0, 0, boardfreq, 0, 0, CFG_OCLKDIV)
-    port    map (lclk, lclk, clkm, open, clk2x, sdclkl, pciclk, cgi, cgo);
-    
-  ramclk  <=  clkm;
+  ramclk <= clkm;
 
   rst0 : rstgen                         -- reset generator
     PORT MAP (resetn, clkm, cgo.clklock, rstn, rstraw);
@@ -322,91 +317,49 @@ BEGIN
 ----------------------------------------------------------------------
 ---  Memory controllers ----------------------------------------------
 ----------------------------------------------------------------------
-
-  --src : IF CFG_SRCTRL = 1 GENERATE      -- 32-bit PROM/SRAM controller
-  --  sr0 : srctrl GENERIC MAP (hindex  => 0, ramws => CFG_SRCTRL_RAMWS,
-  --                            romws   => CFG_SRCTRL_PROMWS, ramaddr => 16#400#,
-  --                            prom8en => CFG_SRCTRL_8BIT, rmw => CFG_SRCTRL_RMW)
-  --    PORT MAP (rstn, clkm, ahbsi, ahbso(0), memi, memo, sdo3);
-  --  apbo(0) <= apb_none;
-  --END GENERATE;
-
-  --sdc : IF CFG_SDCTRL = 1 GENERATE
-  --  sdc : sdctrl GENERIC MAP (hindex => 3, haddr => 16#600#, hmask => 16#F00#,
-  --                            ioaddr => 1, fast => 0, pwron => 0, invclk => CFG_SDCTRL_INVCLK,
-  --                            sdbits => 32 + 32*CFG_SDCTRL_SD64, pageburst => CFG_SDCTRL_PAGE)
-  --    PORT MAP (rstn, clkm, ahbsi, ahbso(3), sdi, sdo2);
-  --  sa_pad : outpadv GENERIC MAP (width => 15, tech => padtech)
-  --    PORT MAP (sa, sdo2.address);
-  --  sd_pad : iopadv GENERIC MAP (width => 32, tech => padtech)
-  --    PORT MAP (sd(31 DOWNTO 0), sdo2.data(31 DOWNTO 0), sdo2.bdrive, sdi.data(31 DOWNTO 0));
-  --  sd2 : IF CFG_SDCTRL_SD64 = 1 GENERATE
-  --    sd_pad2 : iopadv GENERIC MAP (width => 32)
-  --      PORT MAP (sd(63 DOWNTO 32), sdo2.data, sdo2.bdrive, sdi.data(63 DOWNTO 32));
-  --  END GENERATE;
-  --  sdcke_pad : outpadv GENERIC MAP (width => 2, tech => padtech)
-  --    PORT MAP (sdcke, sdo2.sdcke);
-  --  sdwen_pad : outpad GENERIC MAP (tech => padtech)
-  --    PORT MAP (sdwen, sdo2.sdwen);
-  --  sdcsn_pad : outpadv GENERIC MAP (width => 2, tech => padtech)
-  --    PORT MAP (sdcsn, sdo2.sdcsn);
-  --  sdras_pad : outpad GENERIC MAP (tech => padtech)
-  --    PORT MAP (sdrasn, sdo2.rasn);
-  --  sdcas_pad : outpad GENERIC MAP (tech => padtech)
-  --    PORT MAP (sdcasn, sdo2.casn);
-  --  sddqm_pad : outpadv GENERIC MAP (width => 8, tech => padtech)
-  --    PORT MAP (sddqm, sdo2.dqm(7 DOWNTO 0));
-  --END GENERATE;
-
- -- mg2 : IF CFG_MCTRL_LEON2 = 1 GENERATE      -- LEON2 memory controller
-    sr1 : mctrl GENERIC MAP ( hindex    => 0,
-                              pindex    => 0,
-                              paddr     => 0--,
-                              --srbanks   => 4+CFG_MCTRL_5CS,
-                              --sden      => CFG_MCTRL_SDEN,
-                              --ram8      => CFG_MCTRL_RAM8BIT,
-                              --ram16     => CFG_MCTRL_RAM16BIT,
-                              --invclk    => CFG_MCTRL_INVCLK,
-                              --sepbus    => CFG_MCTRL_SEPBUS,
-                              --sdbits    => 32 + 32*CFG_MCTRL_SD64,
-                              --pageburst => CFG_MCTRL_PAGE
-                              )
-      PORT MAP (rstn, clkm, memi, memo, ahbsi, ahbso(0), apbi, apbo(0), wpo, sdo);
-    --sdpads : IF CFG_MCTRL_SDEN = 1 GENERATE  -- SDRAM controller
-    --  sd2 : IF CFG_MCTRL_SEPBUS = 1 GENERATE
-    --    sa_pad : outpadv GENERIC MAP (width => 15) PORT MAP (sa, memo.sa);
-    --    bdr    : FOR i IN 0 TO 3 GENERATE
-    --      sd_pad : iopadv GENERIC MAP (tech => padtech, width => 8)
-    --        PORT MAP (sd(31-i*8 DOWNTO 24-i*8), memo.data(31-i*8 DOWNTO 24-i*8),
-    --                  memo.bdrive(i), memi.sd(31-i*8 DOWNTO 24-i*8));
-    --      sd2 : IF CFG_MCTRL_SD64 = 1 GENERATE
-    --        sd_pad2 : iopadv GENERIC MAP (tech => padtech, width => 8)
-    --          PORT MAP (sd(31-i*8+32 DOWNTO 24-i*8+32), memo.data(31-i*8 DOWNTO 24-i*8),
-    --                    memo.bdrive(i), memi.sd(31-i*8+32 DOWNTO 24-i*8+32));
-    --      END GENERATE;
-    --    END GENERATE;
-    --  END GENERATE;
-    --  sdwen_pad : outpad GENERIC MAP (tech => padtech)
-    --    PORT MAP (sdwen, sdo.sdwen);
-    --  sdras_pad : outpad GENERIC MAP (tech => padtech)
-    --    PORT MAP (sdrasn, sdo.rasn);
-    --  sdcas_pad : outpad GENERIC MAP (tech => padtech)
-    --    PORT MAP (sdcasn, sdo.casn);
-    --  sddqm_pad : outpadv GENERIC MAP (width => 8, tech => padtech)
-    --    PORT MAP (sddqm, sdo.dqm);
-    --  sdcke_pad : outpadv GENERIC MAP (width => 2, tech => padtech)
-    --    PORT MAP (sdcke, sdo.sdcke);
-    --  sdcsn_pad : outpadv GENERIC MAP (width => 2, tech => padtech)
-    --    PORT MAP (sdcsn, sdo.sdcsn);
-    --END GENERATE;
- -- END GENERATE;
-
-  --nosd0 : IF (CFG_MCTRL_SDEN = 0) AND (CFG_SDCTRL = 0) GENERATE  -- no SDRAM controller
-  --  sdcke_pad : outpadv GENERIC MAP (width => 2, tech => padtech)
-  --    PORT MAP (sdcke, sdo3.sdcke);
-  --  sdcsn_pad : outpadv GENERIC MAP (width => 2, tech => padtech)
-  --    PORT MAP (sdcsn, sdo3.sdcsn);
-  --END GENERATE;
+-- LEON2 memory controller
+  sr1 : mctrl
+    GENERIC MAP (
+      hindex    => 0,
+      pindex    => 0,
+      romaddr   => 16#000#,
+      rommask   => 16#E00#,
+      ioaddr    => 16#200#,
+      iomask    => 16#E00#,
+      ramaddr   => 16#400#,
+      rammask   => 16#C00#,
+      paddr     => 0,
+      pmask     => 16#fff#,
+      wprot     => 0,
+      invclk    => 0,
+      fast      => 0,
+      romasel   => 28,
+      sdrasel   => 29,
+      srbanks   => 4,
+      ram8      => 0,
+      ram16     => 0,
+      sden      => 0,
+      sepbus    => 0,
+      sdbits    => 32,
+      sdlsb     => 2,                   -- set to 12 for the GE-HPE board
+      oepol     => 0,
+      syncrst   => 0,
+      pageburst => 0,
+      scantest  => 0,
+      mobile    => 0
+      )
+    PORT MAP (
+      rst   => rstn,
+      clk   => clkm,
+      memi  => memi,
+      memo  => memo,
+      ahbsi => ahbsi,
+      ahbso => ahbso(0),
+      apbi  => apbi,
+      apbo  => apbo(0),
+      wpo   => wpo,
+      sdo   => sdo
+      );
 
 
   memi.brdyn  <= '1'; memi.bexcn <= '1';
@@ -414,14 +367,14 @@ BEGIN
 
   mgpads : IF (CFG_SRCTRL = 1) OR (CFG_MCTRL_LEON2 = 1) GENERATE  -- prom/sram pads
     addr_pad : outpadv GENERIC MAP (width => 28, tech => padtech) PORT MAP (address, memo.address(27 DOWNTO 0));
-    rams_pad : outpadv GENERIC MAP (width => 5,  tech => padtech) PORT MAP (ramsn,   memo.ramsn(4 DOWNTO 0));
-    roms_pad : outpadv GENERIC MAP (width => 2,  tech => padtech) PORT MAP (romsn,   memo.romsn(1 DOWNTO 0));
-    oen_pad  : outpad  GENERIC MAP (             tech => padtech) PORT MAP (oen,     memo.oen);
-    rwen_pad : outpadv GENERIC MAP (width => 4,  tech => padtech) PORT MAP (rwen,    memo.wrn);
-    roen_pad : outpadv GENERIC MAP (width => 5,  tech => padtech) PORT MAP (ramoen,  memo.ramoen(4 DOWNTO 0));
-    wri_pad  : outpad  GENERIC MAP (             tech => padtech) PORT MAP (writen,  memo.writen);
-    read_pad : outpad  GENERIC MAP (             tech => padtech) PORT MAP (read,    memo.read);
-    iosn_pad : outpad  GENERIC MAP (             tech => padtech) PORT MAP (iosn,    memo.iosn);
+    rams_pad : outpadv GENERIC MAP (width => 5, tech => padtech) PORT MAP (ramsn, memo.ramsn(4 DOWNTO 0));
+    roms_pad : outpadv GENERIC MAP (width => 2, tech => padtech) PORT MAP (romsn, memo.romsn(1 DOWNTO 0));
+    oen_pad  : outpad GENERIC MAP (tech   => padtech) PORT MAP (oen, memo.oen);
+    rwen_pad : outpadv GENERIC MAP (width => 4, tech => padtech) PORT MAP (rwen, memo.wrn);
+    roen_pad : outpadv GENERIC MAP (width => 5, tech => padtech) PORT MAP (ramoen, memo.ramoen(4 DOWNTO 0));
+    wri_pad  : outpad GENERIC MAP (tech   => padtech) PORT MAP (writen, memo.writen);
+    read_pad : outpad GENERIC MAP (tech   => padtech) PORT MAP (read, memo.read);
+    iosn_pad : outpad GENERIC MAP (tech   => padtech) PORT MAP (iosn, memo.iosn);
 
     bdr : FOR i IN 0 TO 3 GENERATE
       data_pad : iopadv GENERIC MAP (tech => padtech, width => 8)
@@ -431,22 +384,12 @@ BEGIN
 
   END GENERATE;
 
-  SSRAM_0: ssram_plugin
-    generic map (tech => padtech)
-    port map    (lclk2x,memo,SSRAM_CLK,nBWa,nBWb,nBWc,nBWd,nBWE,nADSC,nADSP,nADV,nGW,nCE1,CE2,nCE3,nOE,MODE,ZZ);
+  SSRAM_0 : ssram_plugin
+    GENERIC MAP (tech => padtech)
+    PORT MAP (lclk2x, memo, SSRAM_CLK,
+              nBWa, nBWb, nBWc, nBWd, nBWE, nADSC, nADSP, nADV, nGW, nCE1, CE2, nCE3, nOE, MODE, ZZ);
 
-----------------------------------------------------------------------
----  APB Bridge and various periherals -------------------------------
-----------------------------------------------------------------------
 
-  bpromgen : IF CFG_AHBROMEN /= 0 GENERATE
-    brom : ENTITY work.ahbrom
-      GENERIC MAP (hindex => 5, haddr => CFG_AHBRODDR, pipe => CFG_AHBROPIP)
-      PORT MAP (rstn, clkm, ahbsi, ahbso(5));
-  END GENERATE;
-  nobpromgen : IF CFG_AHBROMEN = 0 GENERATE
-    ahbso(5) <= ahbs_none;
-  END GENERATE;
 
 ----------------------------------------------------------------------
 ---  APB Bridge and various periherals -------------------------------
@@ -572,7 +515,7 @@ BEGIN
   noarb : IF CFG_PCI_ARB = 0 GENERATE apbo(10)  <= apb_none; END GENERATE;
 
 
-  ahbso(6) <= ahbs_none;
+--  ahbso(6) <= ahbs_none;
 
 -----------------------------------------------------------------------
 ---  AHB RAM ----------------------------------------------------------
@@ -614,11 +557,35 @@ BEGIN
     END GENERATE;
   END GENERATE;
 
+
+
+-------------------------------------------------------------------------------
+-- BOOT MEMORY AND REGISTER
+-------------------------------------------------------------------------------
+  
+  lpp_bootloader_1: lpp_bootloader
+    GENERIC MAP (
+      pindex => 13,
+      paddr  => 13,
+      pmask  => 16#fff#,
+      
+      hindex => 6,
+      haddr  => 16#900#,
+      hmask  => 16#F00#)
+    PORT MAP (
+      HCLK    => clkm,
+      HRESETn => resetn,
+      apbi    => apbi,
+      apbo    => apbo(13),
+      ahbsi   => ahbsi,
+      ahbso   => ahbso(6));
+  
+  
 -------------------------------------------------------------------------------
 -- AHB DMA
 -------------------------------------------------------------------------------
 
-  lpp_dma_1: lpp_dma
+  lpp_dma_1 : lpp_dma
     GENERIC MAP (
       tech   => fabtech,
       hindex => 2,
@@ -633,24 +600,24 @@ BEGIN
       apbo           => apbo(14),
       AHB_Master_In  => ahbmi,
       AHB_Master_Out => ahbmo(2),
-      fifo_data      => dma_data,
-      fifo_empty     => dma_empty,
-      fifo_ren       => dma_ren,
+      fifo_data      => fifo_data,      --dma_data,
+      fifo_empty     => fifo_empty,     --dma_empty,
+      fifo_ren       => fifo_ren,       --dma_ren,
       header         => header,
       header_val     => header_val,
       header_ack     => header_ack);
 
-  fifo_latency_correction_1: fifo_latency_correction
-    PORT MAP (
-      HCLK       => clkm,
-      HRESETn    => resetn,
-      fifo_data  => fifo_data,
-      fifo_empty => fifo_empty,
-      fifo_ren   => fifo_ren,
-      dma_data   => dma_data,
-      dma_empty  => dma_empty,
-      dma_ren    => dma_ren);
-  
+  --fifo_latency_correction_1 : fifo_latency_correction
+  --  PORT MAP (
+  --    HCLK       => clkm,
+  --    HRESETn    => resetn,
+  --    fifo_data  => fifo_data,
+  --    fifo_empty => fifo_empty,
+  --    fifo_ren   => fifo_ren,
+  --    dma_data   => dma_data,
+  --    dma_empty  => dma_empty,
+  --    dma_ren    => dma_ren);
+
   fifo_test_dma_1 : fifo_test_dma
     GENERIC MAP (
       tech   => fabtech,
@@ -658,16 +625,16 @@ BEGIN
       paddr  => 15,
       pmask  => 16#fff#)
     PORT MAP (
-      HCLK           => clkm,
-      HRESETn        => resetn,
-      apbi           => apbi,
-      apbo           => apbo(15),
-      fifo_data      => fifo_data,
-      fifo_empty     => fifo_empty,
-      fifo_ren       => fifo_ren,
-      header         => header,
-      header_val     => header_val,
-      header_ack     => header_ack);
+      HCLK       => clkm,
+      HRESETn    => resetn,
+      apbi       => apbi,
+      apbo       => apbo(15),
+      fifo_data  => fifo_data,
+      fifo_empty => fifo_empty,
+      fifo_ren   => fifo_ren,
+      header     => header,
+      header_val => header_val,
+      header_ack => header_ack);
 
 -----------------------------------------------------------------------
 ---  Boot message  ----------------------------------------------------
