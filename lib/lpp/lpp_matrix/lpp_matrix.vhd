@@ -56,6 +56,25 @@ component APB_Matrix is
 );
 end component;
 
+component TopSpecMatrix is
+generic(
+    Input_SZ  : integer := 16);
+port(
+    clk         : in std_logic;
+    rstn       : in std_logic;
+    Write       : in std_logic;
+    ReadIn      : in std_logic_vector(1 downto 0);
+    Full        : in std_logic_vector(4 downto 0);
+    Data        : in std_logic_vector((5*Input_SZ)-1 downto 0);
+    Start       : out std_logic;
+    ReadOut     : out std_logic_vector(4 downto 0);
+    Statu       : out std_logic_vector(3 downto 0); 
+    DATA1       : out std_logic_vector(Input_SZ-1 downto 0);
+    DATA2       : out std_logic_vector(Input_SZ-1 downto 0)
+);
+end component;
+
+
 component Top_MatrixSpec is
 generic(
     Input_SZ  : integer := 16;

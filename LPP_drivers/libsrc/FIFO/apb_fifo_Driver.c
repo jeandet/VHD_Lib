@@ -32,13 +32,22 @@ FIFO_Device* openFIFO(int count)
 }
 
 
-int FillFifo(FIFO_Device* dev,int ID,int Tbl[])
+int FillFifo(FIFO_Device* dev,int ID,int Tbl[],int count)
 {
     int i=0;
-    while((dev->FIFOreg[(2*ID)+FIFO_Ctrl] & FIFO_Full) != FIFO_Full) // TANT QUE  full a 0  ALORS
+    //int poub;
+    //printf("%x\n",dev->FIFOreg[(2*0)+FIFO_Ctrl]);
+    while(i<count)
+    //while((dev->FIFOreg[(2*ID)+FIFO_Ctrl] & FIFO_Full) != FIFO_Full)// TANT QUE  full a 0  ALORS
     {
+        //printf("%x\n",dev->FIFOreg[(2*ID)+FIFO_Ctrl]);
+        //printf("%d\n",i);
         dev->FIFOreg[(2*ID)+FIFO_RWdata] = Tbl[i];
         i++;
     }
+    //poub = dev->FIFOreg[(2*ID)+FIFO_RWdata];
+    //dev->FIFOreg[(2*ID)+FIFO_RWdata] = Tbl[0];
+    //printf("END:%x\n",dev->FIFOreg[(2*ID)+FIFO_Ctrl]);
+    //while((dev->FIFOreg[(2*ID)+FIFO_Ctrl] & FIFO_Full) != FIFO_Full); // TANT QUE  full a 0  RIEN
     return 0;
 }

@@ -22,7 +22,6 @@
 library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
-use lpp.lpp_matrix.all;
 
 entity Dispatch is
 generic(
@@ -34,65 +33,52 @@ port(
     Data        : in std_logic_vector(Data_SZ-1 downto 0);
     Write       : in std_logic;
     Full        : in std_logic_vector(1 downto 0);
---    Empty       : in std_logic_vector(1 downto 0);
     FifoData    : out std_logic_vector(2*Data_SZ-1 downto 0);
     FifoWrite   : out std_logic_vector(1 downto 0);
---    FifoFull    : out std_logic;
     Pong        : out std_logic;
     Error       : out std_logic
-
 );
 end entity;
 
 
 architecture ar_Dispatch of Dispatch is
 
-type etat is (e0,e1,e2,e3);
+type etat is (eX,e0,e1,e2);
 signal ect : etat;
+
+signal Pong_int : std_logic;
+signal FifoCpt : integer range 0 to 1 := 0;
 
 begin
 
  process (clk,reset)
     begin
         if(reset='0')then
-            Pong    <= '0';
-            Error   <= '0';   
+            Pong_int    <= '0';
+            Error   <= '0';
+            ect <= e0;   
             
         elsif(clk' event and clk='1')then
 
             case ect is
 
                 when e0 =>
-                    if(Full(0) = '1')then
-                        pong <= '1';                        
+                    if(Full(FifoCpt) = '1')then
+                        Pong_int <= not Pong_int;
                         ect <= e1;
                     end if;
 
                 when e1 =>
-                    if(Acq <= '1')then
-                        Error <= '0';
-                        pong <= '0';
-                        ect <= e2;
-                    else
+                    if(Acq = '0')then
                         Error <= '1';
                         ect <= e1;
-                    end if;
-
-                when e2 =>
-                    if(Full(1) = '1')then
-                        pong <= '1';                        
-                        ect <= e3;
-                    end if;
-
-                when e3 =>
-                    if(Acq <= '1')then
-                        Error <= '0';
-                        pong <= '0';
-                        ect <= e0;
                     else
-                        Error <= '1';
-                        ect <= e3;
-                    end if;
+                        Error <= '0';
+                        ect <= e0;
+                    end if;                  
+                        
+                when others =>
+                    null;  
 
             end case;
 
@@ -100,10 +86,10 @@ begin
     end process;
 
 FifoData <= Data & Data;
+Pong <= Pong_int;
 
-with ect select
-    FifoWrite <= '1' & not Write when e0,
-                 not Write & '1' when e2,
-                 "11" when others;
+FifoCpt <= 0 when Pong_int='0' else 1;
+
+FifoWrite <= '1' & not Write when Pong_int='0' else not Write & '1';
                     
 end architecture;

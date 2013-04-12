@@ -25,7 +25,8 @@ use IEEE.numeric_std.all;
 
 entity Linker_FFT is
 generic(
-    Data_sz  : integer range 1 to 32 := 8
+    Data_sz  : integer range 1 to 32 := 16;
+    NbData : integer range 1 to 512 := 256
     );
 port(
     clk         : in std_logic;
@@ -45,15 +46,15 @@ end entity;
 
 architecture ar_Linker of Linker_FFT is
 
-type etat is (eX,e0,e1,e2,e3);
+type etat is (eX,e0,e1,e2);
 signal ect : etat;
 
-signal FifoCpt  : integer;
 signal DataTmp  : std_logic_vector(Data_sz-1 downto 0);
 
-signal sFull    : std_logic;
-signal sData    : std_logic_vector(Data_sz-1 downto 0);
-signal sReady   : std_logic;
+signal sRead   : std_logic;
+signal sReady : std_logic;
+
+signal FifoCpt  : integer range 0 to 4 := 0;
 
 begin
 
@@ -61,69 +62,51 @@ begin
     begin
         if(rstn='0')then 
             ect <= e0;
-            Read <= '0';
+            sRead <= '0';
+            sReady <= '0';
             Write <= (others => '1');
             Reuse <= (others => '0');
-            FifoCpt <= 1;
-            sDATA <= (others => '0');
+            FifoCpt <= 0;
             
         elsif(clk'event and clk='1')then
             sReady <= Ready;
 
+            if(sReady='1' and Ready='0')then
+                if(FifoCpt=4)then
+                    FifoCpt <= 0;
+                else
+                    FifoCpt <= FifoCpt + 1;
+                end if;
+            elsif(Ready='1')then
+                sRead <= not sRead;               
+            else
+                sRead <= '0';
+            end if;           
+
             case ect is
 
                 when e0 =>
-                    Write(FifoCpt-1) <= '1';
-                    if(sReady='0' and Ready='1' and sfull='0')then
-                        Read <= '1';
-                        ect <= e1;
-                    end if;
-
-                when e1 =>
-                    Read <= '0';
-                    if(Valid='1' and sfull='0')then
+                    Write(FifoCpt) <= '1';
+                    if(Valid='1' and Full(FifoCpt)='0')then
                         DataTmp <= Data_im;
-                        sDATA <= Data_re;
-                        Write(FifoCpt-1) <= '0';
-                        ect <= e2;
-                    elsif(sfull='1')then
-                        ReUse(FifoCpt-1) <= '1';
-                        ect <= eX;
+                        DATA(((FifoCpt+1)*Data_sz)-1 downto (FifoCpt*Data_sz)) <= Data_re;
+                        Write(FifoCpt) <= '0';
+                        ect <= e1;
+                    elsif(Full(FifoCpt)='1')then
+                        ReUse(FifoCpt) <= '1';                        
                     end if;                    
 
-                 when e2 =>
-                    sDATA <= DataTmp;
-                    ect <= e3;            
- 
-                when e3 =>
-                    Write(FifoCpt-1) <= '1';
-                    if(Ready='1' and sfull='0')then
-                        Read <= '1';
-                        ect <= e1;
-                    end if;
+                 when e1 =>
+                    DATA(((FifoCpt+1)*Data_sz)-1 downto (FifoCpt*Data_sz)) <= DataTmp;
+                    ect <= e0;
                                
-                when eX =>
-                    if(FifoCpt=5)then
-                        FifoCpt <= 1;
-                    else
-                        FifoCpt <= FifoCpt+1;
-                    end if;
-                    ect <= e0;                    
+                when others =>
+                    null;
 
             end case;
         end if;
     end process;
 
-DATA <= sData & sData & sData & sData & sData;
-
-with FifoCpt select
-    sFull <=    Full(0) when 1,
-                Full(1) when 2,
-                Full(2) when 3,
-                Full(3) when 4,
-                Full(4) when 5,
-                '1' when others;
-                           
+Read <= sRead;
 
 end architecture;
-

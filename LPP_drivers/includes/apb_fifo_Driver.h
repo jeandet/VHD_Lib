@@ -51,8 +51,8 @@
 */
 struct APB_FIFO_REG
 {
-    int IDreg;
-    int FIFOreg[2*8];
+    volatile int IDreg;
+    volatile int FIFOreg[2*8];
 };
 
 typedef volatile struct APB_FIFO_REG FIFO_Device;
@@ -71,6 +71,6 @@ typedef volatile struct APB_FIFO_REG FIFO_Device;
     \return The pointer to the device.
 */
 FIFO_Device* openFIFO(int count);
-int FillFifo(FIFO_Device* dev,int ID,int Tbl[]);
+int FillFifo(FIFO_Device* dev,int ID,int Tbl[],int count);
 
 #endif
