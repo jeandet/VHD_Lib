@@ -20,7 +20,7 @@ ENTITY lpp_top_acq IS
     sck             : OUT STD_LOGIC;
     sdo             : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
     --
-    cnv_clk         : IN  STD_LOGIC;
+    cnv_clk         : IN  STD_LOGIC;  -- clk 49 MHz
     cnv_rstn        : IN  STD_LOGIC;
     --
     clk             : IN  STD_LOGIC;
