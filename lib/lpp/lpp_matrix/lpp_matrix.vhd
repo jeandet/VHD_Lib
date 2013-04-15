@@ -56,6 +56,27 @@ component APB_Matrix is
 );
 end component;
 
+component MatriceSpectrale is
+  generic(
+      Input_SZ  : integer := 16;
+      Result_SZ : integer := 32);
+    port(
+        clkm            : in std_logic;
+        rstn            : in std_logic;
+
+        FifoIN_Full     : in std_logic_vector(4 downto 0);
+        FifoOUT_Full    : in std_logic_vector(1 downto 0);
+        Data_IN         : in std_logic_vector(79 downto 0);
+        ACQ             : in std_logic;
+        FlagError       : out std_logic;
+        Pong            : out std_logic;
+        Write           : out std_logic_vector(1 downto 0);
+        Read            : out std_logic_vector(4 downto 0);
+        Data_OUT        : out std_logic_vector(63 downto 0)
+        );
+end component;
+
+
 component TopSpecMatrix is
 generic(
     Input_SZ  : integer := 16);
@@ -222,56 +243,10 @@ component ALU_Driver is
       Conjugate :   in std_logic;
       Valid     :   out std_logic;
       Read      :   out std_logic;
-      CTRL      :   out std_logic_vector(4 downto 0);
+      CTRL      :   out std_logic_vector(2 downto 0);
+      COMP      :   out  std_logic_vector(1 downto 0);
       OP1       :   out std_logic_vector(Input_SZ_1-1 downto 0);
       OP2       :   out std_logic_vector(Input_SZ_2-1 downto 0)
-);
-end component;
-
-
-component ALU_v2 is
-generic(
-    Arith_en        :   integer := 1;
-    Logic_en        :   integer := 1;
-    Input_SZ_1      :   integer := 16;
-    Input_SZ_2      :   integer := 9);
-port(
-    clk     :   in  std_logic;
-    reset   :   in  std_logic;
-    ctrl    :   in  std_logic_vector(4 downto 0);
-    OP1     :   in  std_logic_vector(Input_SZ_1-1 downto 0);
-    OP2     :   in  std_logic_vector(Input_SZ_2-1 downto 0);
-    RES     :   out std_logic_vector(Input_SZ_1+Input_SZ_2-1 downto 0)
-);
-end component;
-
-
-component MAC_v2 is
-generic(
-    Input_SZ_A     :   integer := 8;
-    Input_SZ_B     :   integer := 8);
-port(
-    clk             :   in  std_logic;
-    reset           :   in  std_logic;
-    clr_MAC         :   in  std_logic;
-    MAC_MUL_ADD_2C  :   in  std_logic_vector(3 downto 0);
-    OP1             :   in  std_logic_vector(Input_SZ_A-1 downto 0);
-    OP2             :   in  std_logic_vector(Input_SZ_B-1 downto 0);
-    RES             :   out std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0)
-);
-end component;
-
-
-component TwoComplementer is
-generic(
-    Input_SZ : integer := 16);
-port(
-    clk     : in  std_logic;
-    reset   : in  std_logic;
-    clr     : in  std_logic;
-    TwoComp : in  std_logic;
-    OP      : in  std_logic_vector(Input_SZ-1 downto 0);    
-    RES     : out std_logic_vector(Input_SZ-1 downto 0)
 );
 end component;
 

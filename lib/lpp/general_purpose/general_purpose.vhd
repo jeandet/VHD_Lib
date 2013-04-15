@@ -89,13 +89,23 @@ PACKAGE general_purpose IS
     PORT(
       clk   : IN  STD_LOGIC;
       reset : IN  STD_LOGIC;
-      ctrl  : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      ctrl  : IN  STD_LOGIC_VECTOR(2 downto 0);
+      comp  : IN  STD_LOGIC_VECTOR(1 downto 0);
       OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
       OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_2-1 DOWNTO 0);
       RES   : OUT STD_LOGIC_VECTOR(Input_SZ_1+Input_SZ_2-1 DOWNTO 0)
       );
   END COMPONENT;
 
+---------------------------------------------------------
+-------- // Sélection grace a l'entrée "ctrl" \\ --------
+---------------------------------------------------------
+Constant ctrl_IDLE   : std_logic_vector(2 downto 0) := "000";
+Constant ctrl_MAC    : std_logic_vector(2 downto 0) := "001";
+Constant ctrl_MULT   : std_logic_vector(2 downto 0) := "010";
+Constant ctrl_ADD    : std_logic_vector(2 downto 0) := "011";
+Constant ctrl_CLRMAC : std_logic_vector(2 downto 0) := "100";
+---------------------------------------------------------
 
   COMPONENT MAC IS
     GENERIC(
@@ -108,12 +118,25 @@ PACKAGE general_purpose IS
       reset       : IN  STD_LOGIC;
       clr_MAC     : IN  STD_LOGIC;
       MAC_MUL_ADD : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+      Comp_2C     : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
       OP1         : IN  STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
       OP2         : IN  STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
       RES         : OUT STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0)
       );
   END COMPONENT;
 
+  COMPONENT TwoComplementer is
+  generic(
+      Input_SZ : integer := 16);
+  port(
+      clk     : in  std_logic;                                --! Horloge du composant
+      reset   : in  std_logic;                                --! Reset general du composant
+      clr     : in  std_logic;                                --! Un reset spécifique au programme
+      TwoComp : in  std_logic;                                --! Autorise l'utilisation du complément
+      OP      : in  std_logic_vector(Input_SZ-1 downto 0);    --! Opérande d'entrée
+      RES     : out std_logic_vector(Input_SZ-1 downto 0)     --! Résultat, opérande complémenté ou non
+  );
+  end COMPONENT;
 
   COMPONENT MAC_CONTROLER IS
     PORT(

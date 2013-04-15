@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 --  This file is a part of the LPP VHDL IP LIBRARY
---  Copyright (C) 2009 - 2010, Laboratory of Plasmas Physic - CNRS
+--  Copyright (C) 2009 - 2012, Laboratory of Plasmas Physic - CNRS
 --
 --  This program is free software; you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published by
@@ -19,20 +19,13 @@
 --                    Author : Martin Morlot
 --                     Mail : martin.morlot@lpp.polytechnique.fr
 ------------------------------------------------------------------------------
-library ieee;
-use ieee.std_logic_1164.all;
-library grlib;
-use grlib.amba.all;
-use std.textio.all;
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
 library lpp;
-use lpp.lpp_amba.all;
+use lpp.lpp_demux.all;
 
---! Package contenant tous les programmes qui forment le composant intégré dans le léon 
-
-package lpp_demux is
-
-
-component Demultiplex is
+entity Demultiplex is
 generic(
     Data_sz        :   integer range 1 to 32 := 16);
 port(
@@ -55,49 +48,40 @@ port(
     Empty   :   out std_logic_vector(4 downto 0);
     Data    :   out std_logic_vector((5*Data_sz)-1 downto 0)
 );
-end component;
+end entity;
 
 
-component DEMUX is
-generic(
-    Data_sz        :   integer range 1 to 32 := 16);
-port(
-    clk    :   in std_logic;
-    rstn   :   in std_logic;
+architecture ar_Demultiplex of Demultiplex is
 
-    Read : in std_logic_vector(4 downto 0);
-    DataCpt : in std_logic_vector(3 downto 0); -- f2 f1 f0b f0a
+signal DataCpt      : std_logic_vector(3 downto 0);
 
-    EmptyF0a    :   in std_logic_vector(4 downto 0);
-    EmptyF0b    :   in std_logic_vector(4 downto 0);
-    EmptyF1     :   in std_logic_vector(4 downto 0);
-    EmptyF2     :   in std_logic_vector(4 downto 0);
+begin
 
-    DataF0a     :   in std_logic_vector((5*Data_sz)-1 downto 0);
-    DataF0b     :   in std_logic_vector((5*Data_sz)-1 downto 0);
-    DataF1      :   in std_logic_vector((5*Data_sz)-1 downto 0);
-    DataF2      :   in std_logic_vector((5*Data_sz)-1 downto 0);
+    FLG0 : WatchFlag
+        port map(clk,rstn,EmptyF0a,EmptyF0b,EmptyF1,EmptyF2,DataCpt);
 
-    Read_DEMUX : out std_logic_vector(19 downto 0);
-    Empty   :   out std_logic_vector(4 downto 0);
-    Data    :   out std_logic_vector((5*Data_sz)-1 downto 0)
-);
-end component;
+    DEM : DEMUX
+        generic map(Data_sz)
+        port map(clk,rstn,Read,DataCpt,EmptyF0a,EmptyF0b,EmptyF1,EmptyF2,DataF0a,DataF0b,DataF1,DataF2,Read_DEMUX,Empty,Data);
+
+end architecture;
 
 
-component WatchFlag is
-port(
-    clk    :   in std_logic;
-    rstn   :   in std_logic;
-
-    EmptyF0a    :   in std_logic_vector(4 downto 0);
-    EmptyF0b    :   in std_logic_vector(4 downto 0);
-    EmptyF1     :   in std_logic_vector(4 downto 0);
-    EmptyF2     :   in std_logic_vector(4 downto 0);
-
-    DataCpt     :   out std_logic_vector(3 downto 0) -- f2 f1 f0b f0a
-);
-end component;
 
 
-end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
