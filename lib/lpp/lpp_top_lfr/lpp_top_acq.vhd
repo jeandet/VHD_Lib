@@ -28,16 +28,16 @@ ENTITY lpp_top_acq IS
     --
     sample_f0_0_wen : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
     sample_f0_1_wen : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f0_wdata : OUT STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
+    sample_f0_wdata : OUT STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
     --
     sample_f1_wen   : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f1_wdata : OUT STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
+    sample_f1_wdata : OUT STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
     --
     sample_f2_wen   : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f2_wdata : OUT STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
+    sample_f2_wdata : OUT STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
     --
     sample_f3_wen   : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f3_wdata : OUT STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0)
+    sample_f3_wdata : OUT STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0)
     );
 END lpp_top_acq;
 
@@ -148,7 +148,7 @@ BEGIN
   IIR_CEL_CTRLR_v2_1 : IIR_CEL_CTRLR_v2
     GENERIC MAP (
       tech         => 0,
-      Mem_use      => use_CEL,
+      Mem_use      => use_RAM,
       Sample_SZ    => 18,
       Coef_SZ      => Coef_SZ,
       Coef_Nb      => 25,               -- TODO
@@ -199,12 +199,12 @@ BEGIN
       sample_out_val => sample_f0_val,
       sample_out     => sample_f0);
 
-  all_bit_sample_f0 : FOR I IN 17 DOWNTO 0 GENERATE
+  all_bit_sample_f0 : FOR I IN 15 DOWNTO 0 GENERATE
     sample_f0_wdata(I)      <= sample_f0(0, I);
-    sample_f0_wdata(18*1+I) <= sample_f0(1, I);
-    sample_f0_wdata(18*2+I) <= sample_f0(2, I);
-    sample_f0_wdata(18*3+I) <= sample_f0(6, I);
-    sample_f0_wdata(18*4+I) <= sample_f0(7, I);
+    sample_f0_wdata(16*1+I) <= sample_f0(1, I);
+    sample_f0_wdata(16*2+I) <= sample_f0(2, I);
+    sample_f0_wdata(16*3+I) <= sample_f0(6, I);
+    sample_f0_wdata(16*4+I) <= sample_f0(7, I);
   END GENERATE all_bit_sample_f0;
 
   PROCESS (clk, rstn)
@@ -259,12 +259,12 @@ BEGIN
                      NOT(sample_f1_val) &
                      NOT(sample_f1_val);
   
-  all_bit_sample_f1 : FOR I IN 17 DOWNTO 0 GENERATE
+  all_bit_sample_f1 : FOR I IN 15 DOWNTO 0 GENERATE
     sample_f1_wdata(I)      <= sample_f1(0, I);
-    sample_f1_wdata(18*1+I) <= sample_f1(1, I);
-    sample_f1_wdata(18*2+I) <= sample_f1(2, I);
-    sample_f1_wdata(18*3+I) <= sample_f1(6, I);
-    sample_f1_wdata(18*4+I) <= sample_f1(7, I);
+    sample_f1_wdata(16*1+I) <= sample_f1(1, I);
+    sample_f1_wdata(16*2+I) <= sample_f1(2, I);
+    sample_f1_wdata(16*3+I) <= sample_f1(6, I);
+    sample_f1_wdata(16*4+I) <= sample_f1(7, I);
   END GENERATE all_bit_sample_f1;
 
   -----------------------------------------------------------------------------
@@ -289,12 +289,12 @@ BEGIN
                      NOT(sample_f2_val) &
                      NOT(sample_f2_val);
   
-  all_bit_sample_f2 : FOR I IN 17 DOWNTO 0 GENERATE
+  all_bit_sample_f2 : FOR I IN 15 DOWNTO 0 GENERATE
     sample_f2_wdata(I)      <= sample_f2(0, I);
-    sample_f2_wdata(18*1+I) <= sample_f2(1, I);
-    sample_f2_wdata(18*2+I) <= sample_f2(2, I);
-    sample_f2_wdata(18*3+I) <= sample_f2(6, I);
-    sample_f2_wdata(18*4+I) <= sample_f2(7, I);
+    sample_f2_wdata(16*1+I) <= sample_f2(1, I);
+    sample_f2_wdata(16*2+I) <= sample_f2(2, I);
+    sample_f2_wdata(16*3+I) <= sample_f2(6, I);
+    sample_f2_wdata(16*4+I) <= sample_f2(7, I);
   END GENERATE all_bit_sample_f2;
 
   -----------------------------------------------------------------------------
@@ -319,12 +319,12 @@ BEGIN
                      (NOT sample_f3_val) &
                      (NOT sample_f3_val);
   
-  all_bit_sample_f3 : FOR I IN 17 DOWNTO 0 GENERATE
+  all_bit_sample_f3 : FOR I IN 15 DOWNTO 0 GENERATE
     sample_f3_wdata(I)      <= sample_f3(0, I);
-    sample_f3_wdata(18*1+I) <= sample_f3(1, I);
-    sample_f3_wdata(18*2+I) <= sample_f3(2, I);
-    sample_f3_wdata(18*3+I) <= sample_f3(6, I);
-    sample_f3_wdata(18*4+I) <= sample_f3(7, I);
+    sample_f3_wdata(16*1+I) <= sample_f3(1, I);
+    sample_f3_wdata(16*2+I) <= sample_f3(2, I);
+    sample_f3_wdata(16*3+I) <= sample_f3(6, I);
+    sample_f3_wdata(16*4+I) <= sample_f3(7, I);
   END GENERATE all_bit_sample_f3;
 
   

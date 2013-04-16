@@ -22,7 +22,9 @@
 library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
+library lpp;
 use lpp.lpp_matrix.all;
+use lpp.general_purpose.all;
 
 --! Programme de calcule de Matrice Spectral, composé d'une ALU et de son Driver
 
@@ -46,7 +48,8 @@ end Matrix;
 
 architecture ar_Matrix of Matrix is
 
-signal CTRL  : std_logic_vector(4 downto 0);
+signal CTRL  : std_logic_vector(2 downto 0);
+signal COMP  : std_logic_vector(1 downto 0);
 signal OP1   : std_logic_vector(Input_SZ-1 downto 0);
 signal OP2   : std_logic_vector(Input_SZ-1 downto 0);
 
@@ -54,13 +57,12 @@ begin
 
 DRIVE : ALU_Driver
     generic map(Input_SZ,Input_SZ)
-    port map(clk,raz,IN1,IN2,Take,Received,Conjugate,Valid,Read,CTRL,OP1,OP2);
+    port map(clk,raz,IN1,IN2,Take,Received,Conjugate,Valid,Read,CTRL,COMP,OP1,OP2);
 
 
-ALU : ALU_v2
+ALU0 : ALU
     generic map(1,0,Input_SZ,Input_SZ)
-    port map(clk,raz,CTRL,OP1,OP2,Result);  
+    port map(clk,raz,CTRL,COMP,OP1,OP2,Result);
 
 
 end ar_Matrix;
-

@@ -79,7 +79,8 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v2 OF IIR_CEL_CTRLR_v2 IS
       waddr_previous : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
       alu_sel_input  : IN  STD_LOGIC;
       alu_sel_coeff  : IN  STD_LOGIC_VECTOR(Coef_sel_SZ-1 DOWNTO 0);
-      alu_ctrl       : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      alu_ctrl       : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+      alu_comp       : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
       sample_in      : IN  STD_LOGIC_VECTOR(Sample_SZ-1 DOWNTO 0);
       sample_out     : OUT STD_LOGIC_VECTOR(Sample_SZ-1 DOWNTO 0));
   END COMPONENT;
@@ -105,7 +106,7 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v2 OF IIR_CEL_CTRLR_v2 IS
       waddr_previous : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
       alu_sel_input  : OUT STD_LOGIC;
       alu_sel_coeff  : OUT STD_LOGIC_VECTOR(Coef_sel_SZ-1 DOWNTO 0);
-      alu_ctrl       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0));
+      alu_ctrl       : OUT STD_LOGIC_VECTOR(2 DOWNTO 0));
   END COMPONENT;
 
   SIGNAL in_sel_src     : STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -117,7 +118,7 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v2 OF IIR_CEL_CTRLR_v2 IS
   SIGNAL waddr_previous : STD_LOGIC_VECTOR(1 DOWNTO 0);
   SIGNAL alu_sel_input  : STD_LOGIC;
   SIGNAL alu_sel_coeff  : STD_LOGIC_VECTOR(Coef_sel_SZ-1 DOWNTO 0);
-  SIGNAL alu_ctrl       : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL alu_ctrl       : STD_LOGIC_VECTOR(2 DOWNTO 0);
 
   SIGNAL sample_in_buf     : samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0);
   SIGNAL sample_in_rotate  : STD_LOGIC;
@@ -155,6 +156,7 @@ BEGIN
       alu_sel_input  => alu_sel_input,
       alu_sel_coeff  => alu_sel_coeff,
       alu_ctrl       => alu_ctrl,
+      alu_comp       => "00",
       --DATA
       sample_in      => sample_in_s,
       sample_out     => sample_out_s);

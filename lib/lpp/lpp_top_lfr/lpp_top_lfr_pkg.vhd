@@ -22,15 +22,15 @@ PACKAGE lpp_top_lfr_pkg IS
       cnv_rstn        : IN  STD_LOGIC;
       clk             : IN  STD_LOGIC;
       rstn            : IN  STD_LOGIC;
-      sample_f0_0_wen : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
-      sample_f0_1_wen : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
-      sample_f0_wdata : OUT STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
-      sample_f1_wen   : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
-      sample_f1_wdata : OUT STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
-      sample_f2_wen   : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
-      sample_f2_wdata : OUT STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
-      sample_f3_wen   : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
-      sample_f3_wdata : OUT STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0));
+      sample_f0_0_wen : OUT  STD_LOGIC_VECTOR(4 DOWNTO 0);
+      sample_f0_1_wen : OUT  STD_LOGIC_VECTOR(4 DOWNTO 0);
+      sample_f0_wdata : OUT STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+      sample_f1_wen   : OUT  STD_LOGIC_VECTOR(4 DOWNTO 0);
+      sample_f1_wdata : OUT STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+      sample_f2_wen   : OUT  STD_LOGIC_VECTOR(4 DOWNTO 0);
+      sample_f2_wdata : OUT STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+      sample_f3_wen   : OUT  STD_LOGIC_VECTOR(4 DOWNTO 0);
+      sample_f3_wdata : OUT STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0));
   END COMPONENT;
 
   COMPONENT lpp_top_apbreg

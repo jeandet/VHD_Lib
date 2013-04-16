@@ -40,6 +40,7 @@ ENTITY MAC IS
     reset       : IN  STD_LOGIC;
     clr_MAC     : IN  STD_LOGIC;
     MAC_MUL_ADD : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+    Comp_2C     : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
     OP1         : IN  STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
     OP2         : IN  STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
     RES         : OUT STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0)
@@ -51,34 +52,35 @@ END MAC;
 
 ARCHITECTURE ar_MAC OF MAC IS
 
-  SIGNAL add, mult : STD_LOGIC;
-  SIGNAL MULTout   : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
+signal  add,mult    :   std_logic;
+signal  MULTout     :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
 
-  SIGNAL ADDERinA : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
-  SIGNAL ADDERinB : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
-  SIGNAL ADDERout : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
+signal  ADDERinA    :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
+signal  ADDERinB    :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
+signal  ADDERout    :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
 
+signal  MACMUXsel   :   std_logic;
+signal  OP1_2C_D_Resz    :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
+signal  OP2_2C_D_Resz    :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
 
-  SIGNAL MACMUXsel  : STD_LOGIC;
-  SIGNAL OP1_D_Resz : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
-  SIGNAL OP2_D_Resz : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
+signal  OP1_2C      :   std_logic_vector(Input_SZ_A-1 downto 0);
+signal  OP2_2C      :   std_logic_vector(Input_SZ_B-1 downto 0);
 
+signal  MACMUX2sel  :   std_logic;
 
+signal  add_D               :   std_logic;
+signal  OP1_2C_D            :   std_logic_vector(Input_SZ_A-1 downto 0);
+signal  OP2_2C_D            :   std_logic_vector(Input_SZ_B-1 downto 0);
+signal  MULTout_D           :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
+signal  MACMUXsel_D         :   std_logic;
+signal  MACMUX2sel_D        :   std_logic;
+signal  MACMUX2sel_D_D      :   std_logic;
+signal  clr_MAC_D           :   std_logic;
+signal  clr_MAC_D_D         :   std_logic;
+signal  MAC_MUL_ADD_2C_D     : std_logic_vector(1 downto 0);
 
-  SIGNAL MACMUX2sel : STD_LOGIC;
-
-  SIGNAL add_D          : STD_LOGIC;
-  SIGNAL OP1_D          : STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
-  SIGNAL OP2_D          : STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
-  SIGNAL MULTout_D      : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
-  SIGNAL MACMUXsel_D    : STD_LOGIC;
-  SIGNAL MACMUX2sel_D   : STD_LOGIC;
-  SIGNAL MACMUX2sel_D_D : STD_LOGIC;
-  SIGNAL clr_MAC_D      : STD_LOGIC;
-  SIGNAL clr_MAC_D_D    : STD_LOGIC;
-
-  SIGNAL load_mult_result : STD_LOGIC;
-  SIGNAL load_mult_result_D : STD_LOGIC;
+SIGNAL load_mult_result : STD_LOGIC;
+SIGNAL load_mult_result_D : STD_LOGIC;
 
 BEGIN
 
@@ -111,14 +113,14 @@ BEGIN
       Input_SZ_A => Input_SZ_A,
       Input_SZ_B => Input_SZ_B
       )
-    PORT MAP(
-      clk   => clk,
-      reset => reset,
-      mult  => mult,
-      OP1   => OP1,
-      OP2   => OP2,
-      RES   => MULTout
-      );
+port map(
+    clk         =>  clk,
+    reset       =>  reset,
+    mult        =>  mult,
+    OP1         =>  OP1_2C,
+    OP2         =>  OP2_2C,
+    RES         =>  MULTout
+);
 --==============================================================
 
   PROCESS (clk, reset)
@@ -148,8 +150,37 @@ BEGIN
       OP2   => ADDERinB,
       RES   => ADDERout
       );
---==============================================================
 
+--==============================================================
+--===================TWO COMPLEMENTERS==========================
+--==============================================================
+TWO_COMPLEMENTER1 : TwoComplementer
+generic map(
+    Input_SZ    =>   Input_SZ_A
+)
+port map(
+    clk         =>  clk,
+    reset       =>  reset,
+    clr         =>  clr_MAC,
+    TwoComp     =>  Comp_2C(0),
+    OP          =>  OP1,    
+    RES         =>  OP1_2C
+);
+
+
+TWO_COMPLEMENTER2 : TwoComplementer
+generic map(
+    Input_SZ    =>   Input_SZ_B
+)
+port map(
+    clk         =>  clk,
+    reset       =>  reset,
+    clr         =>  clr_MAC,
+    TwoComp     =>  Comp_2C(1),
+    OP          =>  OP2,    
+    RES         =>  OP2_2C
+);
+--==============================================================
 
   clr_MACREG1 : MAC_REG
     GENERIC MAP(size => 1)
@@ -169,23 +200,24 @@ BEGIN
       Q(0)  => add_D
       );
 
-  OP1REG : MAC_REG
-    GENERIC MAP(size => Input_SZ_A)
-    PORT MAP(
-      reset => reset,
-      clk   => clk,
-      D     => OP1,
-      Q     => OP1_D
-      );
+OP1REG : MAC_REG
+generic map(size    =>  Input_SZ_A)
+port map(
+    reset   =>  reset,
+    clk     =>  clk,
+    D       =>  OP1_2C,
+    Q       =>  OP1_2C_D
+);
 
-  OP2REG : MAC_REG
-    GENERIC MAP(size => Input_SZ_B)
-    PORT MAP(
-      reset => reset,
-      clk   => clk,
-      D     => OP2,
-      Q     => OP2_D
-      );
+
+OP2REG : MAC_REG
+generic map(size    =>  Input_SZ_B)
+port map(
+    reset   =>  reset,
+    clk     =>  clk,
+    D       =>  OP2_2C,
+    Q       =>  OP2_2C_D
+);
 
   MULToutREG : MAC_REG
     GENERIC MAP(size => Input_SZ_A+Input_SZ_B)
@@ -235,14 +267,14 @@ BEGIN
     PORT MAP(
       sel  => MACMUXsel_D,
       INA1 => ADDERout,
-      INA2 => OP2_D_Resz,
+      INA2 => OP2_2C_D_Resz,
       INB1 => MULTout,
-      INB2 => OP1_D_Resz,
+      INB2 => OP1_2C_D_Resz,
       OUTA => ADDERinA,
       OUTB => ADDERinB
       );
-  OP1_D_Resz <= STD_LOGIC_VECTOR(resize(SIGNED(OP1_D), Input_SZ_A+Input_SZ_B));
-  OP2_D_Resz <= STD_LOGIC_VECTOR(resize(SIGNED(OP2_D), Input_SZ_A+Input_SZ_B));
+  OP1_2C_D_Resz <= STD_LOGIC_VECTOR(resize(SIGNED(OP1_2C_D), Input_SZ_A+Input_SZ_B));
+  OP2_2C_D_Resz <= STD_LOGIC_VECTOR(resize(SIGNED(OP2_2C_D), Input_SZ_A+Input_SZ_B));
 --==============================================================
 
 
