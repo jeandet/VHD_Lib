@@ -164,11 +164,7 @@ PACKAGE lpp_dma_pkg IS
   COMPONENT lpp_dma_ip
     GENERIC (
       tech   : INTEGER;
-      hindex : INTEGER;
-      pindex : INTEGER;
-      paddr  : INTEGER;
-      pmask  : INTEGER;
-      pirq   : INTEGER);
+      hindex : INTEGER);
     PORT (
       HCLK                                   : IN  STD_ULOGIC;
       HRESETn                                : IN  STD_ULOGIC;

@@ -20,10 +20,10 @@ ENTITY lpp_top_acq IS
     sck             : OUT STD_LOGIC;
     sdo             : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
     --
-    cnv_clk         : IN  STD_LOGIC;
+    cnv_clk         : IN  STD_LOGIC;    -- 49 MHz
     cnv_rstn        : IN  STD_LOGIC;
     --
-    clk             : IN  STD_LOGIC;
+    clk             : IN  STD_LOGIC;    -- 25 MHz
     rstn            : IN  STD_LOGIC;
     --
     sample_f0_0_wen : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
@@ -72,16 +72,14 @@ ARCHITECTURE tb OF lpp_top_acq IS
   CONSTANT CoefPerCel       : INTEGER := 5;
   CONSTANT Cels_count       : INTEGER := 5;
 
---  SIGNAL coefs                       : STD_LOGIC_VECTOR((Coef_SZ*CoefCntPerCel*Cels_count)-1 DOWNTO 0);
-  SIGNAL coefs_JC                    : STD_LOGIC_VECTOR((Coef_SZ*CoefPerCel*Cels_count)-1 DOWNTO 0);
+  SIGNAL coefs_v2                    : STD_LOGIC_VECTOR((Coef_SZ*CoefPerCel*Cels_count)-1 DOWNTO 0);
   SIGNAL sample_filter_in            : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
---  SIGNAL sample_filter_out           : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
   --
-  SIGNAL sample_filter_JC_out_val    : STD_LOGIC;
-  SIGNAL sample_filter_JC_out        : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
+  SIGNAL sample_filter_v2_out_val    : STD_LOGIC;
+  SIGNAL sample_filter_v2_out        : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
   --
-  SIGNAL sample_filter_JC_out_r_val  : STD_LOGIC;
-  SIGNAL sample_filter_JC_out_r      : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
+  SIGNAL sample_filter_v2_out_r_val  : STD_LOGIC;
+  SIGNAL sample_filter_v2_out_r      : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
   -----------------------------------------------------------------------------
   SIGNAL downsampling_cnt            : STD_LOGIC_VECTOR(1 DOWNTO 0);
   SIGNAL sample_downsampling_out_val : STD_LOGIC;
@@ -144,28 +142,8 @@ BEGIN
     sample_filter_in(i, 16) <= sample(i)(15);
     sample_filter_in(i, 17) <= sample(i)(15);
   END GENERATE;
-
---  coefs    <= CoefsInitValCst;
-  coefs_JC <= CoefsInitValCst_JC;
-
-  --FILTER : IIR_CEL_CTRLR
-  --  GENERIC MAP (
-  --    tech          => 0,
-  --    Sample_SZ     => 18,
-  --    ChanelsCount  => ChanelCount,
-  --    Coef_SZ       => Coef_SZ,
-  --    CoefCntPerCel => CoefCntPerCel,
-  --    Cels_count    => Cels_count,
-  --    Mem_use       => use_CEL)  -- use_CEL for SIMU, use_RAM for synthesis
-  --  PORT MAP (
-  --    reset      => rstn,
-  --    clk        => clk,
-  --    sample_clk => sample_val_delay,
-  --    sample_in  => sample_filter_in,
-  --    sample_out => sample_filter_out,
-  --    virg_pos   => 7,
-  --    GOtest     => OPEN,
-  --    coefs      => coefs);
+  
+  coefs_v2 <= CoefsInitValCst_v2;
 
   IIR_CEL_CTRLR_v2_1 : IIR_CEL_CTRLR_v2
     GENERIC MAP (
@@ -181,26 +159,26 @@ BEGIN
       rstn           => rstn,
       clk            => clk,
       virg_pos       => 7,
-      coefs          => coefs_JC,
+      coefs          => coefs_v2,
       sample_in_val  => sample_val_delay,
       sample_in      => sample_filter_in,
-      sample_out_val => sample_filter_JC_out_val,
-      sample_out     => sample_filter_JC_out);
+      sample_out_val => sample_filter_v2_out_val,
+      sample_out     => sample_filter_v2_out);
 
   -----------------------------------------------------------------------------
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      sample_filter_JC_out_r_val <= '0';
+      sample_filter_v2_out_r_val <= '0';
       rst_all_chanel : FOR I IN ChanelCount-1 DOWNTO 0 LOOP
         rst_all_bits : FOR J IN 17 DOWNTO 0 LOOP
-          sample_filter_JC_out_r(I, J) <= '0';
+          sample_filter_v2_out_r(I, J) <= '0';
         END LOOP rst_all_bits;
       END LOOP rst_all_chanel;
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      sample_filter_JC_out_r_val <= sample_filter_JC_out_val;
-      IF sample_filter_JC_out_val = '1' THEN
-        sample_filter_JC_out_r <= sample_filter_JC_out;
+      sample_filter_v2_out_r_val <= sample_filter_v2_out_val;
+      IF sample_filter_v2_out_val = '1' THEN
+        sample_filter_v2_out_r <= sample_filter_v2_out;
       END IF;
     END IF;
   END PROCESS;
@@ -216,8 +194,8 @@ BEGIN
     PORT MAP (
       clk            => clk,
       rstn           => rstn,
-      sample_in_val  => sample_filter_JC_out_val ,
-      sample_in      => sample_filter_JC_out,
+      sample_in_val  => sample_filter_v2_out_val ,
+      sample_in      => sample_filter_v2_out,
       sample_out_val => sample_f0_val,
       sample_out     => sample_f0);
 

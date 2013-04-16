@@ -2,7 +2,6 @@ SCRIPTSDIR=scripts/
 LIBDIR=lib/
 BOARDSDIR=boards/
 DESIGNSDIR=designs/
-	
 
 
 .PHONY:doc
@@ -54,6 +53,7 @@ Patch-GRLIB: init doc
 
 link:
 	sh $(SCRIPTSDIR)/linklibs.sh $(GRLIB)
+	sh $(SCRIPTSDIR)/patchboards.sh $(GRLIB)
 
 dist: init
 	tar -cvzf ./../lpp-lib.tgz ./../VHD_Lib/*

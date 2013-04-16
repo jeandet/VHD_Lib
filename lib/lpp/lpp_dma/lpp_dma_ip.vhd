@@ -45,11 +45,8 @@ USE techmap.gencomp.ALL;
 ENTITY lpp_dma_ip IS
   GENERIC (
     tech   : INTEGER := inferred;
-    hindex : INTEGER := 2;
-    pindex : INTEGER := 4;
-    paddr  : INTEGER := 4;
-    pmask  : INTEGER := 16#fff#;
-    pirq   : INTEGER := 0);
+    hindex : INTEGER := 2
+    );
   PORT (
     -- AMBA AHB system signals
     HCLK    : IN STD_ULOGIC;
