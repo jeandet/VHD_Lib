@@ -1,5 +1,9 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+
+LIBRARY grlib;
+USE grlib.amba.ALL;
+
 LIBRARY lpp;
 USE lpp.lpp_ad_conv.ALL;
 USE lpp.iir_filter.ALL;

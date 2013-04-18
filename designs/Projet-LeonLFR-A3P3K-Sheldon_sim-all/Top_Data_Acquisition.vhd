@@ -159,32 +159,32 @@ BEGIN
     sample_filter_in(i, 17) <= sample(i)(15);
   END GENERATE;
 
-  coefs    <= CoefsInitValCst;
-  coefs_JC <= CoefsInitValCst_JC;
+  --coefs    <= CoefsInitValCst;
+  coefs_JC <= CoefsInitValCst_v2;
 
-  FILTER : IIR_CEL_CTRLR
-    GENERIC MAP (
-      tech          => 0,
-      Sample_SZ     => 18,
-      ChanelsCount  => ChanelCount,
-      Coef_SZ       => Coef_SZ,
-      CoefCntPerCel => CoefCntPerCel,
-      Cels_count    => Cels_count,
-      Mem_use       => use_CEL)  -- use_CEL for SIMU, use_RAM for synthesis
-    PORT MAP (
-      reset      => rstn,
-      clk        => clk,
-      sample_clk => sample_val_delay,
-      sample_in  => sample_filter_in,
-      sample_out => sample_filter_out,
-      virg_pos   => 7,
-      GOtest     => OPEN,
-      coefs      => coefs);
+  --FILTER : IIR_CEL_CTRLR
+  --  GENERIC MAP (
+  --    tech          => 0,
+  --    Sample_SZ     => 18,
+  --    ChanelsCount  => ChanelCount,
+  --    Coef_SZ       => Coef_SZ,
+  --    CoefCntPerCel => CoefCntPerCel,
+  --    Cels_count    => Cels_count,
+  --    Mem_use       => use_CEL)  -- use_CEL for SIMU, use_RAM for synthesis
+  --  PORT MAP (
+  --    reset      => rstn,
+  --    clk        => clk,
+  --    sample_clk => sample_val_delay,
+  --    sample_in  => sample_filter_in,
+  --    sample_out => sample_filter_out,
+  --    virg_pos   => 7,
+  --    GOtest     => OPEN,
+  --    coefs      => coefs);
 
   IIR_CEL_CTRLR_v2_1 : IIR_CEL_CTRLR_v2
     GENERIC MAP (
       tech         => 0,
-      Mem_use      => use_CEL,
+      Mem_use      => use_RAM,
       Sample_SZ    => 18,
       Coef_SZ      => Coef_SZ,
       Coef_Nb      => 25,               -- TODO

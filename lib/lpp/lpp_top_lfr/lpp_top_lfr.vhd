@@ -12,6 +12,9 @@ USE lpp.FILTERcfg.ALL;
 USE lpp.lpp_memory.ALL;
 USE lpp.lpp_top_lfr_pkg.ALL;
 USE lpp.lpp_dma_pkg.ALL;
+USE lpp.lpp_demux.ALL;
+USE lpp.lpp_fft.ALL;
+use lpp.lpp_matrix.all;
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
 
@@ -52,37 +55,37 @@ ARCHITECTURE tb OF lpp_top_lfr IS
   -- f0
   SIGNAL sample_f0_0_wen   : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL sample_f0_1_wen   : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f0_wdata   : STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
+  SIGNAL sample_f0_wdata   : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   --
   SIGNAL sample_f0_0_ren   : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f0_0_rdata : STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
+  SIGNAL sample_f0_0_rdata : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   SIGNAL sample_f0_0_full  : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL sample_f0_0_empty : STD_LOGIC_VECTOR(4 DOWNTO 0);
   --
   SIGNAL sample_f0_1_ren   : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f0_1_rdata : STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
+  SIGNAL sample_f0_1_rdata : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   SIGNAL sample_f0_1_full  : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL sample_f0_1_empty : STD_LOGIC_VECTOR(4 DOWNTO 0);
   -----------------------------------------------------------------------------
   -- f1
   SIGNAL sample_f1_wen     : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f1_wdata   : STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
+  SIGNAL sample_f1_wdata   : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   --
   SIGNAL sample_f1_ren     : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f1_rdata   : STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
+  SIGNAL sample_f1_rdata   : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   SIGNAL sample_f1_full    : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL sample_f1_empty   : STD_LOGIC_VECTOR(4 DOWNTO 0);
   -----------------------------------------------------------------------------
   -- f2
   SIGNAL sample_f2_wen     : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f2_wdata   : STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
+  SIGNAL sample_f2_wdata   : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   -----------------------------------------------------------------------------
   -- f3
   SIGNAL sample_f3_wen     : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f3_wdata   : STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
+  SIGNAL sample_f3_wdata   : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   --
   SIGNAL sample_f3_ren     : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f3_rdata   : STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
+  SIGNAL sample_f3_rdata   : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   SIGNAL sample_f3_full    : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL sample_f3_empty   : STD_LOGIC_VECTOR(4 DOWNTO 0);
   -----------------------------------------------------------------------------
@@ -90,6 +93,20 @@ ARCHITECTURE tb OF lpp_top_lfr IS
   -----------------------------------------------------------------------------
   -- SPECTRAL MATRIX
   -----------------------------------------------------------------------------
+  SIGNAL sample_ren : STD_LOGIC_VECTOR(19 DOWNTO 0);
+
+  SIGNAL demux_empty : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL demux_ren   : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL demux_data  : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+
+  SIGNAL fft_fifo_full  : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL fft_fifo_data  : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+  SIGNAL fft_fifo_wen   : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL fft_fifo_reuse : STD_LOGIC_VECTOR(4 DOWNTO 0);
+
+  SIGNAL SP_fifo_data  : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+  SIGNAL SP_fifo_ren : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  
   SIGNAL fifo_data  : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL fifo_empty : STD_LOGIC;
   SIGNAL fifo_ren   : STD_LOGIC;
@@ -155,7 +172,7 @@ BEGIN
   lppFIFO_f0_0 : lppFIFOxN
     GENERIC MAP (
       tech         => tech,
-      Data_sz      => 18,
+      Data_sz      => 16,
       FifoCnt      => 5,
       Enable_ReUse => '0')
     PORT MAP (
@@ -174,7 +191,7 @@ BEGIN
   lppFIFO_f0_1 : lppFIFOxN
     GENERIC MAP (
       tech         => tech,
-      Data_sz      => 18,
+      Data_sz      => 16,
       FifoCnt      => 5,
       Enable_ReUse => '0')
     PORT MAP (
@@ -193,7 +210,7 @@ BEGIN
   lppFIFO_f1 : lppFIFOxN
     GENERIC MAP (
       tech         => tech,
-      Data_sz      => 18,
+      Data_sz      => 16,
       FifoCnt      => 5,
       Enable_ReUse => '0')
     PORT MAP (
@@ -212,7 +229,7 @@ BEGIN
   lppFIFO_f3 : lppFIFOxN
     GENERIC MAP (
       tech         => tech,
-      Data_sz      => 18,
+      Data_sz      => 16,
       FifoCnt      => 5,
       Enable_ReUse => '0')
     PORT MAP (
@@ -231,6 +248,82 @@ BEGIN
   -----------------------------------------------------------------------------
   -- SPECTRAL MATRIX
   -----------------------------------------------------------------------------
+  sample_f0_0_ren <= sample_ren(4 DOWNTO 0);
+  sample_f0_1_ren <= sample_ren(9 DOWNTO 5);
+  sample_f1_ren   <= sample_ren(14 DOWNTO 10);
+  sample_f3_ren   <= sample_ren(19 DOWNTO 15);
+
+  Demultiplex_1 : Demultiplex
+    GENERIC MAP (
+      Data_sz => 16)
+    PORT MAP (
+      clk  => clk,
+      rstn => rstn,
+
+      Read       => demux_ren,
+      EmptyF0a   => sample_f0_0_empty,
+      EmptyF0b   => sample_f0_0_empty,
+      EmptyF1    => sample_f1_empty,
+      EmptyF2    => sample_f3_empty,
+      DataF0a    => sample_f0_0_rdata,
+      DataF0b    => sample_f0_1_rdata,
+      DataF1     => sample_f1_rdata,
+      DataF2     => sample_f3_rdata,
+      Read_DEMUX => sample_ren,
+      Empty      => demux_empty,
+      Data       => demux_data);
+
+  FFT_1 : FFT
+    GENERIC MAP (
+      Data_sz => 16,
+      NbData  => 256)
+    PORT MAP (
+      clkm         => clk,
+      rstn         => rstn,
+      FifoIN_Empty => demux_empty,
+      FifoIN_Data  => demux_data,
+      FifoOUT_Full => fft_fifo_full,    
+      Read         => demux_ren,
+      Write        => fft_fifo_wen,     
+      ReUse        => fft_fifo_reuse,   
+      Data         => fft_fifo_data);   
+
+  lppFIFO_fft : lppFIFOxN
+    GENERIC MAP (
+      tech         => tech,
+      Data_sz      => 16,
+      FifoCnt      => 5,
+      Enable_ReUse => '1')
+    PORT MAP (
+      rst   => rstn,
+      wclk  => clk,
+      rclk  => clk,
+      ReUse => fft_fifo_reuse,
+      wen   => fft_fifo_wen,
+      ren   => SP_fifo_ren,
+      wdata => fft_fifo_data,
+      rdata => SP_fifo_data,
+      full  => fft_fifo_full,
+      empty => OPEN);
+
+  MatriceSpectrale_1: MatriceSpectrale
+    GENERIC MAP (
+      Input_SZ  => 16,
+      Result_SZ => 32)
+    PORT MAP (
+      clkm         => clk,
+      rstn         => rstn,
+      
+      FifoIN_Full  => fft_fifo_full,
+      FifoOUT_Full => ,                 -- TODO
+      Data_IN      => SP_fifo_data,
+      ACQ          => ,                 -- TODO
+      FlagError    => ,                 -- TODO
+      Pong         => ,                 -- TODO
+      Write        => ,                 -- TODO
+      Read         => SP_fifo_ren,
+      Data_OUT     => );                -- TODO
+  
 
   -----------------------------------------------------------------------------
   -- DMA SPECTRAL MATRIX
@@ -282,11 +375,11 @@ BEGIN
       pmask  => pmask,
       pirq   => pirq)
     PORT MAP (
-      HCLK                                   => clk,
-      HRESETn                                => rstn,
-      apbi                                   => apbi,
-      apbo                                   => apbo,
-      
+      HCLK    => clk,
+      HRESETn => rstn,
+      apbi    => apbi,
+      apbo    => apbo,
+
       ready_matrix_f0_0                      => ready_matrix_f0_0,
       ready_matrix_f0_1                      => ready_matrix_f0_1,
       ready_matrix_f1                        => ready_matrix_f1,
@@ -307,12 +400,12 @@ BEGIN
       addr_matrix_f1                         => addr_matrix_f1,
       addr_matrix_f2                         => addr_matrix_f2);
 
-  
+
   --TODO : add the irq alert for DMA matrix transfert ending
   --TODO : add 5 bit register into APB to control the DATA SHIPING
   --TODO : add Spectral Matrix (FFT + SP)
   --TODO : add DMA for WaveForms Picker
   --TODO : add APB Reg to control WaveForms Picker
   --TODO : add WaveForms Picker
-  
+
 END tb;

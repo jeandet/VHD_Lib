@@ -19,7 +19,7 @@ vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/iir_filter.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/FILTERcfg.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/RAM_CEL.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/RAM_CTRLR2.vhd
-vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/IIR_CEL_CTRLR.vhd
+#vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/IIR_CEL_CTRLR.vhd
 
 vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/RAM_CTRLR_v2.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/IIR_CEL_CTRLR_v2_DATAFLOW.vhd
