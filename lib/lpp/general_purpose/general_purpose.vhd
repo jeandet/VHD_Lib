@@ -111,7 +111,6 @@ Constant ctrl_CLRMAC : std_logic_vector(2 downto 0) := "100";
     GENERIC(
       Input_SZ_A : INTEGER := 8;
       Input_SZ_B : INTEGER := 8
-
       );
     PORT(
       clk         : IN  STD_LOGIC;
