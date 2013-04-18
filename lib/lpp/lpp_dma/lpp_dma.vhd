@@ -104,14 +104,10 @@ BEGIN
   -- LPP DMA IP
   -----------------------------------------------------------------------------
 
-  lpp_dma_ip_1: ENTITY work.lpp_dma_ip
+  lpp_dma_ip_1: lpp_dma_ip
     GENERIC MAP (
       tech   => tech,
-      hindex => hindex,
-      pindex => pindex,
-      paddr  => paddr,
-      pmask  => pmask,
-      pirq   => pirq)
+      hindex => hindex)
     PORT MAP (
       HCLK                                   => HCLK,
       HRESETn                                => HRESETn,
