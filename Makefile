@@ -2,7 +2,6 @@ SCRIPTSDIR=scripts/
 LIBDIR=lib/
 BOARDSDIR=boards/
 DESIGNSDIR=designs/
-	
 
 
 .PHONY:doc
@@ -14,6 +13,7 @@ help:
 	@echo
 	@echo " batch targets:"
 	@echo
+	@echo " make link            : link lpp library to GRLIB at : $(GRLIB)"
 	@echo " make Patch-GRLIB     : install library into GRLIB at : $(GRLIB)"
 	@echo " make dist            : create a tar file for using into an other computer"
 	@echo " make Patched-dist    : create a tar file for with a patched grlib for using"
@@ -51,6 +51,9 @@ APB_devs:
 Patch-GRLIB: init doc
 	sh $(SCRIPTSDIR)/patch.sh $(GRLIB)
 
+link:
+	sh $(SCRIPTSDIR)/linklibs.sh $(GRLIB)
+	sh $(SCRIPTSDIR)/patchboards.sh $(GRLIB)
 
 dist: init
 	tar -cvzf ./../lpp-lib.tgz ./../VHD_Lib/*

@@ -1,0 +1,1033 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spirit:design xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xilinx="http://www.xilinx.com" >
+   <spirit:vendor>xilinx.com</spirit:vendor>
+   <spirit:library>project</spirit:library>
+   <spirit:name>mig</spirit:name>
+   <spirit:version>1.0</spirit:version>
+   <spirit:componentInstances>
+      <spirit:componentInstance>
+         <spirit:instanceName>mig_392</spirit:instanceName>
+         <spirit:componentRef spirit:vendor="xilinx.com" spirit:library="ip" spirit:name="MIG_Virtex6_and_Spartan6" spirit:version="3.92" />
+         <spirit:configurableElementValues>
+            <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.COMPONENT_NAME">mig_392</spirit:configurableElementValue>
+            <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.XML_INPUT_FILE">./mig.prj</spirit:configurableElementValue>
+         </spirit:configurableElementValues>
+         <spirit:vendorExtensions>
+            <xilinx:instanceProperties xmlns:xilinx="http://www.xilinx.com">
+               <xilinx:projectOptions>
+                  <xilinx:projectName>mig</xilinx:projectName>
+                  <xilinx:outputDirectory>./</xilinx:outputDirectory>
+                  <xilinx:workingDirectory>./tmp/</xilinx:workingDirectory>
+                  <xilinx:subWorkingDirectory>./tmp/_cg/</xilinx:subWorkingDirectory>
+               </xilinx:projectOptions>
+               <xilinx:part>
+                  <xilinx:device>xc6slx45t</xilinx:device>
+                  <xilinx:deviceFamily>spartan6</xilinx:deviceFamily>
+                  <xilinx:package>fgg484</xilinx:package>
+                  <xilinx:speedGrade>-3</xilinx:speedGrade>
+               </xilinx:part>
+               <xilinx:flowOptions>
+                  <xilinx:busFormat>BusFormatParenNotRipped</xilinx:busFormat>
+                  <xilinx:designEntry>VHDL</xilinx:designEntry>
+                  <xilinx:asySymbol>true</xilinx:asySymbol>
+                  <xilinx:flowVendor>Synplicity</xilinx:flowVendor>
+                  <xilinx:addPads>false</xilinx:addPads>
+                  <xilinx:removeRPMs>false</xilinx:removeRPMs>
+                  <xilinx:createNDF>false</xilinx:createNDF>
+                  <xilinx:implementationFileType>Ngc</xilinx:implementationFileType>
+                  <xilinx:formalVerification>false</xilinx:formalVerification>
+               </xilinx:flowOptions>
+               <xilinx:simulationOptions>
+                  <xilinx:simulationModel>Behavioral</xilinx:simulationModel>
+                  <xilinx:simulationLanguage>VHDL</xilinx:simulationLanguage>
+                  <xilinx:foundationSym>false</xilinx:foundationSym>
+               </xilinx:simulationOptions>
+            </xilinx:instanceProperties>
+         </spirit:vendorExtensions>
+      </spirit:componentInstance>
+      <spirit:componentInstance>
+         <spirit:instanceName>mig_38</spirit:instanceName>
+         <spirit:componentRef spirit:vendor="xilinx.com" spirit:library="ip" spirit:name="mig" spirit:version="3.92" />
+         <spirit:configurableElementValues>
+            <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.COMPONENT_NAME">mig_38</spirit:configurableElementValue>
+            <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.XML_INPUT_FILE">./mig_38/user_design/mig.prj</spirit:configurableElementValue>
+         </spirit:configurableElementValues>
+         <spirit:vendorExtensions>
+            <xilinx:instanceProperties>
+               <xilinx:projectOptions>
+                  <xilinx:projectName>mig</xilinx:projectName>
+                  <xilinx:outputDirectory>./</xilinx:outputDirectory>
+                  <xilinx:workingDirectory>./tmp/</xilinx:workingDirectory>
+                  <xilinx:subWorkingDirectory>./tmp/_cg/</xilinx:subWorkingDirectory>
+               </xilinx:projectOptions>
+               <xilinx:part>
+                  <xilinx:device>xc6slx45</xilinx:device>
+                  <xilinx:deviceFamily>spartan6</xilinx:deviceFamily>
+                  <xilinx:package>fgg484</xilinx:package>
+                  <xilinx:speedGrade>-3</xilinx:speedGrade>
+               </xilinx:part>
+               <xilinx:flowOptions>
+                  <xilinx:busFormat>BusFormatAngleBracketNotRipped</xilinx:busFormat>
+                  <xilinx:designEntry>VHDL</xilinx:designEntry>
+                  <xilinx:asySymbol>true</xilinx:asySymbol>
+                  <xilinx:flowVendor>Other</xilinx:flowVendor>
+                  <xilinx:addPads>false</xilinx:addPads>
+                  <xilinx:removeRPMs>false</xilinx:removeRPMs>
+                  <xilinx:createNDF>false</xilinx:createNDF>
+                  <xilinx:implementationFileType>Ngc</xilinx:implementationFileType>
+                  <xilinx:formalVerification>false</xilinx:formalVerification>
+               </xilinx:flowOptions>
+               <xilinx:simulationOptions>
+                  <xilinx:simulationModel>Behavioral</xilinx:simulationModel>
+                  <xilinx:simulationLanguage>VHDL</xilinx:simulationLanguage>
+                  <xilinx:foundationSym>false</xilinx:foundationSym>
+               </xilinx:simulationOptions>
+               <xilinx:packageInfo>
+                  <xilinx:sourceCoreCreationDate>2012-07-21+06:31</xilinx:sourceCoreCreationDate>
+               </xilinx:packageInfo>
+            </xilinx:instanceProperties>
+            <xilinx:generationHistory>
+               <xilinx:fileSet>
+                  <xilinx:name>apply_current_project_options_generator</xilinx:name>
+               </xilinx:fileSet>
+               <xilinx:fileSet>
+                  <xilinx:name>customization_generator</xilinx:name>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/docs/ug388.pdf</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>pdf</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x90FCF0D1</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/docs/ug416.pdf</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>pdf</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x5A2D5D89</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/datasheet.txt</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>txt</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x3B3D8F7B</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/mig.prj</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x74598905</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/par/create_ise.sh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x2E26C0EA</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/par/example_top.ucf</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>ucf</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xEC0BF13A</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/par/icon_coregen.xco</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>xco</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xA685087A</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/par/ila_coregen.xco</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>xco</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x09D6FF45</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/par/ise_flow.sh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x8D1A0F1F</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/par/ise_run.txt</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>txt</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xEC7E774F</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/par/makeproj.sh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xCFE64DF9</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/par/mem_interface_top.ut</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xCDD0105F</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/par/readme.txt</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>txt</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xCA0E2934</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/par/rem_files.sh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xC692A20F</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/par/set_ise_prop.tcl</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>tcl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x3307FF85</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/par/vio_coregen.xco</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>xco</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x273CCC27</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/example_top.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x79C4A1D0</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/iodrp_controller.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x5A2197DD</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/iodrp_mcb_controller.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x69237401</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/mcb_raw_wrapper.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xA3623325</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/mcb_soft_calibration.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x9B8E0B5E</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/mcb_soft_calibration_top.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xC37A23BB</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/memc3_infrastructure.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x8EA90667</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/memc3_tb_top.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xDB511AFE</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/memc3_wrapper.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x301ED9DD</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/afifo.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x26568D9A</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/cmd_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xC6EF0126</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/cmd_prbs_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x893B0F01</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/data_prbs_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x6E88FB8E</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/init_mem_pattern_ctr.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x26DEA717</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/mcb_flow_control.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xB9D71414</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/mcb_traffic_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x125A1D59</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/rd_data_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x50A90B14</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/read_data_path.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xDFA5DAF7</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/read_posted_fifo.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xBC61DAC4</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/sp6_data_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xA9170C59</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/tg_status.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x7B717096</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/v6_data_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x24F3E550</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/wr_data_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x91BCA941</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/rtl/traffic_gen/write_data_path.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x391A16CE</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/sim/functional/ddr3_model_c3.v</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>verilog</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x4888E9C7</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/sim/functional/ddr3_model_parameters_c3.vh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xFCAE2B71</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/sim/functional/isim.sh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x3C08CE2A</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/sim/functional/isim.tcl</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>tcl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x42CDE72E</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/sim/functional/mig_38.prj</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x4C74E1F0</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/sim/functional/readme.txt</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>txt</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xFF44EBCB</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/sim/functional/sim.do</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x7B7530ED</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/sim/functional/sim_tb_top.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x708A0AE5</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/sim/functional/timing_sim.sh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x68A01DAC</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/synth/example_top.lso</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xEEDE3797</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/synth/example_top.prj</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x45A82CBA</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/synth/mem_interface_top_synp.sdc</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x53C2426B</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/example_design/synth/script_synp.tcl</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>tcl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x26385651</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/datasheet.txt</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>txt</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xE0532100</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/mig.prj</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x74598905</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/par/create_ise.sh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x2E26C0EA</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/par/icon_coregen.xco</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>xco</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xA685087A</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/par/ila_coregen.xco</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>xco</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x09D6FF45</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/par/ise_flow.sh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x2A709F1E</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/par/ise_run.txt</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>txt</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x87308F55</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/par/makeproj.sh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xCFE64DF9</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/par/mem_interface_top.ut</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xCDD0105F</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/par/mig_38.ucf</xilinx:name>
+                     <xilinx:userFileType>ucf</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x37B6E71C</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/par/readme.txt</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>txt</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x14A89A1B</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/par/rem_files.sh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x1A866057</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/par/set_ise_prop.tcl</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>tcl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x21AE7E61</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/par/vio_coregen.xco</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>xco</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x273CCC27</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/rtl/iodrp_controller.vhd</xilinx:name>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x5A2197DD</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/rtl/iodrp_mcb_controller.vhd</xilinx:name>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x69237401</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/rtl/mcb_raw_wrapper.vhd</xilinx:name>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xA3623325</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/rtl/mcb_soft_calibration.vhd</xilinx:name>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x9B8E0B5E</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/rtl/mcb_soft_calibration_top.vhd</xilinx:name>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xC37A23BB</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/rtl/memc3_infrastructure.vhd</xilinx:name>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x8EA90667</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/rtl/memc3_wrapper.vhd</xilinx:name>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x301ED9DD</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/rtl/mig_38.vhd</xilinx:name>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x9CF2B6E1</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/afifo.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x26568D9A</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/cmd_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xC6EF0126</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/cmd_prbs_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x893B0F01</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/data_prbs_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x6E88FB8E</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/ddr3_model_c3.v</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>verilog</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x4888E9C7</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/ddr3_model_parameters_c3.vh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xFCAE2B71</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/init_mem_pattern_ctr.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x26DEA717</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/isim.sh</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x3C08CE2A</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/isim.tcl</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>tcl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x42CDE72E</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/mcb_flow_control.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xB9D71414</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/mcb_traffic_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x125A1D59</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/memc3_tb_top.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xDB511AFE</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/mig_38.prj</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x095DF099</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/rd_data_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x50A90B14</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/read_data_path.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xDFA5DAF7</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/read_posted_fifo.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xBC61DAC4</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/readme.txt</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>txt</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xFF44EBCB</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/sim.do</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x71356E79</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/sim_tb_top.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x07646316</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/sp6_data_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xA9170C59</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/tg_status.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x7B717096</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/v6_data_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x24F3E550</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/wr_data_gen.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x91BCA941</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/sim/write_data_path.vhd</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>vhdl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x391A16CE</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/synth/mem_interface_top_synp.sdc</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x1F855903</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/synth/mig_38.lso</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xEEDE3797</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/synth/mig_38.prj</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>unknown</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xB356DCEF</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38/user_design/synth/script_synp.tcl</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>tcl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x2F81C446</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38.vho</xilinx:name>
+                     <xilinx:userFileType>vho</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x01F45477</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38_readme.txt</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>txt</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xB03C2FD6</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38_xmdf.tcl</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>tcl</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x46DC07F2</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+               </xilinx:fileSet>
+               <xilinx:fileSet>
+                  <xilinx:name>model_parameter_resolution_generator</xilinx:name>
+               </xilinx:fileSet>
+               <xilinx:fileSet>
+                  <xilinx:name>ip_xco_generator</xilinx:name>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38.xco</xilinx:name>
+                     <xilinx:userFileType>xco</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:56:57 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xDA75A70B</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+               </xilinx:fileSet>
+               <xilinx:fileSet>
+                  <xilinx:name>implementation_source_generator</xilinx:name>
+               </xilinx:fileSet>
+               <xilinx:fileSet>
+                  <xilinx:name>instantiation_template_generator</xilinx:name>
+               </xilinx:fileSet>
+               <xilinx:fileSet>
+                  <xilinx:name>asy_generator</xilinx:name>
+               </xilinx:fileSet>
+               <xilinx:fileSet>
+                  <xilinx:name>xmdf_generator</xilinx:name>
+               </xilinx:fileSet>
+               <xilinx:fileSet>
+                  <xilinx:name>ise_generator</xilinx:name>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38.gise</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>gise</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:57:01 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xDB2406DD</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38.xise</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>xise</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:57:01 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x54C3BA6E</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+               </xilinx:fileSet>
+               <xilinx:fileSet>
+                  <xilinx:name>deliver_readme_generator</xilinx:name>
+               </xilinx:fileSet>
+               <xilinx:fileSet>
+                  <xilinx:name>flist_generator</xilinx:name>
+                  <xilinx:file>
+                     <xilinx:name>./mig_38_flist.txt</xilinx:name>
+                     <xilinx:userFileType>ignore</xilinx:userFileType>
+                     <xilinx:userFileType>txtFlist</xilinx:userFileType>
+                     <xilinx:userFileType>txt</xilinx:userFileType>
+                     <xilinx:timeStamp>Mon Apr 08 17:57:01 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x7CF73606</xilinx:checkSum>
+                     <xilinx:generationId>generationID_4013899584</xilinx:generationId>
+                  </xilinx:file>
+               </xilinx:fileSet>
+               <xilinx:fileSet>
+                  <xilinx:name>view_readme_generator</xilinx:name>
+               </xilinx:fileSet>
+            </xilinx:generationHistory>
+         </spirit:vendorExtensions>
+      </spirit:componentInstance>
+   </spirit:componentInstances>
+   <spirit:vendorExtensions>
+      <xilinx:instanceProperties>
+         <xilinx:projectOptions>
+            <xilinx:projectName>mig</xilinx:projectName>
+            <xilinx:outputDirectory>./</xilinx:outputDirectory>
+            <xilinx:workingDirectory>./tmp/</xilinx:workingDirectory>
+            <xilinx:subWorkingDirectory>./tmp/_cg/</xilinx:subWorkingDirectory>
+         </xilinx:projectOptions>
+         <xilinx:part>
+            <xilinx:device>xc6slx45</xilinx:device>
+            <xilinx:deviceFamily>spartan6</xilinx:deviceFamily>
+            <xilinx:package>fgg484</xilinx:package>
+            <xilinx:speedGrade>-3</xilinx:speedGrade>
+         </xilinx:part>
+         <xilinx:flowOptions>
+            <xilinx:busFormat>BusFormatAngleBracketNotRipped</xilinx:busFormat>
+            <xilinx:designEntry>VHDL</xilinx:designEntry>
+            <xilinx:asySymbol>true</xilinx:asySymbol>
+            <xilinx:flowVendor>Other</xilinx:flowVendor>
+            <xilinx:addPads>false</xilinx:addPads>
+            <xilinx:removeRPMs>false</xilinx:removeRPMs>
+            <xilinx:createNDF>false</xilinx:createNDF>
+            <xilinx:implementationFileType>Ngc</xilinx:implementationFileType>
+            <xilinx:formalVerification>false</xilinx:formalVerification>
+         </xilinx:flowOptions>
+         <xilinx:simulationOptions>
+            <xilinx:simulationModel>Behavioral</xilinx:simulationModel>
+            <xilinx:simulationLanguage>VHDL</xilinx:simulationLanguage>
+            <xilinx:foundationSym>false</xilinx:foundationSym>
+         </xilinx:simulationOptions>
+      </xilinx:instanceProperties>
+   </spirit:vendorExtensions>
+</spirit:design>
+

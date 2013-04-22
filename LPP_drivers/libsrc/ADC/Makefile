@@ -16,8 +16,8 @@
 #--  along with this program; if not, write to the Free Software
 #--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 #------------------------------------------------------------------------------
-FILE = adc_Driver
-LIB = liblpp_adc_Driver.a
+FILE = ADC_Driver
+LIB = liblpp_ADC_Driver.a
 
 include ../../rules.mk
 

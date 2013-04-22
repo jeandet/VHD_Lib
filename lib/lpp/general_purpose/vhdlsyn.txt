@@ -1,6 +1,7 @@
 ADDRcntr.vhd
 ALU.vhd
 Adder.vhd
+Clk_Divider2.vhd
 Clk_divider.vhd
 MAC.vhd
 MAC_CONTROLER.vhd
@@ -11,6 +12,6 @@ MUX2.vhd
 MUXN.vhd
 Multiplier.vhd
 REG.vhd
-Shifter.vhd
 SYNC_FF.vhd
+Shifter.vhd
 general_purpose.vhd

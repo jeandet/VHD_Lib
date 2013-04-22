@@ -32,8 +32,8 @@ int main()
 
 ///////////////////////////////////////////////////////////////////////////
     mspec->Statu = 2;
-    FillFifo(fifoIn,0,TblB1);
-    FillFifo(fifoIn,1,TblB2);
+    FillFifo(fifoIn,0,TblB1,256);
+    FillFifo(fifoIn,1,TblB2,256);
     gpio0->Dout = 0x1;
 
     while((fifoOut->FIFOreg[(2*0)+FIFO_Ctrl] & FIFO_Empty) != FIFO_Empty) // TANT QUE  empty a 0  ALORS
@@ -56,7 +56,7 @@ int main()
 
 ///////////////////////////////////////////////////////////////////////////
     mspec->Statu = 1;
-    FillFifo(fifoIn,0,TblB1);
+    FillFifo(fifoIn,0,TblB1,256);
     gpio0->Dout = 0x1;
     while((fifoOut->FIFOreg[(2*0)+FIFO_Ctrl] & FIFO_Empty) != FIFO_Empty) // TANT QUE  empty a 0  ALORS
     {
@@ -78,8 +78,8 @@ int main()
 
 ///////////////////////////////////////////////////////////////////////////
     mspec->Statu = 4;
-    FillFifo(fifoIn,0,TblB1);
-    FillFifo(fifoIn,1,TblB3);
+    FillFifo(fifoIn,0,TblB1,256);
+    FillFifo(fifoIn,1,TblB3,256);
     gpio0->Dout = 0x1;
 
     while((fifoOut->FIFOreg[(2*0)+FIFO_Ctrl] & FIFO_Empty) != FIFO_Empty) // TANT QUE  empty a 0  ALORS
@@ -123,19 +123,19 @@ int main2()
 
     printf("\nDebut Main\n\n");
 
-    FillFifo(fifoIn,0,TblB1);
+    FillFifo(fifoIn,0,TblB1,256);
     fifoIn->FIFOreg[(2*0)+FIFO_Ctrl] = (fifoIn->FIFOreg[(2*0)+FIFO_Ctrl] | FIFO_ReUse);
 
-    FillFifo(fifoIn,1,TblB2);
+    FillFifo(fifoIn,1,TblB2,256);
     fifoIn->FIFOreg[(2*1)+FIFO_Ctrl] = (fifoIn->FIFOreg[(2*1)+FIFO_Ctrl] | FIFO_ReUse);
 
-    FillFifo(fifoIn,2,TblB3);
+    FillFifo(fifoIn,2,TblB3,256);
     fifoIn->FIFOreg[(2*2)+FIFO_Ctrl] = (fifoIn->FIFOreg[(2*2)+FIFO_Ctrl] | FIFO_ReUse);
 
-    FillFifo(fifoIn,3,TblE1);
+    FillFifo(fifoIn,3,TblE1,256);
     fifoIn->FIFOreg[(2*3)+FIFO_Ctrl] = (fifoIn->FIFOreg[(2*3)+FIFO_Ctrl] | FIFO_ReUse);
 
-    FillFifo(fifoIn,4,TblE2);
+    FillFifo(fifoIn,4,TblE2,256);
 
     fifoIn->FIFOreg[(2*4)+FIFO_Ctrl] = (fifoIn->FIFOreg[(2*4)+FIFO_Ctrl] | FIFO_ReUse);
 

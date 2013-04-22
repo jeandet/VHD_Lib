@@ -1,5 +1,5 @@
 include .config
-GRLIB=../..
+#GRLIB=../..
 TOP=leon3mp
 BOARD=digilent-xc3s1600e
 include $(GRLIB)/boards/$(BOARD)/Makefile.inc

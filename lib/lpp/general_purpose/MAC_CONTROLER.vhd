@@ -34,6 +34,7 @@ port(
     ctrl        :   in  std_logic_vector(1 downto 0);
     MULT        :   out std_logic;
     ADD         :   out std_logic;
+    LOAD_ADDER  :   out std_logic;
     MACMUX_sel  :   out std_logic;
     MACMUX2_sel :   out std_logic
 
@@ -52,8 +53,12 @@ begin
 
 MULT        <=  '0' when (ctrl = "00" or ctrl = "11") else '1';
 ADD         <=  '0' when (ctrl = "00" or ctrl = "10") else '1';
-MACMUX_sel  <=  '0' when (ctrl = "00" or ctrl = "01") else '1';
-MACMUX2_sel <=  '0' when (ctrl = "00" or ctrl = "01"or ctrl = "11") else '1';
+LOAD_ADDER  <=  '1' when (ctrl = "10") else '0';  -- PATCH JC : mem mult result
+                                                  -- to permit to compute a
+                                                  -- MULT follow by a MAC
+--MACMUX_sel  <=  '0' when (ctrl = "00" or ctrl = "01") else '1';
+MACMUX_sel  <=  '0' when (ctrl = "00" or ctrl = "01" OR ctrl = "10") else '1';
+MACMUX2_sel <=  '0' when (ctrl = "00" or ctrl = "01" or ctrl = "11") else '1';
 
 
 end ar_MAC_CONTROLER;

@@ -16,62 +16,48 @@
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 -------------------------------------------------------------------------------
---                    Author : Alexis Jeandet
---                     Mail : alexis.jeandet@lpp.polytechnique.fr
-----------------------------------------------------------------------------
-LIBRARY IEEE;
-USE IEEE.numeric_std.ALL;
-USE IEEE.std_logic_1164.ALL;
-LIBRARY lpp;
-USE lpp.general_purpose.ALL;
---IDLE                  = 0000
---MAC                   = 0001
---MULT                  = 0010 and set MULT in ADD reg
---ADD                   = 0011
---CLRMAC                = 0100
+--                    Author : Martin Morlot
+--                   Mail : martin.morlot@lpp.polytechnique.fr
+-------------------------------------------------------------------------------
+library IEEE;
+use IEEE.numeric_std.all;
+use IEEE.std_logic_1164.all;
+library lpp;
+use lpp.general_purpose.all;
 
+--! Une ALU : Arithmetic and logical unit, permettant de réaliser une ou plusieurs opération
 
-ENTITY ALU IS
-  GENERIC(
-    Arith_en   : INTEGER := 1;
-    Logic_en   : INTEGER := 1;
-    Input_SZ_1 : INTEGER := 16;
-    Input_SZ_2 : INTEGER := 9
+entity ALU is
+generic(
+    Arith_en        :   integer := 1;
+    Logic_en        :   integer := 1;
+    Input_SZ_1      :   integer := 16;
+    Input_SZ_2      :   integer := 16);
+port(
+    clk     :   in  std_logic;                                           --! Horloge du composant
+    reset   :   in  std_logic;                                           --! Reset general du composant
+    ctrl    :   in  std_logic_vector(2 downto 0);                        --! Permet de sélectionner la/les opération désirée
+    comp    :   in  std_logic_vector(1 downto 0);                        --! (set) Permet de complémenter les opérandes
+    OP1     :   in  std_logic_vector(Input_SZ_1-1 downto 0);             --! Premier Opérande
+    OP2     :   in  std_logic_vector(Input_SZ_2-1 downto 0);             --! Second Opérande
+    RES     :   out std_logic_vector(Input_SZ_1+Input_SZ_2-1 downto 0)   --! Résultat de l'opération
+);
+end ALU;
 
-    );
-  PORT(
-    clk   : IN  STD_LOGIC;
-    reset : IN  STD_LOGIC;
-    ctrl  : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
-    OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_2-1 DOWNTO 0);
-    RES   : OUT STD_LOGIC_VECTOR(Input_SZ_1+Input_SZ_2-1 DOWNTO 0)
-    );
-END ENTITY;
+--! @details Sélection grace a l'entrée "ctrl" :
+--! Pause                    : IDLE     = 000
+--! Multiplieur/Accumulateur : MAC      = 001
+--! Multiplication           : MULT     = 010
+--! Addition                 : ADD      = 011
+--! Reset du MAC             : CLRMAC   = 100
+architecture ar_ALU of ALU is
 
-ARCHITECTURE ar_ALU OF ALU IS
+begin
 
-  SIGNAL clr_MAC : STD_LOGIC := '1';
-  
-BEGIN
-  clr_MAC <= '1' WHEN ctrl = "0100" OR ctrl = "0101" OR ctrl = "0110"  ELSE '0';
+arith : if Arith_en = 1 generate
+MACinst : MAC
+generic map(Input_SZ_1,Input_SZ_2)
+port map(clk,reset,ctrl(2),ctrl(1 downto 0),comp,OP1,OP2,RES);
+end generate;
 
-  arith : IF Arith_en = 1 GENERATE
-    MACinst : MAC
-      GENERIC MAP(Input_SZ_1, Input_SZ_2)
-      PORT MAP(clk, reset, clr_MAC, ctrl(1 DOWNTO 0), OP1, OP2, RES);
-  END GENERATE;
-
-END ARCHITECTURE;
-
-
-
-
-
-
-
-
-
-
-
-
+end architecture;

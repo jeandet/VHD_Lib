@@ -1,0 +1,3 @@
+lpp_top_acq.vhd
+lpp_top_lfr.vhd
+lpp_top_lfr_pkg.vhd

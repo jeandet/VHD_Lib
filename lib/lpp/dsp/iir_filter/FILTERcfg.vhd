@@ -108,7 +108,7 @@ constant a4_2       :   std_logic_vector(Coef_SZ-1 downto 0) := std_logic_vector
 
 constant CoefsInitValCst  :   std_logic_vector((Cels_count*CoefCntPerCel*Coef_SZ)-1 downto 0) := (a4_2 & a4_1 & a4_0 & b4_2 & b4_1 & b4_0 & a3_2 & a3_1 & a3_0 & b3_2 & b3_1 & b3_0 & a2_2 & a2_1 & a2_0 & b2_2 & b2_1 & b2_0 & a1_2 & a1_1 & a1_0 & b1_2 & b1_1 &  b1_0 & a0_2 & a0_1 & a0_0 & b0_2 & b0_1 & b0_0);
 
-constant CoefsInitValCst_JC  :   std_logic_vector((Cels_count*CoefPerCel*Coef_SZ)-1 downto 0) :=
+constant CoefsInitValCst_v2  :   std_logic_vector((Cels_count*CoefPerCel*Coef_SZ)-1 downto 0) :=
   (a4_1 & a4_2 & b4_0 & b4_1 & b4_2 &
    a3_1 & a3_2 & b3_0 & b3_1 & b3_2 &
    a2_1 & a2_2 & b2_0 & b2_1 & b2_2 &
