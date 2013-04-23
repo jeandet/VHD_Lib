@@ -136,6 +136,9 @@ BEGIN  -- beh
       reg.addr_matrix_f1                         <= (OTHERS => '0');
       reg.addr_matrix_f2                         <= (OTHERS => '0');
       prdata                                     <= (OTHERS => '0');
+
+      apbo.pirq    <= (OTHERS => '0');
+      
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
 
       reg.status_ready_matrix_f0_0 <= reg.status_ready_matrix_f0_0 OR ready_matrix_f0_0;
@@ -186,10 +189,21 @@ BEGIN  -- beh
           END CASE;
         END IF;
       END IF;
+
+      apbo.pirq(pirq) <= ( reg.config_active_interruption_onNewMatrix AND ( ready_matrix_f0_0 OR
+                                                                            ready_matrix_f0_1 OR
+                                                                            ready_matrix_f1   OR
+                                                                            ready_matrix_f2)
+                           )
+                         OR
+                         ( reg.config_active_interruption_onError AND ( error_anticipating_empty_fifo OR
+                                                                        error_bad_component_error)
+                           );
+
+      
     END IF;
   END PROCESS lpp_top_apbreg;
-
-  apbo.pirq    <= (OTHERS => '0');
+  
   apbo.pindex  <= pindex;
   apbo.pconfig <= pconfig;
   apbo.prdata  <= prdata;

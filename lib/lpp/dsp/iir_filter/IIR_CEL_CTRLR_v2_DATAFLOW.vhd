@@ -196,7 +196,8 @@ BEGIN
     GENERIC MAP (
       Arith_en   => 1,
       Input_SZ_1 => Sample_SZ,
-      Input_SZ_2 => Coef_SZ)
+      Input_SZ_2 => Coef_SZ,
+      COMP_EN    => 1)
     PORT MAP (
       clk   => clk,
       reset => rstn,

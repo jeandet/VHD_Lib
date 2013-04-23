@@ -83,7 +83,8 @@ PACKAGE general_purpose IS
       Arith_en   : INTEGER := 1;
       Logic_en   : INTEGER := 1;
       Input_SZ_1 : INTEGER := 16;
-      Input_SZ_2 : INTEGER := 9
+      Input_SZ_2 : INTEGER := 9;
+      COMP_EN    : INTEGER := 0 -- 1 =>  No Comp
 
       );
     PORT(
@@ -110,7 +111,8 @@ Constant ctrl_CLRMAC : std_logic_vector(2 downto 0) := "100";
   COMPONENT MAC IS
     GENERIC(
       Input_SZ_A : INTEGER := 8;
-      Input_SZ_B : INTEGER := 8
+      Input_SZ_B : INTEGER := 8;
+      COMP_EN    : INTEGER := 0 -- 1 =>  No Comp
       );
     PORT(
       clk         : IN  STD_LOGIC;

@@ -401,8 +401,11 @@ BEGIN
       addr_matrix_f2                         => addr_matrix_f2);
 
 
-  --TODO : add the irq alert for DMA matrix transfert ending
+  --DONE : add the irq alert for DMA matrix transfert ending
+  
   --TODO : add 5 bit register into APB to control the DATA SHIPING
+  --TODO : data shiping
+  
   --TODO : add Spectral Matrix (FFT + SP)
   --TODO : add DMA for WaveForms Picker
   --TODO : add APB Reg to control WaveForms Picker
