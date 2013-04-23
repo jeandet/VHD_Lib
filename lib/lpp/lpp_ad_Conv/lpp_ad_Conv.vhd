@@ -50,7 +50,7 @@ PACKAGE lpp_ad_conv IS
 
   TYPE Samples IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
 
-  COMPONENT ADS7886_drvr
+  COMPONENT AD7688_drvr
     GENERIC (
       ChanelCount     : INTEGER;
       ncycle_cnv_high : INTEGER := 79;

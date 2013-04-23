@@ -201,7 +201,8 @@ apbo.prdata <=	Rdata when apbi.penable = '1' ;
 -- pragma translate_off
     bootmsg : report_version
     generic map ("apb IIR filter" & tost(pindex) &
-	": IIR filter rev " & tost(REVISION) & ", fifo " & tost(fifosize) &
+	": IIR filter rev " & tost(REVISION)& 
+	--", fifo " & tost(fifosize) &
 	", irq " & tost(pirq));
 -- pragma translate_on
 
