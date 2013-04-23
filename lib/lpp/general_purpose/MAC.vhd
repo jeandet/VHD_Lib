@@ -32,7 +32,8 @@ USE lpp.general_purpose.ALL;
 ENTITY MAC IS
   GENERIC(
     Input_SZ_A : INTEGER := 8;
-    Input_SZ_B : INTEGER := 8
+    Input_SZ_B : INTEGER := 8;
+    COMP_EN    : INTEGER := 0           -- 1 =>  No Comp
 
     );
   PORT(
@@ -52,35 +53,35 @@ END MAC;
 
 ARCHITECTURE ar_MAC OF MAC IS
 
-signal  add,mult    :   std_logic;
-signal  MULTout     :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
+  SIGNAL add, mult : STD_LOGIC;
+  SIGNAL MULTout   : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
 
-signal  ADDERinA    :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
-signal  ADDERinB    :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
-signal  ADDERout    :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
+  SIGNAL ADDERinA : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
+  SIGNAL ADDERinB : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
+  SIGNAL ADDERout : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
 
-signal  MACMUXsel   :   std_logic;
-signal  OP1_2C_D_Resz    :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
-signal  OP2_2C_D_Resz    :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
+  SIGNAL MACMUXsel     : STD_LOGIC;
+  SIGNAL OP1_2C_D_Resz : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
+  SIGNAL OP2_2C_D_Resz : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
 
-signal  OP1_2C      :   std_logic_vector(Input_SZ_A-1 downto 0);
-signal  OP2_2C      :   std_logic_vector(Input_SZ_B-1 downto 0);
+  SIGNAL OP1_2C : STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+  SIGNAL OP2_2C : STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
 
-signal  MACMUX2sel  :   std_logic;
+  SIGNAL MACMUX2sel : STD_LOGIC;
 
-signal  add_D               :   std_logic;
-signal  OP1_2C_D            :   std_logic_vector(Input_SZ_A-1 downto 0);
-signal  OP2_2C_D            :   std_logic_vector(Input_SZ_B-1 downto 0);
-signal  MULTout_D           :   std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0);
-signal  MACMUXsel_D         :   std_logic;
-signal  MACMUX2sel_D        :   std_logic;
-signal  MACMUX2sel_D_D      :   std_logic;
-signal  clr_MAC_D           :   std_logic;
-signal  clr_MAC_D_D         :   std_logic;
-signal  MAC_MUL_ADD_2C_D     : std_logic_vector(1 downto 0);
+  SIGNAL add_D            : STD_LOGIC;
+  SIGNAL OP1_2C_D         : STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+  SIGNAL OP2_2C_D         : STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
+  SIGNAL MULTout_D        : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
+  SIGNAL MACMUXsel_D      : STD_LOGIC;
+  SIGNAL MACMUX2sel_D     : STD_LOGIC;
+  SIGNAL MACMUX2sel_D_D   : STD_LOGIC;
+  SIGNAL clr_MAC_D        : STD_LOGIC;
+  SIGNAL clr_MAC_D_D      : STD_LOGIC;
+  SIGNAL MAC_MUL_ADD_2C_D : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
-SIGNAL load_mult_result : STD_LOGIC;
-SIGNAL load_mult_result_D : STD_LOGIC;
+  SIGNAL load_mult_result   : STD_LOGIC;
+  SIGNAL load_mult_result_D : STD_LOGIC;
 
 BEGIN
 
@@ -113,25 +114,25 @@ BEGIN
       Input_SZ_A => Input_SZ_A,
       Input_SZ_B => Input_SZ_B
       )
-port map(
-    clk         =>  clk,
-    reset       =>  reset,
-    mult        =>  mult,
-    OP1         =>  OP1_2C,
-    OP2         =>  OP2_2C,
-    RES         =>  MULTout
-);
+    PORT MAP(
+      clk   => clk,
+      reset => reset,
+      mult  => mult,
+      OP1   => OP1_2C,
+      OP2   => OP2_2C,
+      RES   => MULTout
+      );
 --==============================================================
 
   PROCESS (clk, reset)
   BEGIN  -- PROCESS
     IF reset = '0' THEN                 -- asynchronous reset (active low)
       load_mult_result_D <= '0';
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
       load_mult_result_D <= load_mult_result;
     END IF;
   END PROCESS;
-  
+
 --==============================================================
 --======================A D D E R ==============================
 --==============================================================
@@ -154,32 +155,38 @@ port map(
 --==============================================================
 --===================TWO COMPLEMENTERS==========================
 --==============================================================
-TWO_COMPLEMENTER1 : TwoComplementer
-generic map(
-    Input_SZ    =>   Input_SZ_A
-)
-port map(
-    clk         =>  clk,
-    reset       =>  reset,
-    clr         =>  clr_MAC,
-    TwoComp     =>  Comp_2C(0),
-    OP          =>  OP1,    
-    RES         =>  OP1_2C
-);
+  gen_comp : IF COMP_EN = 0 GENERATE
+    TWO_COMPLEMENTER1 : TwoComplementer
+      GENERIC MAP(
+        Input_SZ => Input_SZ_A
+        )
+      PORT MAP(
+        clk     => clk,
+        reset   => reset,
+        clr     => clr_MAC,
+        TwoComp => Comp_2C(0),
+        OP      => OP1,
+        RES     => OP1_2C
+        );
 
-
-TWO_COMPLEMENTER2 : TwoComplementer
-generic map(
-    Input_SZ    =>   Input_SZ_B
-)
-port map(
-    clk         =>  clk,
-    reset       =>  reset,
-    clr         =>  clr_MAC,
-    TwoComp     =>  Comp_2C(1),
-    OP          =>  OP2,    
-    RES         =>  OP2_2C
-);
+    TWO_COMPLEMENTER2 : TwoComplementer
+      GENERIC MAP(
+        Input_SZ => Input_SZ_B
+        )
+      PORT MAP(
+        clk     => clk,
+        reset   => reset,
+        clr     => clr_MAC,
+        TwoComp => Comp_2C(1),
+        OP      => OP2,
+        RES     => OP2_2C
+        );
+  END GENERATE gen_comp;
+  
+  no_gen_comp : IF COMP_EN = 1 GENERATE
+    OP2_2C <= OP2;
+    OP1_2C <= OP1;
+  END GENERATE no_gen_comp;
 --==============================================================
 
   clr_MACREG1 : MAC_REG
@@ -200,24 +207,24 @@ port map(
       Q(0)  => add_D
       );
 
-OP1REG : MAC_REG
-generic map(size    =>  Input_SZ_A)
-port map(
-    reset   =>  reset,
-    clk     =>  clk,
-    D       =>  OP1_2C,
-    Q       =>  OP1_2C_D
-);
+  OP1REG : MAC_REG
+    GENERIC MAP(size => Input_SZ_A)
+    PORT MAP(
+      reset => reset,
+      clk   => clk,
+      D     => OP1_2C,
+      Q     => OP1_2C_D
+      );
 
 
-OP2REG : MAC_REG
-generic map(size    =>  Input_SZ_B)
-port map(
-    reset   =>  reset,
-    clk     =>  clk,
-    D       =>  OP2_2C,
-    Q       =>  OP2_2C_D
-);
+  OP2REG : MAC_REG
+    GENERIC MAP(size => Input_SZ_B)
+    PORT MAP(
+      reset => reset,
+      clk   => clk,
+      D     => OP2_2C,
+      Q     => OP2_2C_D
+      );
 
   MULToutREG : MAC_REG
     GENERIC MAP(size => Input_SZ_A+Input_SZ_B)

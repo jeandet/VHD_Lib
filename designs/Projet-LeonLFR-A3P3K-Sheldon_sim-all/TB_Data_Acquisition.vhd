@@ -2,6 +2,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 LIBRARY lpp;
 USE lpp.lpp_ad_conv.ALL;
+USE lpp.lpp_top_lfr_pkg.ALL;
 
 -------------------------------------------------------------------------------
 
@@ -24,38 +25,6 @@ ARCHITECTURE tb OF TB_Data_Acquisition IS
       sck : IN  STD_LOGIC;
       sdo : OUT STD_LOGIC);
   END COMPONENT;
-
-  COMPONENT Top_Data_Acquisition
-    PORT (
-      cnv_run  : IN  STD_LOGIC;
-      cnv      : OUT STD_LOGIC;
-      sck      : OUT STD_LOGIC;
-      sdo      : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
-      cnv_clk  : IN  STD_LOGIC;
-      cnv_rstn : IN  STD_LOGIC;
-      clk      : IN  STD_LOGIC;
-      rstn     : IN  STD_LOGIC;
-    --
-    sample_f0_0_ren   : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f0_0_rdata : OUT STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
-    sample_f0_0_full  : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f0_0_empty : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    --
-    sample_f0_1_ren   : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f0_1_rdata : OUT STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
-    sample_f0_1_full  : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f0_1_empty : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    --
-    sample_f1_ren   : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f1_rdata : OUT STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
-    sample_f1_full  : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f1_empty : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    --
-    sample_f3_ren   : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f3_rdata : OUT STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
-    sample_f3_full  : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f3_empty : OUT STD_LOGIC_VECTOR(4 DOWNTO 0));
-  END COMPONENT;
   
   -- component ports
   SIGNAL cnv_rstn   : STD_LOGIC;
@@ -71,26 +40,17 @@ ARCHITECTURE tb OF TB_Data_Acquisition IS
   SIGNAL cnv_clk  : STD_LOGIC := '1';
 
   -----------------------------------------------------------------------------
-  SIGNAL sample_f0_0_ren   :  STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f0_0_rdata :  STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
-  SIGNAL sample_f0_0_full  :  STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f0_0_empty :  STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL sample_f0_wen   :  STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL sample_f0_wdata :  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   -----------------------------------------------------------------------------
-  SIGNAL sample_f0_1_ren   :  STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f0_1_rdata :  STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
-  SIGNAL sample_f0_1_full  :  STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f0_1_empty :  STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL sample_f1_wen   :  STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL sample_f1_wdata :  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   -----------------------------------------------------------------------------
-  SIGNAL sample_f1_ren   :  STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f1_rdata :  STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
-  SIGNAL sample_f1_full  :  STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f1_empty :  STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL sample_f2_wen   :  STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL sample_f2_wdata :  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   -----------------------------------------------------------------------------
-  SIGNAL sample_f3_ren   :  STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f3_rdata :  STD_LOGIC_VECTOR((5*18)-1 DOWNTO 0);
-  SIGNAL sample_f3_full  :  STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f3_empty :  STD_LOGIC_VECTOR(4 DOWNTO 0);
-
+  SIGNAL sample_f3_wen   :  STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL sample_f3_wdata :  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   
 BEGIN  -- tb
 
@@ -148,8 +108,8 @@ BEGIN  -- tb
   end process WaveGen_Proc;
   
   -----------------------------------------------------------------------------
-
-  Top_Data_Acquisition_1: Top_Data_Acquisition
+  
+  Top_Data_Acquisition_1: lpp_top_acq 
     PORT MAP (
       cnv_run  => run_cnv,
       cnv      => cnv,
@@ -159,30 +119,22 @@ BEGIN  -- tb
       cnv_rstn => cnv_rstn,
       clk      => clk,
       rstn     => rstn,
-      --
-      sample_f0_0_ren   => sample_f0_0_ren,
-      sample_f0_0_rdata => sample_f0_0_rdata,
-      sample_f0_0_full  => sample_f0_0_full,
-      sample_f0_0_empty => sample_f0_0_empty,
-      --
-      sample_f0_1_ren   => sample_f0_1_ren,
-      sample_f0_1_rdata => sample_f0_1_rdata,
-      sample_f0_1_full  => sample_f0_1_full,
-      sample_f0_1_empty => sample_f0_1_empty,
-      --
-      sample_f1_ren   => sample_f1_ren,
-      sample_f1_rdata => sample_f1_rdata,
-      sample_f1_full  => sample_f1_full,
-      sample_f1_empty => sample_f1_empty,
-      --
-      sample_f3_ren   => sample_f3_ren,
-      sample_f3_rdata => sample_f3_rdata,
-      sample_f3_full  => sample_f3_full,
-      sample_f3_empty => sample_f3_empty
+    --
+      sample_f0_wen   => sample_f0_wen,
+      sample_f0_wdata => sample_f0_wdata,
+    --
+      sample_f1_wen   => sample_f1_wen,
+      sample_f1_wdata => sample_f1_wdata,
+    --
+      sample_f2_wen   => sample_f2_wen,
+      sample_f2_wdata => sample_f2_wdata,
+    --
+      sample_f3_wen   => sample_f3_wen,
+      sample_f3_wdata => sample_f3_wdata
       );
-  sample_f0_0_ren <= (OTHERS => '1');
-  sample_f0_1_ren <= (OTHERS => '1');
-  sample_f1_ren   <= (OTHERS => '1');
-  sample_f3_ren   <= (OTHERS => '1');
+  
+  
+  
+  
   
 END tb;

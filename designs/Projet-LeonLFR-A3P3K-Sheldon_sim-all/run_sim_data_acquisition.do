@@ -18,6 +18,7 @@ vcom -quiet -93 -work lpp ../../lib/lpp/general_purpose/ADDRcntr.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/iir_filter.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/FILTERcfg.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/RAM_CEL.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/RAM_CEL_N.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/RAM_CTRLR2.vhd
 #vcom -quiet -93 -work lpp ../../lib/lpp/dsp/iir_filter/IIR_CEL_CTRLR.vhd
 
@@ -36,13 +37,17 @@ vcom -quiet -93 -work lpp e:/opt/tortoiseHG_vhdlib/lib/lpp/lpp_top_lfr/lpp_top_l
 vcom -quiet -93 -work lpp e:/opt/tortoiseHG_vhdlib/lib/lpp/lpp_top_lfr/lpp_top_acq.vhd
 
 vcom -quiet -93 -work lpp ../../lib/lpp/lpp_ad_Conv/lpp_ad_conv.vhd
-vcom -quiet -93 -work lpp ../../lib/lpp/lpp_ad_Conv/ADS7886_drvr.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_ad_Conv/AD7688_drvr.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/lpp_ad_Conv/TestModule_ADS7886.vhd
 
-vcom -quiet -93 -work work Top_Data_Acquisition.vhd
+
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_lfr_pkg.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_acq.vhd
+#vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_lfr.vhd
+
 vcom -quiet -93 -work work TB_Data_Acquisition.vhd
 
-#vsim work.TB_Data_Acquisition
+vsim work.TB_Data_Acquisition
 
 #log -r *
 #do wave_data_acquisition.do

@@ -32,7 +32,9 @@ generic(
     Arith_en        :   integer := 1;
     Logic_en        :   integer := 1;
     Input_SZ_1      :   integer := 16;
-    Input_SZ_2      :   integer := 16);
+    Input_SZ_2      :   integer := 16;
+    COMP_EN    : INTEGER := 0 -- 1 =>  No Comp
+    );
 port(
     clk     :   in  std_logic;                                           --! Horloge du composant
     reset   :   in  std_logic;                                           --! Reset general du composant
@@ -56,7 +58,7 @@ begin
 
 arith : if Arith_en = 1 generate
 MACinst : MAC
-generic map(Input_SZ_1,Input_SZ_2)
+generic map(Input_SZ_1,Input_SZ_2,COMP_EN)
 port map(clk,reset,ctrl(2),ctrl(1 downto 0),comp,OP1,OP2,RES);
 end generate;
 

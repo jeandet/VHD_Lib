@@ -100,7 +100,7 @@ BEGIN
 
   -- component instantiation
   -----------------------------------------------------------------------------
-  DIGITAL_acquisition : ADS7886_drvr
+  DIGITAL_acquisition : AD7688_drvr
     GENERIC MAP (
       ChanelCount     => ChanelCount,
       ncycle_cnv_high => ncycle_cnv_high,
@@ -143,7 +143,7 @@ BEGIN
   IIR_CEL_CTRLR_v2_1 : IIR_CEL_CTRLR_v2
     GENERIC MAP (
       tech         => 0,
-      Mem_use      => use_RAM,
+      Mem_use      => use_CEL,
       Sample_SZ    => 18,
       Coef_SZ      => Coef_SZ,
       Coef_Nb      => 25,               -- TODO

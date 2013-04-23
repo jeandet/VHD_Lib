@@ -216,6 +216,18 @@ PACKAGE iir_filter IS
       RWCLK, RESET : IN  STD_LOGIC);
   END COMPONENT;
 
+  COMPONENT RAM_CEL_N
+    GENERIC (
+      size : INTEGER);
+    PORT (
+      WD           : IN  STD_LOGIC_VECTOR(size-1 DOWNTO 0);
+      RD           : OUT STD_LOGIC_VECTOR(size-1 DOWNTO 0);
+      WEN, REN     : IN  STD_LOGIC;
+      WADDR        : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
+      RADDR        : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
+      RWCLK, RESET : IN  STD_LOGIC);
+  END COMPONENT;
+
   COMPONENT IIR_CEL_FILTER IS
     GENERIC(
       tech          : INTEGER := 0;
