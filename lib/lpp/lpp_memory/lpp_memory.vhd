@@ -99,6 +99,7 @@ component lppFIFOxN is
 generic(
     tech          :   integer := 0;
     Data_sz       :   integer range 1 to 32 := 8;
+    Addr_sz       :   integer range 1 to 32 := 8;
     FifoCnt : integer := 1;
     Enable_ReUse  :   std_logic := '0'
     );

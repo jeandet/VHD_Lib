@@ -26,8 +26,7 @@ ENTITY lpp_top_acq IS
     clk             : IN  STD_LOGIC;    -- 25 MHz
     rstn            : IN  STD_LOGIC;
     --
-    sample_f0_0_wen : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f0_1_wen : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+    sample_f0_wen : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
     sample_f0_wdata : OUT STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
     --
     sample_f1_wen   : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
@@ -86,11 +85,7 @@ ARCHITECTURE tb OF lpp_top_acq IS
   SIGNAL sample_downsampling_out     : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
   --
   SIGNAL sample_f0_val               : STD_LOGIC;
-  SIGNAL sample_f0                   : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
-  --  
-  SIGNAL sample_f0_0_val             : STD_LOGIC;
-  SIGNAL sample_f0_1_val             : STD_LOGIC;
-  SIGNAL counter_f0                  : INTEGER;
+  SIGNAL sample_f0                   : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);  
   -----------------------------------------------------------------------------
   SIGNAL sample_f1_val               : STD_LOGIC;
   SIGNAL sample_f1                   : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
@@ -207,35 +202,11 @@ BEGIN
     sample_f0_wdata(16*4+I) <= sample_f0(7, I);
   END GENERATE all_bit_sample_f0;
 
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      counter_f0 <= 0;
-    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      IF sample_f0_val = '1' THEN
-        IF counter_f0 = 511 THEN
-          counter_f0 <= 0;
-        ELSE
-          counter_f0 <= counter_f0 + 1;
-        END IF;
-      END IF;
-    END IF;
-  END PROCESS;
-
-  sample_f0_0_val <= sample_f0_val WHEN counter_f0 < 256 ELSE '0';
-  sample_f0_0_wen <= NOT(sample_f0_0_val) &
-                       NOT(sample_f0_0_val) &
-                       NOT(sample_f0_0_val) &
-                       NOT(sample_f0_0_val) &
-                       NOT(sample_f0_0_val);
-  
-  sample_f0_1_val <= sample_f0_val WHEN counter_f0 > 255 ELSE '0';
-  sample_f0_1_wen <= NOT(sample_f0_1_val) &
-                       NOT(sample_f0_1_val) &
-                       NOT(sample_f0_1_val) &
-                       NOT(sample_f0_1_val) &
-                       NOT(sample_f0_1_val);
-
+    sample_f0_wen <= NOT(sample_f0_val) &
+                     NOT(sample_f0_val) &
+                     NOT(sample_f0_val) &
+                     NOT(sample_f0_val) &
+                     NOT(sample_f0_val);
 
   -----------------------------------------------------------------------------
   -- F1 -- @4096 Hz
