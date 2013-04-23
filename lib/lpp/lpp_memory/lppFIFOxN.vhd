@@ -31,6 +31,7 @@ entity lppFIFOxN is
 generic(
     tech          :   integer := 0;
     Data_sz       :   integer range 1 to 32 := 8;
+    Addr_sz       :   integer range 1 to 32 := 8;
     FifoCnt : integer := 1;
     Enable_ReUse  :   std_logic := '0'
     );
@@ -55,32 +56,9 @@ begin
 
 fifos: for i in 0 to FifoCnt-1 generate
     FIFO0 : lpp_fifo
-        generic map (tech,Enable_ReUse,Data_sz,8)
+        generic map (tech,Enable_ReUse,Data_sz,Addr_sz)
         port map(rst,ReUse(i),rclk,ren(i),rdata((i+1)*Data_sz-1 downto i*Data_sz),empty(i),open,wclk,wen(i),wdata((i+1)*Data_sz-1 downto i*Data_sz),full(i),open);
 end generate;
-
-
-
---    fifoB1 : entity work.lpp_fifo
---        generic map (tech,Enable_ReUse,Data_sz,8)
---        port map(rst,ReUse(0),rclk,ren(0),rdata(Data_sz-1 downto 0),empty(0),open,wclk,wen(0),wdata(Data_sz-1 downto 0),full(0),open);
---
---    fifoB2 : entity work.lpp_fifo
---        generic map (tech,Enable_ReUse,Data_sz,8)
---        port map(rst,ReUse(1),rclk,ren(1),rdata((2*Data_sz)-1 downto Data_sz),empty(1),open,wclk,wen(1),wdata((2*Data_sz)-1 downto Data_sz),full(1),open);
---
---    fifoB3 : entity work.lpp_fifo
---        generic map (tech,Enable_ReUse,Data_sz,8)
---        port map(rst,ReUse(2),rclk,ren(2),rdata((3*Data_sz)-1 downto 2*Data_sz),empty(2),open,wclk,wen(2),wdata((3*Data_sz)-1 downto 2*Data_sz),full(2),open);
---
---    fifoE1 : entity work.lpp_fifo
---        generic map (tech,Enable_ReUse,Data_sz,8)
---        port map(rst,ReUse(3),rclk,ren(3),rdata((4*Data_sz)-1 downto 3*Data_sz),empty(3),open,wclk,wen(3),wdata((4*Data_sz)-1 downto 3*Data_sz),full(3),open);
---
---    fifoE2 : entity work.lpp_fifo
---        generic map (tech,Enable_ReUse,Data_sz,8)
---        port map(rst,ReUse(4),rclk,ren(4),rdata((5*Data_sz)-1 downto 4*Data_sz),empty(4),open,wclk,wen(4),wdata((5*Data_sz)-1 downto 4*Data_sz),full(4),open);
-
 
 end architecture;
 

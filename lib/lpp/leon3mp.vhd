@@ -98,14 +98,14 @@ entity leon3mp is
     UART_RXD : in std_logic;
     UART_TXD : out std_logic;
 -- ACQ
-    Clk_49Mhz   : IN  STD_LOGIC;
     CNV_CH1     : OUT STD_LOGIC;
     SCK_CH1     : OUT STD_LOGIC;
     SDO_CH1     : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
+    Bias_Fails  : out std_logic;
 -- ADC
 --    ADC_in  : in AD7688_in(4 downto 0);
 --    ADC_out : out AD7688_out;
---    Bias_Fails : out std_logic;
+
 -- CNA
 --    DAC_SYNC : out std_logic;
 --    DAC_SCLK : out std_logic;
@@ -177,25 +177,17 @@ signal dsuo     : dsu_out_type;
 ---  AJOUT TEST ------------------------Signaux----------------------
 ---------------------------------------------------------------------
 -- FIFOs
-signal FifoF0a_Full      : std_logic_vector(4 downto 0);
-signal FifoF0a_Empty     : std_logic_vector(4 downto 0);
-signal FifoF0a_Data      : std_logic_vector(79 downto 0);
-signal FifoF0b_Full      : std_logic_vector(4 downto 0);
-signal FifoF0b_Empty     : std_logic_vector(4 downto 0);
-signal FifoF0b_Data      : std_logic_vector(79 downto 0);
-signal FifoF1_Full      : std_logic_vector(4 downto 0);
+signal FifoF0_Empty     : std_logic_vector(4 downto 0);
+signal FifoF0_Data      : std_logic_vector(79 downto 0);
 signal FifoF1_Empty     : std_logic_vector(4 downto 0);
 signal FifoF1_Data      : std_logic_vector(79 downto 0);
-signal FifoF3_Full      : std_logic_vector(4 downto 0);
 signal FifoF3_Empty     : std_logic_vector(4 downto 0);
 signal FifoF3_Data      : std_logic_vector(79 downto 0);
 
 signal FifoINT_Full     : std_logic_vector(4 downto 0);
 signal FifoINT_Data     : std_logic_vector(79 downto 0);
 
---signal FifoOUT_FullV    : std_logic;
 signal FifoOUT_Full     : std_logic_vector(1 downto 0);
---signal Matrix_WriteV    : std_logic_vector(0 downto 0);
 
 -- MATRICE SPECTRALE
 signal SM_FlagError : std_logic;
@@ -207,19 +199,23 @@ signal SM_Data      : std_logic_vector(63 downto 0);
 signal Dma_acq      : std_logic;
 
 -- FFT
+signal FFT_Load        : std_logic;
 signal FFT_Read        : std_logic_vector(4 downto 0);
 signal FFT_Write       : std_logic_vector(4 downto 0);
 signal FFT_ReUse       : std_logic_vector(4 downto 0);
 signal FFT_Data        : std_logic_vector(79 downto 0);
 
 -- DEMUX
-signal DEMU_Read    : std_logic_vector(19 downto 0);
+signal DEMU_Read    : std_logic_vector(14 downto 0);
 signal DEMU_Empty   : std_logic_vector(4 downto 0);
 signal DEMU_Data    : std_logic_vector(79 downto 0);
 
 -- ACQ
-signal TopACQ_WenF0a : STD_LOGIC_VECTOR(4 DOWNTO 0);
-signal TopACQ_WenF0b : STD_LOGIC_VECTOR(4 DOWNTO 0);
+
+signal sample_val : STD_LOGIC;
+signal sample : Samples(8-1 DOWNTO 0);
+
+signal TopACQ_WenF0 : STD_LOGIC_VECTOR(4 DOWNTO 0);
 signal TopACQ_DataF0 : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
 signal TopACQ_WenF1 : STD_LOGIC_VECTOR(4 DOWNTO 0);
 signal TopACQ_DataF1 : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
@@ -311,7 +307,7 @@ led(1 downto 0) <= gpio(1 downto 0);
 --        port map (clkm,rstn,SmplClk,ADC_DataReady,Fuller,WG_ReUse,WG_Write);
 --
 --enableADC <= gpio(0);
---Bias_Fails <= '0';
+
 --WG_DATA <= ADC_SmplOut(4) & ADC_SmplOut(3) & ADC_SmplOut(2) & ADC_SmplOut(1) & ADC_SmplOut(0);
 --
 --
@@ -319,32 +315,68 @@ led(1 downto 0) <= gpio(1 downto 0);
 --        generic map (pindex => 6, paddr => 6, FifoCnt => 5, Data_sz => 16, Addr_sz => 8, Enable_ReUse => '0', R => 1, W => 0)
 --        port map (clkm,rstn,clkm,clkm,WG_ReUse,(others => '1'),WG_Write,open,Fuller,open,WG_DATA,open,open,apbi,apbo(6));
     
-    TopACQ : lpp_top_acq
-        port map('1',CNV_CH1,SCK_CH1,SDO_CH1,Clk_49Mhz,rstn,clkm,rstn,TopACQ_WenF0a,TopACQ_WenF0b,TopACQ_DataF0,TopACQ_WenF1,TopACQ_DataF1,open,open,TopACQ_WenF3,TopACQ_DataF3);
+  DIGITAL_acquisition : ADS7886_drvr
+    GENERIC MAP (
+      ChanelCount     => 8,
+      ncycle_cnv_high => 79,
+      ncycle_cnv      => 500)
+    PORT MAP (
+      cnv_clk    => clk50MHz,                      -- 
+      cnv_rstn   => rstn,                     -- 
+      cnv_run    => '1',                      --
+      cnv        => CNV_CH1,                          -- 
+      clk        => clkm,                          -- 
+      rstn       => rstn,                         -- 
+      sck        => SCK_CH1,                          -- 
+      sdo        => SDO_CH1,  -- 
+      sample     => sample,
+      sample_val => sample_val);
+--
+TopACQ_WenF0 <= not sample_val & not sample_val & not sample_val & not sample_val & not sample_val;
+TopACQ_DataF0 <= sample(4) & sample(3) & sample(2) & sample(1) & sample(0);
+--
+TEST(0) <= TopACQ_WenF0(1);
+TEST(1) <= SDO_CH1(1);
+--
+--
+--
+--process(clkm,rstn)
+--begin
+--      if(rstn='0')then
+--        TopACQ_WenF0a <= (others => '1');
+--            
+--        elsif(clkm'event and clkm='1')then
+--            TopACQ_WenF0a <= not sample_val & not sample_val & not sample_val & not sample_val & not sample_val;
+--
+--    end if;
+--end process;
 
+--    TopACQ : lpp_top_acq
+--        port map('1',CNV_CH1,SCK_CH1,SDO_CH1,clk50MHz,rstn,clkm,rstn,TopACQ_WenF0,TopACQ_DataF0,TopACQ_WenF1,TopACQ_DataF1,open,open,TopACQ_WenF3,TopACQ_DataF3);
+
+Bias_Fails <= '0';    
 --- FIFO IN -------------------------------------------------------------
 
-    Memf0a : lppFIFOxN
-        generic map(Data_sz => 16, FifoCnt => 5, Enable_ReUse => '0')
-        port map(rstn,clkm,clkm,(others => '0'),TopACQ_WenF0a,DEMU_Read(4 downto 0),TopACQ_DataF0,FifoF0a_Data,FifoF0a_Full,FifoF0a_Empty);
+    MemOut : APB_FIFO
+        generic map (pindex => 9, paddr => 9, FifoCnt => 5, Data_sz => 16, Addr_sz => 9, Enable_ReUse => '0', R => 1, W => 0)
+        port map (clkm,rstn,clkm,clkm,(others => '0'),(others => '1'),TopACQ_WenF0,FifoF0_Empty,open,open,TopACQ_DataF0,open,open,apbi,apbo(9));
+--    Memf0 : lppFIFOxN
+--        generic map(Data_sz => 16, Addr_sz => 9, FifoCnt => 5, Enable_ReUse => '0')
+--        port map(rstn,clkm,clkm,(others => '0'),TopACQ_WenF0,DEMU_Read(4 downto 0),TopACQ_DataF0,FifoF0_Data,open,FifoF0_Empty);
     
-    Memf0b : lppFIFOxN
-        generic map(Data_sz => 16, FifoCnt => 5, Enable_ReUse => '0')
-        port map(rstn,clkm,clkm,(others => '0'),TopACQ_WenF0b,DEMU_Read(9 downto 5),TopACQ_DataF0,FifoF0b_Data,FifoF0b_Full,FifoF0b_Empty);
-
     Memf1 : lppFIFOxN
-        generic map(Data_sz => 16, FifoCnt => 5, Enable_ReUse => '0')
-        port map(rstn,clkm,clkm,(others => '0'),TopACQ_WenF1,DEMU_Read(14 downto 10),TopACQ_DataF1,FifoF1_Data,FifoF1_Full,FifoF1_Empty);
+        generic map(Data_sz => 16, Addr_sz => 8, FifoCnt => 5, Enable_ReUse => '0')
+        port map(rstn,clkm,clkm,(others => '0'),TopACQ_WenF1,DEMU_Read(9 downto 5),TopACQ_DataF1,FifoF1_Data,open,FifoF1_Empty);
     
     Memf3 : lppFIFOxN
-        generic map(Data_sz => 16, FifoCnt => 5, Enable_ReUse => '0')
-        port map(rstn,clkm,clkm,(others => '0'),TopACQ_WenF3,DEMU_Read(19 downto 15),TopACQ_DataF3,FifoF3_Data,FifoF3_Full,FifoF3_Empty);
+        generic map(Data_sz => 16, Addr_sz => 8, FifoCnt => 5, Enable_ReUse => '0')
+        port map(rstn,clkm,clkm,(others => '0'),TopACQ_WenF3,DEMU_Read(14 downto 10),TopACQ_DataF3,FifoF3_Data,open,FifoF3_Empty);
 
 --- DEMUX -------------------------------------------------------------
 
-    DEMUX0 : Demultiplex
+    DEMU0 : DEMUX
         generic map(Data_sz => 16)
-        port map(clkm,rstn,FFT_Read,FifoF0a_Empty,FifoF0b_Empty,FifoF1_Empty,FifoF3_Empty,FifoF0a_Data,FifoF0b_Data,FifoF1_Data,FifoF3_Data,DEMU_Read,DEMU_Empty,DEMU_Data);
+        port map(clkm,rstn,FFT_Read,FFT_Load,FifoF0_Empty,FifoF1_Empty,FifoF3_Empty,FifoF0_Data,FifoF1_Data,FifoF3_Data,DEMU_Read,DEMU_Empty,DEMU_Data);
 
 --- FFT -------------------------------------------------------------
     
@@ -354,18 +386,18 @@ led(1 downto 0) <= gpio(1 downto 0);
 
     FFT0 : FFT
         generic map(Data_sz => 16,NbData => 256)
-        port map(clkm,rstn,DEMU_Empty,DEMU_Data,FifoINT_Full,FFT_Read,FFT_Write,FFT_ReUse,FFT_Data);
+        port map(clkm,rstn,DEMU_Empty,DEMU_Data,FifoINT_Full,FFT_Load,FFT_Read,FFT_Write,FFT_ReUse,FFT_Data);
 
 ----- LINK MEMORY -------------------------------------------------------
 
 --    MemOut : APB_FIFO
 --        generic map (pindex => 9, paddr => 9, FifoCnt => 5, Data_sz => 16, Addr_sz => 8, Enable_ReUse => '1', R => 1, W => 0)
---        port map (clkm,rstn,clkm,clkm,Link_ReUse,(others =>'1'),Link_Write,Ept,FifoOUT_Full,open,Link_Data,open,open,apbi,apbo(9));
+--        port map (clkm,rstn,clkm,clkm,FFT_ReUse,(others =>'1'),FFT_Write,open,FifoINT_Full,open,FFT_Data,open,open,apbi,apbo(9));
 
     MemInt : lppFIFOxN
         generic map(Data_sz => 16, FifoCnt => 5, Enable_ReUse => '1')
         port map(rstn,clkm,clkm,FFT_ReUse,FFT_Write,SM_Read,FFT_Data,FifoINT_Data,FifoINT_Full,open);
-
+--
 --    MemIn : APB_FIFO
 --        generic map (pindex => 8, paddr => 8, FifoCnt => 5, Data_sz => 16, Addr_sz => 8, Enable_ReUse => '1', R => 0, W => 1)
 --        port map (clkm,rstn,clkm,clkm,(others => '0'),TopSM_Read,(others => '1'),open,FifoINT_Full,FifoINT_Data,(others => '0'),open,open,apbi,apbo(8));
@@ -378,9 +410,9 @@ led(1 downto 0) <= gpio(1 downto 0);
 
 Dma_acq <= '1';
 
-    MemOut : APB_FIFO
-        generic map (pindex => 9, paddr => 9, FifoCnt => 2, Data_sz => 32, Addr_sz => 8, Enable_ReUse => '0', R => 1, W => 0)
-        port map (clkm,rstn,clkm,clkm,(others => '0'),(others => '1'),SM_Write,open,FifoOUT_Full,open,SM_Data,open,open,apbi,apbo(9));
+--    MemOut : APB_FIFO
+--        generic map (pindex => 9, paddr => 9, FifoCnt => 2, Data_sz => 32, Addr_sz => 8, Enable_ReUse => '0', R => 1, W => 0)
+--        port map (clkm,rstn,clkm,clkm,(others => '0'),(others => '1'),SM_Write,open,FifoOUT_Full,open,SM_Data,open,open,apbi,apbo(9));
 
 ----- FIFO -------------------------------------------------------------
 

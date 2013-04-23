@@ -15,3 +15,4 @@ REG.vhd
 SYNC_FF.vhd
 Shifter.vhd
 general_purpose.vhd
+TwoComplementer.vhd
