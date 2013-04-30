@@ -143,7 +143,7 @@ BEGIN
   IIR_CEL_CTRLR_v2_1 : IIR_CEL_CTRLR_v2
     GENERIC MAP (
       tech         => 0,
-      Mem_use      => use_CEL,
+      Mem_use      => use_RAM,
       Sample_SZ    => 18,
       Coef_SZ      => Coef_SZ,
       Coef_Nb      => 25,               -- TODO
