@@ -84,6 +84,7 @@ component FFT is
         FifoIN_Empty    : in std_logic_vector(4 downto 0);
         FifoIN_Data     : in std_logic_vector(79 downto 0);
         FifoOUT_Full    : in std_logic_vector(4 downto 0);
+        Load            : out std_logic;
         Read            : out std_logic_vector(4 downto 0);
         Write           : out std_logic_vector(4 downto 0);
         ReUse           : out std_logic_vector(4 downto 0);

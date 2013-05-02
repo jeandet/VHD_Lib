@@ -22,8 +22,8 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-library lpp;
-use lpp.lpp_matrix.all;
+--library lpp;
+--use lpp.lpp_matrix.all;
 
 entity MatriceSpectrale is
   generic(
@@ -34,14 +34,17 @@ entity MatriceSpectrale is
         rstn            : in std_logic;
 
         FifoIN_Full     : in std_logic_vector(4 downto 0);
+        SetReUse        : in std_logic_vector(4 downto 0);
         FifoOUT_Full    : in std_logic_vector(1 downto 0);
-        Data_IN         : in std_logic_vector(79 downto 0);
+        Data_IN         : in std_logic_vector((5*Input_SZ)-1 downto 0);
         ACQ             : in std_logic;
         FlagError       : out std_logic;
         Pong            : out std_logic;
+        Statu           : out std_logic_vector(3 downto 0);
         Write           : out std_logic_vector(1 downto 0);
         Read            : out std_logic_vector(4 downto 0);
-        Data_OUT        : out std_logic_vector(63 downto 0)
+        ReUse           : out std_logic_vector(4 downto 0);
+        Data_OUT        : out std_logic_vector((2*Result_SZ)-1 downto 0)
         );
 end entity;
 
@@ -59,18 +62,23 @@ signal TopSM_Data2      : std_logic_vector(15 downto 0);
 
 begin
 
-    TopSM : TopSpecMatrix
+    CTRL0 : entity work.ReUse_CTRLR
+        port map(clkm,rstn,SetReUse,TopSM_Statu,ReUse);
+
+
+    TopSM : entity work.TopSpecMatrix
         generic map (Input_SZ)
         port map(clkm,rstn,Matrix_Write,Matrix_Read,FifoIN_Full,Data_IN,TopSM_Start,Read,TopSM_Statu,TopSM_Data1,TopSM_Data2);
 
-    SM : SpectralMatrix
+    SM : entity work.SpectralMatrix
         generic map (Input_SZ,Result_SZ)
         port map(clkm,rstn,TopSM_Start,TopSM_Data1,TopSM_Data2,TopSM_Statu,Matrix_Read,Matrix_Write,Matrix_Result);
 
-    DISP : Dispatch
+    DISP : entity work.Dispatch
         generic map(Result_SZ)
         port map(clkm,rstn,ACQ,Matrix_Result,Matrix_Write,FifoOUT_Full,Data_OUT,Write,Pong,FlagError);
 
+Statu <= TopSM_Statu;
 
 end architecture;
 

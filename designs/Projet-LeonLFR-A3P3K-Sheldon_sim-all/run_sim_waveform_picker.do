@@ -42,7 +42,10 @@ vcom -quiet -93 -work lpp ../../lib/lpp/lpp_ad_Conv/TestModule_ADS7886.vhd
 
 
 vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_lfr_pkg.vhd
-vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_acq.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_apbreg.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_lfr_wf_picker_ip.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_lfr_wf_picker.vhd
+#vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_acq.vhd
 #vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_lfr.vhd
 
 vcom -quiet -93 -work lpp ../../lib/lpp/lfr_time_management/lpp_lfr_time_management.vhd
@@ -56,8 +59,16 @@ vcom -quiet -93 -work lpp ../../lib/lpp/lpp_waveform/lpp_waveform.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/lpp_waveform/lpp_waveform_snapshot_controler.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/lpp_waveform/lpp_waveform_snapshot.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/lpp_waveform/lpp_waveform_burst.vhd
+
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_waveform/lpp_waveform_fifo_arbiter.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_waveform/lpp_waveform_fifo_ctrl.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_waveform/lpp_waveform_fifo.vhd
+  
 vcom -quiet -93 -work lpp ../../lib/lpp/lpp_waveform/lpp_waveform_dma.vhd
-vcom -quiet -93 -work lpp ../../lib/lpp/lpp_waveform/lpp_waveform_dma_send_Nword.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_dma/lpp_dma_pkg.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_dma/lpp_dma_send_1word.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_dma/lpp_dma_send_16word.vhd
+#vcom -quiet -93 -work lpp ../../lib/lpp/lpp_waveform/lpp_waveform_dma_send_Nword.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/lpp_waveform/lpp_waveform_dma_selectaddress.vhd
 vcom -quiet -93 -work lpp ../../lib/lpp/lpp_waveform/lpp_waveform_dma_genvalid.vhd
 
@@ -65,8 +76,8 @@ vcom -quiet -93 -work work Top_Data_Acquisition.vhd
 
 vcom -quiet -93 -work work TB_Data_Acquisition.vhd
 
-#vsim work.TB_Data_Acquisition
+vsim work.TB_Data_Acquisition
 
-#log -r *
-#do wave_data_acquisition.do
-#run 5 ms
+log -r *
+do wave_waveform_picker.do
+run 5 ms

@@ -22,9 +22,10 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-library lpp;
-use lpp.lpp_fft.all;
 use work.fft_components.all;
+use lpp.lpp_fft.all;
+
+-- Update possible lecture (ren) de fifo en continu, pendant un Load, au lieu d'une lecture "créneau"
 
 entity FFT is
     generic(
@@ -36,6 +37,7 @@ entity FFT is
         FifoIN_Empty    : in std_logic_vector(4 downto 0);
         FifoIN_Data     : in std_logic_vector(79 downto 0);
         FifoOUT_Full    : in std_logic_vector(4 downto 0);
+        Load            : out std_logic;
         Read            : out std_logic_vector(4 downto 0);
         Write           : out std_logic_vector(4 downto 0);
         ReUse           : out std_logic_vector(4 downto 0);
@@ -62,6 +64,7 @@ signal Link_Read        : std_logic;
 begin
 
 Start <= '0';
+Load <= FFT_Load;
 
     DRIVE : Driver_FFT
         generic map(Data_sz,NbData)

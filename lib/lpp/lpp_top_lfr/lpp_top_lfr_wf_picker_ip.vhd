@@ -18,7 +18,7 @@ USE grlib.stdlib.ALL;
 USE grlib.devices.ALL;
 USE GRLIB.DMA2AHB_Package.ALL;
 
-ENTITY Top_Data_Acquisition IS
+ENTITY lpp_top_lfr_wf_picker_ip IS
   GENERIC(
     hindex                 : INTEGER := 2;
     nb_burst_available_size : INTEGER := 11;
@@ -59,11 +59,11 @@ ENTITY Top_Data_Acquisition IS
 
     coarse_time_0 : IN STD_LOGIC;
 
-    --config
+    --config    
     data_shaping_SP0 : IN STD_LOGIC;    
     data_shaping_SP1 : IN STD_LOGIC;    
-    data_shaping_R0 : IN STD_LOGIC;     
-    data_shaping_R1 : IN STD_LOGIC;     
+    data_shaping_R0  : IN STD_LOGIC;     
+    data_shaping_R1  : IN STD_LOGIC;     
         
     delta_snapshot : IN STD_LOGIC_VECTOR(delta_snapshot_size-1 DOWNTO 0);
     delta_f2_f1    : IN STD_LOGIC_VECTOR(delta_f2_f1_size-1 DOWNTO 0);
@@ -90,9 +90,9 @@ ENTITY Top_Data_Acquisition IS
     addr_data_f2 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_data_f3 : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
-END Top_Data_Acquisition;
+END lpp_top_lfr_wf_picker_ip;
 
-ARCHITECTURE tb OF Top_Data_Acquisition IS
+ARCHITECTURE tb OF lpp_top_lfr_wf_picker_ip IS
 
   COMPONENT Downsampling
     GENERIC (

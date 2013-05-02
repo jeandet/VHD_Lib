@@ -23,11 +23,6 @@ library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
 
-library lpp;
-use lpp.general_purpose.all;
-
-
-
 entity Multiplier is 
 generic(
     Input_SZ_A     :   integer := 16;
