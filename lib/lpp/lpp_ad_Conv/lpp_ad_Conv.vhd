@@ -184,8 +184,41 @@ port(
 );
 end COMPONENT;
 
+-- todo clean file
+COMPONENT DUAL_ADS1278_DRIVER is 
+port(
+    Clk     :   in  std_logic;
+    reset   :   in  std_logic;
+    SpiClk  :   out std_logic;
+    DIN     :   in  std_logic_vector(1 downto 0);
+    SmplClk :   in  std_logic;
+    OUT00    :   out std_logic_vector(23 downto 0);
+    OUT01    :   out std_logic_vector(23 downto 0);
+    OUT02    :   out std_logic_vector(23 downto 0);
+    OUT03    :   out std_logic_vector(23 downto 0);
+    OUT04    :   out std_logic_vector(23 downto 0);
+    OUT05    :   out std_logic_vector(23 downto 0);
+    OUT06    :   out std_logic_vector(23 downto 0);
+    OUT07    :   out std_logic_vector(23 downto 0);
+    OUT10    :   out std_logic_vector(23 downto 0);
+    OUT11    :   out std_logic_vector(23 downto 0);
+    OUT12    :   out std_logic_vector(23 downto 0);
+    OUT13    :   out std_logic_vector(23 downto 0);
+    OUT14    :   out std_logic_vector(23 downto 0);
+    OUT15    :   out std_logic_vector(23 downto 0);
+    OUT16    :   out std_logic_vector(23 downto 0);
+    OUT17    :   out std_logic_vector(23 downto 0);
+    FSynch  :   out std_logic
+);
+end COMPONENT;
 
 
 END lpp_ad_conv;
+
+
+
+
+
+
 
 
