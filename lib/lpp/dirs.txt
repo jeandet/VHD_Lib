@@ -17,3 +17,4 @@
 ./lpp_top_lfr
 ./lpp_uart
 ./lpp_usb
+./lfr_time_management
