@@ -42,7 +42,10 @@ vcom -quiet -93 -work lpp ../../lib/lpp/lpp_ad_Conv/TestModule_ADS7886.vhd
 
 
 vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_lfr_pkg.vhd
-vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_acq.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_apbreg.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_lfr_wf_picker_ip.vhd
+vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_lfr_wf_picker.vhd
+#vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_acq.vhd
 #vcom -quiet -93 -work lpp ../../lib/lpp/lpp_top_lfr/lpp_top_lfr.vhd
 
 vcom -quiet -93 -work lpp ../../lib/lpp/lfr_time_management/lpp_lfr_time_management.vhd

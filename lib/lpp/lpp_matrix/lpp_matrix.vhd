@@ -65,14 +65,17 @@ component MatriceSpectrale is
         rstn            : in std_logic;
 
         FifoIN_Full     : in std_logic_vector(4 downto 0);
+        SetReUse        : in std_logic_vector(4 downto 0);
         FifoOUT_Full    : in std_logic_vector(1 downto 0);
-        Data_IN         : in std_logic_vector(79 downto 0);
+        Data_IN         : in std_logic_vector((5*Input_SZ)-1 downto 0);
         ACQ             : in std_logic;
         FlagError       : out std_logic;
         Pong            : out std_logic;
+        Statu           : out std_logic_vector(3 downto 0);
         Write           : out std_logic_vector(1 downto 0);
         Read            : out std_logic_vector(4 downto 0);
-        Data_OUT        : out std_logic_vector(63 downto 0)
+        ReUse           : out std_logic_vector(4 downto 0);
+        Data_OUT        : out std_logic_vector((2*Result_SZ)-1 downto 0)
         );
 end component;
 
@@ -248,6 +251,16 @@ component ALU_Driver is
       OP1       :   out std_logic_vector(Input_SZ_1-1 downto 0);
       OP2       :   out std_logic_vector(Input_SZ_2-1 downto 0)
 );
+end component;
+
+component ReUse_CTRLR is
+    port(
+        clk         : in std_logic;
+        reset       : in std_logic;
+        SetReUse    : in std_logic_vector(4 downto 0);
+        Statu       : in std_logic_vector(3 downto 0);
+        ReUse       : out std_logic_vector(4 downto 0)
+    );
 end component;
 
 end;

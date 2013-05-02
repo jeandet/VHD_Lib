@@ -34,19 +34,19 @@ ENTITY lpp_waveform_dma_selectaddress IS
     nb_burst_available_size : INTEGER := 11
     );
   PORT (
-    HCLK               : IN  STD_ULOGIC;
-    HRESETn            : IN  STD_ULOGIC;
-    
-    update             : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
-    
-    nb_burst_available : IN  STD_LOGIC_VECTOR(nb_burst_available_size-1 DOWNTO 0);
-    addr_data_reg      : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-    
-    addr_data         : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    HCLK    : IN STD_ULOGIC;
+    HRESETn : IN STD_ULOGIC;
 
-    status_full       : OUT STD_LOGIC;
-    status_full_ack   : IN  STD_LOGIC;
-    status_full_err   : OUT STD_LOGIC
+    update : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+
+    nb_burst_available : IN STD_LOGIC_VECTOR(nb_burst_available_size-1 DOWNTO 0);
+    addr_data_reg      : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+    addr_data : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+    status_full     : OUT STD_LOGIC;
+    status_full_ack : IN  STD_LOGIC;
+    status_full_err : OUT STD_LOGIC
     );                                      
 END;
 
@@ -59,12 +59,13 @@ ARCHITECTURE Behavioral OF lpp_waveform_dma_selectaddress IS
   SIGNAL nb_send_next : STD_LOGIC_VECTOR(nb_burst_available_size-1 DOWNTO 0);
 
   SIGNAL update_s : STD_LOGIC;
+  SIGNAL update_r : STD_LOGIC_VECTOR(1 DOWNTO 0);
 BEGIN
 
   update_s <= update(0) OR update(1);
-  
+
   addr_data    <= address;
-  nb_send_next <= std_logic_vector(unsigned(nb_send) + 1);
+  nb_send_next <= STD_LOGIC_VECTOR(UNSIGNED(nb_send) + 1);
 
   FSM_SELECT_ADDRESS : PROCESS (HCLK, HRESETn)
   BEGIN
@@ -74,7 +75,9 @@ BEGIN
       nb_send         <= (OTHERS => '0');
       status_full     <= '0';
       status_full_err <= '0';
+      update_r        <= "00";
     ELSIF HCLK'EVENT AND HCLK = '1' THEN
+      update_r        <= update;
       CASE state IS
         WHEN IDLE =>
           IF update_s = '1' THEN
@@ -83,12 +86,12 @@ BEGIN
 
         WHEN ADD =>
           IF UNSIGNED(nb_send_next) < UNSIGNED(nb_burst_available) THEN
-            state   <= IDLE;
-            IF update = "10" THEN
-              address <= std_logic_vector(unsigned(address) + 16);
+            state <= IDLE;
+            IF update_r = "10" THEN
+              address <= STD_LOGIC_VECTOR(UNSIGNED(address) + 64);
               nb_send <= nb_send_next;
-            ELSIF update = "01" THEN
-              address <= std_logic_vector(unsigned(address) + 1);                
+            ELSIF update_r = "01" THEN
+              address <= STD_LOGIC_VECTOR(UNSIGNED(address) + 4);
             END IF;
           ELSE
             state       <= FULL;

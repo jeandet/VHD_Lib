@@ -22,10 +22,6 @@
 LIBRARY IEEE;
 USE IEEE.numeric_std.ALL;
 USE IEEE.std_logic_1164.ALL;
-LIBRARY lpp;
-USE lpp.general_purpose.ALL;
-
-
 
 ENTITY Adder IS
   GENERIC(
