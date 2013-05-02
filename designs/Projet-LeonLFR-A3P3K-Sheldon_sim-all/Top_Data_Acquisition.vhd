@@ -191,34 +191,34 @@ BEGIN
     sample_filter_in(i, 17) <= sample(i)(15);
   END GENERATE;
 
-  --coefs_v2 <= CoefsInitValCst_v2;
+  coefs_v2 <= CoefsInitValCst_v2;
 
-  --IIR_CEL_CTRLR_v2_1 : IIR_CEL_CTRLR_v2
-  --  GENERIC MAP (
-  --    tech         => 0,
-  --    Mem_use      => use_RAM,
-  --    Sample_SZ    => 18,
-  --    Coef_SZ      => Coef_SZ,
-  --    Coef_Nb      => 25,
-  --    Coef_sel_SZ  => 5,
-  --    Cels_count   => Cels_count,
-  --    ChanelsCount => ChanelCount)
-  --  PORT MAP (
-  --    rstn           => rstn,
-  --    clk            => clk,
-  --    virg_pos       => 7,
-  --    coefs          => coefs_v2,
-  --    sample_in_val  => sample_val_delay,
-  --    sample_in      => sample_filter_in,
-  --    sample_out_val => sample_filter_v2_out_val,
-  --    sample_out     => sample_filter_v2_out);
+  IIR_CEL_CTRLR_v2_1 : IIR_CEL_CTRLR_v2
+    GENERIC MAP (
+      tech         => 0,
+      Mem_use      => use_RAM,
+      Sample_SZ    => 18,
+      Coef_SZ      => Coef_SZ,
+      Coef_Nb      => 25,
+      Coef_sel_SZ  => 5,
+      Cels_count   => Cels_count,
+      ChanelsCount => ChanelCount)
+    PORT MAP (
+      rstn           => rstn,
+      clk            => clk,
+      virg_pos       => 7,
+      coefs          => coefs_v2,
+      sample_in_val  => sample_val_delay,
+      sample_in      => sample_filter_in,
+      sample_out_val => sample_filter_v2_out_val,
+      sample_out     => sample_filter_v2_out);
 
-  sample_filter_v2_out_val <= sample_val_delay;
+  --sample_filter_v2_out_val <= sample_val_delay;
   
   ChanelLoopOut : FOR i IN 0 TO 5 GENERATE
     SampleLoopOut : FOR j IN 0 TO 15 GENERATE
-      --sample_filter_v2_out_s(i, j) <= sample_filter_v2_out(i, j);
-      sample_filter_v2_out_s(i, j) <= sample_filter_in(i, j);
+      sample_filter_v2_out_s(i, j) <= sample_filter_v2_out(i, j);
+      --sample_filter_v2_out_s(i, j) <= sample_filter_in(i, j);
     END GENERATE;
   END GENERATE;
   -----------------------------------------------------------------------------
