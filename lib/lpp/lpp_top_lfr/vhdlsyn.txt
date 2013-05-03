@@ -1,3 +1,4 @@
-lpp_top_acq.vhd
-lpp_top_lfr.vhd
 lpp_top_lfr_pkg.vhd
+lpp_top_apbreg.vhd
+lpp_top_lfr_wf_picker.vhd
+lpp_top_lfr_wf_picker_ip.vhd
