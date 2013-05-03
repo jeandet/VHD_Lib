@@ -6,6 +6,7 @@
 ./general_purpose/lpp_AMR
 ./general_purpose/lpp_balise
 ./general_purpose/lpp_delay
+./lfr_time_management
 ./lpp_ad_Conv
 ./lpp_amba
 ./lpp_bootloader
@@ -17,4 +18,4 @@
 ./lpp_top_lfr
 ./lpp_uart
 ./lpp_usb
-./lfr_time_management
+./lpp_waveform
