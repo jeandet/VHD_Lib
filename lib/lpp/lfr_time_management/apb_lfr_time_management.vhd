@@ -164,11 +164,11 @@ BEGIN
       END IF;
 
     END IF;
-    apbo.pconfig <= pconfig;
   END PROCESS;
 
-  apbo.prdata <= Rdata WHEN apbi.penable = '1';
+  apbo.prdata <= Rdata ;--WHEN apbi.penable = '1';
   coarse_time <= r.coarse_time;
   fine_time   <= r.fine_time;
+  apbo.pconfig <= pconfig;
 
 END Behavioral;

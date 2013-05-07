@@ -22,10 +22,10 @@ USE GRLIB.DMA2AHB_Package.ALL;
 ENTITY lpp_top_lfr_wf_picker IS
   GENERIC (
     hindex                 : INTEGER := 2;
-    pindex                 : INTEGER := 4;
-    paddr  : INTEGER := 4;
+    pindex                 : INTEGER := 15;
+    paddr  : INTEGER := 15;
     pmask  : INTEGER := 16#fff#;
-    pirq   : INTEGER := 0;
+    pirq   : INTEGER := 15;
     tech                   : INTEGER := 0;
     nb_burst_available_size : INTEGER := 11;
     nb_snapshot_param_size  : INTEGER := 11;
@@ -121,6 +121,14 @@ ARCHITECTURE tb OF lpp_top_lfr_wf_picker IS
   
   
 BEGIN
+
+	ready_matrix_f0_0 <= '0';
+	ready_matrix_f0_1 <= '0';
+	ready_matrix_f1 <= '0';
+	ready_matrix_f2 <= '0';
+  	error_anticipating_empty_fifo <= '0';
+  	error_bad_component_error <= '0';
+  	debug_reg <= (others => '0');
   
   lpp_top_apbreg_1: lpp_top_apbreg
     GENERIC MAP (
