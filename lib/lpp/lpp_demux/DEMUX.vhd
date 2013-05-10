@@ -41,6 +41,7 @@ port(
     DataF1      :   in std_logic_vector((5*Data_sz)-1 downto 0);
     DataF2      :   in std_logic_vector((5*Data_sz)-1 downto 0);
 
+    WorkFreq : out std_logic_vector(1 downto 0);
     Read_DEMUX : out std_logic_vector(14 downto 0);
     Empty   :   out std_logic_vector(4 downto 0);
     Data    :   out std_logic_vector((5*Data_sz)-1 downto 0)
@@ -59,6 +60,7 @@ constant Dummy_Read : std_logic_vector(4 downto 0) := (others => '1');
 
 signal Countf0 : integer;
 signal Countf1 : integer;
+signal i : integer;
 
 begin
     process(clk,rstn)
@@ -66,8 +68,9 @@ begin
         if(rstn='0')then
             ect <= e0;
             load_reg <= '0';
-            Countf0 <= 5;
+            Countf0 <= 0;
             Countf1 <= 0;
+            i <= 0;
 
         elsif(clk'event and clk='1')then
             load_reg <= Load;
@@ -92,13 +95,25 @@ begin
                             ect <= e2;
                         else
                             Countf1 <= Countf1 + 1;
-                            ect <= e0;
+                            if(i=4)then
+                                i <= 0;
+                                ect <= e0;
+                            else
+                                i <= i+1;
+                                ect <= e1;
+                            end if;
                         end if;
                     end if;  
 
                 when e2 =>
                     if(load_reg = '1' and Load = '0')then
-                        ect <= e0;
+                        if(i=4)then
+                            i <= 0;
+                            ect <= e0;
+                        else
+                            i <= i+1;
+                            ect <= e2;
+                        end if;
                     end if;                
                 
                 when others =>
@@ -125,6 +140,12 @@ with ect select
                     Dummy_Read & Read & Dummy_Read when e1,
                     Read & Dummy_Read & Dummy_Read when e2,
                     (others => '1') when others;
+
+with ect select
+    WorkFreq    <=  "01" when e0,
+                    "10" when e1,
+                    "11" when e2,
+                    "00" when others;
 
 end architecture;
 
