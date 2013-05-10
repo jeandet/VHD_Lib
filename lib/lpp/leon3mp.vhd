@@ -194,6 +194,8 @@ signal SM_FlagError : std_logic;
 signal SM_Pong      : std_logic;
 signal SM_Read      : std_logic_vector(4 downto 0);
 signal SM_Write     : std_logic_vector(1 downto 0);
+signal SM_ReUse      : std_logic_vector(4 downto 0);
+signal SM_Param      : std_logic_vector(3 downto 0);
 signal SM_Data      : std_logic_vector(63 downto 0);
 
 signal Dma_acq      : std_logic;
@@ -211,7 +213,6 @@ signal DEMU_Empty   : std_logic_vector(4 downto 0);
 signal DEMU_Data    : std_logic_vector(79 downto 0);
 
 -- ACQ
-
 signal sample_val : STD_LOGIC;
 signal sample : Samples(8-1 DOWNTO 0);
 
@@ -315,30 +316,29 @@ led(1 downto 0) <= gpio(1 downto 0);
 --        generic map (pindex => 6, paddr => 6, FifoCnt => 5, Data_sz => 16, Addr_sz => 8, Enable_ReUse => '0', R => 1, W => 0)
 --        port map (clkm,rstn,clkm,clkm,WG_ReUse,(others => '1'),WG_Write,open,Fuller,open,WG_DATA,open,open,apbi,apbo(6));
     
-  DIGITAL_acquisition : ADS7886_drvr
-    GENERIC MAP (
-      ChanelCount     => 8,
-      ncycle_cnv_high => 79,
-      ncycle_cnv      => 500)
-    PORT MAP (
-      cnv_clk    => clk50MHz,                      -- 
-      cnv_rstn   => rstn,                     -- 
-      cnv_run    => '1',                      --
-      cnv        => CNV_CH1,                          -- 
-      clk        => clkm,                          -- 
-      rstn       => rstn,                         -- 
-      sck        => SCK_CH1,                          -- 
-      sdo        => SDO_CH1,  -- 
-      sample     => sample,
-      sample_val => sample_val);
+--  DIGITAL_acquisition : ADS7886_drvr
+--    GENERIC MAP (
+--      ChanelCount     => 8,
+--      ncycle_cnv_high => 79,
+--      ncycle_cnv      => 500)
+--    PORT MAP (
+--      cnv_clk    => clk50MHz,                      -- 
+--      cnv_rstn   => rstn,                     -- 
+--      cnv_run    => '1',                      --
+--      cnv        => CNV_CH1,                          -- 
+--      clk        => clkm,                          -- 
+--      rstn       => rstn,                         -- 
+--      sck        => SCK_CH1,                          -- 
+--      sdo        => SDO_CH1,  -- 
+--      sample     => sample,
+--      sample_val => sample_val);
 --
-TopACQ_WenF0 <= not sample_val & not sample_val & not sample_val & not sample_val & not sample_val;
-TopACQ_DataF0 <= sample(4) & sample(3) & sample(2) & sample(1) & sample(0);
+--TopACQ_WenF0 <= not sample_filter_v2_out_val & not sample_filter_v2_out_val & not sample_filter_v2_out_val & not sample_filter_v2_out_val & not sample_filter_v2_out_val;
+--TopACQ_DataF0 <= E & D & C & B & A;
+
 --
-TEST(0) <= TopACQ_WenF0(1);
-TEST(1) <= SDO_CH1(1);
---
---
+--TEST(0) <= TopACQ_WenF0(1);
+--TEST(1) <= SDO_CH1(1);
 --
 --process(clkm,rstn)
 --begin
@@ -351,18 +351,18 @@ TEST(1) <= SDO_CH1(1);
 --    end if;
 --end process;
 
---    TopACQ : lpp_top_acq
---        port map('1',CNV_CH1,SCK_CH1,SDO_CH1,clk50MHz,rstn,clkm,rstn,TopACQ_WenF0,TopACQ_DataF0,TopACQ_WenF1,TopACQ_DataF1,open,open,TopACQ_WenF3,TopACQ_DataF3);
+    TopACQ : lpp_top_acq
+        port map('1',CNV_CH1,SCK_CH1,SDO_CH1,clk50MHz,rstn,clkm,rstn,TopACQ_WenF0,TopACQ_DataF0,TopACQ_WenF1,TopACQ_DataF1,open,open,TopACQ_WenF3,TopACQ_DataF3);
 
 Bias_Fails <= '0';    
 --- FIFO IN -------------------------------------------------------------
 
-    MemOut : APB_FIFO
-        generic map (pindex => 9, paddr => 9, FifoCnt => 5, Data_sz => 16, Addr_sz => 9, Enable_ReUse => '0', R => 1, W => 0)
-        port map (clkm,rstn,clkm,clkm,(others => '0'),(others => '1'),TopACQ_WenF0,FifoF0_Empty,open,open,TopACQ_DataF0,open,open,apbi,apbo(9));
---    Memf0 : lppFIFOxN
---        generic map(Data_sz => 16, Addr_sz => 9, FifoCnt => 5, Enable_ReUse => '0')
---        port map(rstn,clkm,clkm,(others => '0'),TopACQ_WenF0,DEMU_Read(4 downto 0),TopACQ_DataF0,FifoF0_Data,open,FifoF0_Empty);
+--    MemOut : APB_FIFO
+--        generic map (pindex => 9, paddr => 9, FifoCnt => 5, Data_sz => 16, Addr_sz => 9, Enable_ReUse => '0', R => 1, W => 0)
+--        port map (clkm,rstn,clkm,clkm,(others => '0'),(others => '1'),TopACQ_WenF0,FifoF0_Empty,open,open,TopACQ_DataF0,open,open,apbi,apbo(9));
+    Memf0 : lppFIFOxN
+        generic map(Data_sz => 16, Addr_sz => 9, FifoCnt => 5, Enable_ReUse => '0')
+        port map(rstn,clkm,clkm,(others => '0'),TopACQ_WenF0,DEMU_Read(4 downto 0),TopACQ_DataF0,FifoF0_Data,open,FifoF0_Empty);
     
     Memf1 : lppFIFOxN
         generic map(Data_sz => 16, Addr_sz => 8, FifoCnt => 5, Enable_ReUse => '0')
@@ -396,7 +396,7 @@ Bias_Fails <= '0';
 
     MemInt : lppFIFOxN
         generic map(Data_sz => 16, FifoCnt => 5, Enable_ReUse => '1')
-        port map(rstn,clkm,clkm,FFT_ReUse,FFT_Write,SM_Read,FFT_Data,FifoINT_Data,FifoINT_Full,open);
+        port map(rstn,clkm,clkm,SM_ReUse,FFT_Write,SM_Read,FFT_Data,FifoINT_Data,FifoINT_Full,open);
 --
 --    MemIn : APB_FIFO
 --        generic map (pindex => 8, paddr => 8, FifoCnt => 5, Data_sz => 16, Addr_sz => 8, Enable_ReUse => '1', R => 0, W => 1)
@@ -406,13 +406,13 @@ Bias_Fails <= '0';
 
     SM0 : MatriceSpectrale
         generic map(Input_SZ => 16,Result_SZ => 32)
-        port map(clkm,rstn,FifoINT_Full,FifoOUT_Full,FifoINT_Data,Dma_acq,SM_FlagError,SM_Pong,SM_Write,SM_Read,SM_Data);
+        port map(clkm,rstn,FifoINT_Full,FFT_ReUse,FifoOUT_Full,FifoINT_Data,Dma_acq,SM_FlagError,SM_Pong,SM_Param,SM_Write,SM_Read,SM_ReUse,SM_Data);
 
 Dma_acq <= '1';
 
---    MemOut : APB_FIFO
---        generic map (pindex => 9, paddr => 9, FifoCnt => 2, Data_sz => 32, Addr_sz => 8, Enable_ReUse => '0', R => 1, W => 0)
---        port map (clkm,rstn,clkm,clkm,(others => '0'),(others => '1'),SM_Write,open,FifoOUT_Full,open,SM_Data,open,open,apbi,apbo(9));
+    MemOut : APB_FIFO
+        generic map (pindex => 9, paddr => 9, FifoCnt => 2, Data_sz => 32, Addr_sz => 8, Enable_ReUse => '0', R => 1, W => 0)
+        port map (clkm,rstn,clkm,clkm,(others => '0'),(others => '1'),SM_Write,open,FifoOUT_Full,open,SM_Data,open,open,apbi,apbo(9));
 
 ----- FIFO -------------------------------------------------------------
 
