@@ -485,6 +485,10 @@ BEGIN
       data_f2_in_valid => sample_f2_val,
       data_f3_in_valid => sample_f3_val);
 
+  data_f0_in_valid((4*16)-1 DOWNTO 0) <= (others => '0'); 
+  data_f1_in_valid((4*16)-1 DOWNTO 0) <= (others => '0');
+  data_f2_in_valid((4*16)-1 DOWNTO 0) <= (others => '0'); 
+  data_f3_in_valid((4*16)-1 DOWNTO 0) <= (others => '0');
   data_f0_in_valid((10*16)-1 DOWNTO (4*16)) <= sample_f0_wdata_s;
   data_f1_in_valid((10*16)-1 DOWNTO (4*16)) <= sample_f1_wdata_s;
   data_f2_in_valid((10*16)-1 DOWNTO (4*16)) <= sample_f2_wdata_s;
