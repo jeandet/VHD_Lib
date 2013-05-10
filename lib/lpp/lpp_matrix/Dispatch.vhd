@@ -32,7 +32,8 @@ port(
     Acq         : in std_logic;
     Data        : in std_logic_vector(Data_SZ-1 downto 0);
     Write       : in std_logic;
-    Full        : in std_logic_vector(1 downto 0);
+    Valid       : in std_logic;
+--    Full        : in std_logic_vector(1 downto 0);
     FifoData    : out std_logic_vector(2*Data_SZ-1 downto 0);
     FifoWrite   : out std_logic_vector(1 downto 0);
     Pong        : out std_logic;
@@ -47,7 +48,7 @@ type etat is (eX,e0,e1,e2);
 signal ect : etat;
 
 signal Pong_int : std_logic;
-signal FifoCpt : integer range 0 to 1 := 0;
+--signal FifoCpt : integer range 0 to 1 := 0;
 
 begin
 
@@ -63,7 +64,8 @@ begin
             case ect is
 
                 when e0 =>
-                    if(Full(FifoCpt) = '1')then
+--                    if(Full(FifoCpt) = '1')then
+                    if(Valid = '1')then
                         Pong_int <= not Pong_int;
                         ect <= e1;
                     end if;
@@ -88,7 +90,7 @@ begin
 FifoData <= Data & Data;
 Pong <= Pong_int;
 
-FifoCpt <= 0 when Pong_int='0' else 1;
+--FifoCpt <= 0 when Pong_int='0' else 1;
 
 FifoWrite <= '1' & not Write when Pong_int='0' else not Write & '1';
                     

@@ -66,9 +66,11 @@ component MatriceSpectrale is
 
         FifoIN_Full     : in std_logic_vector(4 downto 0);
         SetReUse        : in std_logic_vector(4 downto 0);
-        FifoOUT_Full    : in std_logic_vector(1 downto 0);
+--        FifoOUT_Full    : in std_logic_vector(1 downto 0);
+        Valid           : in std_logic;
         Data_IN         : in std_logic_vector((5*Input_SZ)-1 downto 0);
         ACQ             : in std_logic;
+        SM_Write        : out std_logic;
         FlagError       : out std_logic;
         Pong            : out std_logic;
         Statu           : out std_logic_vector(3 downto 0);
@@ -200,7 +202,8 @@ port(
     Acq         : in std_logic;
     Data        : in std_logic_vector(Data_SZ-1 downto 0);
     Write       : in std_logic;
-    Full        : in std_logic_vector(1 downto 0);
+    Valid       : in std_logic;
+--    Full        : in std_logic_vector(1 downto 0);
     FifoData    : out std_logic_vector(2*Data_SZ-1 downto 0);
     FifoWrite   : out std_logic_vector(1 downto 0);
     Pong        : out std_logic;
