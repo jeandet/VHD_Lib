@@ -9,10 +9,10 @@ DEVTOPLEVELMODULETYPE EDIF
 DEVSIMULATOR Modelsim
 DEVGENERATEDSIMULATIONMODEL VHDL
 SOURCE synplify\top.edf
-DEPASSOC top ..\..\boards\Projet-LeonLFR-A3P3K-Sheldon\top.ucf
+DEPASSOC top C:\opt\grlib-gpl-1.1.0-b4108\boards\LeonLPP-A3PE3kL\top.ucf
 [Normal]
 xilxMapAllowLogicOpt=edif,  PROASIC3, EDIF.t_placeAndRouteDes, 1102861051, True
 xilxMapCoverMode=edif,  PROASIC3, EDIF.t_placeAndRouteDes, 1102861051, Speed
 xilxNgdbld_AUL=edif,  PROASIC3, EDIF.t_placeAndRouteDes, 1102861051, True
 xilxPAReffortLevel=edif,  PROASIC3, EDIF.t_placeAndRouteDes, 1102861051, Medium
-xilxNgdbldMacro=edif,  PROASIC3, EDIF.t_placeAndRouteDes, 1105378344, ..\..\netlists\xilinx\PROASIC3
+xilxNgdbldMacro=edif,  PROASIC3, EDIF.t_placeAndRouteDes, 1105378344, C:\opt\grlib-gpl-1.1.0-b4108\netlists\xilinx\PROASIC3

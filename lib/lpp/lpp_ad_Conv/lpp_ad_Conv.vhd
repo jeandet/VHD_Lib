@@ -48,7 +48,31 @@ PACKAGE lpp_ad_conv IS
 
   --TYPE AD7688_in IS ARRAY(NATURAL RANGE <>) OF AD7688_in_element;
 
-  TYPE Samples IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
+  TYPE Samples   IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+  SUBTYPE Samples24 IS STD_LOGIC_VECTOR(23 DOWNTO 0);
+
+  SUBTYPE Samples16 IS STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+  SUBTYPE Samples14 IS STD_LOGIC_VECTOR(13 DOWNTO 0);
+
+  SUBTYPE Samples12 IS STD_LOGIC_VECTOR(11 DOWNTO 0);
+
+  SUBTYPE Samples10 IS STD_LOGIC_VECTOR(9 DOWNTO 0);
+
+  SUBTYPE Samples8  IS STD_LOGIC_VECTOR(7 DOWNTO 0);
+  
+  TYPE Samples24v IS ARRAY(NATURAL RANGE <>) OF Samples24;
+
+  TYPE Samples16v IS ARRAY(NATURAL RANGE <>) OF Samples16;
+
+  TYPE Samples14v IS ARRAY(NATURAL RANGE <>) OF Samples14;
+
+  TYPE Samples12v IS ARRAY(NATURAL RANGE <>) OF Samples12;
+
+  TYPE Samples10v IS ARRAY(NATURAL RANGE <>) OF Samples10;
+
+  TYPE Samples8v  IS ARRAY(NATURAL RANGE <>) OF Samples8;
 
   COMPONENT ADS7886_drvr
     GENERIC (
@@ -68,6 +92,21 @@ PACKAGE lpp_ad_conv IS
       sample_val : OUT STD_LOGIC);
   END COMPONENT;
   
+COMPONENT RHF1401_drvr IS
+  GENERIC(
+    ChanelCount     : INTEGER:=8);
+  PORT (
+    cnv_clk    : IN  STD_LOGIC;
+    clk        : IN  STD_LOGIC;
+    rstn       : IN  STD_LOGIC;
+    ADC_data   : IN  Samples14;
+    ADC_smpclk : OUT STD_LOGIC;
+    ADC_nOE    : OUT STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+    sample     : OUT Samples14v(ChanelCount-1 DOWNTO 0);
+    sample_val : OUT STD_LOGIC
+    );
+END COMPONENT;
+
   --COMPONENT AD7688_drvr IS
   --  GENERIC(ChanelCount : INTEGER;
   --          clkkHz      : INTEGER);
