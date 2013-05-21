@@ -48,7 +48,31 @@ PACKAGE lpp_ad_conv IS
 
   --TYPE AD7688_in IS ARRAY(NATURAL RANGE <>) OF AD7688_in_element;
 
-  TYPE Samples IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
+  TYPE Samples   IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+  SUBTYPE Samples24 IS STD_LOGIC_VECTOR(23 DOWNTO 0);
+
+  SUBTYPE Samples16 IS STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+  SUBTYPE Samples14 IS STD_LOGIC_VECTOR(13 DOWNTO 0);
+
+  SUBTYPE Samples12 IS STD_LOGIC_VECTOR(11 DOWNTO 0);
+
+  SUBTYPE Samples10 IS STD_LOGIC_VECTOR(9 DOWNTO 0);
+
+  SUBTYPE Samples8  IS STD_LOGIC_VECTOR(7 DOWNTO 0);
+  
+  TYPE Samples24v IS ARRAY(NATURAL RANGE <>) OF Samples24;
+
+  TYPE Samples16v IS ARRAY(NATURAL RANGE <>) OF Samples16;
+
+  TYPE Samples14v IS ARRAY(NATURAL RANGE <>) OF Samples14;
+
+  TYPE Samples12v IS ARRAY(NATURAL RANGE <>) OF Samples12;
+
+  TYPE Samples10v IS ARRAY(NATURAL RANGE <>) OF Samples10;
+
+  TYPE Samples8v  IS ARRAY(NATURAL RANGE <>) OF Samples8;
 
   COMPONENT AD7688_drvr
     GENERIC (
@@ -68,6 +92,21 @@ PACKAGE lpp_ad_conv IS
       sample_val : OUT STD_LOGIC);
   END COMPONENT;
   
+COMPONENT RHF1401_drvr IS
+  GENERIC(
+    ChanelCount     : INTEGER:=8);
+  PORT (
+    cnv_clk    : IN  STD_LOGIC;
+    clk        : IN  STD_LOGIC;
+    rstn       : IN  STD_LOGIC;
+    ADC_data   : IN  Samples14;
+    ADC_smpclk : OUT STD_LOGIC;
+    ADC_nOE    : OUT STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+    sample     : OUT Samples14v(ChanelCount-1 DOWNTO 0);
+    sample_val : OUT STD_LOGIC
+    );
+END COMPONENT;
+
   --COMPONENT AD7688_drvr IS
   --  GENERIC(ChanelCount : INTEGER;
   --          clkkHz      : INTEGER);
@@ -184,8 +223,41 @@ port(
 );
 end COMPONENT;
 
+-- todo clean file
+COMPONENT DUAL_ADS1278_DRIVER is 
+port(
+    Clk     :   in  std_logic;
+    reset   :   in  std_logic;
+    SpiClk  :   out std_logic;
+    DIN     :   in  std_logic_vector(1 downto 0);
+    SmplClk :   in  std_logic;
+    OUT00    :   out std_logic_vector(23 downto 0);
+    OUT01    :   out std_logic_vector(23 downto 0);
+    OUT02    :   out std_logic_vector(23 downto 0);
+    OUT03    :   out std_logic_vector(23 downto 0);
+    OUT04    :   out std_logic_vector(23 downto 0);
+    OUT05    :   out std_logic_vector(23 downto 0);
+    OUT06    :   out std_logic_vector(23 downto 0);
+    OUT07    :   out std_logic_vector(23 downto 0);
+    OUT10    :   out std_logic_vector(23 downto 0);
+    OUT11    :   out std_logic_vector(23 downto 0);
+    OUT12    :   out std_logic_vector(23 downto 0);
+    OUT13    :   out std_logic_vector(23 downto 0);
+    OUT14    :   out std_logic_vector(23 downto 0);
+    OUT15    :   out std_logic_vector(23 downto 0);
+    OUT16    :   out std_logic_vector(23 downto 0);
+    OUT17    :   out std_logic_vector(23 downto 0);
+    FSynch  :   out std_logic
+);
+end COMPONENT;
 
 
 END lpp_ad_conv;
+
+
+
+
+
+
 
 
