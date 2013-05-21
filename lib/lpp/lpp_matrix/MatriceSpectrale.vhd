@@ -35,9 +35,11 @@ entity MatriceSpectrale is
 
         FifoIN_Full     : in std_logic_vector(4 downto 0);
         SetReUse        : in std_logic_vector(4 downto 0);
-        FifoOUT_Full    : in std_logic_vector(1 downto 0);
+--        FifoOUT_Full    : in std_logic_vector(1 downto 0);
+        Valid           : in std_logic;
         Data_IN         : in std_logic_vector((5*Input_SZ)-1 downto 0);
         ACQ             : in std_logic;
+        SM_Write        : out std_logic;
         FlagError       : out std_logic;
         Pong            : out std_logic;
         Statu           : out std_logic_vector(3 downto 0);
@@ -76,9 +78,10 @@ begin
 
     DISP : entity work.Dispatch
         generic map(Result_SZ)
-        port map(clkm,rstn,ACQ,Matrix_Result,Matrix_Write,FifoOUT_Full,Data_OUT,Write,Pong,FlagError);
+        port map(clkm,rstn,ACQ,Matrix_Result,Matrix_Write,Valid,Data_OUT,Write,Pong,FlagError);
 
 Statu <= TopSM_Statu;
+SM_Write <= Matrix_Write;
 
 end architecture;
 

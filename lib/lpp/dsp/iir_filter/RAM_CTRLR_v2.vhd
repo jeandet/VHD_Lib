@@ -72,6 +72,7 @@ BEGIN
   memCEL : IF Mem_use = use_CEL GENERATE
     WEN <= NOT ram_write;
     REN <= NOT ram_read;
+--    RAMblk : RAM_CEL_N
     RAMblk : RAM_CEL_N
       GENERIC MAP(Input_SZ_1)
       PORT MAP(

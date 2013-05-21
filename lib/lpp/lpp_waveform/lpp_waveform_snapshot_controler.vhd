@@ -63,7 +63,7 @@ BEGIN  -- beh
       END IF;
       -------------------------------------------------------------------------
       coarse_time_0_r <= coarse_time_0;
-      IF coarse_time_0 = NOT coarse_time_0_r AND coarse_time_0 = '1' THEN
+      IF coarse_time_0 = NOT coarse_time_0_r THEN --AND coarse_time_0 = '1' THEN
         IF counter_delta_snapshot = 0  THEN
           counter_delta_snapshot <=  to_integer(UNSIGNED(delta_snapshot));
         ELSE

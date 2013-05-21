@@ -29,31 +29,33 @@ use lpp.lpp_amba.all;
 
 --! Package contenant tous les programmes qui forment le composant intégré dans le léon 
 
-package lpp_demux is
+package lpp_Header is
 
-component DEMUX is
-generic(
-    Data_sz        :   integer range 1 to 32 := 16);
-port(
-    clk    :   in std_logic;
-    rstn   :   in std_logic;
+component HeaderBuilder is
+  generic(
+      Data_sz  : integer := 32);
+    port(
+        clkm            : in std_logic;
+        rstn            : in std_logic;
 
-    Read : in std_logic_vector(4 downto 0);
-    Load : in std_logic;
+        pong : in std_logic;
+        Statu : in std_logic_vector(3 downto 0);
+        Matrix_Type : in std_logic_vector(1 downto 0);
+        Matrix_Write : in std_logic;
+        Valid : out std_logic;               
 
-    EmptyF0    :   in std_logic_vector(4 downto 0);
-    EmptyF1     :   in std_logic_vector(4 downto 0);
-    EmptyF2     :   in std_logic_vector(4 downto 0);
+        dataIN : in std_logic_vector((2*Data_sz)-1 downto 0);
+        emptyIN : in std_logic_vector(1 downto 0);
+        RenOUT : out std_logic_vector(1 downto 0);
 
-    DataF0     :   in std_logic_vector((5*Data_sz)-1 downto 0);
-    DataF1      :   in std_logic_vector((5*Data_sz)-1 downto 0);
-    DataF2      :   in std_logic_vector((5*Data_sz)-1 downto 0);
+        dataOUT  : out std_logic_vector(Data_sz-1 downto 0);
+        emptyOUT : out std_logic;
+        RenIN : in std_logic;
 
-    WorkFreq : out std_logic_vector(1 downto 0);
-    Read_DEMUX : out std_logic_vector(14 downto 0);
-    Empty   :   out std_logic_vector(4 downto 0);
-    Data    :   out std_logic_vector((5*Data_sz)-1 downto 0)
-);
+        header     : out  std_logic_vector(Data_sz-1 DOWNTO 0);
+        header_val : out  std_logic;
+        header_ack : in std_logic
+        );
 end component;
 
 end;

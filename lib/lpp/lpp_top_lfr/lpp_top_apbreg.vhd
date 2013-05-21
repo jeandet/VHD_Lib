@@ -277,9 +277,9 @@ BEGIN  -- beh
       reg_sp.status_error_anticipating_empty_fifo <= reg_sp.status_error_anticipating_empty_fifo OR error_anticipating_empty_fifo;
       reg_sp.status_error_bad_component_error     <= reg_sp.status_error_bad_component_error OR error_bad_component_error;
 
-      reg_wp.status_full     <= reg_wp.status_full OR status_full;
+      reg_wp.status_full     <= reg_wp.status_full     OR status_full;
       reg_wp.status_full_err <= reg_wp.status_full_err OR status_full_err;
-      reg_wp.status_new_err  <= reg_wp.status_new_err OR status_new_err;
+      reg_wp.status_new_err  <= reg_wp.status_new_err  OR status_new_err;
 
       paddr             := "000000";
       paddr(7 DOWNTO 2) := apbi.paddr(7 DOWNTO 2);

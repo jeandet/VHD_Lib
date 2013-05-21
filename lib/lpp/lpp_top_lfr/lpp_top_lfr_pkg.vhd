@@ -146,7 +146,8 @@ PACKAGE lpp_top_lfr_pkg IS
       delta_snapshot_size     : INTEGER;
       delta_f2_f0_size        : INTEGER;
       delta_f2_f1_size        : INTEGER;
-      tech                    : INTEGER);
+      tech                    : INTEGER;
+      Mem_use                 : INTEGER);
     PORT (
       cnv_run            : IN  STD_LOGIC;
       cnv                : OUT STD_LOGIC;

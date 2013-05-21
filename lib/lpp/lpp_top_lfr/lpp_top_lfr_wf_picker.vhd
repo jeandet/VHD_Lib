@@ -201,7 +201,9 @@ BEGIN
       delta_snapshot_size     => delta_snapshot_size,
       delta_f2_f0_size        => delta_f2_f0_size,
       delta_f2_f1_size        => delta_f2_f1_size,
-      tech                    => tech)
+      tech                    => tech,
+      Mem_use                   => use_RAM
+      )
     PORT MAP (
       cnv_run            => cnv_run,
       cnv                => cnv,
