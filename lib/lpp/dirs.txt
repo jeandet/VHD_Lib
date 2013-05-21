@@ -19,3 +19,4 @@
 ./lpp_usb
 ./lpp_waveform
 ./lpp_top_lfr
+./lpp_Header

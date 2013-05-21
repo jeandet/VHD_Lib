@@ -1,3 +1,4 @@
+lpp_fft.vhd
 APB_FFT.vhd
 APB_FFT_half.vhd
 Driver_FFT.vhd
@@ -6,4 +7,3 @@ FFTamont.vhd
 FFTaval.vhd
 Flag_Extremum.vhd
 Linker_FFT.vhd
-lpp_fft.vhd

@@ -76,10 +76,10 @@ END;
 
 ARCHITECTURE Behavioral OF lpp_waveform_dma IS
   -----------------------------------------------------------------------------
-  SIGNAL DMAIn                : DMA_In_Type;
-  SIGNAL DMAOut               : DMA_OUt_Type;
+  SIGNAL DMAIn  : DMA_In_Type;
+  SIGNAL DMAOut : DMA_OUt_Type;
   -----------------------------------------------------------------------------
-  TYPE   state_DMAWriteBurst IS (IDLE,
+  TYPE state_DMAWriteBurst IS (IDLE,
                                  SEND_TIME_0, WAIT_TIME_0,
                                  SEND_TIME_1, WAIT_TIME_1,
                                  SEND_5_TIME,
@@ -92,8 +92,8 @@ ARCHITECTURE Behavioral OF lpp_waveform_dma IS
   SIGNAL update               : STD_LOGIC_VECTOR(1 DOWNTO 0);
   SIGNAL time_select          : STD_LOGIC;
   SIGNAL time_write           : STD_LOGIC;
-  SIGNAL time_already_send : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL time_already_send_s : STD_LOGIC;
+  SIGNAL time_already_send    : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL time_already_send_s  : STD_LOGIC;
   -----------------------------------------------------------------------------
   -- SEND TIME MODULE
   SIGNAL time_dmai            : DMA_In_Type;
@@ -117,8 +117,11 @@ ARCHITECTURE Behavioral OF lpp_waveform_dma IS
   SIGNAL addr_data_reg_vector : STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
   SIGNAL addr_data_vector     : STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
   -----------------------------------------------------------------------------
-  SIGNAL send_16_3_time : STD_LOGIC_VECTOR(2 DOWNTO 0);
-  SIGNAL count_send_time : INTEGER;
+  SIGNAL send_16_3_time_reg : STD_LOGIC_VECTOR(3*4-1 DOWNTO 0);
+  SIGNAL send_16_3_time_reg_s : STD_LOGIC_VECTOR(3*4-1 DOWNTO 0);
+  -----------------------------------------------------------------------------
+  SIGNAL send_16_3_time       : STD_LOGIC;
+  SIGNAL count_send_time      : INTEGER;
 BEGIN
 
   -----------------------------------------------------------------------------
@@ -143,10 +146,10 @@ BEGIN
   -----------------------------------------------------------------------------
   -- This module memorises when the Times info are write. When FSM send
   -- the Times info, the "reg" is set and when a full_ack is received the "reg" is reset.
-  all_time_write: FOR I IN 3 DOWNTO 0 GENERATE
+  all_time_write : FOR I IN 3 DOWNTO 0 GENERATE
     PROCESS (HCLK, HRESETn)
     BEGIN  -- PROCESS
-      IF HRESETn = '0' THEN                  -- asynchronous reset (active low)
+      IF HRESETn = '0' THEN                 -- asynchronous reset (active low)
         time_already_send(I) <= '0';
       ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
         IF time_write = '1' AND UNSIGNED(sel_data) = I THEN
@@ -157,7 +160,9 @@ BEGIN
       END IF;
     END PROCESS;
   END GENERATE all_time_write;
+
   
+
   -----------------------------------------------------------------------------
   sel_data_s <= "00" WHEN data_ready(0) = '1' ELSE
                 "01" WHEN data_ready(1) = '1' ELSE
@@ -169,68 +174,84 @@ BEGIN
                          time_already_send(2) WHEN data_ready(2) = '1' ELSE
                          time_already_send(3);
 
+  
+  send_16_3_time <= send_16_3_time_reg(0) WHEN data_ready(0) = '1' ELSE
+                    send_16_3_time_reg(3) WHEN data_ready(1) = '1' ELSE
+                    send_16_3_time_reg(6) WHEN data_ready(2) = '1' ELSE
+                    send_16_3_time_reg(9) ;
+  
+  all_send_16_3: FOR I IN 3 DOWNTO 0 GENERATE
+    send_16_3_time_reg_s(3*(I+1)-1 DOWNTO 3*I) <=
+      send_16_3_time_reg(3*(I+1)-1 DOWNTO 3*I) WHEN data_ready(I) = '0' ELSE
+      send_16_3_time_reg(3*(I+1)-2 DOWNTO 3*I) & send_16_3_time_reg(3*(I+1)-1);
+  END GENERATE all_send_16_3;
+  
   -- DMA control
   DMAWriteFSM_p : PROCESS (HCLK, HRESETn)
   BEGIN  -- PROCESS DMAWriteBurst_p
     IF HRESETn = '0' THEN
-      state         <= IDLE;
-      
-      sel_data      <= "00";
-      update        <= "00";
-      time_select   <= '0';
-      time_fifo_ren <= '1';
-      data_send     <= '0';
-      time_send     <= '0';
-      time_write    <= '0';
-      send_16_3_time <= "001";
+      state <= IDLE;
+
+      sel_data       <= "00";
+      update         <= "00";
+      time_select    <= '0';
+      time_fifo_ren  <= '1';
+      data_send      <= '0';
+      time_send      <= '0';
+      time_write     <= '0';
+      --send_16_3_time <= "001";
+      send_16_3_time_reg(3*1-1 DOWNTO 3*0) <= "001";
+      send_16_3_time_reg(3*2-1 DOWNTO 3*1) <= "001";
+      send_16_3_time_reg(3*3-1 DOWNTO 3*2) <= "001";
+      send_16_3_time_reg(3*4-1 DOWNTO 3*3) <= "001";
       
     ELSIF HCLK'EVENT AND HCLK = '1' THEN
 
       CASE state IS
         WHEN IDLE =>
           count_send_time <= 0;
-          sel_data      <= "00";
-          update        <= "00";
-          time_select   <= '0';
-          time_fifo_ren <= '1';
-          data_send     <= '0';
-          time_send     <= '0';
-          time_write    <= '0';
-          
+          sel_data        <= "00";
+          update          <= "00";
+          time_select     <= '0';
+          time_fifo_ren   <= '1';
+          data_send       <= '0';
+          time_send       <= '0';
+          time_write      <= '0';
+
           IF data_ready = "0000" THEN
-            state    <= IDLE;
+            state <= IDLE;
           ELSE
-            sel_data <= sel_data_s;
-            send_16_3_time <= send_16_3_time(1 DOWNTO 0) & send_16_3_time(2);
-            IF send_16_3_time(0) = '1' THEN
-              state    <= SEND_TIME_0;
+            sel_data            <= sel_data_s;
+            send_16_3_time_reg  <= send_16_3_time_reg_s;
+            IF send_16_3_time = '1' THEN
+              state <= SEND_TIME_0;
             ELSE
-              state    <= SEND_5_TIME;
+              state <= SEND_5_TIME;
             END IF;
           END IF;
           
         WHEN SEND_TIME_0 =>
-          time_select   <= '1';
+          time_select <= '1';
           IF time_already_send_s = '0' THEN
             time_send <= '1';
             state     <= WAIT_TIME_0;
           ELSE
             time_send <= '0';
             state     <= SEND_TIME_1;
-          END IF;
+          END IF; 
           time_fifo_ren <= '0';
 
         WHEN WAIT_TIME_0 =>
           time_fifo_ren <= '1';
-          update    <= "00";
-          time_send <= '0';
+          update        <= "00";
+          time_send     <= '0';
           IF time_send_ok = '1' OR time_send_ko = '1' THEN
-            update    <= "01";
-            state     <= SEND_TIME_1;            
+            update <= "01";
+            state  <= SEND_TIME_1;
           END IF;
           
         WHEN SEND_TIME_1 =>
-          time_select   <= '1';
+          time_select <= '1';
           IF time_already_send_s = '0' THEN
             time_send <= '1';
             state     <= WAIT_TIME_1;
@@ -242,36 +263,36 @@ BEGIN
 
         WHEN WAIT_TIME_1 =>
           time_fifo_ren <= '1';
-          update    <= "00";
-          time_send <= '0';
+          update        <= "00";
+          time_send     <= '0';
           IF time_send_ok = '1' OR time_send_ko = '1' THEN
-            time_write <=  '1';
-            update    <= "01";
-            state     <= SEND_5_TIME;            
+            time_write <= '1';
+            update     <= "01";
+            state      <= SEND_5_TIME;
           END IF;
 
         WHEN SEND_5_TIME =>
-          update    <= "00";
-          time_select   <= '1';
-          time_fifo_ren <= '0';
+          update          <= "00";
+          time_select     <= '1';
+          time_fifo_ren   <= '0';
           count_send_time <= count_send_time + 1;
           IF count_send_time = 10 THEN
-            state     <= SEND_DATA;
-          END IF;          
+            state <= SEND_DATA;
+          END IF;
           
         WHEN SEND_DATA =>
           time_fifo_ren <= '1';
           time_write    <= '0';
           time_send     <= '0';
-          
-          time_select   <= '0';
-          data_send     <= '1';
-          update        <= "00";
-          state         <= WAIT_DATA;
+
+          time_select <= '0';
+          data_send   <= '1';
+          update      <= "00";
+          state       <= WAIT_DATA;
 
         WHEN WAIT_DATA =>
-          data_send     <= '0';
-          
+          data_send <= '0';
+
           IF data_send_ok = '1' OR data_send_ko = '1' THEN
             state  <= IDLE;
             update <= "10";

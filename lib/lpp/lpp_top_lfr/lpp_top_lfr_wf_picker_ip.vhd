@@ -26,7 +26,8 @@ ENTITY lpp_top_lfr_wf_picker_ip IS
     delta_snapshot_size    : INTEGER := 16;
     delta_f2_f0_size       : INTEGER := 10;
     delta_f2_f1_size       : INTEGER := 10;
-    tech                   : INTEGER := 0
+    tech                   : INTEGER := 0;
+    Mem_use                : INTEGER := use_RAM
     );
   PORT (
     -- ADS7886
@@ -214,7 +215,7 @@ BEGIN
   IIR_CEL_CTRLR_v2_1 : IIR_CEL_CTRLR_v2
     GENERIC MAP (
       tech         => 0,
-      Mem_use      => use_RAM,          -- use_RAM
+      Mem_use      => Mem_use,          -- use_RAM
       Sample_SZ    => 18,
       Coef_SZ      => Coef_SZ,
       Coef_Nb      => 25,
@@ -480,6 +481,7 @@ BEGIN
       data_f1_in       => data_f1_in_valid,
       data_f2_in       => data_f2_in_valid,
       data_f3_in       => data_f3_in_valid,
+      
       data_f0_in_valid => sample_f0_val,
       data_f1_in_valid => sample_f1_val,
       data_f2_in_valid => sample_f2_val,
@@ -489,6 +491,7 @@ BEGIN
   data_f1_in_valid((4*16)-1 DOWNTO 0) <= (others => '0');
   data_f2_in_valid((4*16)-1 DOWNTO 0) <= (others => '0'); 
   data_f3_in_valid((4*16)-1 DOWNTO 0) <= (others => '0');
+  
   data_f0_in_valid((10*16)-1 DOWNTO (4*16)) <= sample_f0_wdata_s;
   data_f1_in_valid((10*16)-1 DOWNTO (4*16)) <= sample_f1_wdata_s;
   data_f2_in_valid((10*16)-1 DOWNTO (4*16)) <= sample_f2_wdata_s;
