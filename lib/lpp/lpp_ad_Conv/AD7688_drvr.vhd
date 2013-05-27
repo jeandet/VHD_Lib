@@ -172,7 +172,7 @@ BEGIN
           --shift_reg(l)(15)          <= sdo(l);
           --shift_reg(l)(14 DOWNTO 0) <= shift_reg(l)(15 DOWNTO 1);
           shift_reg(l)(0)           <= sdo(l);
-          shift_reg(l)(15 DOWNTO 1) <= shift_reg(l)(14 DOWNTO 0);
+          shift_reg(l)(14 DOWNTO 1) <= shift_reg(l)(13 DOWNTO 0);
         END LOOP;
         SCK <= '0';
       ELSE
@@ -194,4 +194,3 @@ BEGIN
   END PROCESS;
   
 END ar_AD7688_drvr;
-

@@ -36,7 +36,6 @@ ARCHITECTURE beh OF lpp_waveform_snapshot_controler IS
   SIGNAL coarse_time_0_r : STD_LOGIC;
   SIGNAL start_snapshot_f2_temp : STD_LOGIC;
   SIGNAL start_snapshot_fothers_temp : STD_LOGIC;
-  SIGNAL start_snapshot_fothers_temp2 : STD_LOGIC;
 BEGIN  -- beh
 
   PROCESS (clk, rstn)
@@ -50,7 +49,6 @@ BEGIN  -- beh
       coarse_time_0_r <=  '0';
       start_snapshot_f2_temp <=  '0';
       start_snapshot_fothers_temp <=  '0';
-      start_snapshot_fothers_temp2 <=  '0';
     ELSIF clk'EVENT AND clk = '1' THEN
       IF counter_delta_snapshot = UNSIGNED(delta_snapshot) THEN
         start_snapshot_f2_temp <=   '1';
