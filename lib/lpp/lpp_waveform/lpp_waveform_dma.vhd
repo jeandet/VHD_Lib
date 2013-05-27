@@ -84,7 +84,7 @@ ARCHITECTURE Behavioral OF lpp_waveform_dma IS
                                  SEND_TIME_1, WAIT_TIME_1,
                                  SEND_5_TIME,
                                  SEND_DATA, WAIT_DATA);
-  SIGNAL state                : state_DMAWriteBurst := IDLE;
+  SIGNAL state                : state_DMAWriteBurst ;
   -----------------------------------------------------------------------------
   -- CONTROL 
   SIGNAL sel_data_s           : STD_LOGIC_VECTOR(1 DOWNTO 0);

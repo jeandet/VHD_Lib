@@ -17,224 +17,250 @@
 -- Additional Comments: 
 --
 ----------------------------------------------------------------------------------
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
-library lpp;
-use lpp.general_purpose.Clk_divider;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+LIBRARY lpp;
+USE lpp.general_purpose.Clk_divider;
 
-entity lfr_time_management is
-	generic (
-		masterclk	: integer := 25000000;		-- master clock in Hz
-		timeclk    : integer := 49152000;      -- 2nd clock in Hz
-		finetimeclk	: integer := 65536;			-- divided clock used for the fine time counter
-		nb_clk_div_ticks    : integer   := 1    -- nb ticks before commutation to AUTO state
-		);
-	Port ( 
-		master_clock		: in    std_logic;				--! Clock
-		time_clock      	: in    std_logic;				--! 2nd Clock
-		resetn      		: in    std_logic;				--! Reset
-		grspw_tick			: in    std_logic;
-		soft_tick			: in    std_logic;				--! soft tick, load the coarse_time value
-		coarse_time_load	: in    std_logic_vector(31 downto 0);
-		coarse_time			: out   std_logic_vector(31 downto 0);
-		fine_time			: out	std_logic_vector(31 downto 0);
-		next_commutation	: in	std_logic_vector(31 downto 0);
-		reset_next_commutation: out  std_logic;
-		irq1                : out std_logic;
-		irq2                : out std_logic
-		);
-end lfr_time_management;
+ENTITY lfr_time_management IS
+  GENERIC (
+    masterclk        : INTEGER := 25000000;  -- master clock in Hz
+    timeclk          : INTEGER := 49152000;  -- 2nd clock in Hz
+    finetimeclk      : INTEGER := 65536;  -- divided clock used for the fine time counter
+    nb_clk_div_ticks : INTEGER := 1  -- nb ticks before commutation to AUTO state
+    );
+  PORT (
+    master_clock           : IN  STD_LOGIC;  --! Clock
+    time_clock             : IN  STD_LOGIC;  --! 2nd Clock
+    resetn                 : IN  STD_LOGIC;  --! Reset
+    grspw_tick             : IN  STD_LOGIC;
+    soft_tick              : IN  STD_LOGIC;  --! soft tick, load the coarse_time value
+    coarse_time_load       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+    coarse_time            : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    fine_time              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    next_commutation       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+    reset_next_commutation : OUT STD_LOGIC;
+    irq1                   : OUT STD_LOGIC;
+    irq2                   : OUT STD_LOGIC
+    );
+END lfr_time_management;
 
-architecture Behavioral of lfr_time_management is
+ARCHITECTURE Behavioral OF lfr_time_management IS
 
-signal	resetn_clk_div		: std_logic;
-signal	clk_div				: std_logic;
+  SIGNAL resetn_clk_div            : STD_LOGIC;
+  SIGNAL clk_div                   : STD_LOGIC;
 --
-signal	flag					: std_logic;
-signal	s_coarse_time		: std_logic_vector(31 downto 0);
-signal	previous_coarse_time_load	: std_logic_vector(31 downto 0);
-signal 	cpt					: integer range 0 to 100000;
-signal 	secondary_cpt		: integer range 0 to 72000;
+  SIGNAL flag                      : STD_LOGIC;
+  SIGNAL s_coarse_time             : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL previous_coarse_time_load : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL cpt                       : INTEGER RANGE 0 TO 100000;
+  SIGNAL secondary_cpt             : INTEGER RANGE 0 TO 72000;
 --
-signal  	sirq1             : std_logic;
-signal  	sirq2             : std_logic;
-signal  	cpt_next_commutation			: integer range 0 to 100000;
-signal  	p_next_commutation 			: std_logic_vector(31 downto 0);
-signal	latched_next_commutation	: std_logic_vector(31 downto 0);
-signal  	p_clk_div			: std_logic;
+  SIGNAL sirq1                     : STD_LOGIC;
+  SIGNAL sirq2                     : STD_LOGIC;
+  SIGNAL cpt_next_commutation      : INTEGER RANGE 0 TO 100000;
+  SIGNAL p_next_commutation        : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL latched_next_commutation  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL p_clk_div                 : STD_LOGIC;
 --
-type state_type is (auto, slave);
-signal state				: state_type;
-type timer_type is (idle, engaged);
-signal commutation_timer	: timer_type;
+  TYPE   state_type IS (auto, slave);
+  SIGNAL state                     : state_type;
+  TYPE   timer_type IS (idle, engaged);
+  SIGNAL commutation_timer         : timer_type;
 
-begin
+BEGIN
 
 --*******************************************
 -- COMMUTATION TIMER AND INTERRUPT GENERATION
-process(master_clock, resetn)
-begin
+  PROCESS(master_clock, resetn)
+  BEGIN
 
-	if resetn = '0' then
-		commutation_timer <= idle;
-		cpt_next_commutation <= 0;
-		sirq1 <= '0';		
-		sirq2 <= '0';		
-		latched_next_commutation <= x"ffffffff";
-		
-	elsif master_clock'event and master_clock = '1' then
-	
-		case commutation_timer is
-		
-			when idle =>
-				sirq1 <= '0';
-				sirq2 <= '0';
-				if s_coarse_time = latched_next_commutation then
-					commutation_timer <= engaged;								-- transition to state "engaged"
-					sirq1 <= '1';													-- start the pulse on sirq1
-					latched_next_commutation <= x"ffffffff";
-				elsif not(p_next_commutation = next_commutation) then	-- next_commutation has changed
-					latched_next_commutation <= next_commutation;		-- latch the value
-				else
-					commutation_timer <= idle;
-				end if;
-				
-			when engaged => 
-				sirq1 <= '0';														-- stop the pulse on sirq1
-				if not(p_clk_div = clk_div) and clk_div = '1' then		-- detect a clk_div raising edge
-					if cpt_next_commutation = 65536 then
-						cpt_next_commutation <= 0;
-						commutation_timer <= idle;
-						sirq2 <= '1';													-- start the pulse on sirq2
-					else
-						cpt_next_commutation <= cpt_next_commutation + 1;
-					end if;
-				end if;
-			
-			when others =>
-				commutation_timer <= idle;
-				
-		end case;
-		
-		p_next_commutation <= next_commutation;
-		p_clk_div <= clk_div;
-	
-	end if;
+    IF resetn = '0' THEN
+      commutation_timer        <= idle;
+      cpt_next_commutation     <= 0;
+      sirq1                    <= '0';
+      sirq2                    <= '0';
+      latched_next_commutation <= x"ffffffff";
+      
+    ELSIF master_clock'EVENT AND master_clock = '1' THEN
+      
+      CASE commutation_timer IS
+        
+        WHEN idle =>
+          sirq1 <= '0';
+          sirq2 <= '0';
+          IF s_coarse_time = latched_next_commutation THEN
+            commutation_timer        <= engaged;  -- transition to state "engaged"
+            sirq1                    <= '1';      -- start the pulse on sirq1
+            latched_next_commutation <= x"ffffffff";
+          ELSIF NOT(p_next_commutation = next_commutation) THEN  -- next_commutation has changed
+            latched_next_commutation <= next_commutation;  -- latch the value
+          ELSE
+            commutation_timer <= idle;
+          END IF;
+          
+        WHEN engaged =>
+          sirq1 <= '0';                 -- stop the pulse on sirq1
+          IF NOT(p_clk_div = clk_div) AND clk_div = '1' THEN  -- detect a clk_div raising edge
+            IF cpt_next_commutation = 65536 THEN
+              cpt_next_commutation <= 0;
+              commutation_timer    <= idle;
+              sirq2                <= '1';  -- start the pulse on sirq2
+            ELSE
+              cpt_next_commutation <= cpt_next_commutation + 1;
+            END IF;
+          END IF;
+          
+        WHEN OTHERS =>
+          commutation_timer <= idle;
+          
+      END CASE;
 
-end process;
+      p_next_commutation <= next_commutation;
+      p_clk_div          <= clk_div;
+      
+    END IF;
 
-irq1 <= sirq1;
-irq2 <= sirq2;
-reset_next_commutation <= '0';
+  END PROCESS;
+
+  irq1                   <= sirq1;
+  irq2                   <= sirq2;
+  reset_next_commutation <= '0';
 
 --
 --*******************************************
 
 --**********************
 -- synchronization stage
-process(master_clock, resetn) -- resynchronisation with clk
-begin
+  PROCESS(master_clock, resetn)         -- resynchronisation with clk
+  BEGIN
 
-	if resetn = '0' then
-        coarse_time(31 downto 0) <= x"80000000"; -- set the most significant bit of the coarse time to 1 on reset
+    IF resetn = '0' THEN
+      coarse_time(31 DOWNTO 0) <= x"80000000";  -- set the most significant bit of the coarse time to 1 on reset
 
-    elsif master_clock'event and master_clock = '1' then
-        coarse_time(31 downto 0) <= s_coarse_time(31 downto 0); -- coarse_time is changed synchronously with clk
-    end if;
+    ELSIF master_clock'EVENT AND master_clock = '1' THEN
+      coarse_time(31 DOWNTO 0) <= s_coarse_time(31 DOWNTO 0);  -- coarse_time is changed synchronously with clk
+    END IF;
 
-end process;
+  END PROCESS;
 --
 --**********************
 
 
-process(clk_div, resetn, grspw_tick, soft_tick, flag, coarse_time_load) -- 
-begin
+  -- PROCESS(clk_div, resetn, grspw_tick, soft_tick, flag, coarse_time_load) -- JC
+  PROCESS(clk_div, resetn)              -- JC
+  BEGIN
 
-	if resetn = '0' then
-		flag <= '0';
-		cpt <= 0;
-		secondary_cpt <= 0;
-		s_coarse_time <= x"80000000"; -- set the most significant bit of the coarse time to 1 on reset
-		previous_coarse_time_load <= x"80000000";
-		state <= auto;
-		
-	elsif grspw_tick = '1' or soft_tick = '1' then
-        if flag = '1' then -- coarse_time_load shall change at least 1/65536 s before the timecode
-			s_coarse_time <= coarse_time_load;
-			flag <= '0';
-		else -- if coarse_time_load has not changed, increment the value autonomously
-			s_coarse_time <= std_logic_vector(unsigned(s_coarse_time) + 1);
-		end if;
-		cpt <= 0;
-		secondary_cpt <= 0;
-		state <= slave;
-		
-	elsif clk_div'event and clk_div = '1' then
-	
-		case state is
-		
-			when auto =>
-				if cpt = 65535 then
-					if flag = '1' then
-						s_coarse_time <= coarse_time_load;
-						flag <= '0';
-					else
-						s_coarse_time <= std_logic_vector(unsigned(s_coarse_time) + 1);
-					end if;
-					cpt <= 0;
-					secondary_cpt <= secondary_cpt + 1;
-                else 
-                    cpt <= cpt + 1 ;
-				end if;
-			
-			when slave =>
-				if cpt = 65536 + nb_clk_div_ticks then -- 1 / 65536 = 15.259 us
-                    state <= auto;      -- commutation to AUTO state
-					if flag = '1' then
-						s_coarse_time <= coarse_time_load;
-						flag <= '0';
-					else
-						s_coarse_time <= std_logic_vector(unsigned(s_coarse_time) + 1);
-					end if;
-					cpt <= nb_clk_div_ticks;           -- reset cpt at nb_clk_div_ticks
-					secondary_cpt <= secondary_cpt + 1;
-                else
-                    cpt <= cpt + 1;
-				end if;
-				
-			when others =>
-				state <= auto;
+    IF resetn = '0' THEN
+      flag                      <= '0';
+      cpt                       <= 0;
+      secondary_cpt             <= 0;
+      s_coarse_time             <= x"80000000";  -- set the most significant bit of the coarse time to 1 on reset
+      previous_coarse_time_load <= x"80000000";
+      state                     <= auto;
 
-		end case;
-		
-		if secondary_cpt > 60 then
-			s_coarse_time(31) <= '1';
-		end if;
+      --ELSIF grspw_tick = '1' OR soft_tick = '1' THEN
+      --  --IF flag = '1' THEN  -- coarse_time_load shall change at least 1/65536 s before the timecode
+      --  --  s_coarse_time <= coarse_time_load;
+      --  --  flag          <= '0';
+      --  --ELSE  -- if coarse_time_load has not changed, increment the value autonomously
+      --  --  s_coarse_time <= STD_LOGIC_VECTOR(UNSIGNED(s_coarse_time) + 1);
+      --  --END IF;
 
-        if not(previous_coarse_time_load = coarse_time_load) then
-			flag <= '1';
-		end if;
+      --  cpt           <= 0;
+      --  secondary_cpt <= 0;
+      --  state         <= slave;
+      
+    ELSIF clk_div'EVENT AND clk_div = '1' THEN
+      
+      CASE state IS
+        
+        WHEN auto =>
+          IF grspw_tick = '1' OR soft_tick = '1' THEN
+            IF flag = '1' THEN  -- coarse_time_load shall change at least 1/65536 s before the timecode
+              s_coarse_time <= coarse_time_load;
+            ELSE  -- if coarse_time_load has not changed, increment the value autonomously
+              s_coarse_time <= STD_LOGIC_VECTOR(UNSIGNED(s_coarse_time) + 1);
+            END IF;
+            flag          <= '0';
+            cpt           <= 0;
+            secondary_cpt <= 0;
+            state         <= slave;
+          ELSE
+            IF cpt = 65535 THEN
+              IF flag = '1' THEN
+                s_coarse_time <= coarse_time_load;
+                flag          <= '0';
+              ELSE
+                s_coarse_time <= STD_LOGIC_VECTOR(UNSIGNED(s_coarse_time) + 1);
+              END IF;
+              cpt           <= 0;
+              secondary_cpt <= secondary_cpt + 1;
+            ELSE
+              cpt <= cpt + 1;
+            END IF;
+          END IF;
+          
+        WHEN slave =>
+          IF grspw_tick = '1' OR soft_tick = '1' THEN
+            IF flag = '1' THEN  -- coarse_time_load shall change at least 1/65536 s before the timecode
+              s_coarse_time <= coarse_time_load;
+            ELSE  -- if coarse_time_load has not changed, increment the value autonomously
+              s_coarse_time <= STD_LOGIC_VECTOR(UNSIGNED(s_coarse_time) + 1);
+            END IF;
+            flag          <= '0';
+            cpt           <= 0;
+            secondary_cpt <= 0;
+            state         <= slave;
+          ELSE
+            IF cpt = 65536 + nb_clk_div_ticks THEN  -- 1 / 65536 = 15.259 us
+              state <= auto;            -- commutation to AUTO state
+              IF flag = '1' THEN
+                s_coarse_time <= coarse_time_load;
+                flag          <= '0';
+              ELSE
+                s_coarse_time <= STD_LOGIC_VECTOR(UNSIGNED(s_coarse_time) + 1);
+              END IF;
+              cpt           <= nb_clk_div_ticks;  -- reset cpt at nb_clk_div_ticks
+              secondary_cpt <= secondary_cpt + 1;
+            ELSE
+              cpt <= cpt + 1;
+            END IF;
+          END IF;
+          
+        WHEN OTHERS =>
+          state <= auto;
 
-        previous_coarse_time_load <= coarse_time_load;
-	
-	end if;
-	
-end process;
+      END CASE;
 
-fine_time <= std_logic_vector(to_unsigned(cpt, 32));
+      IF secondary_cpt > 60 THEN
+        s_coarse_time(31) <= '1';
+      END IF;
 
--- resetn	grspw_tick	soft_tick	resetn_clk_div
---	0			0				0				0
---	0			0				1				0
---	0			1				0				0
---	0			1				1				0
---	1			0				0				1
---	1			0				1				0
---	1			1				0				0
---	1			1				1				0
-resetn_clk_div <= '1' when ( (resetn='1') and (grspw_tick='0') and (soft_tick='0') ) else '0';
-Clk_divider0 : Clk_divider  -- the target frequency is 65536 Hz
-generic map (timeclk,finetimeclk) port map ( time_clock, resetn_clk_div, clk_div);
+      IF NOT(previous_coarse_time_load = coarse_time_load) THEN
+        flag <= '1';
+      END IF;
 
-end Behavioral;
+      previous_coarse_time_load <= coarse_time_load;
+      
+    END IF;
+    
+  END PROCESS;
+
+  fine_time <= STD_LOGIC_VECTOR(to_unsigned(cpt, 32));
+
+-- resetn       grspw_tick      soft_tick       resetn_clk_div
+--      0                       0                               0                               0
+--      0                       0                               1                               0
+--      0                       1                               0                               0
+--      0                       1                               1                               0
+--      1                       0                               0                               1
+--      1                       0                               1                               0
+--      1                       1                               0                               0
+--      1                       1                               1                               0
+  resetn_clk_div <= '1' WHEN ((resetn = '1') AND (grspw_tick = '0') AND (soft_tick = '0')) ELSE '0';
+  Clk_divider0 : Clk_divider            -- the target frequency is 65536 Hz
+    GENERIC MAP (timeclk, finetimeclk) PORT MAP (time_clock, resetn_clk_div, clk_div);
+
+END Behavioral;

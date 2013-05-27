@@ -1,16 +1,16 @@
 ----------------------------------------------------------------------------------
 -- Company: 
--- Engineer: 
+-- Engineer:
 -- 
--- Create Date:    11:17:05 07/02/2012 
--- Design Name: 
--- Module Name:    apb_lfr_time_management - Behavioral 
--- Project Name: 
+-- Create Date:    11:17:05 07/02/2012
+-- Design Name:
+-- Module Name:    apb_lfr_time_management - Behavioral
+-- Project Name:
 -- Target Devices: 
--- Tool versions: 
--- Description: 
+-- Tool versions:
+-- Description:
 --
--- Dependencies: 
+-- Dependencies:
 --
 -- Revision: 
 -- Revision 0.01 - File Created
@@ -62,7 +62,7 @@ ARCHITECTURE Behavioral OF apb_lfr_time_management IS
 --! type apb_config_type is array (0 to NAPBCFG-1) of amba_config_word;
   CONSTANT pconfig : apb_config_type := (
 --!  0 => ahb_device_reg (VENDOR_LPP, LPP_ROTARY, 0, REVISION, 0),
-    0 => ahb_device_reg (VENDOR_LPP, 0, 0, REVISION, pirq),
+    0 => ahb_device_reg (VENDOR_LPP, 14, 0, REVISION, pirq),
     1 => apb_iobar(paddr, pmask));
 
   TYPE apb_lfr_time_management_Reg IS RECORD
