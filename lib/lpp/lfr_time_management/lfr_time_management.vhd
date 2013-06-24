@@ -31,18 +31,18 @@ ENTITY lfr_time_management IS
     nb_clk_div_ticks : INTEGER := 1  -- nb ticks before commutation to AUTO state
     );
   PORT (
-    master_clock           : IN  STD_LOGIC;  --! Clock
-    time_clock             : IN  STD_LOGIC;  --! 2nd Clock
-    resetn                 : IN  STD_LOGIC;  --! Reset
-    grspw_tick             : IN  STD_LOGIC;
-    soft_tick              : IN  STD_LOGIC;  --! soft tick, load the coarse_time value
-    coarse_time_load       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-    coarse_time            : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    fine_time              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    next_commutation       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-    reset_next_commutation : OUT STD_LOGIC;
-    irq1                   : OUT STD_LOGIC;
-    irq2                   : OUT STD_LOGIC
+    master_clock           : IN  STD_LOGIC;  --! Clock                                  -- 25MHz
+    time_clock             : IN  STD_LOGIC;  --! 2nd Clock                              -- 49MHz
+    resetn                 : IN  STD_LOGIC;  --! Reset          
+    grspw_tick             : IN  STD_LOGIC;                     
+    soft_tick              : IN  STD_LOGIC;  --! soft tick, load the coarse_time value  -- 25MHz
+    coarse_time_load       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);                         -- 25MHz
+    coarse_time            : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);                         -- 25MHz
+    fine_time              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);                         -- 25MHz
+    next_commutation       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);                         -- 25MHz
+--    reset_next_commutation : OUT STD_LOGIC;
+    irq1                   : OUT STD_LOGIC;                                             -- 25MHz
+    irq2                   : OUT STD_LOGIC                                              -- 25MHz
     );
 END lfr_time_management;
 
@@ -82,7 +82,8 @@ BEGIN
       sirq1                    <= '0';
       sirq2                    <= '0';
       latched_next_commutation <= x"ffffffff";
-      
+      p_next_commutation       <= (others => '0');
+      p_clk_div                <= '0';
     ELSIF master_clock'EVENT AND master_clock = '1' THEN
       
       CASE commutation_timer IS
@@ -126,7 +127,7 @@ BEGIN
 
   irq1                   <= sirq1;
   irq2                   <= sirq2;
-  reset_next_commutation <= '0';
+--  reset_next_commutation <= '0';
 
 --
 --*******************************************

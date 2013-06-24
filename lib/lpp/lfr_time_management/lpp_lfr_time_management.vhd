@@ -72,7 +72,7 @@ component lfr_time_management is
 		coarse_time			: out   std_logic_vector(31 downto 0);
 		fine_time			: out	std_logic_vector(31 downto 0);
 		next_commutation	: in	std_logic_vector(31 downto 0);
-		reset_next_commutation: out  std_logic;
+--		reset_next_commutation: out  std_logic;
 		irq1                : out std_logic;
 		irq2                : out std_logic
 		);

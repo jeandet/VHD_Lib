@@ -125,7 +125,7 @@ ARCHITECTURE beh OF lpp_top_apbreg IS
   CONSTANT REVISION : INTEGER := 1;
   
   CONSTANT pconfig : apb_config_type := (
-    0 => ahb_device_reg (VENDOR_LPP, LPP_DMA_TYPE, 10, REVISION, pirq),
+    0 => ahb_device_reg (VENDOR_LPP, LPP_DMA_TYPE, 2, REVISION, pirq),
     1 => apb_iobar(paddr, pmask));
 
   TYPE lpp_SpectralMatrix_regs IS RECORD

@@ -1,4 +1,5 @@
 lpp_ad_Conv.vhd
 AD7688_drvr.vhd
+AD7688_drvr_sync.vhd
 WriteGen_ADC.vhd
 TestModule_ADS7886.vhd

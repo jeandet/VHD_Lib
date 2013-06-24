@@ -153,10 +153,12 @@ BEGIN
     IF rstn = '0' THEN
       FOR l IN 0 TO ChanelCount-1 LOOP
         shift_reg(l) <= (OTHERS => '0');
+	    sample(l)(15 DOWNTO 0)           <= (OTHERS => '0');
       END LOOP;
       sample_bit_counter <= 0;
       sample_val         <= '0';
       SCK                <= '1';
+      
     ELSIF clk'EVENT AND clk = '1' THEN
       
       IF cnv_run_sync = '0' THEN

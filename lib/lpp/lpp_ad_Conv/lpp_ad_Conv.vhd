@@ -107,6 +107,22 @@ COMPONENT RHF1401_drvr IS
     );
 END COMPONENT;
 
+COMPONENT AD7688_drvr_sync
+  GENERIC (
+    ChanelCount     : INTEGER;
+    ncycle_cnv_high : INTEGER;
+    ncycle_cnv      : INTEGER);
+  PORT (
+    cnv_clk    : IN  STD_LOGIC;
+    cnv_rstn   : IN  STD_LOGIC;
+    cnv_run    : IN  STD_LOGIC;
+    cnv        : OUT STD_LOGIC;
+    sck        : OUT STD_LOGIC;
+    sdo        : IN  STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+    sample     : OUT Samples(ChanelCount-1 DOWNTO 0);
+    sample_val : OUT STD_LOGIC);
+END COMPONENT;
+
   --COMPONENT AD7688_drvr IS
   --  GENERIC(ChanelCount : INTEGER;
   --          clkkHz      : INTEGER);

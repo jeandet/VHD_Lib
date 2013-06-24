@@ -205,6 +205,7 @@ BEGIN
       send_16_3_time_reg(3*3-1 DOWNTO 3*2) <= "001";
       send_16_3_time_reg(3*4-1 DOWNTO 3*3) <= "001";
       
+      count_send_time <= 0;
     ELSIF HCLK'EVENT AND HCLK = '1' THEN
 
       CASE state IS

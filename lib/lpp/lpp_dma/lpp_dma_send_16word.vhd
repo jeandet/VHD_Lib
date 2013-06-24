@@ -77,14 +77,17 @@ BEGIN  -- beh
       send_ok <= '0';
       send_ko <= '0';
 
-      DMAIn.Reset   <= '0';
+      DMAIn.Reset   <= '1';
       DMAIn.Address <= (OTHERS => '0');
       DMAIn.Request <= '0';
       DMAIn.Store   <= '0';
       DMAIn.Burst   <= '1';
       DMAIn.Lock    <= '0';
       data_counter  <= 0;
+      grant_counter <= 0;
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
+      
+      DMAIn.Reset   <= '0';
       
       CASE state IS
         WHEN IDLE =>
