@@ -12,6 +12,7 @@
 ./lpp_bootloader
 ./lpp_cna
 ./lpp_demux
+./lpp_Header
 ./lpp_matrix
 ./lpp_memory
 ./lpp_dma

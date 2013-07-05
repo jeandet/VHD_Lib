@@ -22,8 +22,9 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-use work.fft_components.all;
+library lpp;
 use lpp.lpp_fft.all;
+use lpp.fft_components.all;
 
 -- Update possible lecture (ren) de fifo en continu, pendant un Load, au lieu d'une lecture "créneau"
 

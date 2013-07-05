@@ -167,11 +167,11 @@ BEGIN
   debug_info: PROCESS (HCLK, HRESETn)
   BEGIN  -- PROCESS debug_info
     IF HRESETn = '0' THEN               -- asynchronous reset (active low)
-      debug_reg <= (OTHERS => '0');                  
+      debug_reg_s <= (OTHERS => '0');                  
     ELSIF HCLK'event AND HCLK = '1' THEN  -- rising clock edge
       debug_reg_s(0) <= debug_reg_s(0) OR (DMAOut.Retry );
       debug_reg_s(1) <= debug_reg_s(1) OR (DMAOut.Grant AND DMAOut.Retry) ;
-      IF state = TRASH_FIFO THEN debug_reg(2) <= '1'; END IF;
+      IF state = TRASH_FIFO THEN debug_reg_s(2) <= '1'; END IF;
       debug_reg_s(3) <= debug_reg_s(3) OR (header_send_ko);
       debug_reg_s(4) <= debug_reg_s(4) OR (header_send_ok);
       debug_reg_s(5) <= debug_reg_s(5) OR (component_send_ko);
