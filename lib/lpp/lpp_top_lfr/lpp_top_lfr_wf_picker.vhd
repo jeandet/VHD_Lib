@@ -229,7 +229,7 @@ BEGIN
         delta_f2_f0_size        => delta_f2_f0_size,
         delta_f2_f1_size        => delta_f2_f1_size,
         tech                    => tech,
-        Mem_use                 => use_RAM
+        Mem_use                 => lpp.iir_filter.use_RAM
         )
       PORT MAP (
         sample     => sample,

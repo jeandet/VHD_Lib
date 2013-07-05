@@ -246,6 +246,33 @@ PACKAGE lpp_top_lfr_pkg IS
       addr_data_f3       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
   END COMPONENT;
 
-  
+  COMPONENT top_wf_picker
+    GENERIC (
+      hindex                  : INTEGER;
+      pindex                  : INTEGER;
+      paddr                   : INTEGER;
+      pmask                   : INTEGER;
+      pirq                    : INTEGER;
+      tech                    : INTEGER;
+      nb_burst_available_size : INTEGER;
+      nb_snapshot_param_size  : INTEGER;
+      delta_snapshot_size     : INTEGER;
+      delta_f2_f0_size        : INTEGER;
+      delta_f2_f1_size        : INTEGER;
+      ENABLE_FILTER           : STD_LOGIC);
+    PORT (
+      cnv_clk         : IN  STD_LOGIC;
+      cnv_rstn        : IN  STD_LOGIC;
+      sample          : IN  Samples14v(7 DOWNTO 0);
+      sample_val      : IN  STD_LOGIC;
+      HCLK            : IN  STD_ULOGIC;
+      HRESETn         : IN  STD_ULOGIC;
+      apbi            : IN  apb_slv_in_type;
+      apbo            : OUT apb_slv_out_type;
+      AHB_Master_In   : IN  AHB_Mst_In_Type;
+      AHB_Master_Out  : OUT AHB_Mst_Out_Type;
+      coarse_time_0   : IN  STD_LOGIC;
+      data_shaping_BW : OUT STD_LOGIC);
+  END COMPONENT;
 
 END lpp_top_lfr_pkg;

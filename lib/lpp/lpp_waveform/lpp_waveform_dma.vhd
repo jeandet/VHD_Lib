@@ -175,16 +175,16 @@ BEGIN
                          time_already_send(3);
 
   
-  send_16_3_time <= send_16_3_time_reg(0) WHEN data_ready(0) = '1' ELSE
-                    send_16_3_time_reg(3) WHEN data_ready(1) = '1' ELSE
-                    send_16_3_time_reg(6) WHEN data_ready(2) = '1' ELSE
-                    send_16_3_time_reg(9) ;
+  --send_16_3_time <= send_16_3_time_reg(0) WHEN data_ready(0) = '1' ELSE
+  --                  send_16_3_time_reg(3) WHEN data_ready(1) = '1' ELSE
+  --                  send_16_3_time_reg(6) WHEN data_ready(2) = '1' ELSE
+  --                  send_16_3_time_reg(9) ;
   
-  all_send_16_3: FOR I IN 3 DOWNTO 0 GENERATE
-    send_16_3_time_reg_s(3*(I+1)-1 DOWNTO 3*I) <=
-      send_16_3_time_reg(3*(I+1)-1 DOWNTO 3*I) WHEN data_ready(I) = '0' ELSE
-      send_16_3_time_reg(3*(I+1)-2 DOWNTO 3*I) & send_16_3_time_reg(3*(I+1)-1);
-  END GENERATE all_send_16_3;
+  --all_send_16_3: FOR I IN 3 DOWNTO 0 GENERATE
+  --  send_16_3_time_reg_s(3*(I+1)-1 DOWNTO 3*I) <=
+  --    send_16_3_time_reg(3*(I+1)-1 DOWNTO 3*I) WHEN data_ready(I) = '0' ELSE
+  --    send_16_3_time_reg(3*(I+1)-2 DOWNTO 3*I) & send_16_3_time_reg(3*(I+1)-1);
+  --END GENERATE all_send_16_3;
   
   -- DMA control
   DMAWriteFSM_p : PROCESS (HCLK, HRESETn)
@@ -200,10 +200,10 @@ BEGIN
       time_send      <= '0';
       time_write     <= '0';
       --send_16_3_time <= "001";
-      send_16_3_time_reg(3*1-1 DOWNTO 3*0) <= "001";
-      send_16_3_time_reg(3*2-1 DOWNTO 3*1) <= "001";
-      send_16_3_time_reg(3*3-1 DOWNTO 3*2) <= "001";
-      send_16_3_time_reg(3*4-1 DOWNTO 3*3) <= "001";
+      --send_16_3_time_reg(3*1-1 DOWNTO 3*0) <= "001";
+      --send_16_3_time_reg(3*2-1 DOWNTO 3*1) <= "001";
+      --send_16_3_time_reg(3*3-1 DOWNTO 3*2) <= "001";
+      --send_16_3_time_reg(3*4-1 DOWNTO 3*3) <= "001";
       
       count_send_time <= 0;
     ELSIF HCLK'EVENT AND HCLK = '1' THEN
@@ -223,54 +223,55 @@ BEGIN
             state <= IDLE;
           ELSE
             sel_data            <= sel_data_s;
-            send_16_3_time_reg  <= send_16_3_time_reg_s;
-            IF send_16_3_time = '1' THEN
-              state <= SEND_TIME_0;
-            ELSE
-              state <= SEND_5_TIME;
-            END IF;
+            --send_16_3_time_reg  <= send_16_3_time_reg_s;
+            --IF send_16_3_time = '1' THEN
+            --  state <= SEND_TIME_0;
+            --ELSE
+            --  state <= SEND_5_TIME;
+            --END IF;
+            state <= SEND_5_TIME;
           END IF;
           
-        WHEN SEND_TIME_0 =>
-          time_select <= '1';
-          IF time_already_send_s = '0' THEN
-            time_send <= '1';
-            state     <= WAIT_TIME_0;
-          ELSE
-            time_send <= '0';
-            state     <= SEND_TIME_1;
-          END IF; 
-          time_fifo_ren <= '0';
+        --WHEN SEND_TIME_0 =>
+        --  time_select <= '1';
+        --  IF time_already_send_s = '0' THEN
+        --    time_send <= '1';
+        --    state     <= WAIT_TIME_0;
+        --  ELSE
+        --    time_send <= '0';
+        --    state     <= SEND_TIME_1;
+        --  END IF; 
+        --  time_fifo_ren <= '0';
 
-        WHEN WAIT_TIME_0 =>
-          time_fifo_ren <= '1';
-          update        <= "00";
-          time_send     <= '0';
-          IF time_send_ok = '1' OR time_send_ko = '1' THEN
-            update <= "01";
-            state  <= SEND_TIME_1;
-          END IF;
+        --WHEN WAIT_TIME_0 =>
+        --  time_fifo_ren <= '1';
+        --  update        <= "00";
+        --  time_send     <= '0';
+        --  IF time_send_ok = '1' OR time_send_ko = '1' THEN
+        --    update <= "01";
+        --    state  <= SEND_TIME_1;
+        --  END IF;
           
-        WHEN SEND_TIME_1 =>
-          time_select <= '1';
-          IF time_already_send_s = '0' THEN
-            time_send <= '1';
-            state     <= WAIT_TIME_1;
-          ELSE
-            time_send <= '0';
-            state     <= SEND_5_TIME;
-          END IF;
-          time_fifo_ren <= '0';
+        --WHEN SEND_TIME_1 =>
+        --  time_select <= '1';
+        --  IF time_already_send_s = '0' THEN
+        --    time_send <= '1';
+        --    state     <= WAIT_TIME_1;
+        --  ELSE
+        --    time_send <= '0';
+        --    state     <= SEND_5_TIME;
+        --  END IF;
+        --  time_fifo_ren <= '0';
 
-        WHEN WAIT_TIME_1 =>
-          time_fifo_ren <= '1';
-          update        <= "00";
-          time_send     <= '0';
-          IF time_send_ok = '1' OR time_send_ko = '1' THEN
-            time_write <= '1';
-            update     <= "01";
-            state      <= SEND_5_TIME;
-          END IF;
+        --WHEN WAIT_TIME_1 =>
+        --  time_fifo_ren <= '1';
+        --  update        <= "00";
+        --  time_send     <= '0';
+        --  IF time_send_ok = '1' OR time_send_ko = '1' THEN
+        --    time_write <= '1';
+        --    update     <= "01";
+        --    state      <= SEND_5_TIME;
+        --  END IF;
 
         WHEN SEND_5_TIME =>
           update          <= "00";
