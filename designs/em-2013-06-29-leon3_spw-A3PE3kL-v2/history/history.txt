@@ -1,0 +1,21 @@
+leon3mp_em_JCPE_02-07-2013.pdb
+  + UART  ok
+  + SPW   ok
+  + Leon3 ok
+
+leon3mp_em_JCPE_05-07-2013.pdb
+  + UART  ok
+  + SPW   ok
+  + Leon3 ok
+  + Waveform ok 
+    -> No filter
+    -> Inverted ADC Input Channel
+
+leon3mp_em_JCPE_08-07-2013.pdb
+  + UART  ??
+  + SPW   ??
+  + Leon3 ??
+  + Waveform ??
+    -> No filter
+
+
