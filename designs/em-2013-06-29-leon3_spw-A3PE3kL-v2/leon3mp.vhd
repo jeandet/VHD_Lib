@@ -461,7 +461,7 @@ BEGIN
       delta_snapshot_size     => 16,    -- snapshots period
       delta_f2_f0_size        => 20,  -- initialize the counter when the f2 snapshot starts 
       delta_f2_f1_size        => 16,  -- nb f0 ticks before starting the f1 snapshot
-      ENABLE_FILTER           => '0'
+      ENABLE_FILTER           => '1'
       )
     PORT MAP(
       sample          => sample,

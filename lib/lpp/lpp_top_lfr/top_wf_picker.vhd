@@ -236,8 +236,8 @@ BEGIN
         sample     => sample_s,
         sample_val => sample_val,
 
-        cnv_clk  => cnv_clk,
-        cnv_rstn => cnv_rstn,
+        cnv_clk  => HCLK,--cnv_clk,
+        cnv_rstn => HRESETn,--cnv_rstn,
 
         clk  => HCLK,
         rstn => HRESETn,
