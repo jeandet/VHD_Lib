@@ -80,8 +80,6 @@ signal nCE3int   : std_logic:='1';
 Type stateT is (idle,st1,st2,st3,st4);
 signal state : stateT;
 
-SIGNAL nclk : STD_LOGIC;
-
 begin
 
 process(clk , mem_ctrlr_o.RAMSN(0))
@@ -104,9 +102,8 @@ begin
     end if;
 end process;
 
-nclk <= NOT clk;
 ssram_clk_pad : outpad generic map (tech => tech)
-    port map (SSRAM_CLK,nclk);
+    port map (SSRAM_CLK,not clk);
 
 
 nBWaint  <=  mem_ctrlr_o.WRN(3)or mem_ctrlr_o.ramsn(0);
