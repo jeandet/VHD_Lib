@@ -1,29 +1,6 @@
------------------------------------------------------------------------------
---  LEON3 Xilinx SP605 Demonstration design
---  Copyright (C) 2011 Jiri Gaisler, Aeroflex Gaisler
-------------------------------------------------------------------------------
---  This file is a part of the GRLIB VHDL IP LIBRARY
---  Copyright (C) 2003 - 2008, Gaisler Research
---  Copyright (C) 2008 - 2011, Aeroflex Gaisler
---
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
-------------------------------------------------------------------------------
-
-
 library ieee;
 use ieee.std_logic_1164.all;
+use IEEE.numeric_std.all;
 library grlib, techmap;
 use grlib.amba.all;
 use grlib.amba.all;
@@ -41,12 +18,11 @@ use lpp.lpp_ad_conv.all;
 use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
 use lpp.general_purpose.all;
+use lpp.Rocket_PCM_Encoder.all;
 
 
 use work.Convertisseur_config.all;
 
-library esa;
-use esa.memoryctrl.all;
 
 use work.config.all;
 
@@ -67,26 +43,12 @@ WordSize : integer := 8; WordCnt    :   integer := 144;MinFCount   :   integer :
     MajF    :   in  std_logic;
     Data    :   out std_logic;
     DC_ADC_Sclk     :   out std_logic;
-    DC_ADC_IN       :   in  std_logic_vector(3 downto 0);
-    DC_ADC_FORMAT   :   out std_logic_vector(2 downto 0);
-    DC_ADC_Mode     :   out std_logic_vector(1 downto 0);
+    DC_ADC_IN       :   in  std_logic_vector(1 downto 0);
     DC_ADC_ClkDiv   :   out std_logic;
-    DC_ADC_PWDOWN   :   out std_logic_vector(3 downto 0);
     DC_ADC_FSynch   :   out std_logic;
-    DC_ADC_Synch    :   out std_logic;
---    DATA_out_Test   :   out std_logic;
---    Sclk_out_test   :   out std_logic;
---    Synch_out_test  :   out std_logic;  
-    test            :   out std_logic;  
-
-    LF_ADC_Sclk     :   out std_logic;
-    LF_ADC_IN       :   in  std_logic_vector(3 downto 0);
-    LF_ADC_FORMAT   :   out std_logic_vector(2 downto 0);
-    LF_ADC_Mode     :   out std_logic_vector(1 downto 0);
-    LF_ADC_ClkDiv   :   out std_logic;
-    LF_ADC_PWDOWN   :   out std_logic_vector(3 downto 0);
-    LF_ADC_FSynch   :   out std_logic;
-    LF_ADC_Synch    :   out std_logic
+	 SET_RESET0      :   out std_logic;
+	 SET_RESET1      :   out std_logic;
+	 LED             :   out std_logic
    );
 end;
 
@@ -102,13 +64,32 @@ signal  sclk_Inv    :   std_logic;
 signal  WordCount   :   integer range 0 to WordCnt-1;
 signal  WordClk     :   std_logic;
 
+signal  data_int    :   std_logic;
+
 signal  MuxOUT      :   std_logic_vector(WordSize-1 downto 0);
 signal  MuxIN       :   std_logic_vector((2*WordSize)-1 downto 0);
 signal  Sel         :   integer range 0 to 1;
 
-signal  DC1     :     std_logic_vector(23 downto 0);
-signal  DC2     :     std_logic_vector(23 downto 0);
-signal  DC3     :     std_logic_vector(23 downto 0);
+signal  AMR1X   :     std_logic_vector(23 downto 0);
+signal  AMR1Y   :     std_logic_vector(23 downto 0);
+signal  AMR1Z   :     std_logic_vector(23 downto 0);
+
+signal  AMR2X   :     std_logic_vector(23 downto 0);
+signal  AMR2Y   :     std_logic_vector(23 downto 0);
+signal  AMR2Z   :     std_logic_vector(23 downto 0);
+
+signal  AMR3X   :     std_logic_vector(23 downto 0);
+signal  AMR3Y   :     std_logic_vector(23 downto 0);
+signal  AMR3Z   :     std_logic_vector(23 downto 0);
+
+signal  AMR4X   :     std_logic_vector(23 downto 0);
+signal  AMR4Y   :     std_logic_vector(23 downto 0);
+signal  AMR4Z   :     std_logic_vector(23 downto 0);
+
+signal  Temp1   :     std_logic_vector(23 downto 0);
+signal  Temp2   :     std_logic_vector(23 downto 0);
+signal  Temp3   :     std_logic_vector(23 downto 0);
+signal  Temp4   :     std_logic_vector(23 downto 0);
 
 
 signal  LF1     :     std_logic_vector(15 downto 0);
@@ -120,18 +101,10 @@ signal  LF1_int    :     std_logic_vector(23 downto 0);
 signal  LF2_int    :     std_logic_vector(23 downto 0);
 signal  LF3_int    :     std_logic_vector(23 downto 0);
 
-
---constant DC1cst :   std_logic_vector(23 downto 0) := X"FA5961";
---constant DC2cst :   std_logic_vector(23 downto 0) := X"123456";
---constant DC3cst :   std_logic_vector(23 downto 0) := X"789012";
---
---constant LF1cst :   std_logic_vector(15 downto 0) := X"3210";
---constant LF2cst :   std_logic_vector(15 downto 0) := X"6543";
---constant LF3cst :   std_logic_vector(15 downto 0) := X"3456";
---
-
 signal   DC_ADC_SmplClk  :    std_logic;
 signal   LF_ADC_SmplClk  :    std_logic;
+signal   SET_RESET0_sig  :    std_logic;
+signal   SET_RESET1_sig  :    std_logic;
 
 signal  MinFCnt   :   integer range 0 to MinFCount-1;
 
@@ -139,40 +112,29 @@ signal  FramePlacerFlags    :   std_logic_vector(FramePlacerCount-1 downto 0);
 
 begin
 
---CLKINT0 : CLKINT
---    port map(clk,clk_buf);
---    
---CLKINT1 : CLKINT
---    port map(reset,reset_buf);
 
 clk_buf   <= clk;
 reset_buf <= reset;
 --    
---DATA_out_Test   <=  DC_ADC_IN(0);
---Sclk_out_test   <=  DC_ADC_Sclk;
---Synch_out_test  <=  DC_ADC_FSynch;
 
 Gate_Inv    <=  not Gate;
 sclk_Inv    <=  not Sclk;
 MinF_Inv    <=  not MinF;
 
---DC1 <=  DC1cst;
---DC2 <=  DC2cst;
---DC3 <=  DC3cst;
+LED         <= not data_int;
+data        <= data_int;
 
---LF1 <=  LF1cst;
---LF2 <=  LF2cst;
---LF3 <=  LF3cst;
 
-SD0 : entity work.Serial_Driver 
+
+SD0 : Serial_Driver 
 generic map(WordSize)
-port map(sclk_Inv,MuxOUT,Gate_inv,Data);
+port map(sclk_Inv,MuxOUT,Gate_inv,data_int);
 
-WC0 :   entity work.Word_Cntr
+WC0 :  Word_Cntr
 generic map(WordSize,WordCnt)
 port map(sclk_Inv,MinF,WordClk,WordCount);
 
-MFC0 : entity work.MinF_Cntr
+MFC0 :  MinF_Cntr
 generic map(MinFCount)
 port map(
     clk     =>  MinF_Inv,
@@ -181,7 +143,7 @@ port map(
 );
 
 
-MUX0 : entity work.Serial_Driver_Multiplexor
+MUX0 : Serial_Driver_Multiplexor
 generic map(FramePlacerCount,WordSize)
 port map(sclk_Inv,Sel,MuxIN,MuxOUT);
 
@@ -193,9 +155,22 @@ port map(
     Wcount  =>  WordCount,
     MinFCnt =>  MinFCnt,
     Flag    =>  FramePlacerFlags(0),
-    DC1     =>  DC1,
-    DC2     =>  DC2,
-    DC3     =>  DC3,
+    AMR1X   =>  AMR1X,
+    AMR1Y   =>  AMR1Y,
+    AMR1Z   =>  AMR1Z,
+    AMR2X   =>  AMR2X,
+    AMR2Y   =>  AMR2Y,
+    AMR2Z   =>  AMR2Z,
+    AMR3X   =>  AMR3X,
+    AMR3Y   =>  AMR3Y,
+    AMR3Z   =>  AMR3Z,
+    AMR4X   =>  AMR4X,
+    AMR4Y   =>  AMR4Y,
+    AMR4Z   =>  AMR4Z,
+    Temp1   =>  Temp1,
+    Temp2   =>  Temp2,
+    Temp3   =>  Temp3,
+    Temp4   =>  Temp4,
     WordOut =>  MuxIN(7 downto 0));
 
 
@@ -216,31 +191,101 @@ port map(
 DC_SMPL_CLK0 : entity work.DC_SMPL_CLK 
 port map(MinF_Inv,DC_ADC_SmplClk);
 
+process(reset,DC_ADC_SmplClk)
+begin
+if reset = '0' then
+	SET_RESET0_sig <= '0';
+elsif DC_ADC_SmplClk'event and DC_ADC_SmplClk = '1' then
+	SET_RESET0_sig <= not SET_RESET0_sig;
+end if;
+end process;
 
-DC_ADC_Synch    <=  reset;
-LF_ADC_Synch    <=  reset;
+SET_RESET1_sig	<= SET_RESET0_sig;
+SET_RESET0 	<= SET_RESET0_sig;
+SET_RESET1  <= SET_RESET1_sig;
+--
 
-DC_ADC0 : ADS1274_DRIVER                      --With AMR down ! => 24bits DC TM -> SC high res on Spin
-generic map(ADS127X_MODE_low_power,ADS127X_FSYNC_FORMAT)
-port map(
-    Clk     =>  clk_buf,
-    reset   =>  reset_buf,
-    SpiClk  =>  DC_ADC_Sclk,
-    DIN     =>  DC_ADC_IN,
-    Ready   =>  '0',
-    Format  =>  DC_ADC_Format,
-    Mode    =>  DC_ADC_Mode,
-    ClkDiv  =>  DC_ADC_ClkDiv,
-    PWDOWN  =>  DC_ADC_PWDOWN,
-    SmplClk =>  DC_ADC_SmplClk,
-    OUT0    =>  DC1,
-    OUT1    =>  DC2,
-    OUT2    =>  DC3,
-    OUT3    =>  open,
-    FSynch  =>  DC_ADC_FSynch,
-    test    =>  test
-);
 
+
+send_ADC_DATA : IF SEND_CONSTANT_DATA = 0 GENERATE
+    DC_ADC0 : DUAL_ADS1278_DRIVER                      --With AMR down ! => 24bits DC TM -> SC high res on Spin
+		port map(
+			 Clk     =>  clk_buf,
+			 reset   =>  reset_buf,
+			 SpiClk  =>  DC_ADC_Sclk,
+			 DIN     =>  DC_ADC_IN,
+			 SmplClk =>  DC_ADC_SmplClk,
+			 OUT00   =>  AMR1X,
+			 OUT01   =>  AMR1Y,
+			 OUT02   =>  AMR1Z,
+			 OUT03   =>  AMR2X,
+			 OUT04   =>  AMR2Y,
+			 OUT05   =>  AMR2Z,
+			 OUT06   =>  Temp1,
+			 OUT07   =>  Temp2,
+			 OUT10   =>  AMR3X,
+			 OUT11   =>  AMR3Y,
+			 OUT12   =>  AMR3Z,
+			 OUT13   =>  AMR4X,
+			 OUT14   =>  AMR4Y,
+			 OUT15   =>  AMR4Z,
+			 OUT16   =>  Temp3,
+			 OUT17   =>  Temp4,
+			 FSynch  =>  DC_ADC_FSynch
+		);
+	LF1 <=  LF1cst;
+	LF2 <=  LF2cst;
+	LF3 <=  LF3cst;
+  END GENERATE;
+
+send_CST_DATA : IF (SEND_CONSTANT_DATA = 1) and (SEND_MINF_VALUE = 0) GENERATE
+	AMR1X   <= AMR1Xcst;
+	AMR1Y   <= AMR1Ycst;
+	AMR1Z   <= AMR1Zcst;
+	AMR2X   <= AMR2Xcst;
+	AMR2Y   <= AMR2Ycst;
+	AMR2Z   <= AMR2Zcst;
+	Temp1   <= Temp1cst;
+	Temp2   <= Temp2cst;
+	AMR3X   <= AMR3Xcst;
+	AMR3Y   <= AMR3Ycst;
+	AMR3Z   <= AMR3Zcst;
+	AMR4X   <= AMR4Xcst;
+	AMR4Y   <= AMR4Ycst;
+	AMR4Z   <= AMR4Zcst;
+	Temp3   <= Temp3cst;
+	Temp4   <= Temp4cst;
+	
+	LF1 <=  LF1cst;
+	LF2 <=  LF2cst;
+	LF3 <=  LF3cst;	
+  END GENERATE;
+  
+  
+
+
+send_minF_valuelbl : IF (SEND_CONSTANT_DATA = 1) and (SEND_MINF_VALUE = 1) GENERATE
+	AMR1X   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	AMR1Y   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	AMR1Z   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	AMR2X   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	AMR2Y   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	AMR2Z   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	Temp1   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	Temp2   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	AMR3X   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	AMR3Y   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	AMR3Z   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	AMR4X   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	AMR4Y   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	AMR4Z   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	Temp3   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	Temp4   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
+	
+	LF1 <=  LF1cst;
+	LF2 <=  LF2cst;
+	LF3 <=  LF3cst;	
+  END GENERATE;
 
 LF_SMPL_CLK0 : entity work.LF_SMPL_CLK
 port map(
@@ -249,36 +294,7 @@ port map(
     SMPL_CLK => LF_ADC_SmplClk
 );
 
-LF_ADC0 : ADS1274_DRIVER 
-generic map(ADS127X_MODE_low_power,ADS127X_FSYNC_FORMAT)
-port map(
-    Clk     =>  clk_buf,
-    reset   =>  reset_buf,
-    SpiClk  =>  LF_ADC_Sclk,
-    DIN     =>  LF_ADC_IN,
-    Ready   =>  '0',
-    Format  =>  LF_ADC_Format,
-    Mode    =>  LF_ADC_Mode,
-    ClkDiv  =>  LF_ADC_ClkDiv,
-    PWDOWN  =>  LF_ADC_PWDOWN,
-    SmplClk =>  LF_ADC_SmplClk,
-    OUT0    =>  LF1_int,
-    OUT1    =>  LF2_int,
-    OUT2    =>  LF3_int,
-    OUT3    =>  open,
-    FSynch  =>  LF_ADC_FSynch
-);
 
-
-LF1     <=  LF1_int(23 downto 8);
-LF2     <=  LF2_int(23 downto 8);
-LF3     <=  LF3_int(23 downto 8);
---
---DC1     <=  LF1_int(23 downto 0);
---DC2     <=  LF2_int(23 downto 0);
---DC3     <=  LF3_int(23 downto 0);
-
---Input Word Selection Decoder
 
 process(clk)
 variable SelVar :   integer range 0 to 1;

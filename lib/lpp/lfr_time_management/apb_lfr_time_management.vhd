@@ -1,16 +1,16 @@
 ----------------------------------------------------------------------------------
 -- Company: 
--- Engineer: 
+-- Engineer:
 -- 
--- Create Date:    11:17:05 07/02/2012 
--- Design Name: 
--- Module Name:    apb_lfr_time_management - Behavioral 
--- Project Name: 
+-- Create Date:    11:17:05 07/02/2012
+-- Design Name:
+-- Module Name:    apb_lfr_time_management - Behavioral
+-- Project Name:
 -- Target Devices: 
--- Tool versions: 
--- Description: 
+-- Tool versions:
+-- Description:
 --
--- Dependencies: 
+-- Dependencies:
 --
 -- Revision: 
 -- Revision 0.01 - File Created
@@ -62,7 +62,7 @@ ARCHITECTURE Behavioral OF apb_lfr_time_management IS
 --! type apb_config_type is array (0 to NAPBCFG-1) of amba_config_word;
   CONSTANT pconfig : apb_config_type := (
 --!  0 => ahb_device_reg (VENDOR_LPP, LPP_ROTARY, 0, REVISION, 0),
-    0 => ahb_device_reg (VENDOR_LPP, 0, 0, REVISION, pirq),
+    0 => ahb_device_reg (VENDOR_LPP, 14, 0, REVISION, pirq),
     1 => apb_iobar(paddr, pmask));
 
   TYPE apb_lfr_time_management_Reg IS RECORD
@@ -78,7 +78,7 @@ ARCHITECTURE Behavioral OF apb_lfr_time_management IS
   SIGNAL force_tick             : STD_LOGIC;
   SIGNAL previous_force_tick    : STD_LOGIC;
   SIGNAL soft_tick              : STD_LOGIC;
-  SIGNAL reset_next_commutation : STD_LOGIC;
+--  SIGNAL reset_next_commutation : STD_LOGIC;
   
   SIGNAL irq1 : STD_LOGIC;
   SIGNAL irq2 : STD_LOGIC;
@@ -101,7 +101,7 @@ BEGIN
       coarse_time => r.coarse_time, 
       fine_time => r.fine_time,
       next_commutation => r.next_commutation, 
-      reset_next_commutation => reset_next_commutation,
+--      reset_next_commutation => reset_next_commutation,
       irq1             => irq1,--apbo.pirq(pirq), 
       irq2 => irq2);--apbo.pirq(pirq+1));  
 
@@ -122,7 +122,7 @@ BEGIN
   --all_irq_sig: FOR I IN 31 DOWNTO 0 GENERATE
   --END GENERATE all_irq_sig;
   
-  PROCESS(resetn, clk25MHz, reset_next_commutation)
+  PROCESS(resetn, clk25MHz)--, reset_next_commutation)
   BEGIN
 
     IF resetn = '0' THEN
@@ -134,8 +134,8 @@ BEGIN
       previous_force_tick <= '0';
       soft_tick           <= '0';
 
-    ELSIF reset_next_commutation = '1' THEN
-      r.next_commutation <= x"ffffffff";
+    --ELSIF reset_next_commutation = '1' THEN
+    --  r.next_commutation <= x"ffffffff";
 
     ELSIF clk25MHz'EVENT AND clk25MHz = '1' THEN
 

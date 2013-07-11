@@ -101,6 +101,8 @@ BEGIN
       Cel_ongoing    <= 0;              --
       sample_in_rot  <= '0';
       
+      IIR_CEL_STATE <= waiting;
+      
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
       
       CASE IIR_CEL_STATE IS

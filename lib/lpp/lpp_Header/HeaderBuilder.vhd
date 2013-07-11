@@ -101,6 +101,7 @@ Matrix_Param <= std_logic_vector(to_unsigned(to_integer(unsigned(Statu))-1,4));
 
 header(1 downto 0) <= Matrix_Type;
 header(5 downto 2) <= Matrix_Param;
+header(31 downto 6) <= (others => '0');
 
 dataOUT <= dataIN(Data_sz-1 downto 0) when pong = '0' else dataIN((2*Data_sz)-1 downto Data_sz);
 emptyOUT <= emptyIN(0) when pong = '0' else emptyIN(1);
