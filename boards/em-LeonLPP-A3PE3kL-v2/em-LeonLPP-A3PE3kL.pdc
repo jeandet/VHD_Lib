@@ -69,6 +69,11 @@ set_io	spw1_sin	-pinname	C6	-fixed	yes	-DIRECTION	Inout
 set_io	spw1_dout	-pinname	C16	-fixed	yes	-DIRECTION	Inout
 set_io	spw1_sout	-pinname	C4	-fixed	yes	-DIRECTION	Inout
 
+set_io	spw2_din	-pinname	E6	-fixed	yes	-DIRECTION	Inout
+set_io	spw2_sin	-pinname	C15	-fixed	yes	-DIRECTION	Inout
+set_io	spw2_dout	-pinname	B7	-fixed	yes	-DIRECTION	Inout
+set_io	spw2_sout	-pinname	D7	-fixed	yes	-DIRECTION	Inout
+
 set_io	{led[0]}	-pinname	K17	-fixed	yes	-DIRECTION	Inout
 set_io	{led[1]}	-pinname	L18	-fixed	yes	-DIRECTION	Inout
 set_io	{led[2]}	-pinname	M17	-fixed	yes	-DIRECTION	Inout

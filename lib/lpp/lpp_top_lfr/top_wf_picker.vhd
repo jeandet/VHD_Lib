@@ -38,7 +38,8 @@ ENTITY top_wf_picker IS
     cnv_clk  : IN  STD_LOGIC;
     cnv_rstn : IN  STD_LOGIC;
     --
-    sample     : IN Samples14v(7 DOWNTO 0);
+    sample_B   : IN Samples14v(2 DOWNTO 0);
+    sample_E   : IN Samples14v(4 DOWNTO 0);
     sample_val : IN STD_LOGIC;
 
     -- AMBA AHB system signals
@@ -121,10 +122,15 @@ ARCHITECTURE tb OF top_wf_picker IS
   CONSTANT ncycle_cnv_high : INTEGER := 40;
   CONSTANT ncycle_cnv      : INTEGER := 250;
   
-  SIGNAL   sample_s          : Samples(ChanelCount-1 DOWNTO 0);
+  SIGNAL  sample_s          : Samples(ChanelCount-1 DOWNTO 0);
+  SIGNAL  sample            :  Samples14v(7 DOWNTO 0);
   
 BEGIN
 
+  sample(4 DOWNTO 0) <= sample_E(4 DOWNTO 0);
+  sample(7 DOWNTO 5) <= sample_B(2 DOWNTO 0);
+  
+  
   ready_matrix_f0_0             <= '0';
   ready_matrix_f0_1             <= '0';
   ready_matrix_f1               <= '0';

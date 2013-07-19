@@ -263,7 +263,8 @@ PACKAGE lpp_top_lfr_pkg IS
     PORT (
       cnv_clk         : IN  STD_LOGIC;
       cnv_rstn        : IN  STD_LOGIC;
-      sample          : IN  Samples14v(7 DOWNTO 0);
+      sample_B          : IN  Samples14v(2 DOWNTO 0);
+      sample_E          : IN  Samples14v(4 DOWNTO 0);
       sample_val      : IN  STD_LOGIC;
       HCLK            : IN  STD_ULOGIC;
       HRESETn         : IN  STD_ULOGIC;
