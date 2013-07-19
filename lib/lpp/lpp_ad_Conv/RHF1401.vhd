@@ -92,15 +92,13 @@ BEGIN
           END IF;
           sample_val <= '0';
         WHEN output_en =>
-          sample_reg(0)                      <= ADC_data;                             --JC
-          sample_reg(ChanelCount-1 DOWNTO 1) <= sample_reg(ChanelCount-2 DOWNTO 0);   --JC
+          sample_reg(ChanelCount-1)                 <= ADC_data;
+          sample_reg(ChanelCount-2 DOWNTO 0)        <= sample_reg(ChanelCount-1 DOWNTO 1);
           ADC_nOE_Reg_Shift(ChanelCount-1 DOWNTO 0) <= ADC_nOE_Reg_Shift(ChanelCount-2 DOWNTO 0) & '1';
           adc_index                                 <= adc_index + 1;
           sample_val                                <= '0';
           state                                     <= latch;
         WHEN latch =>
-          --sample_reg(0)                      <= ADC_data;                             --JC
-          --sample_reg(ChanelCount-1 DOWNTO 1) <= sample_reg(ChanelCount-2 DOWNTO 0);   --JC
           IF(adc_index = ChanelCount) THEN
             state <= data_valid;
           ELSE
