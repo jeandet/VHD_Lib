@@ -24,12 +24,14 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 library lpp;
 use lpp.lpp_memory.all;
+use lpp.iir_filter.all;
 library techmap;
 use techmap.gencomp.all;
 
 entity lppFIFOxN is
 generic(
     tech          :   integer := 0;
+    Mem_use       :   integer := use_RAM;
     Data_sz       :   integer range 1 to 32 := 8;
     Addr_sz       :   integer range 1 to 32 := 8;
     FifoCnt : integer := 1;
@@ -56,7 +58,7 @@ begin
 
 fifos: for i in 0 to FifoCnt-1 generate
     FIFO0 : lpp_fifo
-        generic map (tech,Enable_ReUse,Data_sz,Addr_sz)
+        generic map (tech,Mem_use,Enable_ReUse,Data_sz,Addr_sz)
         port map(rst,ReUse(i),rclk,ren(i),rdata((i+1)*Data_sz-1 downto i*Data_sz),empty(i),open,wclk,wen(i),wdata((i+1)*Data_sz-1 downto i*Data_sz),full(i),open);
 end generate;
 
