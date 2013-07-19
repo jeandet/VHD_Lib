@@ -26,7 +26,7 @@ use grlib.amba.all;
 use std.textio.all;
 library lpp;
 use lpp.lpp_amba.all;
-use work.fft_components.all;
+use lpp.fft_components.all;
 
 --! Package contenant tous les programmes qui forment le composant intégré dans le léon 
 

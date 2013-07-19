@@ -50,6 +50,30 @@ PACKAGE lpp_ad_conv IS
 
   TYPE Samples IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
 
+  SUBTYPE Samples24 IS STD_LOGIC_VECTOR(23 DOWNTO 0);
+
+  SUBTYPE Samples16 IS STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+  SUBTYPE Samples14 IS STD_LOGIC_VECTOR(13 DOWNTO 0);
+
+  SUBTYPE Samples12 IS STD_LOGIC_VECTOR(11 DOWNTO 0);
+
+  SUBTYPE Samples10 IS STD_LOGIC_VECTOR(9 DOWNTO 0);
+
+  SUBTYPE Samples8 IS STD_LOGIC_VECTOR(7 DOWNTO 0);
+
+  TYPE Samples24v IS ARRAY(NATURAL RANGE <>) OF Samples24;
+
+  TYPE Samples16v IS ARRAY(NATURAL RANGE <>) OF Samples16;
+
+  TYPE Samples14v IS ARRAY(NATURAL RANGE <>) OF Samples14;
+
+  TYPE Samples12v IS ARRAY(NATURAL RANGE <>) OF Samples12;
+
+  TYPE Samples10v IS ARRAY(NATURAL RANGE <>) OF Samples10;
+
+  TYPE Samples8v IS ARRAY(NATURAL RANGE <>) OF Samples8;
+
   COMPONENT AD7688_drvr
     GENERIC (
       ChanelCount     : INTEGER;
@@ -58,7 +82,7 @@ PACKAGE lpp_ad_conv IS
     PORT (
       cnv_clk    : IN  STD_LOGIC;
       cnv_rstn   : IN  STD_LOGIC;
-      cnv_run  : IN  STD_LOGIC;
+      cnv_run    : IN  STD_LOGIC;
       cnv        : OUT STD_LOGIC;
       clk        : IN  STD_LOGIC;
       rstn       : IN  STD_LOGIC;
@@ -67,7 +91,67 @@ PACKAGE lpp_ad_conv IS
       sample     : OUT Samples(ChanelCount-1 DOWNTO 0);
       sample_val : OUT STD_LOGIC);
   END COMPONENT;
-  
+
+  COMPONENT RHF1401_drvr IS
+    GENERIC(
+      ChanelCount : INTEGER := 8);
+    PORT (
+      cnv_clk    : IN  STD_LOGIC;
+      clk        : IN  STD_LOGIC;
+      rstn       : IN  STD_LOGIC;
+      ADC_data   : IN  Samples14;
+      --ADC_smpclk : OUT STD_LOGIC;
+      ADC_nOE    : OUT STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+      sample     : OUT Samples14v(ChanelCount-1 DOWNTO 0);
+      sample_val : OUT STD_LOGIC
+      );
+  END COMPONENT;
+
+  COMPONENT top_ad_conv_RHF1401
+    GENERIC (
+      ChanelCount : INTEGER;
+      ncycle_cnv_high : INTEGER := 79;
+      ncycle_cnv      : INTEGER := 500);
+    PORT (
+      cnv_clk    : IN  STD_LOGIC;
+      cnv_rstn   : IN  STD_LOGIC;
+      cnv        : OUT STD_LOGIC;
+      clk        : IN  STD_LOGIC;
+      rstn       : IN  STD_LOGIC;
+      ADC_data   : IN  Samples14;
+      ADC_nOE    : OUT STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+      sample     : OUT Samples14v(ChanelCount-1 DOWNTO 0);
+      sample_val : OUT STD_LOGIC);
+  END COMPONENT;
+
+
+  COMPONENT AD7688_drvr_sync
+    GENERIC (
+      ChanelCount     : INTEGER;
+      ncycle_cnv_high : INTEGER;
+      ncycle_cnv      : INTEGER);
+    PORT (
+      cnv_clk    : IN  STD_LOGIC;
+      cnv_rstn   : IN  STD_LOGIC;
+      cnv_run    : IN  STD_LOGIC;
+      cnv        : OUT STD_LOGIC;
+      sck        : OUT STD_LOGIC;
+      sdo        : IN  STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+      sample     : OUT Samples(ChanelCount-1 DOWNTO 0);
+      sample_val : OUT STD_LOGIC);
+  END COMPONENT;
+
+  COMPONENT TestModule_RHF1401
+    GENERIC (
+      freq      : INTEGER;
+      amplitude : INTEGER;
+      impulsion : INTEGER);
+    PORT (
+      ADC_smpclk  : IN  STD_LOGIC;
+      ADC_OEB_bar : IN  STD_LOGIC;
+      ADC_data    : OUT STD_LOGIC_VECTOR(13 DOWNTO 0));
+  END COMPONENT;
+
   --COMPONENT AD7688_drvr IS
   --  GENERIC(ChanelCount : INTEGER;
   --          clkkHz      : INTEGER);
@@ -145,47 +229,80 @@ PACKAGE lpp_ad_conv IS
 --=======================  ADS 127X =========================|
 --===========================================================|
 
-Type ADS127X_FORMAT_Type is array(2 downto 0) of std_logic;
-constant ADS127X_SPI_FORMAT     : ADS127X_FORMAT_Type := "010";
-constant ADS127X_FSYNC_FORMAT   : ADS127X_FORMAT_Type := "101";
+  TYPE     ADS127X_FORMAT_Type IS ARRAY(2 DOWNTO 0) OF STD_LOGIC;
+  CONSTANT ADS127X_SPI_FORMAT   : ADS127X_FORMAT_Type := "010";
+  CONSTANT ADS127X_FSYNC_FORMAT : ADS127X_FORMAT_Type := "101";
 
-Type ADS127X_MODE_Type is array(1 downto 0) of std_logic;
-constant ADS127X_MODE_low_power         : ADS127X_MODE_Type := "10";
-constant ADS127X_MODE_low_speed         : ADS127X_MODE_Type := "11";
-constant ADS127X_MODE_high_resolution   : ADS127X_MODE_Type := "01";
+  TYPE     ADS127X_MODE_Type IS ARRAY(1 DOWNTO 0) OF STD_LOGIC;
+  CONSTANT ADS127X_MODE_low_power       : ADS127X_MODE_Type := "10";
+  CONSTANT ADS127X_MODE_low_speed       : ADS127X_MODE_Type := "11";
+  CONSTANT ADS127X_MODE_high_resolution : ADS127X_MODE_Type := "01";
 
-Type ADS127X_config is
-    record
-        SYNC    : std_logic;
-        CLKDIV  : std_logic;
-        FORMAT  : ADS127X_FORMAT_Type;
-        MODE    : ADS127X_MODE_Type;
-end record;
+  TYPE ADS127X_config IS
+  RECORD
+    SYNC   : STD_LOGIC;
+    CLKDIV : STD_LOGIC;
+    FORMAT : ADS127X_FORMAT_Type;
+    MODE   : ADS127X_MODE_Type;
+  END RECORD;
 
-COMPONENT ADS1274_DRIVER is 
-generic(modeCfg : ADS127X_MODE_Type := ADS127X_MODE_low_power; formatCfg : ADS127X_FORMAT_Type := ADS127X_FSYNC_FORMAT);
-port(
-    Clk     :   in  std_logic;
-    reset   :   in  std_logic;
-    SpiClk  :   out std_logic;
-    DIN     :   in  std_logic_vector(3 downto 0);
-    Ready   :   in  std_logic;
-    Format  :   out std_logic_vector(2 downto 0);
-    Mode    :   out std_logic_vector(1 downto 0);
-    ClkDiv  :   out std_logic;
-    PWDOWN  :   out std_logic_vector(3 downto 0);
-    SmplClk :   in  std_logic;
-    OUT0    :   out std_logic_vector(23 downto 0);
-    OUT1    :   out std_logic_vector(23 downto 0);
-    OUT2    :   out std_logic_vector(23 downto 0);
-    OUT3    :   out std_logic_vector(23 downto 0);
-    FSynch  :   out std_logic;
-    test    :   out std_logic
-);
-end COMPONENT;
+  COMPONENT ADS1274_DRIVER IS
+    GENERIC(modeCfg : ADS127X_MODE_Type := ADS127X_MODE_low_power; formatCfg : ADS127X_FORMAT_Type := ADS127X_FSYNC_FORMAT);
+    PORT(
+      Clk     : IN  STD_LOGIC;
+      reset   : IN  STD_LOGIC;
+      SpiClk  : OUT STD_LOGIC;
+      DIN     : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      Ready   : IN  STD_LOGIC;
+      Format  : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+      Mode    : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+      ClkDiv  : OUT STD_LOGIC;
+      PWDOWN  : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      SmplClk : IN  STD_LOGIC;
+      OUT0    : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT1    : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT2    : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT3    : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      FSynch  : OUT STD_LOGIC;
+      test    : OUT STD_LOGIC
+      );
+  END COMPONENT;
 
+-- todo clean file
+  COMPONENT DUAL_ADS1278_DRIVER IS
+    PORT(
+      Clk     : IN  STD_LOGIC;
+      reset   : IN  STD_LOGIC;
+      SpiClk  : OUT STD_LOGIC;
+      DIN     : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+      SmplClk : IN  STD_LOGIC;
+      OUT00   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT01   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT02   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT03   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT04   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT05   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT06   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT07   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT10   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT11   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT12   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT13   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT14   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT15   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT16   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT17   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      FSynch  : OUT STD_LOGIC
+      );
+  END COMPONENT;
 
 
 END lpp_ad_conv;
+
+
+
+
+
+
 
 

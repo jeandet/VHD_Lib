@@ -38,16 +38,16 @@ begin
                     when 6 =>
                         WordOut <=  LF1(7 downto 0);
                         Flag <= '1';
-                    when 13 =>
+                    when 7 =>
                         WordOut <=  LF2(15 downto 8);
                         Flag <= '1';
-                    when 14 =>
+                    when 8 =>
                         WordOut <=  LF2(7 downto 0);
                         Flag <= '1';
-                    when 21 =>
+                    when 9 =>
                         WordOut <=  LF3(15 downto 8);
                         Flag <= '1';
-                    when 22 =>
+                    when 10 =>
                         WordOut <=  LF3(7 downto 0);
                         Flag <= '1';
 
@@ -57,16 +57,16 @@ begin
                     when 30 =>
                         WordOut <=  LF1(7 downto 0);
                         Flag <= '1';
-                    when 37 =>
+                    when 31 =>
                         WordOut <=  LF2(15 downto 8);
                         Flag <= '1';
-                    when 38 =>
+                    when 32 =>
                         WordOut <=  LF2(7 downto 0);
                         Flag <= '1';
-                    when 45 =>
+                    when 33 =>
                         WordOut <=  LF3(15 downto 8);
                         Flag <= '1';
-                    when 46 =>
+                    when 34 =>
                         WordOut <=  LF3(7 downto 0);
                         Flag <= '1';
 
@@ -76,16 +76,16 @@ begin
                     when 54 =>
                         WordOut <=  LF1(7 downto 0);
                         Flag <= '1';
-                    when 61 =>
+                    when 55 =>
                         WordOut <=  LF2(15 downto 8);
                         Flag <= '1';
-                    when 62 =>
+                    when 56 =>
                         WordOut <=  LF2(7 downto 0);
                         Flag <= '1';
-                    when 69 =>
+                    when 57 =>
                         WordOut <=  LF3(15 downto 8);
                         Flag <= '1';
-                    when 70 =>
+                    when 58 =>
                         WordOut <=  LF3(7 downto 0);
                         Flag <= '1';
 
@@ -95,16 +95,16 @@ begin
                     when 78 =>
                         WordOut <=  LF1(7 downto 0);
                         Flag <= '1';
-                    when 85 =>
+                    when 79 =>
                         WordOut <=  LF2(15 downto 8);
                         Flag <= '1';
-                    when 86 =>
+                    when 80 =>
                         WordOut <=  LF2(7 downto 0);
                         Flag <= '1';
-                    when 93 =>
+                    when 81 =>
                         WordOut <=  LF3(15 downto 8);
                         Flag <= '1';
-                    when 94 =>
+                    when 82 =>
                         WordOut <=  LF3(7 downto 0);
                         Flag <= '1';
 
@@ -114,16 +114,16 @@ begin
                     when 102 =>
                         WordOut <=  LF1(7 downto 0);
                         Flag <= '1';
-                    when 109 =>
+                    when 103 =>
                         WordOut <=  LF2(15 downto 8);
                         Flag <= '1';
-                    when 110 =>
+                    when 104 =>
                         WordOut <=  LF2(7 downto 0);
                         Flag <= '1';
-                    when 117 =>
+                    when 105 =>
                         WordOut <=  LF3(15 downto 8);
                         Flag <= '1';
-                    when 118 =>
+                    when 106 =>
                         WordOut <=  LF3(7 downto 0);
                         Flag <= '1';
 
@@ -133,16 +133,16 @@ begin
                     when 126 =>
                         WordOut <=  LF1(7 downto 0);
                         Flag <= '1';
-                    when 133 =>
+                    when 127 =>
                         WordOut <=  LF2(15 downto 8);
                         Flag <= '1';
-                    when 134 =>
+                    when 128 =>
                         WordOut <=  LF2(7 downto 0);
                         Flag <= '1';
-                    when 141 =>
+                    when 129 =>
                         WordOut <=  LF3(15 downto 8);
                         Flag <= '1';
-                    when 142 =>
+                    when 130 =>
                         WordOut <=  LF3(7 downto 0);
                         Flag <= '1';
 

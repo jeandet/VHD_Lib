@@ -246,7 +246,7 @@ BEGIN
     GENERIC MAP (
       ChanelCount => ChanelCount,
       SampleSize  => 18,
-      DivideParam => 256)
+      DivideParam => 96)
     PORT MAP (
       clk            => clk,
       rstn           => rstn,
@@ -276,7 +276,7 @@ BEGIN
     GENERIC MAP (
       ChanelCount => ChanelCount,
       SampleSize  => 18,
-      DivideParam => 96)
+      DivideParam => 256)
     PORT MAP (
       clk            => clk,
       rstn           => rstn,

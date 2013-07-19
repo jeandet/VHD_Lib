@@ -53,6 +53,11 @@ BEGIN  -- beh
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
       counter        <= 0;
       sample_out_val <= '0';
+      all_sampl: FOR I IN ChanelCount-1 DOWNTO 0 LOOP
+      	all_bit: FOR J IN SampleSize-1 DOWNTO 0 LOOP
+	        sample_out(I,J)     <= '0'; 
+        END LOOP all_bit;
+      END LOOP all_sampl;
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
       IF sample_in_val = '1' THEN
         IF counter = 0 THEN

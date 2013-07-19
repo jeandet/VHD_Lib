@@ -25,7 +25,6 @@ LIBRARY grlib;
 USE grlib.amba.ALL;
 USE grlib.stdlib.ALL;
 USE grlib.devices.ALL;
-LIBRARY lpp;
 
 
 
