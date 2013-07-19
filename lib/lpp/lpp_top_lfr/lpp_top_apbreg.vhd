@@ -193,7 +193,7 @@ BEGIN  -- beh
 
 
 
-  data_shaping_BW  <= reg_wp.data_shaping_BW;
+  data_shaping_BW  <= NOT reg_wp.data_shaping_BW;
   data_shaping_SP0 <= reg_wp.data_shaping_SP0;
   data_shaping_SP1 <= reg_wp.data_shaping_SP1;
   data_shaping_R0  <= reg_wp.data_shaping_R0;
