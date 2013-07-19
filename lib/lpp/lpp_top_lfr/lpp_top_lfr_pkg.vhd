@@ -16,7 +16,8 @@ PACKAGE lpp_top_lfr_pkg IS
 
   COMPONENT lpp_top_acq
   GENERIC(
-    tech : INTEGER := 0
+    tech : INTEGER := 0;
+    Mem_use : integer := use_RAM
     );
   PORT (
     -- ADS7886

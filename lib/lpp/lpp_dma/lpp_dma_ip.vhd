@@ -103,6 +103,7 @@ ARCHITECTURE Behavioral OF lpp_dma_ip IS
   -----------------------------------------------------------------------------
   -----------------------------------------------------------------------------
   TYPE state_DMAWriteBurst IS (IDLE,
+                               CHECK_COMPONENT_TYPE,
                                TRASH_FIFO,
                                WAIT_HEADER_ACK,
                                SEND_DATA,
@@ -182,8 +183,7 @@ BEGIN
   END PROCESS debug_info;
     
   
-  matrix_type    <= header(1 DOWNTO 0);
-  component_type <= header(5 DOWNTO 2);
+
 
   send_matrix <= '1' WHEN matrix_type = "00" AND status_ready_matrix_f0_0 = '0' ELSE
                  '1' WHEN matrix_type = "01" AND status_ready_matrix_f0_1 = '0' ELSE
@@ -191,8 +191,8 @@ BEGIN
                  '1' WHEN matrix_type = "11" AND status_ready_matrix_f2 = '0'   ELSE
                  '0';
   
-  header_check_ok <= '0' WHEN component_type = "1111" ELSE
-                     '1' WHEN component_type = "0000" AND component_type_pre = "1110" ELSE
+  header_check_ok <= '0' WHEN component_type = "1111" ELSE -- ?? component_type_pre = "1111"
+                     '1' WHEN component_type = "0000" AND component_type_pre = "0000" ELSE
                      '1' WHEN component_type = component_type_pre + "0001"            ELSE
                      '0';
 
@@ -208,6 +208,8 @@ BEGIN
   DMAWriteFSM_p : PROCESS (HCLK, HRESETn)
   BEGIN  -- PROCESS DMAWriteBurst_p
     IF HRESETn = '0' THEN                 -- asynchronous reset (active low)
+      matrix_type    <= (others => '0');
+      component_type <= (others => '0');
       state                         <= IDLE;
       header_ack                    <= '0';
       ready_matrix_f0_0             <= '0';
@@ -216,7 +218,7 @@ BEGIN
       ready_matrix_f2               <= '0';
       error_anticipating_empty_fifo <= '0';
       error_bad_component_error     <= '0';
-      component_type_pre            <= "1110";
+      component_type_pre            <= "0000";
       fifo_ren_trash                <= '1';
       component_send                <= '0';
       address                       <= (OTHERS => '0');
@@ -226,7 +228,10 @@ BEGIN
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
 
       CASE state IS
-        WHEN IDLE =>
+        WHEN IDLE =>    
+          matrix_type    <= header(1 DOWNTO 0);
+          --component_type <= header(5 DOWNTO 2);
+
           ready_matrix_f0_0 <= '0';
           ready_matrix_f0_1 <= '0';
           ready_matrix_f1   <= '0';
@@ -234,9 +239,14 @@ BEGIN
           error_bad_component_error <= '0';
           header_select                    <= '1';
           IF header_val = '1' AND fifo_empty = '0' AND send_matrix = '1' THEN
+              matrix_type        <= header(1 DOWNTO 0);
+              component_type     <= header(5 DOWNTO 2);
+              component_type_pre <= component_type;
+              state <= CHECK_COMPONENT_TYPE;
+          END IF;
+        
+        WHEN CHECK_COMPONENT_TYPE =>
             IF header_check_ok = '1' THEN
-              header_data        <= header;
-              component_type_pre <= header(5 DOWNTO 2);
               header_ack         <= '1';
               --
               header_send        <= '1';
@@ -247,14 +257,15 @@ BEGIN
               --
               state       <= WAIT_HEADER_ACK;
             ELSE
-              error_bad_component_error <= '1';
-              component_type_pre               <= "1110";
+              error_bad_component_error        <= '1';
+              component_type_pre               <= "0000";
               header_ack                       <= '1';
               state                            <= TRASH_FIFO;
             END IF;
-          END IF;
+
 
         WHEN TRASH_FIFO =>
+          header_ack  <= '0';
           error_bad_component_error <= '0';
           error_anticipating_empty_fifo <= '0';
           IF fifo_empty = '1' THEN
@@ -263,8 +274,9 @@ BEGIN
           ELSE
             fifo_ren_trash <= '0';
           END IF;
-          
+
         WHEN WAIT_HEADER_ACK =>
+          header_ack  <= '0';
           header_send <= '0';
           IF header_send_ko = '1' THEN
             state <= TRASH_FIFO;
@@ -279,7 +291,7 @@ BEGIN
         WHEN SEND_DATA =>
           IF fifo_empty = '1' THEN
             state <= IDLE;
-            IF component_type = "1110" THEN
+            IF component_type = "1110" THEN   --"1110" -- JC
               CASE matrix_type IS
                 WHEN "00"  => ready_matrix_f0_0 <= '1';
                 WHEN "01"  => ready_matrix_f0_1 <= '1';
@@ -287,6 +299,7 @@ BEGIN
                 WHEN "11"  => ready_matrix_f2   <= '1';
                 WHEN OTHERS => NULL;
               END CASE;
+
             END IF;
           ELSE
             component_send <= '1';

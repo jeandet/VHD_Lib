@@ -11,7 +11,8 @@ USE techmap.gencomp.ALL;
 
 ENTITY lpp_top_acq IS
   GENERIC(
-    tech : INTEGER := 0
+    tech : INTEGER := 0;
+    Mem_use : integer := use_RAM
     );
   PORT (
     -- ADS7886
@@ -143,7 +144,7 @@ BEGIN
   IIR_CEL_CTRLR_v2_1 : IIR_CEL_CTRLR_v2
     GENERIC MAP (
       tech         => 0,
-      Mem_use      => use_RAM,
+      Mem_use      => Mem_use,
       Sample_SZ    => 18,
       Coef_SZ      => Coef_SZ,
       Coef_Nb      => 25,               -- TODO

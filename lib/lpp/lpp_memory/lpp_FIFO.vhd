@@ -31,6 +31,7 @@ use techmap.gencomp.all;
 entity lpp_fifo is
 generic(
     tech          :   integer := 0;
+    Mem_use       :   integer := use_RAM;
     Enable_ReUse  :   std_logic := '0';
     DataSz        :   integer range 1 to 32 := 8;
     abits         :   integer range 2 to 12 := 8
@@ -75,12 +76,17 @@ begin
 -- /!\ syncram_2p Write et Read actif a l'état haut /!\
 -- A l'inverse de RAM_CEL !!!
 --==================================================================================
-SRAM : syncram_2p
-    generic map(tech,abits,DataSz)
-    port map(RCLK,sRE,Raddr_vect,rdata,WCLK,sWE,Waddr_vect,wdata);
+memRAM : IF Mem_use = use_RAM GENERATE
+  SRAM : syncram_2p
+      generic map(tech,abits,DataSz)
+      port map(RCLK,sRE,Raddr_vect,rdata,WCLK,sWE,Waddr_vect,wdata);
+END GENERATE;
 --================================================================================== 
---RAM0: entity work.RAM_CEL
---    port map(wdata, rdata, sWEN, sREN, Waddr_vect, Raddr_vect, WCLK, rstn);
+memCEL : IF Mem_use = use_CEL GENERATE
+  CRAM : RAM_CEL
+      generic map(DataSz,abits)
+      port map(wdata, rdata, sWEN, sREN, Waddr_vect, Raddr_vect, WCLK, rstn);
+END GENERATE;
 --================================================================================== 
 
 --=============================
