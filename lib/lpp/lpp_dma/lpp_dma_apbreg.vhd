@@ -189,16 +189,16 @@ BEGIN  -- beh
     END IF;
   END PROCESS lpp_dma_apbreg;
 
-  apbo.pirq    <= (reg.config_active_interruption_onNewMatrix AND (ready_matrix_f0_0 OR
-                                                                   ready_matrix_f0_1 OR
+  apbo.pirq(pirq)    <= (reg.config_active_interruption_onNewMatrix AND (ready_matrix_f0_0 OR
+                                                                  ready_matrix_f0_1 OR
                                                                    ready_matrix_f1   OR
                                                                    ready_matrix_f2)
                    )
                   OR
                   (reg.config_active_interruption_onError AND (error_anticipating_empty_fifo OR
-                                                               error_bad_component_error)
-                   );
-
+                                                              error_bad_component_error)
+                  );
+  
 
 
 

@@ -1,5 +1,6 @@
 ALU_Driver.vhd
 APB_Matrix.vhd
+ReUse_CTRLR.vhd
 Dispatch.vhd
 DriveInputs.vhd
 GetResult.vhd
