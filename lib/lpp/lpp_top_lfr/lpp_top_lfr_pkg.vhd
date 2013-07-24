@@ -153,8 +153,6 @@ PACKAGE lpp_top_lfr_pkg IS
     PORT (
     sample               : IN Samples(7 DOWNTO 0);
     sample_val           : IN STD_LOGIC;
-      cnv_clk            : IN  STD_LOGIC;
-      cnv_rstn           : IN  STD_LOGIC;
       clk                : IN  STD_LOGIC;
       rstn               : IN  STD_LOGIC;
       sample_f0_wen      : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);

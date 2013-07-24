@@ -31,16 +31,8 @@ ENTITY lpp_top_lfr_wf_picker_ip IS
     Mem_use                 : INTEGER := use_RAM
     );
   PORT (
-    -- ADS7886
---    cnv_run         : IN  STD_LOGIC;
---    cnv             : OUT STD_LOGIC;
---    sck             : OUT STD_LOGIC;
---    sdo             : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
     sample           : IN Samples(7 DOWNTO 0);
     sample_val       : IN STD_LOGIC;
-    --
-    cnv_clk         : IN  STD_LOGIC;
-    cnv_rstn        : IN  STD_LOGIC;
     --
     clk             : IN  STD_LOGIC;
     rstn            : IN  STD_LOGIC;
@@ -141,15 +133,15 @@ ARCHITECTURE tb OF lpp_top_lfr_wf_picker_ip IS
   SIGNAL sample_filter_v2_out_val : STD_LOGIC;
   SIGNAL sample_filter_v2_out     : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
   -----------------------------------------------------------------------------
-  SIGNAL sample_filter_v2_out_reg : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
+  --SIGNAL sample_filter_v2_out_reg : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
 
-  SIGNAL sample_filter_v2_out_reg_val    : STD_LOGIC;
-  SIGNAL sample_filter_v2_out_reg_val_s  : STD_LOGIC;
-  SIGNAL sample_filter_v2_out_reg_val_s2 : STD_LOGIC;
-  SIGNAL only_one_hot                    : STD_LOGIC;
-  SIGNAL sample_filter_v2_out_sync_val_t : STD_LOGIC;
-  SIGNAL sample_filter_v2_out_sync_val   : STD_LOGIC;
-  SIGNAL sample_filter_v2_out_sync       : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
+  --SIGNAL sample_filter_v2_out_reg_val    : STD_LOGIC;
+  --SIGNAL sample_filter_v2_out_reg_val_s  : STD_LOGIC;
+  --SIGNAL sample_filter_v2_out_reg_val_s2 : STD_LOGIC;
+  --SIGNAL only_one_hot                    : STD_LOGIC;
+  --SIGNAL sample_filter_v2_out_sync_val_t : STD_LOGIC;
+  --SIGNAL sample_filter_v2_out_sync_val   : STD_LOGIC;
+  --SIGNAL sample_filter_v2_out_sync       : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
   -----------------------------------------------------------------------------
   SIGNAL sample_data_shaping_out_val     : STD_LOGIC;
   SIGNAL sample_data_shaping_out         : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
@@ -190,11 +182,11 @@ ARCHITECTURE tb OF lpp_top_lfr_wf_picker_ip IS
 BEGIN
   
   -----------------------------------------------------------------------------
-  PROCESS (cnv_clk, cnv_rstn)
+  PROCESS (clk, rstn)
   BEGIN  -- PROCESS
-    IF cnv_rstn = '0' THEN              -- asynchronous reset (active low)
+    IF rstn = '0' THEN              -- asynchronous reset (active low)
       sample_val_delay <= '0';
-    ELSIF cnv_clk'EVENT AND cnv_clk = '1' THEN  -- rising clock edge
+    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
       sample_val_delay <= sample_val;
     END IF;
   END PROCESS;
@@ -222,8 +214,8 @@ BEGIN
       Cels_count   => Cels_count,
       ChanelsCount => ChanelCount)
     PORT MAP (
-      rstn           => cnv_rstn,
-      clk            => cnv_clk,
+      rstn           => rstn,
+      clk            => clk,
       virg_pos       => 7,
       coefs          => coefs_v2,
       sample_in_val  => sample_val_delay,
@@ -236,90 +228,90 @@ BEGIN
   -- RESYNC STAGE
   -----------------------------------------------------------------------------
 
-  all_sample_reg : FOR I IN ChanelCount-1 DOWNTO 0 GENERATE
-    all_data_reg : FOR J IN 17 DOWNTO 0 GENERATE
-      PROCESS (cnv_clk, cnv_rstn)
-      BEGIN  -- PROCESS
-        IF cnv_rstn = '0' THEN          -- asynchronous reset (active low)
-          sample_filter_v2_out_reg(I, J) <= '0';
-        ELSIF cnv_clk'EVENT AND cnv_clk = '1' THEN  -- rising clock edge
-          IF sample_filter_v2_out_val = '1' THEN
-            sample_filter_v2_out_reg(I, J) <= sample_filter_v2_out(I, J);
-          END IF;
-        END IF;
-      END PROCESS;
-    END GENERATE all_data_reg;
-  END GENERATE all_sample_reg;
+  --all_sample_reg : FOR I IN ChanelCount-1 DOWNTO 0 GENERATE
+  --  all_data_reg : FOR J IN 17 DOWNTO 0 GENERATE
+  --    PROCESS (cnv_clk, cnv_rstn)
+  --    BEGIN  -- PROCESS
+  --      IF cnv_rstn = '0' THEN          -- asynchronous reset (active low)
+  --        sample_filter_v2_out_reg(I, J) <= '0';
+  --      ELSIF cnv_clk'EVENT AND cnv_clk = '1' THEN  -- rising clock edge
+  --        IF sample_filter_v2_out_val = '1' THEN
+  --          sample_filter_v2_out_reg(I, J) <= sample_filter_v2_out(I, J);
+  --        END IF;
+  --      END IF;
+  --    END PROCESS;
+  --  END GENERATE all_data_reg;
+  --END GENERATE all_sample_reg;
 
-  PROCESS (cnv_clk, cnv_rstn)
-  BEGIN  -- PROCESS
-    IF cnv_rstn = '0' THEN              -- asynchronous reset (active low)
-      sample_filter_v2_out_reg_val <= '0';
-    ELSIF cnv_clk'EVENT AND cnv_clk = '1' THEN  -- rising clock edge
-      IF sample_filter_v2_out_val = '1' THEN
-        sample_filter_v2_out_reg_val <= '1';
-      ELSIF sample_filter_v2_out_reg_val_s2 = '1' THEN
-        sample_filter_v2_out_reg_val <= '0';
-      END IF;
-    END IF;
-  END PROCESS;
+  --PROCESS (cnv_clk, cnv_rstn)
+  --BEGIN  -- PROCESS
+  --  IF cnv_rstn = '0' THEN              -- asynchronous reset (active low)
+  --    sample_filter_v2_out_reg_val <= '0';
+  --  ELSIF cnv_clk'EVENT AND cnv_clk = '1' THEN  -- rising clock edge
+  --    IF sample_filter_v2_out_val = '1' THEN
+  --      sample_filter_v2_out_reg_val <= '1';
+  --    ELSIF sample_filter_v2_out_reg_val_s2 = '1' THEN
+  --      sample_filter_v2_out_reg_val <= '0';
+  --    END IF;
+  --  END IF;
+  --END PROCESS;
 
-  SYNC_FF_1 : SYNC_FF
-    GENERIC MAP (
-      NB_FF_OF_SYNC => 2)
-    PORT MAP (
-      clk    => clk,
-      rstn   => rstn,
-      A      => sample_filter_v2_out_reg_val,
-      A_sync => sample_filter_v2_out_reg_val_s);
+  --SYNC_FF_1 : SYNC_FF
+  --  GENERIC MAP (
+  --    NB_FF_OF_SYNC => 2)
+  --  PORT MAP (
+  --    clk    => clk,
+  --    rstn   => rstn,
+  --    A      => sample_filter_v2_out_reg_val,
+  --    A_sync => sample_filter_v2_out_reg_val_s);
 
-  SYNC_FF_2 : SYNC_FF
-    GENERIC MAP (
-      NB_FF_OF_SYNC => 2)
-    PORT MAP (
-      clk    => cnv_clk,
-      rstn   => cnv_rstn,
-      A      => sample_filter_v2_out_reg_val_s,
-      A_sync => sample_filter_v2_out_reg_val_s2);
-
-
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      sample_filter_v2_out_sync_val_t <= '0';
-      sample_filter_v2_out_sync_val   <= '0';
-      only_one_hot                    <= '0';
-    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      sample_filter_v2_out_sync_val_t <= sample_filter_v2_out_reg_val_s AND NOT only_one_hot;
-      only_one_hot                    <= sample_filter_v2_out_reg_val_s;
-      sample_filter_v2_out_sync_val   <= sample_filter_v2_out_sync_val_t;
-    END IF;
-  END PROCESS;
+  --SYNC_FF_2 : SYNC_FF
+  --  GENERIC MAP (
+  --    NB_FF_OF_SYNC => 2)
+  --  PORT MAP (
+  --    clk    => cnv_clk,
+  --    rstn   => cnv_rstn,
+  --    A      => sample_filter_v2_out_reg_val_s,
+  --    A_sync => sample_filter_v2_out_reg_val_s2);
 
 
-  all_sample_reg2 : FOR I IN ChanelCount-1 DOWNTO 0 GENERATE
-    all_data_reg : FOR J IN 17 DOWNTO 0 GENERATE
-      PROCESS (clk, cnv_rstn)
-      BEGIN  -- PROCESS
-        IF cnv_rstn = '0' THEN              -- asynchronous reset (active low)
-          sample_filter_v2_out_sync(I,J) <= '0';
-        ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-          IF sample_filter_v2_out_sync_val_t = '1' THEN
-            sample_filter_v2_out_sync(I,J) <= sample_filter_v2_out_reg(I,J);
-          END IF;
-        END IF;
-      END PROCESS;
-    END GENERATE all_data_reg;
-  END GENERATE all_sample_reg2;
+  --PROCESS (clk, rstn)
+  --BEGIN  -- PROCESS
+  --  IF rstn = '0' THEN                  -- asynchronous reset (active low)
+  --    sample_filter_v2_out_sync_val_t <= '0';
+  --    sample_filter_v2_out_sync_val   <= '0';
+  --    only_one_hot                    <= '0';
+  --  ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
+  --    sample_filter_v2_out_sync_val_t <= sample_filter_v2_out_reg_val_s AND NOT only_one_hot;
+  --    only_one_hot                    <= sample_filter_v2_out_reg_val_s;
+  --    sample_filter_v2_out_sync_val   <= sample_filter_v2_out_sync_val_t;
+  --  END IF;
+  --END PROCESS;
+
+
+  --all_sample_reg2 : FOR I IN ChanelCount-1 DOWNTO 0 GENERATE
+  --  all_data_reg : FOR J IN 17 DOWNTO 0 GENERATE
+  --    PROCESS (clk, cnv_rstn)
+  --    BEGIN  -- PROCESS
+  --      IF cnv_rstn = '0' THEN              -- asynchronous reset (active low)
+  --        sample_filter_v2_out_sync(I,J) <= '0';
+  --      ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
+  --        IF sample_filter_v2_out_sync_val_t = '1' THEN
+  --          sample_filter_v2_out_sync(I,J) <= sample_filter_v2_out_reg(I,J);
+  --        END IF;
+  --      END IF;
+  --    END PROCESS;
+  --  END GENERATE all_data_reg;
+  --END GENERATE all_sample_reg2;
 
 
   -----------------------------------------------------------------------------
   -- DATA_SHAPING
   ----------------------------------------------------------------------------- 
   all_data_shaping_in_loop : FOR I IN 17 DOWNTO 0 GENERATE
-    sample_data_shaping_f0_s(I) <= sample_filter_v2_out_sync(0, I);
-    sample_data_shaping_f1_s(I) <= sample_filter_v2_out_sync(1, I);
-    sample_data_shaping_f2_s(I) <= sample_filter_v2_out_sync(2, I);
+    sample_data_shaping_f0_s(I) <= sample_filter_v2_out(0, I);
+    sample_data_shaping_f1_s(I) <= sample_filter_v2_out(1, I);
+    sample_data_shaping_f2_s(I) <= sample_filter_v2_out(2, I);
   END GENERATE all_data_shaping_in_loop;
 
   sample_data_shaping_f1_f0_s <= sample_data_shaping_f1_s - sample_data_shaping_f0_s;
@@ -330,7 +322,7 @@ BEGIN
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
       sample_data_shaping_out_val <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      sample_data_shaping_out_val <= sample_filter_v2_out_sync_val;
+      sample_data_shaping_out_val <= sample_filter_v2_out_val;
     END IF;
   END PROCESS;
 
@@ -347,22 +339,22 @@ BEGIN
         sample_data_shaping_out(6, j) <= '0';
         sample_data_shaping_out(7, j) <= '0';
       ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-        sample_data_shaping_out(0, j) <= sample_filter_v2_out_sync(0, j);
+        sample_data_shaping_out(0, j) <= sample_filter_v2_out(0, j);
         IF data_shaping_SP0 = '1' THEN
           sample_data_shaping_out(1, j) <= sample_data_shaping_f1_f0_s(j);
         ELSE
-          sample_data_shaping_out(1, j) <= sample_filter_v2_out_sync(1, j);
+          sample_data_shaping_out(1, j) <= sample_filter_v2_out(1, j);
         END IF;
         IF data_shaping_SP1 = '1' THEN
           sample_data_shaping_out(2, j) <= sample_data_shaping_f2_f1_s(j);
         ELSE
-          sample_data_shaping_out(2, j) <= sample_filter_v2_out_sync(2, j);
+          sample_data_shaping_out(2, j) <= sample_filter_v2_out(2, j);
         END IF;
-        sample_data_shaping_out(3, j) <= sample_filter_v2_out_sync(3, j);
-        sample_data_shaping_out(4, j) <= sample_filter_v2_out_sync(4, j);
-        sample_data_shaping_out(5, j) <= sample_filter_v2_out_sync(5, j);
-        sample_data_shaping_out(6, j) <= sample_filter_v2_out_sync(6, j);
-        sample_data_shaping_out(7, j) <= sample_filter_v2_out_sync(7, j);
+        sample_data_shaping_out(3, j) <= sample_filter_v2_out(3, j);
+        sample_data_shaping_out(4, j) <= sample_filter_v2_out(4, j);
+        sample_data_shaping_out(5, j) <= sample_filter_v2_out(5, j);
+        sample_data_shaping_out(6, j) <= sample_filter_v2_out(6, j);
+        sample_data_shaping_out(7, j) <= sample_filter_v2_out(7, j);
       END IF;
     END PROCESS;
   END GENERATE;

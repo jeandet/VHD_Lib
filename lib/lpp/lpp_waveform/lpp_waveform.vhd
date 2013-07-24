@@ -268,7 +268,6 @@ BEGIN  -- beh
      status_full       => status_full,
      status_full_ack   => status_full_ack,
      status_full_err   => status_full_err,
---     status_new_err    => status_new_err,
      addr_data_f0      => addr_data_f0,
      addr_data_f1      => addr_data_f1,
      addr_data_f2      => addr_data_f2,
