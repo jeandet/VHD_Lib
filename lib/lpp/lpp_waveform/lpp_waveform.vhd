@@ -237,9 +237,6 @@ BEGIN  -- beh
       time_wen => time_wen,
       data_wen => data_wen,
       wdata    => wdata);
-
-  --time_ren <= (OTHERS => '1');
-  --data_ren <= (OTHERS => '1');
  
   pp_waveform_dma_1: lpp_waveform_dma
    GENERIC MAP (
@@ -248,29 +245,21 @@ BEGIN  -- beh
      hindex                 => hindex,
      nb_burst_available_size => nb_burst_available_size)
    PORT MAP (
-     HCLK              => clk,                 
-     HRESETn           => rstn,                
-     AHB_Master_In     => AHB_Master_In,       
-     AHB_Master_Out    => AHB_Master_Out,
-     data_ready        => ready,
-     data              => rdata,
-     data_data_ren     => data_ren,
-     data_time_ren     => time_ren,
-     --data_f0_in        => data_f0_out,         
-     --data_f1_in        => data_f1_out,         
-     --data_f2_in        => data_f2_out,         
-     --data_f3_in        => data_f3_out,         
-     --data_f0_in_valid  => data_f0_out_valid,   
-     --data_f1_in_valid  => data_f1_out_valid,   
-     --data_f2_in_valid  => data_f2_out_valid,   
-     --data_f3_in_valid  => data_f3_out_valid,   
+     HCLK               => clk,                 
+     HRESETn            => rstn,                
+     AHB_Master_In      => AHB_Master_In,       
+     AHB_Master_Out     => AHB_Master_Out,
+     data_ready         => ready,
+     data               => rdata,
+     data_data_ren      => data_ren,
+     data_time_ren      => time_ren,  
      nb_burst_available => nb_burst_available,   
-     status_full       => status_full,
-     status_full_ack   => status_full_ack,
-     status_full_err   => status_full_err,
-     addr_data_f0      => addr_data_f0,
-     addr_data_f1      => addr_data_f1,
-     addr_data_f2      => addr_data_f2,
-     addr_data_f3      => addr_data_f3);
+     status_full        => status_full,
+     status_full_ack    => status_full_ack,
+     status_full_err    => status_full_err,
+     addr_data_f0       => addr_data_f0,
+     addr_data_f1       => addr_data_f1,
+     addr_data_f2       => addr_data_f2,
+     addr_data_f3       => addr_data_f3);
 
 END beh;
