@@ -27,7 +27,7 @@ ENTITY lpp_top_acq IS
     clk             : IN  STD_LOGIC;    -- 25 MHz
     rstn            : IN  STD_LOGIC;
     --
-    sample_f0_wen : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+    sample_f0_wen   : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
     sample_f0_wdata : OUT STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
     --
     sample_f1_wen   : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);

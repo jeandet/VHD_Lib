@@ -151,7 +151,7 @@ BEGIN
     GENERIC MAP (
       hindex   => hindex,
       vendorid => VENDOR_LPP,
-      deviceid => 0,
+      deviceid => 11,
       version  => 0,
       syncrst  => 1,
       boundary => 1)                    -- FIX 11/01/2013

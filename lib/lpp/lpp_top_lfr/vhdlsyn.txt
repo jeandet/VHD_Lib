@@ -1,8 +1,13 @@
 lpp_top_lfr_pkg.vhd
+lpp_lfr_pkg.vhd
 lpp_top_apbreg.vhd
 lpp_top_acq.vhd
 lpp_top_lfr_wf_picker.vhd
 lpp_top_lfr_wf_picker_ip.vhd
 lpp_top_lfr_wf_picker_ip_whitout_filter.vhd
 top_lfr_wf_picker.vhd
+lpp_lfr_apbreg.vhd
 top_wf_picker.vhd
+lpp_lfr_filter.vhd
+lpp_lfr_ms.vhd
+lpp_lfr.vhd
