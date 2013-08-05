@@ -1,4 +1,3 @@
-lpp_waveform_pkg.vhd
 lpp_waveform.vhd
 lpp_waveform_burst.vhd
 lpp_waveform_dma.vhd
@@ -8,5 +7,7 @@ lpp_waveform_dma_send_Nword.vhd
 lpp_waveform_fifo.vhd
 lpp_waveform_fifo_arbiter.vhd
 lpp_waveform_fifo_ctrl.vhd
+lpp_waveform_pkg.vhd
 lpp_waveform_snapshot.vhd
 lpp_waveform_snapshot_controler.vhd
+lpp_waveform_valid_ack.vhd

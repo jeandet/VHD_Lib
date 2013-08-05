@@ -1,0 +1,13 @@
+set -tmpdir xst/projnav.tmp
+set -xsthdpdir xst
+run
+-opt_mode Speed
+-opt_level 2
+-fsm_extract no
+-iob true
+-ifn top_files.prj
+-bus_delimiter ()
+-ifmt mixed
+-p A3PE1500-""Std
+-top top
+-ofn top -define {XSTDUMMY } -sd C:/opt/grlib-gpl-1.1.0-b4108/netlists/xilinx/PROASIC3

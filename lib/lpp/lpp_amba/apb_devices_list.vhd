@@ -31,11 +31,9 @@ constant LPP_IIR_CEL_FILTER   : amba_device_type := 16#10#;
 constant LPP_FIFO_PID   : amba_device_type := 16#11#;
 constant LPP_FFT   : amba_device_type := 16#12#;
 constant LPP_MATRIX   : amba_device_type := 16#13#;
-constant LPP_BALISE   : amba_device_type := 16#14#;
+constant LPP_DELAY   : amba_device_type := 16#14#;
 constant LPP_USB   : amba_device_type := 16#15#;
-constant LPP_DELAY   : amba_device_type := 16#16#;
-constant LPP_DMA_TYPE   : amba_device_type := 16#17#;
-constant LPP_BOOTLOADER_TYPE   : amba_device_type := 16#18#;
+constant LPP_BALISE   : amba_device_type := 16#16#;
 
 
 end;
