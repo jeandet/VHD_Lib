@@ -25,7 +25,6 @@ LIBRARY grlib;
 USE grlib.amba.ALL;
 USE grlib.stdlib.ALL;
 USE grlib.devices.ALL;
-LIBRARY lpp;
 
 
 
@@ -204,12 +203,22 @@ PACKAGE iir_filter IS
           ) ;
   END COMPONENT;
 
-  COMPONENT RAM_CEL
+COMPONENT RAM_CEL is
+    generic(DataSz        :   integer range 1 to 32 := 8;
+            abits         :   integer range 2 to 12 := 8);
+    port( WD : in std_logic_vector(DataSz-1 downto 0); RD : out
+        std_logic_vector(DataSz-1 downto 0);WEN, REN : in std_logic;
+        WADDR : in std_logic_vector(abits-1 downto 0); RADDR : in 
+        std_logic_vector(abits-1 downto 0);RWCLK, RESET : in std_logic
+        ) ;
+end COMPONENT;
+
+  COMPONENT RAM_CEL_N
     GENERIC (
-      Sample_SZ : INTEGER);
+      size : INTEGER);
     PORT (
-      WD           : IN  STD_LOGIC_VECTOR(Sample_SZ-1 DOWNTO 0);
-      RD           : OUT STD_LOGIC_VECTOR(Sample_SZ-1 DOWNTO 0);
+      WD           : IN  STD_LOGIC_VECTOR(size-1 DOWNTO 0);
+      RD           : OUT STD_LOGIC_VECTOR(size-1 DOWNTO 0);
       WEN, REN     : IN  STD_LOGIC;
       WADDR        : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
       RADDR        : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);

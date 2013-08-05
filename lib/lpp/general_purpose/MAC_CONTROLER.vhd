@@ -22,9 +22,6 @@
 library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
-library lpp;
-use lpp.general_purpose.all;
-
 
 --IDLE =00 MAC =01 MULT =10 ADD =11
 

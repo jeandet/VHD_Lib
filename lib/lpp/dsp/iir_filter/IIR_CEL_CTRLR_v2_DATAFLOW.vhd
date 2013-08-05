@@ -55,7 +55,8 @@ ENTITY IIR_CEL_CTRLR_v2_DATAFLOW IS
     --
     alu_sel_input : IN STD_LOGIC;
     alu_sel_coeff : IN STD_LOGIC_VECTOR(Coef_sel_SZ-1 DOWNTO 0);
-    alu_ctrl      : IN STD_LOGIC_VECTOR(3 DOWNTO 0);--(MAC_op,  MULT_with_clear_ADD, IDLE)
+    alu_ctrl      : IN STD_LOGIC_VECTOR(2 DOWNTO 0);--(MAC_op,  MULT_with_clear_ADD, IDLE)
+    alu_comp      : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
     -- DATA
     sample_in  : IN  STD_LOGIC_VECTOR(Sample_SZ-1 DOWNTO 0);
     sample_out : OUT STD_LOGIC_VECTOR(Sample_SZ-1 DOWNTO 0)
@@ -195,11 +196,13 @@ BEGIN
     GENERIC MAP (
       Arith_en   => 1,
       Input_SZ_1 => Sample_SZ,
-      Input_SZ_2 => Coef_SZ)
+      Input_SZ_2 => Coef_SZ,
+      COMP_EN    => 1)
     PORT MAP (
       clk   => clk,
       reset => rstn,
       ctrl  => alu_ctrl,
+      comp  => alu_comp,
       OP1   => alu_sample,
       OP2   => alu_coef,
       RES   => alu_output_s);

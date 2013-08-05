@@ -18,97 +18,181 @@
 -------------------------------------------------------------------------------
 --                    Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@lpp.polytechnique.fr
-----------------------------------------------------------------------------
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-library lpp;
-use lpp.lpp_ad_conv.all;
-use lpp.general_purpose.Clk_divider;
+-------------------------------------------------------------------------------
+-- MODIFIED by  Jean-christophe PELLION
+--              jean-christophe.pellion@lpp.polytechnique.fr
+-------------------------------------------------------------------------------
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+LIBRARY lpp;
+USE lpp.lpp_ad_conv.ALL;
+USE lpp.general_purpose.SYNC_FF;
 
---! \brief AD7688 driver, generates all needed signal to drive this ADC.
---!
---! \author Alexis Jeandet alexis.jeandet@lpp.polytechnique.fr
+ENTITY AD7688_drvr IS
+  GENERIC(
+    ChanelCount     : INTEGER;
+    ncycle_cnv_high : INTEGER := 79;
+    ncycle_cnv      : INTEGER := 500);
+  PORT (
+    -- CONV --
+    cnv_clk   : IN  STD_LOGIC;
+    cnv_rstn  : IN  STD_LOGIC;
+    cnv_run : IN  STD_LOGIC;
+    cnv       : OUT STD_LOGIC;
 
-entity AD7688_drvr is
-generic(
-        ChanelCount     :integer; --! Number of ADC you whant to drive
-        clkkHz          :integer  --! System clock frequency in kHz usefull to generate some pulses with good width.
-        );
-Port(
-        clk       : in  STD_LOGIC; --! System clock
-        rstn      : in  STD_LOGIC; --! System reset
-        enable    : in std_logic;  --! Negative enable
-        smplClk   : in  STD_LOGIC; --! Sampling clock
-        DataReady : out std_logic; --! New sample available
-        smpout    : out Samples_out(ChanelCount-1 downto 0); --! Samples 	
-        AD_in     : in  AD7688_in(ChanelCount-1 downto 0);   --! Input signals for ADC see lpp.lpp_ad_conv
-        AD_out    : out AD7688_out                           --! Output signals for ADC see lpp.lpp_ad_conv
-);
-end AD7688_drvr;
+    -- DATA --
+    clk  : IN  STD_LOGIC;
+    rstn : IN  STD_LOGIC;
+    sck  : OUT STD_LOGIC;
+    sdo  : IN  STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
 
-architecture ar_AD7688_drvr of AD7688_drvr is
+    sample     : OUT Samples(ChanelCount-1 DOWNTO 0);
+    sample_val : OUT STD_LOGIC
+    );    
+END AD7688_drvr;
 
-constant        convTrigger     :       integer:=  clkkHz*16/10000;  --tconv = 1.6µs
+ARCHITECTURE ar_AD7688_drvr OF AD7688_drvr IS
 
-signal i                : integer range 0 to convTrigger :=0;
-signal clk_int          : std_logic;
-signal clk_int_inv      : std_logic;
-signal smplClk_reg      : std_logic;
-signal cnv_int          : std_logic;
-signal reset            : std_logic;
-
-begin
-
-clkdiv: if clkkHz>=66000 generate 
-        clkdivider: entity work.Clk_divider
-                generic map(clkkHz*1000,60000000)
-                Port map( clk ,reset,clk_int);
-end generate;
-
-clknodiv: if clkkHz<66000 generate 
-nodiv:  clk_int <=      clk;
-end generate;
-
-clk_int_inv     <=      not clk_int;
-
-AD_out.CNV      <=      cnv_int;	
-AD_out.SCK      <=      clk_int;
-reset           <=      rstn and enable;
-
-sckgen: process(clk,reset)
-begin
-        if reset = '0' then
-                i <= 0;
-                cnv_int         <=      '0';
-                smplClk_reg     <=      '0';
-        elsif clk'event and clk = '1' then
-                if smplClk = '1' and smplClk_reg = '0' then
-                        if i = convTrigger then
-                                smplClk_reg     <=      '1';
-                                i       <=      0;
-                                cnv_int	<=      '0';
-                        else
-                                i       <=      i+1;
-                                cnv_int <=      '1';
-                        end if;
-                elsif smplClk = '0' and smplClk_reg = '1' then
-                        smplClk_reg     <=      '0';
-                end if;
-        end if;
-end process;
+  COMPONENT SYNC_FF
+    GENERIC (
+      NB_FF_OF_SYNC : INTEGER);
+    PORT (
+      clk    : IN  STD_LOGIC;
+      rstn   : IN  STD_LOGIC;
+      A      : IN  STD_LOGIC;
+      A_sync : OUT STD_LOGIC);
+  END COMPONENT;
 
 
+  SIGNAL cnv_cycle_counter  : INTEGER;
+  SIGNAL cnv_s              : STD_LOGIC;
+  SIGNAL cnv_sync           : STD_LOGIC;
+  SIGNAL cnv_sync_r         : STD_LOGIC;
+  SIGNAL cnv_done           : STD_LOGIC;
+  SIGNAL sample_bit_counter : INTEGER;
+  SIGNAL shift_reg          : Samples(ChanelCount-1 DOWNTO 0);
 
-spidrvr: entity work.AD7688_spi_if 
-        generic map(ChanelCount)
-        Port map(clk_int_inv,reset,cnv_int,DataReady,AD_in,smpout);
+  SIGNAL cnv_run_sync : STD_LOGIC;
+  
+BEGIN
+  -----------------------------------------------------------------------------
+  -- CONV
+  -----------------------------------------------------------------------------
+  PROCESS (cnv_clk, cnv_rstn)
+  BEGIN  -- PROCESS
+    IF cnv_rstn = '0' THEN              -- asynchronous reset (active low)
+      cnv_cycle_counter <= 0;
+      cnv_s             <= '0';
+    ELSIF cnv_clk'EVENT AND cnv_clk = '1' THEN  -- rising clock edge
+      IF cnv_run = '1' THEN
+        IF cnv_cycle_counter < ncycle_cnv THEN
+          cnv_cycle_counter <= cnv_cycle_counter +1;
+          IF cnv_cycle_counter < ncycle_cnv_high THEN
+            cnv_s <= '1';
+          ELSE
+            cnv_s <= '0';
+          END IF;
+        ELSE
+          cnv_s             <= '1';
+          cnv_cycle_counter <= 0;
+        END IF;
+      ELSE
+        cnv_s             <= '0';
+        cnv_cycle_counter <= 0;
+      END IF;
+    END IF;
+  END PROCESS;
+
+  cnv <= cnv_s;
+
+  -----------------------------------------------------------------------------
 
 
+  -----------------------------------------------------------------------------
+  -- SYNC CNV
+  -----------------------------------------------------------------------------
+  
+  SYNC_FF_cnv : SYNC_FF
+    GENERIC MAP (
+      NB_FF_OF_SYNC => 2)
+    PORT MAP (
+      clk    => clk,
+      rstn   => rstn,
+      A      => cnv_s,
+      A_sync => cnv_sync);
 
-end ar_AD7688_drvr;
+  PROCESS (clk, rstn)
+  BEGIN
+    IF rstn = '0' THEN
+      cnv_sync_r <= '0';
+      cnv_done   <= '0';
+    ELSIF clk'EVENT AND clk = '1' THEN
+      cnv_sync_r <= cnv_sync;
+      cnv_done   <= (NOT cnv_sync) AND cnv_sync_r;
+    END IF;
+  END PROCESS;
+
+  -----------------------------------------------------------------------------
+  
+  SYNC_FF_run : SYNC_FF
+    GENERIC MAP (
+      NB_FF_OF_SYNC => 2)
+    PORT MAP (
+      clk    => clk,
+      rstn   => rstn,
+      A      => cnv_run,
+      A_sync => cnv_run_sync);
 
 
+  
+  -----------------------------------------------------------------------------
+  -- DATA
+  -----------------------------------------------------------------------------
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS
+    IF rstn = '0' THEN
+      FOR l IN 0 TO ChanelCount-1 LOOP
+        shift_reg(l) <= (OTHERS => '0');
+	    sample(l)(15 DOWNTO 0)           <= (OTHERS => '0');
+      END LOOP;
+      sample_bit_counter <= 0;
+      sample_val         <= '0';
+      SCK                <= '1';
+      
+    ELSIF clk'EVENT AND clk = '1' THEN
+      
+      IF cnv_run_sync = '0' THEN
+        sample_bit_counter <= 0;
+      ELSIF cnv_done = '1' THEN
+        sample_bit_counter <= 1;
+      ELSIF sample_bit_counter > 0 AND sample_bit_counter < 32 THEN
+        sample_bit_counter <= sample_bit_counter + 1;
+      END IF;
 
+      IF (sample_bit_counter MOD 2) = 1 THEN
+        FOR l IN 0 TO ChanelCount-1 LOOP
+          --shift_reg(l)(15)          <= sdo(l);
+          --shift_reg(l)(14 DOWNTO 0) <= shift_reg(l)(15 DOWNTO 1);
+          shift_reg(l)(0)           <= sdo(l);
+          shift_reg(l)(14 DOWNTO 1) <= shift_reg(l)(13 DOWNTO 0);
+        END LOOP;
+        SCK <= '0';
+      ELSE
+        SCK <= '1';
+      END IF;
 
-
-
+      IF sample_bit_counter = 31 THEN
+        sample_val <= '1';
+        FOR l IN 0 TO ChanelCount-1 LOOP
+          --sample(l)(15)          <= sdo(l);
+          --sample(l)(14 DOWNTO 0) <= shift_reg(l)(15 DOWNTO 1);
+          sample(l)(0)           <= sdo(l);
+          sample(l)(15 DOWNTO 1) <= shift_reg(l)(14 DOWNTO 0);
+        END LOOP;
+      ELSE
+        sample_val <= '0';
+      END IF;
+    END IF;
+  END PROCESS;
+  
+END ar_AD7688_drvr;

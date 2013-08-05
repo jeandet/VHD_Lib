@@ -169,8 +169,10 @@ BEGIN
 
       IF (sample_bit_counter MOD 2) = 1 THEN
         FOR l IN 0 TO ChanelCount-1 LOOP
-          shift_reg(l)(15)          <= sdo(l);
-          shift_reg(l)(14 DOWNTO 0) <= shift_reg(l)(15 DOWNTO 1);
+          --shift_reg(l)(15)          <= sdo(l);
+          --shift_reg(l)(14 DOWNTO 0) <= shift_reg(l)(15 DOWNTO 1);
+          shift_reg(l)(0)           <= sdo(l);
+          shift_reg(l)(15 DOWNTO 1) <= shift_reg(l)(14 DOWNTO 0);
         END LOOP;
         SCK <= '0';
       ELSE
@@ -180,8 +182,10 @@ BEGIN
       IF sample_bit_counter = 31 THEN
         sample_val <= '1';
         FOR l IN 0 TO ChanelCount-1 LOOP
-          sample(l)(15)           <= sdo(l);
-          sample(l)(14 DOWNTO 0) <= shift_reg(l)(15 DOWNTO 1);
+          --sample(l)(15)          <= sdo(l);
+          --sample(l)(14 DOWNTO 0) <= shift_reg(l)(15 DOWNTO 1);
+          sample(l)(0)           <= sdo(l);
+          sample(l)(15 DOWNTO 1) <= shift_reg(l)(14 DOWNTO 0);
         END LOOP;
       ELSE
         sample_val <= '0';

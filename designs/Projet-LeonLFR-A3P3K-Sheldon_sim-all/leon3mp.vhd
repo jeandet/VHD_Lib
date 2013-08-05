@@ -607,17 +607,6 @@ BEGIN
       header_val     => header_val,
       header_ack     => header_ack);
 
-  --fifo_latency_correction_1 : fifo_latency_correction
-  --  PORT MAP (
-  --    HCLK       => clkm,
-  --    HRESETn    => resetn,
-  --    fifo_data  => fifo_data,
-  --    fifo_empty => fifo_empty,
-  --    fifo_ren   => fifo_ren,
-  --    dma_data   => dma_data,
-  --    dma_empty  => dma_empty,
-  --    dma_ren    => dma_ren);
-
   fifo_test_dma_1 : fifo_test_dma
     GENERIC MAP (
       tech   => fabtech,

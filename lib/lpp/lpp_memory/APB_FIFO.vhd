@@ -33,7 +33,7 @@ library lpp;
 use lpp.lpp_amba.all;
 use lpp.apb_devices_list.all;
 use lpp.lpp_memory.all;
-
+use lpp.iir_filter.all;
 
 entity APB_FIFO is
 generic (
@@ -47,6 +47,7 @@ generic (
     Data_sz        : integer := 16;
     Addr_sz        : integer := 9;
     Enable_ReUse   : std_logic := '0';
+    Mem_use        : integer := use_RAM;
     R              : integer := 1;
     W              : integer := 1
     );
@@ -175,7 +176,7 @@ Full <= sFull;
 
 fifos: for i in 0 to FifoCnt-1 generate
     FIFO0 : lpp_fifo
-        generic map (tech,Enable_ReUse,Data_sz,Addr_sz)
+        generic map (tech,Mem_use,Enable_ReUse,Data_sz,Addr_sz)
         port map(rst,sReUse(i),srclk,sRen(i),sRDATA(i),sEmpty(i),sRADDR(i),swclk,sWen(i),sWDATA(i),sFull(i),sWADDR(i));
 end generate;
 

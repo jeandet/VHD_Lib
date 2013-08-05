@@ -22,7 +22,8 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-use work.FFT_config.all;
+library lpp;
+use lpp.FFT_config.all;
 
 --! Programme qui va permettre de générer des flags utilisés au niveau du driver C
 

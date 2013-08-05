@@ -19,166 +19,169 @@
 --                    Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@lpp.polytechnique.fr
 -------------------------------------------------------------------------------
-library ieee;
-use ieee.std_logic_1164.all;
-library gaisler;
-use gaisler.misc.all;
-use gaisler.memctrl.all;
-library techmap;
-use techmap.gencomp.all;
-use techmap.allclkgen.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+LIBRARY gaisler;
+USE gaisler.misc.ALL;
+USE gaisler.memctrl.ALL;
+LIBRARY techmap;
+USE techmap.gencomp.ALL;
+USE techmap.allclkgen.ALL;
 
 
 
 
-entity ssram_plugin is 
-generic (tech : integer := 0);
-port
-(
-    clk             : in  std_logic;
-    mem_ctrlr_o     : in  memory_out_type;
-    SSRAM_CLK       : out std_logic;
-    nBWa            : out std_logic;
-    nBWb            : out std_logic;
-    nBWc            : out std_logic;
-    nBWd            : out std_logic;
-    nBWE            : out std_logic;
-    nADSC           : out std_logic;
-    nADSP           : out std_logic;
-    nADV            : out std_logic;
-    nGW             : out std_logic;
-    nCE1            : out std_logic;
-    CE2             : out std_logic;
-    nCE3            : out std_logic;
-    nOE             : out std_logic;
-    MODE            : out std_logic;
-    ZZ              : out std_logic
-);
-end entity;
+ENTITY ssram_plugin IS
+  GENERIC (tech : INTEGER := 0);
+  PORT
+    (
+      clk         : IN  STD_LOGIC;
+      mem_ctrlr_o : IN  memory_out_type;
+      SSRAM_CLK   : OUT STD_LOGIC;
+      nBWa        : OUT STD_LOGIC;
+      nBWb        : OUT STD_LOGIC;
+      nBWc        : OUT STD_LOGIC;
+      nBWd        : OUT STD_LOGIC;
+      nBWE        : OUT STD_LOGIC;
+      nADSC       : OUT STD_LOGIC;
+      nADSP       : OUT STD_LOGIC;
+      nADV        : OUT STD_LOGIC;
+      nGW         : OUT STD_LOGIC;
+      nCE1        : OUT STD_LOGIC;
+      CE2         : OUT STD_LOGIC;
+      nCE3        : OUT STD_LOGIC;
+      nOE         : OUT STD_LOGIC;
+      MODE        : OUT STD_LOGIC;
+      ZZ          : OUT STD_LOGIC
+      );
+END ENTITY;
 
 
 
 
 
 
-architecture ar_ssram_plugin of ssram_plugin is
+ARCHITECTURE ar_ssram_plugin OF ssram_plugin IS
 
 
-signal nADSPint : std_logic:='1';
-signal nOEint   : std_logic:='1';
-signal RAMSN_reg: std_logic:='1';
-signal OEreg    : std_logic:='1';
-signal nBWaint   : std_logic:='1';
-signal nBWbint   : std_logic:='1';
-signal nBWcint   : std_logic:='1';
-signal nBWdint   : std_logic:='1';
-signal nBWEint   : std_logic:='1';
-signal nCE1int   : std_logic:='1';
-signal CE2int    : std_logic:='0';
-signal nCE3int   : std_logic:='1';
+  SIGNAL nADSPint  : STD_LOGIC := '1';
+  SIGNAL nOEint    : STD_LOGIC := '1';
+  SIGNAL RAMSN_reg : STD_LOGIC := '1';
+  SIGNAL OEreg     : STD_LOGIC := '1';
+  SIGNAL nBWaint   : STD_LOGIC := '1';
+  SIGNAL nBWbint   : STD_LOGIC := '1';
+  SIGNAL nBWcint   : STD_LOGIC := '1';
+  SIGNAL nBWdint   : STD_LOGIC := '1';
+  SIGNAL nBWEint   : STD_LOGIC := '1';
+  SIGNAL nCE1int   : STD_LOGIC := '1';
+  SIGNAL CE2int    : STD_LOGIC := '0';
+  SIGNAL nCE3int   : STD_LOGIC := '1';
 
-Type stateT is (idle,st1,st2,st3,st4);
-signal state : stateT;
+  TYPE   stateT IS (idle, st1, st2, st3, st4);
+  SIGNAL state : stateT;
 
-begin
+--SIGNAL nclk : STD_LOGIC;
 
-process(clk , mem_ctrlr_o.RAMSN(0))
-begin
-    if mem_ctrlr_o.RAMSN(0) ='1' then
-        state   <=  idle;
-    elsif clk ='1' and clk'event then
-        case state is
-            when idle =>
-                state   <=  st1;
-            when st1 =>
-                state   <=  st2;
-            when st2 =>
-                state   <=  st3;
-            when st3 =>
-                state   <=  st4;
-            when st4 =>
-                state   <=  st1;
-        end case;
-    end if;
-end process;
+BEGIN
 
-ssram_clk_pad : outpad generic map (tech => tech)
-    port map (SSRAM_CLK,not clk);
+  PROCESS(clk , mem_ctrlr_o.RAMSN(0))
+  BEGIN
+    IF mem_ctrlr_o.RAMSN(0) = '1' then
+      state <= idle;
+    ELSIF clk = '1' and clk'event then
+      CASE state IS
+        WHEN idle =>
+          state <= st1;
+        WHEN st1 =>
+          state <= st2;
+        WHEN st2 =>
+          state <= st3;
+        WHEN st3 =>
+          state <= st4;
+        WHEN st4 =>
+          state <= st1;
+      END CASE;
+    END IF;
+  END PROCESS;
+
+--nclk <= NOT clk;
+  ssram_clk_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (SSRAM_CLK, NOT clk);
 
 
-nBWaint  <=  mem_ctrlr_o.WRN(3)or mem_ctrlr_o.ramsn(0);
-nBWa_pad : outpad generic map (tech => tech)
-    port map (nBWa,nBWaint);
+  nBWaint <= mem_ctrlr_o.WRN(3)OR mem_ctrlr_o.ramsn(0);
+  nBWa_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (nBWa, nBWaint);
 
-nBWbint  <=  mem_ctrlr_o.WRN(2)or mem_ctrlr_o.ramsn(0);
-nBWb_pad : outpad generic map (tech => tech)
-    port map (nBWb, nBWbint);
+  nBWbint <= mem_ctrlr_o.WRN(2)OR mem_ctrlr_o.ramsn(0);
+  nBWb_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (nBWb, nBWbint);
 
-nBWcint  <=  mem_ctrlr_o.WRN(1)or mem_ctrlr_o.ramsn(0);
-nBWc_pad : outpad generic map (tech => tech)
-    port map (nBWc, nBWcint);
+  nBWcint <= mem_ctrlr_o.WRN(1)OR mem_ctrlr_o.ramsn(0);
+  nBWc_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (nBWc, nBWcint);
 
-nBWdint  <=  mem_ctrlr_o.WRN(0)or mem_ctrlr_o.ramsn(0);
-nBWd_pad : outpad generic map (tech => tech)
-    port map (nBWd, nBWdint);
+  nBWdint <= mem_ctrlr_o.WRN(0)OR mem_ctrlr_o.ramsn(0);
+  nBWd_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (nBWd, nBWdint);
 
-nBWEint  <=  mem_ctrlr_o.WRITEN or mem_ctrlr_o.ramsn(0);
-nBWE_pad : outpad generic map (tech => tech)
-    port map (nBWE, nBWEint);
+  nBWEint <= mem_ctrlr_o.WRITEN OR mem_ctrlr_o.ramsn(0);
+  nBWE_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (nBWE, nBWEint);
 
-nADSC_pad : outpad generic map (tech => tech)
-    port map (nADSC, '1');
+  nADSC_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (nADSC, '1');
 
 --nADSPint    <=  not((RAMSN_reg xor mem_ctrlr_o.RAMSN(0)) and RAMSN_reg);
-nADSPint    <=  '0' when state = st1 else '1';
+  nADSPint <= '0' WHEN state = st1 ELSE '1';
 
-process(clk)
-begin
-    if clk'event and clk = '1' then
-        RAMSN_reg   <=  mem_ctrlr_o.RAMSN(0);
-    end if;
-end process;
+  PROCESS(clk)
+  BEGIN
+    IF clk'EVENT AND clk = '1' THEN
+      RAMSN_reg <= mem_ctrlr_o.RAMSN(0);
+    END IF;
+  END PROCESS;
 
-nADSP_pad : outpad generic map (tech => tech)
-    port map (nADSP, nADSPint);
+  nADSP_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (nADSP, nADSPint);
 
-nADV_pad : outpad generic map (tech => tech)
-    port map (nADV, '1');       
+  nADV_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (nADV, '1');
 
-nGW_pad : outpad generic map (tech => tech)
-    port map (nGW, '1');
+  nGW_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (nGW, '1');
 
-nCE1int <= nADSPint or mem_ctrlr_o.address(31) or (not mem_ctrlr_o.address(30)) or mem_ctrlr_o.address(29)  or mem_ctrlr_o.address(28);
-CE2int <= (not mem_ctrlr_o.address(27)) and (not mem_ctrlr_o.address(26)) and (not mem_ctrlr_o.address(25))  and (not mem_ctrlr_o.address(24));
-nCE3int <= mem_ctrlr_o.address(23) or mem_ctrlr_o.address(22) or mem_ctrlr_o.address(21)  or mem_ctrlr_o.address(20);
+  nCE1int <= nADSPint OR mem_ctrlr_o.address(31) OR (NOT mem_ctrlr_o.address(30)) OR mem_ctrlr_o.address(29) OR mem_ctrlr_o.address(28);
+  CE2int  <= (NOT mem_ctrlr_o.address(27)) AND (NOT mem_ctrlr_o.address(26)) AND (NOT mem_ctrlr_o.address(25)) AND (NOT mem_ctrlr_o.address(24));
+  nCE3int <= mem_ctrlr_o.address(23) OR mem_ctrlr_o.address(22) OR mem_ctrlr_o.address(21) OR mem_ctrlr_o.address(20);
 
-nCE1_pad : outpad generic map (tech => tech)
-    port map (nCE1, nCE1int);
+  nCE1_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (nCE1, nCE1int);
 
-CE2_pad : outpad generic map (tech => tech)
-    port map (CE2, CE2int);
+  CE2_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (CE2, CE2int);
 
-nCE3_pad : outpad generic map (tech => tech)
-    port map (nCE3, nCE3int);
+  nCE3_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (nCE3, nCE3int);
 
-nOE_pad : outpad generic map (tech => tech)
-    port map (nOE, nOEint);
+  nOE_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (nOE, nOEint);
 
-process(clk)
-begin
-    if clk'event and clk = '1' then
-        OEreg   <=  mem_ctrlr_o.OEN;
-    end if;
-end process;
+  PROCESS(clk)
+  BEGIN
+    IF clk'EVENT AND clk = '1' THEN
+      OEreg <= mem_ctrlr_o.OEN;
+    END IF;
+  END PROCESS;
 
- 
---nOEint  <=  OEreg or mem_ctrlr_o.RAMOEN(0);	
-nOEint  <=  '0' when state = st2 or state = st3 or state = st4 else '1';	
- 
-MODE_pad : outpad generic map (tech => tech)
-    port map (MODE, '0');      
 
-ZZ_pad : outpad generic map (tech => tech)
-    port map (ZZ, '0');
+--nOEint  <=  OEreg or mem_ctrlr_o.RAMOEN(0);   
+  nOEint <= '0' WHEN state = st2 OR state = st3 OR state = st4 ELSE '1';
 
-end architecture;
+  MODE_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (MODE, '0');
+
+  ZZ_pad : outpad GENERIC MAP (tech => tech)
+    PORT MAP (ZZ, '0');
+
+END ARCHITECTURE;
