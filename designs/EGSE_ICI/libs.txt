@@ -1,1 +1,0 @@
-grlib proasic3 dware synplify techmap spw eth opencores gaisler esa fmf spansion gsi lpp cypress work 

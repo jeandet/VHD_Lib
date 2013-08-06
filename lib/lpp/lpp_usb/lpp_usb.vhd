@@ -53,7 +53,7 @@ end component;
 component FX2_WithFIFO is
 generic(
     tech          :   integer := 0;
-    Mem_use       :   integer := use_RAM;
+    Mem_use       :   integer := 0;
     Enable_ReUse  :   std_logic := '0'
     );
 port(

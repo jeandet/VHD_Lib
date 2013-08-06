@@ -72,6 +72,29 @@ generic (
     );
 end component;
 
+component FIFO_pipeline is
+generic(
+    tech          :   integer := 0;
+    Mem_use       :   integer := use_RAM;
+    fifoCount     :   integer range 2 to 32 := 8;
+    DataSz        :   integer range 1 to 32 := 8;
+    abits         :   integer range 2 to 12 := 8
+    );
+port(
+    rstn    :   in std_logic;
+    ReUse   :   in std_logic;
+    rclk    :   in std_logic;
+    ren     :   in std_logic;
+    rdata   :   out std_logic_vector(DataSz-1 downto 0);
+    empty   :   out std_logic;
+    raddr   :   out std_logic_vector(abits-1 downto 0);
+    wclk    :   in std_logic;
+    wen     :   in std_logic;
+    wdata   :   in std_logic_vector(DataSz-1 downto 0);
+    full    :   out std_logic;
+    waddr   :   out std_logic_vector(abits-1 downto 0)
+);
+end component;
 
 component lpp_fifo is
 generic(

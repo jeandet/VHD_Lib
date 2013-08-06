@@ -1,5 +1,6 @@
 APB_FIFO.vhd
 APB_FIFO.vhd.bak
+FIFO_pipeline.vhd
 FillFifo.vhd
 SSRAM_plugin.vhd
 SSRAM_plugin_vsim.vhd
