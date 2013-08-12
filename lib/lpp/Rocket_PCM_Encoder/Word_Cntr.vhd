@@ -35,7 +35,11 @@ begin
         WordClk <=  '0';
     elsif Sclk'event and Sclk = '1' then
         if Wcnt = WordSize - 1 then
-            Cnt_int <=  Cnt_int + 1;
+            if Cnt_int = N-1 then
+                Cnt_int <= 0;
+            else
+                Cnt_int <=  Cnt_int + 1;
+            end if;
             Wcnt    <=  0;
             WordClk <=  '1';
         else

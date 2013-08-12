@@ -29,7 +29,7 @@ port(
         fifoadr     : out std_logic_vector (1 downto 0);
 
         FULL        : out std_logic;
-        Write       : in std_logic;
+        wen         : in std_logic;
         Data        : in std_logic_vector(7 downto 0)
     ); 
 end FX2_WithFIFO;
@@ -40,18 +40,18 @@ architecture Ar_FX2_WithFIFO of FX2_WithFIFO is
 type FX2State is (idle);
 
 Signal  USB_DATA  :   std_logic_vector(7 downto 0);
-Signal  FIFOwe,FIFOre,FIFOfull      :   std_logic; 
-Signal  USBwe,USBfull,USBempty      :   std_logic; 
+Signal  FIFOfull      :   std_logic; 
+Signal  USBwe,USBfull     :   std_logic; 
 
 begin
 
 FULL    <=  FIFOfull;
 
-FIFO: lpp_fifo 
+--FIFO:  lpp_fifo
+FIFO: FIFO_pipeline
 generic map(
     tech          => tech,
     Mem_use       => Mem_use,
-    Enable_ReUse  => '0',
     DataSz        =>  8,
     abits         =>  12
     )
@@ -64,7 +64,7 @@ port map(
     empty   =>   USBwe,
     raddr   =>   open,
     wclk    =>   clk,
-    wen     =>   not Write,
+    wen     =>   wen,
     wdata   =>   Data,
     full    =>   FIFOfull,
     waddr   =>   open
@@ -89,6 +89,5 @@ port map(
     );
 
 end ar_FX2_WithFIFO; 
-
 
 
