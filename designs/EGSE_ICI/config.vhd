@@ -28,13 +28,14 @@ package config is
   constant CFG_SCAN : integer := 0;
 
 -- Clock generator
-  constant CFG_CLKTECH : integer := inferred;
-  constant CFG_CLKMUL : integer := (5);
-  constant CFG_CLKDIV : integer := (10);
-  constant CFG_OCLKDIV : integer := (1);
+  constant CFG_CLKTECH : integer := apa3;
+  constant CFG_CLKMUL : integer := (25);
+  constant CFG_CLKDIV : integer := (9);
+  constant CFG_OCLKDIV : integer := (4);
   constant CFG_PCIDLL : integer := 0;
   constant CFG_PCISYSCLK: integer := 0;
   constant CFG_CLK_NOFB : integer := 0;
+  constant BOARDFREQ : integer := 48000;
 
 
 end;

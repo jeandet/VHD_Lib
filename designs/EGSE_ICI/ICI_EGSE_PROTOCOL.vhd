@@ -24,10 +24,10 @@ architecture ar_ICI_EGSE_PROTOCOL of ICI_EGSE_PROTOCOL is
 
 type   DATA_pipe_t is  array(NATURAL RANGE <>) of  std_logic_vector (WordSize-1 downto 0);
 
-signal DATA_pipe    : DATA_pipe_t(10 downto 0);
-signal WR_pipe      : std_logic_vector(10 downto 0);
+signal DATA_pipe    : DATA_pipe_t(12 downto 0);
+signal WR_pipe      : std_logic_vector(12 downto 0);
 signal headerSended : std_logic := '0';
-
+signal counter      : std_logic_vector(7 downto 0):=(others => '0');
 
 begin
 
@@ -39,35 +39,41 @@ DATAOUT     <= DATA_pipe(0);
 process(reset,clk)
 begin
     if reset = '0' then
-        WR_pipe(10 downto 0)         <= (others => '1');
-rstloop: for i in 0 to 10 loop
+        WR_pipe(12 downto 0)         <= (others => '1');
+        counter     <= (others => '0');
+rstloop: for i in 0 to 12 loop
             DATA_pipe(i)    <= X"00";
         end loop;
         headerSended    <=  '0';
     elsif clk'event and clk ='1' then
         if WordCnt_in = 1 and headerSended = '0' then
+            counter     <= (others => '0');
             WR_pipe(4 downto 1)         <= (others => '0');
             WR_pipe(1)      <=  '0';
             WR_pipe(3)      <=  '0';
             WR_pipe(5)      <=  '0';
             WR_pipe(7)      <=  '0';
             WR_pipe(9)      <=  '0';
-            DATA_pipe(1)    <= X"0F";
+            WR_pipe(11)      <=  '0';
+            DATA_pipe(1)    <= counter; -- Size
             DATA_pipe(3)    <= X"5a";
-            DATA_pipe(5)    <= X"a5";
-            DATA_pipe(7)    <= X"F0";           
-            DATA_pipe(9)    <= std_logic_vector(TO_UNSIGNED(MinfCnt_in,WordSize));
+            DATA_pipe(5)    <= X"f0";
+            DATA_pipe(7)    <= X"0f";           
+            DATA_pipe(9)    <= X"a5";
+            DATA_pipe(11)    <= std_logic_vector(TO_UNSIGNED(MinfCnt_in,WordSize));
             WR_pipe(0)      <=  '1';
             WR_pipe(2)      <=  '1';
             WR_pipe(4)      <=  '1';
             WR_pipe(6)      <=  '1';
             WR_pipe(8)      <=  '1';
             WR_pipe(10)     <=  '1';
+            WR_pipe(12)     <=  '1';
             DATA_pipe(0)    <= X"00";
             DATA_pipe(2)    <= X"00";
             DATA_pipe(4)    <= X"00";
             DATA_pipe(6)    <= X"00";
             DATA_pipe(10)   <= X"00";
+            DATA_pipe(12)   <= X"00";
             headerSended    <= '1';
         elsif (FULL = '0') then
             if WordCnt_in /= 1 then
@@ -83,8 +89,13 @@ rstloop: for i in 0 to 10 loop
             DATA_pipe(7)    <= DATA_pipe(8);
             DATA_pipe(8)    <= DATA_pipe(9);
             DATA_pipe(9)    <= DATA_pipe(10);
-            DATA_pipe(10)   <= DATAIN;
-            WR_pipe(10 downto 0)         <=  WEN & WR_pipe(10 downto 1);
+            DATA_pipe(10)    <= DATA_pipe(11);
+            DATA_pipe(11)    <= DATA_pipe(12);
+            DATA_pipe(12)   <= DATAIN;
+            WR_pipe(12 downto 0)         <=  WEN & WR_pipe(12 downto 1);
+            if(WR_pipe(0) = '0') then
+                counter <= std_logic_vector(UNSIGNED(counter) + 1);
+            end if;
         else
             WR_pipe(0)      <= '1';
             if WordCnt_in /= 1 then

@@ -77,6 +77,8 @@ Signal  PROTO_DATAOUT      :   std_logic_vector (WordSize-1 downto 0);
 
 Signal  clk80       :   std_logic;
 
+signal cgi                : clkgen_in_type;
+signal cgo                : clkgen_out_type;
 
 
 begin
@@ -88,28 +90,33 @@ DataRTX_echo    <= DataRTX; --P48
 ck_int0 :  CLKINT
         port map(Clock,clk_48);
 
-DEFPLL: IF simu = 0 generate
-    PLL : entity work.PLL0
-        port map(
-            POWERDOWN => '1',
-            CLKA => clk_48,
-            LOCK => RaZ,
-            GLA  => clk80,
-            GLB  => clk         --33.3MHz
-        );
-end generate;
+RaZ <= cgo.clklock;
 
+CLKGEN : entity clkgen 
+  generic map(
+    tech      => CFG_CLKTECH,
+    clk_mul   => CFG_CLKMUL,
+    clk_div   => CFG_CLKDIV,
+    freq      => BOARDFREQ,	-- clock frequency in KHz
+    clk_odiv  => CFG_OCLKDIV,            -- Proasic3/Fusion output divider clkA
+    clkb_odiv => CFG_OCLKDIV,            -- Proasic3/Fusion output divider clkB
+    clkc_odiv => CFG_OCLKDIV)           -- Proasic3/Fusion output divider clkC
+  port map(
+    clkin   => clk_48,
+    pciclkin => '0',
+    clk      => clk,			-- main clock
+    clkn     => open,			-- inverted main clock
+    clk2x    => open,			-- 2x clock
+    sdclk    => open,			-- SDRAM clock
+    pciclk   => open,			-- PCI clock
+    cgi      => cgi,
+    cgo      => cgo,
+    clk4x    => open,			-- 4x clock
+    clk1xu   => open,			-- unscaled 1X clock
+    clk2xu   => open,			-- unscaled 2X clock
+    clkb     => clk80,           -- Proasic3/Fusion clkB
+    clkc     => open);           -- Proasic3/Fusion clkC
 
-SIMPLL: IF simu = 1 generate
-    PLL : entity work.PLL0Sim
-        port map(
-            POWERDOWN => '1',
-            CLKA => clk_48,
-            LOCK => RaZ,
-            GLA  => clk80,
-            GLB  => clk
-        );
-end generate;
 
 
     gene3_3M : entity Clk_Divider2 
@@ -275,7 +282,6 @@ begin
 end process;
 
 end ar_TOP_EGSE2;
-
 
 
 
