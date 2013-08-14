@@ -273,8 +273,9 @@ begin
     elsif clk'event and clk = '1' then
         NwDatR   <= NwDat;
         if NwDat = '1' and NwDatR = '0'  then
-            PROTO_DATAIN  <=  std_logic_vector(unsigned(PROTO_DATAIN) + 1 );
-            PROTO_WEN       <= '0';
+--            PROTO_DATAIN  <=  std_logic_vector(unsigned(PROTO_DATAIN) + 1 );
+              PROTO_DATAIN  <=  DATA;
+              PROTO_WEN       <= '0';
         else
             PROTO_WEN       <= '1';
         end if;
