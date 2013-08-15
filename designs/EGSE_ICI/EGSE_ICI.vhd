@@ -243,8 +243,8 @@ rstn    <=  reset and RaZ;
 SCLK    <=  Sclkint;
 
 Major_Frame <=  MajF;
---Minor_Frame <=  MinF;
-Minor_Frame <=  MinFclk;
+Minor_Frame <=  MinF;
+--Minor_Frame <=  MinFclk;
 gateint <=  GateDC or GateLF or GateHF;
 Gate    <=  gateint;
 
@@ -259,8 +259,11 @@ end process;
 
 BUS0  <= WordClk;
 BUS12 <= MinFVector(0);
-BUS13 <= MinFclk;
-BUS14 <= '1' when WordCount = 0 else '0';
+--BUS13 <= MinFclk;
+--BUS14 <= '1' when WordCount = 0 else '0';
+BUS13 <= MinF;
+BUS14 <= MajF;
+
 
 MinFVector    <= std_logic_vector(TO_UNSIGNED(MinfCnt,WordSize));
 
