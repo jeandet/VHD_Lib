@@ -40,7 +40,7 @@ Port(
         enable    : in std_logic;  --! Negative enable
         smplClk   : in  STD_LOGIC; --! Sampling clock
         DataReady : out std_logic; --! New sample available
-        smpout    : out Samples_out(ChanelCount-1 downto 0); --! Samples 	
+        smpout    : out Samples(ChanelCount-1 downto 0); --! Samples 	
         AD_in     : in  AD7688_in(ChanelCount-1 downto 0);   --! Input signals for ADC see lpp.lpp_ad_conv
         AD_out    : out AD7688_out                           --! Output signals for ADC see lpp.lpp_ad_conv
 );

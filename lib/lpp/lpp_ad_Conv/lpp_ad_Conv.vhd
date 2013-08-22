@@ -35,18 +35,18 @@ PACKAGE lpp_ad_conv IS
   --CONSTANT ADS7886 : INTEGER := 1;
 
 
-  --TYPE AD7688_out IS
-  --RECORD
-  --  CNV : STD_LOGIC;
-  --  SCK : STD_LOGIC;
-  --END RECORD;
+  TYPE AD7688_out IS
+  RECORD
+    CNV : STD_LOGIC;
+    SCK : STD_LOGIC;
+  END RECORD;
 
-  --TYPE AD7688_in_element IS
-  --RECORD
-  --  SDI : STD_LOGIC;
-  --END RECORD;
+  TYPE AD7688_in_element IS
+  RECORD
+    SDI : STD_LOGIC;
+  END RECORD;
 
-  --TYPE AD7688_in IS ARRAY(NATURAL RANGE <>) OF AD7688_in_element;
+  TYPE AD7688_in IS ARRAY(NATURAL RANGE <>) OF AD7688_in_element;
 
   TYPE Samples IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
 
@@ -68,30 +68,30 @@ PACKAGE lpp_ad_conv IS
       sample_val : OUT STD_LOGIC);
   END COMPONENT;
   
-  --COMPONENT AD7688_drvr IS
-  --  GENERIC(ChanelCount : INTEGER;
-  --          clkkHz      : INTEGER);
-  --  PORT (clk        : IN  STD_LOGIC;
-  --         rstn      : IN  STD_LOGIC;
-  --         enable    : IN  STD_LOGIC;
-  --         smplClk   : IN  STD_LOGIC;
-  --         DataReady : OUT STD_LOGIC;
-  --         smpout    : OUT Samples_out(ChanelCount-1 DOWNTO 0);
-  --         AD_in     : IN  AD7688_in(ChanelCount-1 DOWNTO 0);
-  --         AD_out    : OUT AD7688_out);
-  --END COMPONENT;
+  COMPONENT AD7688_drvr IS
+    GENERIC(ChanelCount : INTEGER;
+            clkkHz      : INTEGER);
+    PORT (clk        : IN  STD_LOGIC;
+           rstn      : IN  STD_LOGIC;
+           enable    : IN  STD_LOGIC;
+           smplClk   : IN  STD_LOGIC;
+           DataReady : OUT STD_LOGIC;
+           smpout    : OUT Samples(ChanelCount-1 DOWNTO 0);
+           AD_in     : IN  AD7688_in(ChanelCount-1 DOWNTO 0);
+           AD_out    : OUT AD7688_out);
+  END COMPONENT;
 
 
-  --COMPONENT AD7688_spi_if IS
-  --  GENERIC(ChanelCount : INTEGER);
-  --  PORT(clk           : IN  STD_LOGIC;
-  --           reset     : IN  STD_LOGIC;
-  --           cnv       : IN  STD_LOGIC;
-  --           DataReady : OUT STD_LOGIC;
-  --           sdi       : IN  AD7688_in(ChanelCount-1 DOWNTO 0);
-  --           smpout    : OUT Samples_out(ChanelCount-1 DOWNTO 0)
-  --           );
-  --END COMPONENT;
+  COMPONENT AD7688_spi_if IS
+    GENERIC(ChanelCount : INTEGER);
+    PORT(clk           : IN  STD_LOGIC;
+             reset     : IN  STD_LOGIC;
+             cnv       : IN  STD_LOGIC;
+             DataReady : OUT STD_LOGIC;
+             sdi       : IN  AD7688_in(ChanelCount-1 DOWNTO 0);
+             smpout    : OUT Samples(ChanelCount-1 DOWNTO 0)
+             );
+  END COMPONENT;
 
 
   --COMPONENT lpp_apb_ad_conv
