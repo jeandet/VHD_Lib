@@ -50,7 +50,7 @@ ENTITY IIR_CEL_CTRLR_v2_CONTROL IS
     waddr_previous : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
     alu_sel_input  : OUT STD_LOGIC;
     alu_sel_coeff  : OUT STD_LOGIC_VECTOR(Coef_sel_SZ-1 DOWNTO 0);
-    alu_ctrl       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
+    alu_ctrl       : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
     );
 END IIR_CEL_CTRLR_v2_CONTROL;
 
@@ -92,7 +92,7 @@ BEGIN
       --ALU -------------------------------------------------------------------
       alu_selected_coeff <= 0;          --      
       alu_sel_input      <= '0';        --
-      alu_ctrl           <= (OTHERS => '0');  --        
+      alu_ctrl           <= ctrl_IDLE;  --
       --OUT
       sample_out_val     <= '0';        --
       sample_out_rot     <= '0';        --
@@ -101,6 +101,8 @@ BEGIN
       Cel_ongoing    <= 0;              --
       sample_in_rot  <= '0';
       
+      IIR_CEL_STATE <= waiting;
+      
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
       
       CASE IIR_CEL_STATE IS
@@ -108,7 +110,7 @@ BEGIN
           sample_out_rot     <= '0';
           sample_in_rot      <= '0';
           sample_out_val     <= '0';
-          alu_ctrl           <= "0100";
+          alu_ctrl           <= ctrl_CLRMAC;
           alu_selected_coeff <= 0;
           in_sel_src         <= "01";
           ram_read           <= '0';
@@ -134,7 +136,7 @@ BEGIN
           IIR_CEL_STATE <= compute_b2;
           ram_read      <= '1';
           raddr_add1    <= '1';     
-          alu_ctrl      <= "0010";
+          alu_ctrl      <= ctrl_MULT;
           alu_sel_input <= '1';
           in_sel_src    <= "01";
           
@@ -160,7 +162,7 @@ BEGIN
             in_sel_src <= "11";
           END IF;
           alu_selected_coeff <= alu_selected_coeff+1;
-          alu_ctrl           <= "0001";
+          alu_ctrl           <= ctrl_MAC;
           IIR_CEL_STATE      <= compute_b1;
           
         WHEN compute_b1 =>
@@ -183,7 +185,7 @@ BEGIN
             in_sel_src     <= "00";
           END IF;
           alu_selected_coeff <= alu_selected_coeff+1;
-          alu_ctrl           <= "0001";
+          alu_ctrl           <= ctrl_MAC;
           IIR_CEL_STATE      <= compute_b0;
           
         WHEN compute_b0 =>
@@ -199,7 +201,7 @@ BEGIN
           raddr_add1         <= '0';     
           in_sel_src         <= "10";    
           alu_selected_coeff <= alu_selected_coeff+1;
-          alu_ctrl           <= "0001";
+          alu_ctrl           <= ctrl_MAC;
           IIR_CEL_STATE      <= compute_a2;
           IF Cel_ongoing = Cels_count THEN
             sample_in_rot <= '1';
@@ -223,7 +225,7 @@ BEGIN
           END IF;
           in_sel_src         <= "00";
           alu_selected_coeff <= alu_selected_coeff+1;
-          alu_ctrl           <= "0001";
+          alu_ctrl           <= ctrl_MAC;
           IIR_CEL_STATE      <= compute_a1;
           sample_in_rot      <= '0';
           
@@ -236,7 +238,7 @@ BEGIN
           waddr_previous <= "01";
           ram_read       <= '1';
           raddr_rst      <= '0';
-          alu_ctrl       <= "0010";
+          alu_ctrl       <= ctrl_MULT;
           sample_in_rot  <= '0';
           IF Cel_ongoing = Cels_count THEN
             alu_selected_coeff <= 0;
@@ -274,7 +276,7 @@ BEGIN
         WHEN wait_valid_last_output =>
           IIR_CEL_STATE      <= wait_valid_last_output_2;
           sample_in_rot      <= '0';
-          alu_ctrl           <= "0000";
+          alu_ctrl           <= ctrl_IDLE;
           alu_selected_coeff <= 0;
           in_sel_src         <= "01";
           ram_read           <= '0';
@@ -291,7 +293,7 @@ BEGIN
         WHEN wait_valid_last_output_2 =>
           IIR_CEL_STATE      <= waiting;
           sample_in_rot      <= '0';
-          alu_ctrl           <= "0000";
+          alu_ctrl           <= ctrl_IDLE;
           alu_selected_coeff <= 0;
           in_sel_src         <= "01";
           ram_read           <= '0';

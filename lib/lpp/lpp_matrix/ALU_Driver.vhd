@@ -22,6 +22,8 @@
 library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
+library lpp;
+use lpp.general_purpose.all;
 
 --! Driver de l'ALU
 
@@ -39,7 +41,8 @@ entity ALU_Driver is
       Conjugate :   in std_logic;                                --! Flag, Calcul sur un complexe et son conjugué
       Valid     :   out std_logic;                               --! Flag, Résultat disponible
       Read      :   out std_logic;                               --! Flag, opérande disponible
-      CTRL      :   out std_logic_vector(4 downto 0);            --! Permet de sélectionner la/les opération désirée
+      CTRL      :   out std_logic_vector(2 downto 0);            --! Permet de sélectionner la/les opération désirée
+      COMP      :   out  std_logic_vector(1 downto 0);            --! (set) Permet de complémenter les opérandes
       OP1       :   out std_logic_vector(Input_SZ_1-1 downto 0); --! Premier Opérande
       OP2       :   out std_logic_vector(Input_SZ_2-1 downto 0)  --! Second Opérande
 );
@@ -58,7 +61,7 @@ signal go_st        : std_logic;
 signal Take_reg     : std_logic;
 signal Received_reg : std_logic;
 
-type etat is (eX,e0,e1,e2,e3,e4,e5,idle,idle2,idle3);
+type etat is (eX,e0,e1,e2,e3,e4,e5,eY,eZ,eW);
 signal ect : etat;
 signal st  : etat;
 
@@ -70,7 +73,8 @@ begin
             ect          <= eX;
             st           <= e0;
             go_st        <= '0';
-            CTRL         <= "10000";
+            CTRL         <= ctrl_CLRMAC;
+            COMP         <= "00"; -- pas de complement
             Read         <= '0';
             Valid        <= '0';
             Take_reg     <= '0';
@@ -84,7 +88,7 @@ begin
                 when eX =>
                     go_st <= '0';
                     Read  <= '1';
-                    CTRL  <= "10000";
+                    CTRL  <= ctrl_CLRMAC;
                     ect   <= e0;
 
                 when e0 =>
@@ -102,18 +106,18 @@ begin
                 when e1 =>
                     OP1  <= OP1re;
                     OP2  <= OP2re;
-                    CTRL <= "00001";
+                    CTRL <= ctrl_MAC;
                     Read <= '1';
-                    ect  <= idle;
+                    ect  <= eY;
               
-                when idle =>
+                when eY =>
                     OP1im <= IN1;
                     if(Conjugate='1')then           --
                         OP2im <= IN1;               --
                     else                            --
                         OP2im <= IN2;               -- modif 23/06/11
                     end if;                         --
-                    CTRL  <= "00000";
+                    CTRL  <= ctrl_IDLE;
                     if(Take_reg='1' and Take='0')then
                         Read <= '0';
                         ect  <= e2;
@@ -122,11 +126,11 @@ begin
                 when e2 =>                    
                     OP1  <= OP1im;
                     OP2  <= OP2im;
-                    CTRL <= "00001";
-                    ect  <= idle2;
+                    CTRL <= ctrl_MAC;
+                    ect  <= eZ;
                     
-                when idle2 =>
-                    CTRL  <= "00000";
+                when eZ =>
+                    CTRL  <= ctrl_IDLE;
                     go_st <= '1';
                     if(Received_reg='0' and Received='1')then
                         if(Conjugate='1')then     
@@ -137,24 +141,25 @@ begin
                     end if;
 
                 when e3 =>
-                    CTRL  <= "10000";
+                    CTRL  <= ctrl_CLRMAC;
                     go_st <= '0';
                     ect   <= e4;
 
                 when e4 =>
                     OP1  <= OP1im;
                     OP2  <= OP2re;
-                    CTRL <= "00001";                    
+                    CTRL <= ctrl_MAC;
                     ect  <= e5;
                 
                 when e5 =>
                     OP1  <= OP1re;
                     OP2  <= OP2im;
-                    CTRL <= "01001";
-                    ect  <= idle3;
-                
-                when idle3 =>
-                    CTRL  <= "00000";
+                    COMP <= "10";
+                    ect  <= eW;
+
+                when eW =>
+                    CTRL  <= ctrl_IDLE;
+                    COMP  <= "00";
                     go_st <= '1';
                     if(Received_reg='1' and Received='0')then
                         ect <= eX;
@@ -175,13 +180,13 @@ begin
                     if(Received_reg='0' and Received='1')then
                         Valid <= '0';
                         if(Conjugate='1')then
-                            st <= idle2;
+                            st <= eY;
                         else
-                            st <= idle;
+                            st <= eX;
                         end if;
                     end if;
 
-                when idle =>
+                when eX =>
                     st <= e3;
 
                 when e3 =>
@@ -196,10 +201,10 @@ begin
                 when e5 =>
                     if(Received_reg='1' and Received='0')then
                         Valid <= '0';                    
-                        st    <= idle2;
+                        st    <= eY;
                     end if;
                                 
-                when idle2 =>
+                when eY =>
                     st <= e0;
                         
                 when others =>

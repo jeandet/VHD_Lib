@@ -26,8 +26,7 @@ use grlib.amba.all;
 use std.textio.all;
 library lpp;
 use lpp.lpp_amba.all;
-use lpp.lpp_memory.all;
-use work.fft_components.all;
+use lpp.fft_components.all;
 
 --! Package contenant tous les programmes qui forment le composant intégré dans le léon 
 
@@ -75,6 +74,23 @@ component APB_FFT_half is
     );
 end component;
 
+component FFT is
+    generic(
+        Data_sz : integer := 16;
+        NbData : integer := 256);
+    port(
+        clkm            : in std_logic;
+        rstn            : in std_logic;
+        FifoIN_Empty    : in std_logic_vector(4 downto 0);
+        FifoIN_Data     : in std_logic_vector(79 downto 0);
+        FifoOUT_Full    : in std_logic_vector(4 downto 0);
+        Load            : out std_logic;
+        Read            : out std_logic_vector(4 downto 0);
+        Write           : out std_logic_vector(4 downto 0);
+        ReUse           : out std_logic_vector(4 downto 0);
+        Data            : out std_logic_vector(79 downto 0)
+        );
+end component;
 
 component Flag_Extremum is
   port(

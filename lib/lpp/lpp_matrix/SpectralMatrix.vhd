@@ -22,6 +22,7 @@
 library IEEE;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_1164.all;
+library lpp;
 use lpp.lpp_matrix.all;
 
 entity SpectralMatrix is

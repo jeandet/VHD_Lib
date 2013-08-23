@@ -31,6 +31,49 @@ use lpp.lpp_amba.all;
 
 package lpp_usb is
 
+component FX2_Driver is
+port(
+        clk         : in STD_LOGIC;
+        if_clk      : out STD_LOGIC;
+        reset       : in  std_logic;
+        flagb       : in STD_LOGIC; 
+        slwr        : out STD_LOGIC;
+        slrd        : out std_logic;
+        pktend      : out STD_LOGIC;
+        sloe        : out STD_LOGIC;
+        fdbusw      : out std_logic_vector (7 downto 0);
+        fifoadr     : out std_logic_vector (1 downto 0);
+
+        FULL        : out std_logic;
+        Write       : in std_logic;
+        Data        : in std_logic_vector(7 downto 0)
+    ); 
+end component;
+
+component FX2_WithFIFO is
+generic(
+    tech          :   integer := 0;
+    Mem_use       :   integer := 0;
+    Enable_ReUse  :   std_logic := '0'
+    );
+port(
+        clk         : in STD_LOGIC;
+        if_clk      : out STD_LOGIC;
+        reset       : in  std_logic;
+        flagb       : in STD_LOGIC; 
+        slwr        : out STD_LOGIC;
+        slrd        : out std_logic;
+        pktend      : out STD_LOGIC;
+        sloe        : out STD_LOGIC;
+        fdbusw      : out std_logic_vector (7 downto 0);
+        fifoadr     : out std_logic_vector (1 downto 0);
+
+        FULL        : out std_logic;
+        Write       : in std_logic;
+        Data        : in std_logic_vector(7 downto 0)
+    ); 
+end component;
+
 component APB_USB is
     generic (
       pindex   : integer := 0;

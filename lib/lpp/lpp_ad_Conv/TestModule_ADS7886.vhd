@@ -61,10 +61,10 @@ BEGIN  -- beh
         reg <= conv_std_logic_vector(integer(REAL(amplitude) * SIN(MATH_2_PI*REAL(n)/REAL(freq))) , 16);
       END IF;
     ELSIF sck'EVENT AND sck = '0' THEN  -- rising clock edge
-      reg(15)          <= 'X';
-      reg(14 DOWNTO 0) <= reg(15 DOWNTO 1);
+      reg(0)           <= 'X';
+      reg(15 DOWNTO 1) <= reg(14 DOWNTO 0);
     END IF;
   END PROCESS;
-  sdo              <= reg(0);
+  sdo              <= reg(15);
   
 END beh;
