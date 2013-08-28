@@ -15,7 +15,7 @@ generic(
 	WordCnt     : integer := 144;
 	MinFCount   : integer := 64;
 	CstDATA     : integer := 0;
-	IIRFilter   : integer := 1
+	IIRFilter   : integer := 0
 );
 port(
 
@@ -52,6 +52,10 @@ signal	AD_out         :  AD7688_out;
 signal   Filter_sp_in   :  samplT(2 DOWNTO 0, 15 DOWNTO 0);
 signal   Filter_sp_out  :  samplT(2 DOWNTO 0, 15 DOWNTO 0);
 signal   sample_out_val :  std_logic;
+
+signal   LF1_sync   	:     std_logic_vector(15 downto 0);
+signal   LF2_sync   	:     std_logic_vector(15 downto 0);
+signal   LF3_sync   	:     std_logic_vector(15 downto 0);
 
 begin
 
@@ -101,70 +105,49 @@ smpPulse: entity work.OneShot
 
 
 
-Filter: IIR_CEL_CTRLR_v2 
-  GENERIC map(
-    tech          => CFG_MEMTECH,
-    Mem_use       => use_RAM,
-    Sample_SZ     => Sample_SZ,
-    Coef_SZ       => Coef_SZ,
-    Coef_Nb       => 25,
-    Coef_sel_SZ   => 5,
-    Cels_count    => 5,
-    ChanelsCount  => ChanelsCount
-	 )
-  PORT map(
-    rstn => reset,
-    clk  => clk,
-
-    virg_pos => virgPos,
-    coefs    => CoefsInitValCst_v2,
-
-    sample_in_val => LF_ADC_SpPulse,
-    sample_in     => Filter_sp_in,
-
-    sample_out_val => sample_out_val,
-    sample_out     => Filter_sp_out
-);
 
 NOfilt:	IF IIRFilter = 0 GENERATE
 		process(reset,clk)
 		begin
 			if reset ='0' then
-				LF1	<=	(others => '0');
-				LF2	<=	(others => '0');
-				LF3	<=	(others => '0');
+				LF1_sync	<=	(others => '0');
+				LF2_sync	<=	(others => '0');
+				LF3_sync	<=	(others => '0');
 			elsif clk'event and clk ='1' then
 				if sample_val = '1' then
-					LF1	<=	sps(0);
-					LF2	<=	sps(1);
-					LF3	<=	sps(2);
+					LF1_sync	<=	sps(0);
+					LF2_sync	<=	sps(1);
+					LF3_sync	<=	sps(2);
 				end if;
 			end if;
 		end process;
 	END GENERATE;
+	
+	
 filt:	IF IIRFilter /= 0 GENERATE
 
-	LF1	<= LFX(0);
-	LF2	<=	LFX(1);
-	LF3	<=	LFX(2);
 
-  loop_all_sample : FOR J IN 15 DOWNTO 0 GENERATE
+filtertop: entity work.IIR_FILTER_TOP 
+generic map
+(
+	V2	=> 0
+)
+port map
+(
+    rstn 	=> reset,
+    clk  	=> clk,
 
-    loop_all_chanel : FOR I IN 2 DOWNTO 0 GENERATE
-			process(reset,clk)
-			begin
-				if reset ='0' then
-					Filter_sp_in(I,J)	<=	'0';
---					LFX(I)					<=	(others => '0');
-				elsif clk'event and clk ='1' then
-					if sample_out_val = '1' then
-						LFX(I)(J)	<=	Filter_sp_out(I,J);
-						Filter_sp_in(I,J)	<=	sps(I)(J);
-					end if;
-				end if;
-			end process;
-		END GENERATE;
-	END GENERATE;
+    SMPclk  => LF_ADC_SmplClk,
+    LF1_IN  => sps(0),
+    LF2_IN  => sps(1),
+    LF3_IN  => sps(2),
+
+    SMPCLKOut => open,
+    LF1_OUT   => LF1_sync,
+    LF2_OUT   => LF2_sync,
+    LF3_OUT   => LF3_sync
+);
+
 END GENERATE;
 
 
@@ -174,14 +157,25 @@ END GENERATE;
 
 CST: IF CstDATA /=0 GENERATE
 
-	LF1	<=	LF1cst;
-	LF2	<=	LF2cst;
-	LF3	<=	LF3cst;
+	LF1_sync	<=	LF1cst;
+	LF2_sync	<=	LF2cst;
+	LF3_sync	<=	LF3cst;
 
 END GENERATE;
 
 
 
+LF1sync: entity work.Fast2SlowSync
+generic map(N	=> 16)
+port map( LF1_sync,clk,sclk,SyncSig,LF1);
+
+LF2sync: entity work.Fast2SlowSync
+generic map(N	=> 16)
+port map( LF2_sync,clk,sclk,SyncSig,LF2);
+
+LF3sync: entity work.Fast2SlowSync
+generic map(N	=> 16)
+port map( LF3_sync,clk,sclk,SyncSig,LF3);
 
 --Filter: IIR_CEL_FILTER 
 --    GENERIC map(

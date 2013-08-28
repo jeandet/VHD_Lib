@@ -172,7 +172,8 @@ generic map (
 	WordCnt   => WordCnt,
 	MinFCount => MinFCount,
 	EnableSR  => 0,
-	FakeADC	 => 1
+	CstDATA   => SEND_CONSTANT_DATA,
+	FakeADC	 => 0
 )
 port map(
 
@@ -219,7 +220,8 @@ generic map(
 	WordSize  => WordSize,
 	WordCnt   => WordCnt,
 	MinFCount => MinFCount,
-	CstDATA   => 0
+	CstDATA   => SEND_CONSTANT_DATA,
+	IIRFilter => 0
 )
 port map(
 

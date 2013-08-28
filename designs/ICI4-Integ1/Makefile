@@ -27,7 +27,8 @@ VHDLOPTSYNFILES= \
                  ICI4HDL/DC_ACQ_TOP.vhd \
                  ICI4HDL/LF_ACQ_TOP.vhd \
            	 ICI4HDL/FAKE_ADC.vhd \
-                 ICI4HDL/OneShot.vhd
+                 ICI4HDL/OneShot.vhd \
+                 ICI4HDL/IIR_FILTER_TOP.vhd
 
 
 VHDLSYNFILES= \

@@ -1,10 +1,10 @@
-APB_FFT.vhd
 APB_FFT_half.vhd
+APB_FFT.vhd
 Driver_FFT.vhd
-FFT.vhd
-FFT.vhd.bak
 FFTamont.vhd
 FFTaval.vhd
+FFT.vhd
+FFT.vhd.bak
 Flag_Extremum.vhd
 Flag_Extremum.vhd.bak
 Linker_FFT.vhd

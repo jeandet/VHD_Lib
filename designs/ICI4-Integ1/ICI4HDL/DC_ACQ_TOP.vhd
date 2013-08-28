@@ -8,6 +8,8 @@ use lpp.apb_devices_list.all;
 use lpp.general_purpose.all;
 use lpp.Rocket_PCM_Encoder.all;
 
+use work.config.all;
+
 
 entity DC_ACQ_TOP is
 generic(
@@ -15,7 +17,9 @@ generic(
 	WordCnt    : integer := 144;
 	MinFCount  : integer := 64;
 	EnableSR   : integer := 1;
-	FakeADC	  : integer := 0
+	CstDATA    : integer := 0;
+	FakeADC	  : integer := 0;
+	CDS        : integer := 0
 );
 port(
 
@@ -113,64 +117,92 @@ port map(
 --			DC	ADC
 --
 ------------------------------------------------------------------
-ADC : IF FakeADC /=1 GENERATE
-	 
-DC_ADC0 : DUAL_ADS1278_DRIVER                 
-port map(
-    Clk     =>  clk,
-    reset   =>  reset,
-    SpiClk  =>  DC_ADC_Sclk,
-    DIN     =>  DC_ADC_IN,
-    SmplClk =>  DC_ADC_SmplClk,
-    OUT00   =>  AMR1X_Sync,
-    OUT01   =>  AMR1Y_Sync,
-    OUT02   =>  AMR1Z_Sync,
-    OUT03   =>  AMR2X_Sync,
-    OUT04   =>  AMR2Y_Sync,
-    OUT05   =>  AMR2Z_Sync,
-    OUT06   =>  Temp1_Sync,
-    OUT07   =>  Temp2_Sync,
-    OUT10   =>  AMR3X_Sync,
-    OUT11   =>  AMR3Y_Sync,
-    OUT12   =>  AMR3Z_Sync,
-    OUT13   =>  AMR4X_Sync,
-    OUT14   =>  AMR4Y_Sync,
-    OUT15   =>  AMR4Z_Sync,
-    OUT16   =>  Temp3_Sync,
-    OUT17   =>  Temp4_Sync,
-    FSynch  =>  DC_ADC_FSynch
-);
-END GENERATE;
+ADC1: IF CstDATA /= 1 GENERATE
+	ADC : IF FakeADC /=1 GENERATE
+		 
+	DC_ADC0 : DUAL_ADS1278_DRIVER                 
+	port map(
+		 Clk     =>  clk,
+		 reset   =>  reset,
+		 SpiClk  =>  DC_ADC_Sclk,
+		 DIN     =>  DC_ADC_IN,
+		 SmplClk =>  DC_ADC_SmplClk,
+		 OUT00   =>  AMR1X_Sync,
+		 OUT01   =>  AMR1Y_Sync,
+		 OUT02   =>  AMR1Z_Sync,
+		 OUT03   =>  AMR2X_Sync,
+		 OUT04   =>  AMR2Y_Sync,
+		 OUT05   =>  AMR2Z_Sync,
+		 OUT06   =>  Temp1_Sync,
+		 OUT07   =>  Temp2_Sync,
+		 OUT10   =>  AMR3X_Sync,
+		 OUT11   =>  AMR3Y_Sync,
+		 OUT12   =>  AMR3Z_Sync,
+		 OUT13   =>  AMR4X_Sync,
+		 OUT14   =>  AMR4Y_Sync,
+		 OUT15   =>  AMR4Z_Sync,
+		 OUT16   =>  Temp3_Sync,
+		 OUT17   =>  Temp4_Sync,
+		 FSynch  =>  DC_ADC_FSynch
+	);
+	END GENERATE;
 
-NOADC: IF FakeADC=1 GENERATE
-	 
-DC_ADC0 : entity work.FAKE_DUAL_ADS1278_DRIVER                 
-port map(
-    Clk     =>  clk,
-    reset   =>  reset,
-    SpiClk  =>  DC_ADC_Sclk,
-    DIN     =>  DC_ADC_IN,
-    SmplClk =>  DC_ADC_SmplClk,
-    OUT00   =>  AMR1X_Sync,
-    OUT01   =>  AMR1Y_Sync,
-    OUT02   =>  AMR1Z_Sync,
-    OUT03   =>  AMR2X_Sync,
-    OUT04   =>  AMR2Y_Sync,
-    OUT05   =>  AMR2Z_Sync,
-    OUT06   =>  Temp1_Sync,
-    OUT07   =>  Temp2_Sync,
-    OUT10   =>  AMR3X_Sync,
-    OUT11   =>  AMR3Y_Sync,
-    OUT12   =>  AMR3Z_Sync,
-    OUT13   =>  AMR4X_Sync,
-    OUT14   =>  AMR4Y_Sync,
-    OUT15   =>  AMR4Z_Sync,
-    OUT16   =>  Temp3_Sync,
-    OUT17   =>  Temp4_Sync,
-    FSynch  =>  DC_ADC_FSynch
-);
+	NOADC: IF FakeADC=1 GENERATE
+		 
+	DC_ADC0 : entity work.FAKE_DUAL_ADS1278_DRIVER                 
+	port map(
+		 Clk     =>  clk,
+		 reset   =>  reset,
+		 SpiClk  =>  DC_ADC_Sclk,
+		 DIN     =>  DC_ADC_IN,
+		 SmplClk =>  DC_ADC_SmplClk,
+		 OUT00   =>  AMR1X_Sync,
+		 OUT01   =>  AMR1Y_Sync,
+		 OUT02   =>  AMR1Z_Sync,
+		 OUT03   =>  AMR2X_Sync,
+		 OUT04   =>  AMR2Y_Sync,
+		 OUT05   =>  AMR2Z_Sync,
+		 OUT06   =>  Temp1_Sync,
+		 OUT07   =>  Temp2_Sync,
+		 OUT10   =>  AMR3X_Sync,
+		 OUT11   =>  AMR3Y_Sync,
+		 OUT12   =>  AMR3Z_Sync,
+		 OUT13   =>  AMR4X_Sync,
+		 OUT14   =>  AMR4Y_Sync,
+		 OUT15   =>  AMR4Z_Sync,
+		 OUT16   =>  Temp3_Sync,
+		 OUT17   =>  Temp4_Sync,
+		 FSynch  =>  DC_ADC_FSynch
+	);
+	END GENERATE;
+
 END GENERATE;
 ------------------------------------------------------------------
+
+NOADC: IF CstDATA = 1 GENERATE
+
+AMR1X_Sync  <=  AMR1Xcst;
+AMR1Y_Sync  <=  AMR1Ycst;
+AMR1Z_Sync  <=  AMR1Zcst;
+AMR2X_Sync  <=  AMR2Xcst;
+AMR2Y_Sync  <=  AMR2Ycst;
+AMR2Z_Sync  <=  AMR2Zcst;
+Temp1_Sync  <=  Temp1cst;
+Temp2_Sync  <=  Temp2cst;
+AMR3X_Sync  <=  AMR3Xcst;
+AMR3Y_Sync  <=  AMR3Ycst;
+AMR3Z_Sync  <=  AMR3Zcst;
+AMR4X_Sync  <=  AMR4Xcst;
+AMR4Y_Sync  <=  AMR4Ycst;
+AMR4Z_Sync  <=  AMR4Zcst;
+Temp3_Sync  <=  Temp3cst;
+Temp4_Sync  <=  Temp4cst;
+
+
+
+
+
+END GENERATE;
 
 
 
@@ -214,7 +246,7 @@ SET_RESET1  <= SET_RESET1_sig;
 --
 ------------------------------------------------------------------
 
-
+IF CDS =1 GENERATE
 
 AMR1Xsync: entity work.Fast2SlowSync
 generic map(N	=> 24)
@@ -271,6 +303,29 @@ TEMP4sync: entity work.Fast2SlowSync
 generic map(N	=> 24)
 port map( TEMP4_Sync,clk,sclk,SyncSig,TEMP4);
 
+END GENERATE;
+
+IF CDS /= 1 GENERATE
+
+
+AMR1X_Sync  <=  AMR1X;
+AMR1Y_Sync  <=  AMR1Y;
+AMR1Z_Sync  <=  AMR1Z;
+AMR2X_Sync  <=  AMR2X;
+AMR2Y_Sync  <=  AMR2Y;
+AMR2Z_Sync  <=  AMR2Z;
+Temp1_Sync  <=  Temp1;
+Temp2_Sync  <=  Temp2;
+AMR3X_Sync  <=  AMR3X;
+AMR3Y_Sync  <=  AMR3Y;
+AMR3Z_Sync  <=  AMR3Z;
+AMR4X_Sync  <=  AMR4X;
+AMR4Y_Sync  <=  AMR4Y;
+AMR4Z_Sync  <=  AMR4Z;
+Temp3_Sync  <=  Temp3;
+Temp4_Sync  <=  Temp4;
+
+END GENERATE;
 ------------------------------------------------------------------
 
 
