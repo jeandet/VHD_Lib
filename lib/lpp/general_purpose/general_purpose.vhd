@@ -68,6 +68,23 @@ PACKAGE general_purpose IS
       );
   END COMPONENT;
 
+COMPONENT Adder_V0 is
+generic(
+    Input_SZ_A     :   integer := 16;
+    Input_SZ_B     :   integer := 16
+
+);
+port(
+    clk     :   in  std_logic;
+    reset   :   in  std_logic;
+    clr     :   in  std_logic;
+    add     :   in  std_logic;
+    OP1     :   in  std_logic_vector(Input_SZ_A-1 downto 0);
+    OP2     :   in  std_logic_vector(Input_SZ_B-1 downto 0);
+    RES     :   out std_logic_vector(Input_SZ_A-1 downto 0)
+);
+end COMPONENT;
+
   COMPONENT ADDRcntr IS
     PORT(
       clk   : IN  STD_LOGIC;
@@ -98,14 +115,56 @@ PACKAGE general_purpose IS
       );
   END COMPONENT;
 
+COMPONENT ALU_V0 IS
+  GENERIC(
+    Arith_en   : INTEGER := 1;
+    Logic_en   : INTEGER := 1;
+    Input_SZ_1 : INTEGER := 16;
+    Input_SZ_2 : INTEGER := 9
+
+    );
+  PORT(
+    clk   : IN  STD_LOGIC;
+    reset : IN  STD_LOGIC;
+    ctrl  : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
+    OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_2-1 DOWNTO 0);
+    RES   : OUT STD_LOGIC_VECTOR(Input_SZ_1+Input_SZ_2-1 DOWNTO 0)
+    );
+END COMPONENT;
+
+COMPONENT MAC_V0 is
+generic(
+    Input_SZ_A     :   integer := 8;
+    Input_SZ_B     :   integer := 8
+
+);
+port(
+    clk     :   in  std_logic;
+    reset   :   in  std_logic;
+    clr_MAC :   in  std_logic;
+    MAC_MUL_ADD :   in  std_logic_vector(1 downto 0);
+    OP1     :   in  std_logic_vector(Input_SZ_A-1 downto 0);
+    OP2     :   in  std_logic_vector(Input_SZ_B-1 downto 0);
+    RES     :   out std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0)
+);
+end COMPONENT;
+
 ---------------------------------------------------------
--------- // Sélection grace a l'entrée "ctrl" \\ --------
+-------- // SÃ©lection grace a l'entrÃ©e "ctrl" \\ --------
 ---------------------------------------------------------
 Constant ctrl_IDLE   : std_logic_vector(2 downto 0) := "000";
 Constant ctrl_MAC    : std_logic_vector(2 downto 0) := "001";
 Constant ctrl_MULT   : std_logic_vector(2 downto 0) := "010";
 Constant ctrl_ADD    : std_logic_vector(2 downto 0) := "011";
 Constant ctrl_CLRMAC : std_logic_vector(2 downto 0) := "100";
+
+
+Constant IDLE_V0    : std_logic_vector(3 downto 0) := "0000";
+Constant MAC_op_V0  : std_logic_vector(3 downto 0) := "0001";
+Constant MULT_V0    : std_logic_vector(3 downto 0) := "0010";
+Constant ADD_V0     : std_logic_vector(3 downto 0) := "0011";
+Constant CLR_MAC_V0 : std_logic_vector(3 downto 0) := "0100";
 ---------------------------------------------------------
 
   COMPONENT MAC IS
@@ -132,10 +191,10 @@ Constant ctrl_CLRMAC : std_logic_vector(2 downto 0) := "100";
   port(
       clk     : in  std_logic;                                --! Horloge du composant
       reset   : in  std_logic;                                --! Reset general du composant
-      clr     : in  std_logic;                                --! Un reset spécifique au programme
-      TwoComp : in  std_logic;                                --! Autorise l'utilisation du complément
-      OP      : in  std_logic_vector(Input_SZ-1 downto 0);    --! Opérande d'entrée
-      RES     : out std_logic_vector(Input_SZ-1 downto 0)     --! Résultat, opérande complémenté ou non
+      clr     : in  std_logic;                                --! Un reset spÃ©cifique au programme
+      TwoComp : in  std_logic;                                --! Autorise l'utilisation du complÃ©ment
+      OP      : in  std_logic_vector(Input_SZ-1 downto 0);    --! OpÃ©rande d'entrÃ©e
+      RES     : out std_logic_vector(Input_SZ-1 downto 0)     --! RÃ©sultat, opÃ©rande complÃ©mentÃ© ou non
   );
   end COMPONENT;
 

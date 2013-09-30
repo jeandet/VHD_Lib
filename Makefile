@@ -52,6 +52,7 @@ Patch-GRLIB: init doc
 	sh $(SCRIPTSDIR)/patch.sh $(GRLIB)
 
 link:
+	sh $(SCRIPTSDIR)/vhdlsynPatcher.sh
 	sh $(SCRIPTSDIR)/linklibs.sh $(GRLIB)
 	sh $(SCRIPTSDIR)/patchboards.sh $(GRLIB)
 

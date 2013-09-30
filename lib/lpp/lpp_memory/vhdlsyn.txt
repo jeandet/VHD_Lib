@@ -1,8 +1,11 @@
-lpp_memory.vhd
-lpp_FIFO.vhd
-FillFifo.vhd
 APB_FIFO.vhd
-Bridge.vhd
-SSRAM_plugin.vhd
-lppFIFOx5.vhd
+APB_FIFO.vhd.bak
+FIFO_pipeline.vhd
+FillFifo.vhd
+lpp_FIFO.vhd
 lppFIFOxN.vhd
+lppFIFOxN.vhd.bak
+lpp_memory.vhd
+lpp_memory.vhd.bak
+SSRAM_plugin.vhd
+SSRAM_plugin_vsim.vhd

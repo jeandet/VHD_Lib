@@ -4,11 +4,11 @@ include .config
 TOP=ici4
 BOARD=ICI4-main-BD
 #BOARD=SP601
-include $(GRLIB)/boards/$(BOARD)/Makefile.inc
+include ../../boards/$(BOARD)/Makefile.inc
 DEVICE=$(PART)-$(PACKAGE)$(SPEED)
 #UCF=$(GRLIB)/boards/$(BOARD)/ICI3.ucf
-UCF=$(GRLIB)/boards/$(BOARD)/ICI4-Main-BD.ucf
-QSF=$(GRLIB)/boards/$(BOARD)/$(TOP).qsf
+UCF=../../boards/$(BOARD)/ICI4-Main-BD.ucf
+QSF=../../boards/$(BOARD)/$(TOP).qsf
 EFFORT=high
 ISEMAPOPT="-timing"
 XSTOPT=""
@@ -19,7 +19,17 @@ VHDLOPTSYNFILES= \
                  ICI4HDL/DC_FRAME_PLACER.vhd \
                  ICI4HDL/DC_SMPL_CLK.vhd \
                  ICI4HDL/LF_FRAME_PLACER.vhd \
-                 ICI4HDL/LF_SMPL_CLK.vhd
+                 ICI4HDL/LF_SMPL_CLK.vhd \
+                 ICI4HDL/Fast2SlowSync.vhd \
+                 ICI4HDL/Slow2FastSync.vhd \
+                 ICI4HDL/CrossDomainSyncGen.vhd \
+                 ICI4HDL/TM_MODULE.vhd \
+                 ICI4HDL/DC_ACQ_TOP.vhd \
+                 ICI4HDL/LF_ACQ_TOP.vhd \
+           	 ICI4HDL/FAKE_ADC.vhd \
+                 ICI4HDL/OneShot.vhd \
+                 ICI4HDL/IIR_FILTER_TOP.vhd
+
 
 VHDLSYNFILES= \
 	config.vhd  ici4.vhd
@@ -27,7 +37,7 @@ VHDLSIMFILES=testbench.vhd
 SIMTOP=testbench
 #SDCFILE=$(GRLIB)/boards/$(BOARD)/default.sdc
 SDCFILE=default.sdc
-BITGEN=$(GRLIB)/boards/$(BOARD)/default.ut
+BITGEN=../../boards/$(BOARD)/default.ut
 CLEAN=soft-clean
 VCOMOPT=-explicit
 TECHLIBS = secureip unisim 
@@ -47,4 +57,5 @@ include $(GRLIB)/software/leon3/Makefile
 
 ##################  project specific targets ##########################
 
-
+flash:
+	xc3sprog -c ftdi -p 1 ici4.bit

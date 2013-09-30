@@ -1,2 +1,4 @@
 apb_devices_list.vhd
+APB_MULTI_DIODE.vhd
+APB_SIMPLE_DIODE.vhd
 lpp_amba.vhd

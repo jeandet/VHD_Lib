@@ -137,7 +137,7 @@ port map(
 
 
 
-ALU_inst :ALU
+ALU_inst : ALU_V0
 generic map(Logic_en => 0,Input_SZ_1 => Sample_SZ, Input_SZ_2 => Coef_SZ)
 port map(
     clk     =>  clk,
@@ -178,7 +178,7 @@ if reset = '0' then
 
     smpl_clk_old    <=  '0';
     RAM_sample_in   <=  (others=> '0');
-    ALU_ctrl        <=  IDLE;
+    ALU_ctrl        <=  IDLE_V0;
     ALU_sample_in   <=  (others=> '0');
     ALU_Coef_in     <=  (others=> '0');
     RAM_sample_in_bk<=  (others=> '0');
@@ -206,7 +206,7 @@ elsif clk'event and clk = '1' then
                 ALU_sample_in   <=  std_logic_vector(sample_in_BUFF(0));
                 
             else
-                ALU_ctrl        <=  IDLE; 
+                ALU_ctrl        <=  IDLE_V0; 
                 smplConnectL0: for i in 0 to ChanelsCount-1 loop
                     smplConnectL1: for j in 0 to Sample_SZ-1 loop
 						      sample_in_BUFF(i)(j)  <=  sample_in(i,j);
@@ -219,12 +219,12 @@ elsif clk'event and clk = '1' then
 
         when pipe1 =>
                 IIR_CEL_STATE   <=  computeb1;
-                ALU_ctrl        <=  MAC_op;
+                ALU_ctrl        <=  MAC_op_V0;
                 ALU_Coef_in     <=  std_logic_vector(CoefsReg.NumCoefs(curentCel)(0));
 
         when computeb1 =>
             
-            ALU_ctrl        <=  MAC_op;
+            ALU_ctrl        <=  MAC_op_V0;
             ALU_sample_in   <=  RAM_sample_out;
             ALU_Coef_in     <=  std_logic_vector(CoefsReg.NumCoefs(curentCel)(1));
             IIR_CEL_STATE   <=  computeb2;
@@ -248,7 +248,7 @@ elsif clk'event and clk = '1' then
             
 
         when next_cel =>
-            ALU_ctrl        <=  clr_mac;
+            ALU_ctrl        <=  clr_mac_V0;
             IIR_CEL_STATE   <=  pipe2;            
 
         when pipe2 =>
@@ -281,7 +281,7 @@ rotate :    for i in 1 to ChanelsCount-1 loop
                 
             if curentChan   = (ChanelsCount-1) then
                 IIR_CEL_STATE   <=  waiting;
-                ALU_ctrl        <=  clr_mac;
+                ALU_ctrl        <=  clr_mac_V0;
             elsif ChanelsCount>1 then
                 curentChan       <=  curentChan + 1;
                 IIR_CEL_STATE    <=  pipe1;
