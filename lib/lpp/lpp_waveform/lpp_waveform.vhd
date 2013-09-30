@@ -94,7 +94,8 @@ ARCHITECTURE beh OF lpp_waveform IS
   SIGNAL valid_in  : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL valid_out : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL valid_ack : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL ready     : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL time_ready     : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL data_ready     : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL ready_arb     : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL data_wen     : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL time_wen     : STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -103,6 +104,7 @@ ARCHITECTURE beh OF lpp_waveform IS
   SIGNAL data_ren     : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL time_ren     : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL rdata         : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL enable      : STD_LOGIC_VECTOR(3 DOWNTO 0);
   
 BEGIN  -- beh
 
@@ -222,14 +224,15 @@ BEGIN  -- beh
       data_wen       => data_wen,
       data           => wdata);
 
-  ready_arb <= NOT ready;
+  ready_arb <= NOT data_ready;
   
   lpp_waveform_fifo_1: lpp_waveform_fifo
     GENERIC MAP (tech => tech)
     PORT MAP (
       clk      => clk,
       rstn     => rstn,
-      ready    => ready,
+      time_ready    => time_ready,
+      data_ready    => data_ready,
       time_ren => time_ren,             -- todo
       data_ren => data_ren,             -- todo
       rdata    => rdata,                -- todo
@@ -237,7 +240,9 @@ BEGIN  -- beh
       time_wen => time_wen,
       data_wen => data_wen,
       wdata    => wdata);
- 
+
+  enable <= enable_f3 & enable_f2 & enable_f1 & enable_f0;
+  
   pp_waveform_dma_1: lpp_waveform_dma
    GENERIC MAP (
      data_size              => data_size,
@@ -249,7 +254,9 @@ BEGIN  -- beh
      HRESETn            => rstn,                
      AHB_Master_In      => AHB_Master_In,       
      AHB_Master_Out     => AHB_Master_Out,
-     data_ready         => ready,
+     enable             => enable,  -- todo
+     time_ready         => time_ready,  -- todo
+     data_ready         => data_ready,
      data               => rdata,
      data_data_ren      => data_ren,
      data_time_ren      => time_ren,  

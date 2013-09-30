@@ -10,4 +10,5 @@ lpp_lfr_apbreg.vhd
 top_wf_picker.vhd
 lpp_lfr_filter.vhd
 lpp_lfr_ms.vhd
+lpp_top_ms.vhd
 lpp_lfr.vhd

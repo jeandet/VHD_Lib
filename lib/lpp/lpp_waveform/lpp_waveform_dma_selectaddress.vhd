@@ -37,6 +37,7 @@ ENTITY lpp_waveform_dma_selectaddress IS
     HCLK    : IN STD_ULOGIC;
     HRESETn : IN STD_ULOGIC;
 
+    enable : IN STD_LOGIC;
     update : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
 
     nb_burst_available : IN STD_LOGIC_VECTOR(nb_burst_available_size-1 DOWNTO 0);
@@ -80,10 +81,12 @@ BEGIN
       update_r        <= update;
       CASE state IS
         WHEN IDLE =>
-          IF update_s = '1' THEN
+          IF enable = '0' THEN
+            state <= UPDATED;
+          elsIF update_s = '1' THEN
             state <= ADD;
           END IF;
-
+              
         WHEN ADD =>
           IF UNSIGNED(nb_send_next) < UNSIGNED(nb_burst_available) THEN
             state <= IDLE;
@@ -121,8 +124,10 @@ BEGIN
           
         WHEN UPDATED =>
           status_full_err <= '0';
-          state           <= IDLE;
           address         <= addr_data_reg;
+          IF enable = '1' THEN
+            state     <= IDLE;
+          END IF;
           
         WHEN OTHERS => NULL;
       END CASE;

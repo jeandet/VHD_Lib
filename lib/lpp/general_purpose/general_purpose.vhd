@@ -269,4 +269,31 @@ Constant ctrl_CLRMAC : std_logic_vector(2 downto 0) := "100";
       A_sync : OUT STD_LOGIC);
   END COMPONENT;
 
+  COMPONENT lpp_front_to_level
+    PORT (
+      clk  : IN  STD_LOGIC;
+      rstn : IN  STD_LOGIC;
+      sin  : IN  STD_LOGIC;
+      sout : OUT STD_LOGIC);
+  END COMPONENT;
+
+  COMPONENT lpp_front_detection
+    PORT (
+      clk  : IN  STD_LOGIC;
+      rstn : IN  STD_LOGIC;
+      sin  : IN  STD_LOGIC;
+      sout : OUT STD_LOGIC);
+  END COMPONENT;
+
+  COMPONENT SYNC_VALID_BIT
+    GENERIC (
+      NB_FF_OF_SYNC : INTEGER);
+    PORT (
+      clk_in  : IN  STD_LOGIC;
+      clk_out : IN  STD_LOGIC;
+      rstn : IN  STD_LOGIC;
+      sin  : IN  STD_LOGIC;
+      sout : OUT STD_LOGIC);
+  END COMPONENT;
+  
 END;

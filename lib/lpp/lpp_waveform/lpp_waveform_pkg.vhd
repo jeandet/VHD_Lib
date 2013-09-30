@@ -132,6 +132,7 @@ PACKAGE lpp_waveform_pkg IS
     PORT (
       HCLK              : IN  STD_ULOGIC;
       HRESETn           : IN  STD_ULOGIC;
+      enable : IN STD_LOGIC;      
       update            : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
       nb_burst_available : IN  STD_LOGIC_VECTOR(nb_burst_available_size-1 DOWNTO 0);
       addr_data_reg     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -162,6 +163,8 @@ PACKAGE lpp_waveform_pkg IS
       HRESETn           : IN  STD_ULOGIC;
       AHB_Master_In     : IN  AHB_Mst_In_Type;
       AHB_Master_Out    : OUT AHB_Mst_Out_Type;
+      enable             : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);   -- todo
+      time_ready         : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);   -- todo
       data_ready        : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);  
       data              : IN  STD_LOGIC_VECTOR(31 DOWNTO 0); 
       data_data_ren     : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -229,7 +232,8 @@ PACKAGE lpp_waveform_pkg IS
     PORT (
       clk      : IN  STD_LOGIC;
       rstn     : IN  STD_LOGIC;
-      ready    : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      time_ready    : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      data_ready    : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       time_ren : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
       data_ren : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
       rdata    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);

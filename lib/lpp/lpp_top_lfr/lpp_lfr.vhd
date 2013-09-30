@@ -139,10 +139,10 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL data_f2_wfp : STD_LOGIC_VECTOR(159 DOWNTO 0) ;
   SIGNAL data_f3_wfp : STD_LOGIC_VECTOR(159 DOWNTO 0) ;
 
-  SIGNAL val_f0_wfp : STD_LOGIC;
-  SIGNAL val_f1_wfp : STD_LOGIC;
-  SIGNAL val_f2_wfp : STD_LOGIC;
-  SIGNAL val_f3_wfp : STD_LOGIC;
+ -- SIGNAL val_f0_wfp : STD_LOGIC;
+ --  SIGNAL val_f1_wfp : STD_LOGIC;
+ --  SIGNAL val_f2_wfp : STD_LOGIC;
+ --  SIGNAL val_f3_wfp : STD_LOGIC;
 BEGIN
   
   sample(4 DOWNTO 0) <= sample_E(4 DOWNTO 0);
@@ -286,6 +286,8 @@ BEGIN
       data_f1_in_valid   => sample_f1_val,
       data_f2_in_valid   => sample_f2_val,
       data_f3_in_valid   => sample_f3_val);
+  
+  time_info <= (others => '0');
   
   data_f0_wfp <= sample_f0_data & time_info;
   data_f1_wfp <= sample_f1_data & time_info;

@@ -164,5 +164,33 @@ PACKAGE lpp_lfr_pkg IS
       addr_data_f2                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_data_f3                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0));
   END COMPONENT;
+
+  COMPONENT lpp_top_ms
+    GENERIC (
+      Mem_use                 : INTEGER;
+      nb_burst_available_size : INTEGER;
+      nb_snapshot_param_size  : INTEGER;
+      delta_snapshot_size     : INTEGER;
+      delta_f2_f0_size        : INTEGER;
+      delta_f2_f1_size        : INTEGER;
+      pindex                  : INTEGER;
+      paddr                   : INTEGER;
+      pmask                   : INTEGER;
+      pirq_ms                 : INTEGER;
+      pirq_wfp                : INTEGER;
+      hindex_wfp              : INTEGER;
+      hindex_ms               : INTEGER);
+    PORT (
+      clk             : IN  STD_LOGIC;
+      rstn            : IN  STD_LOGIC;
+      sample_B        : IN  Samples14v(2 DOWNTO 0);
+      sample_E        : IN  Samples14v(4 DOWNTO 0);
+      sample_val      : IN  STD_LOGIC;
+      apbi            : IN  apb_slv_in_type;
+      apbo            : OUT apb_slv_out_type;
+      ahbi_ms         : IN  AHB_Mst_In_Type;
+      ahbo_ms         : OUT AHB_Mst_Out_Type;
+      data_shaping_BW : OUT STD_LOGIC);
+  END COMPONENT;
   
 END lpp_lfr_pkg;

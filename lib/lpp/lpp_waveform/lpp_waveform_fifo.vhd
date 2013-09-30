@@ -39,7 +39,8 @@ ENTITY lpp_waveform_fifo IS
     rstn : IN STD_LOGIC;
 
     ---------------------------------------------------------------------------
-    ready      : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);  -- FIFO_DATA occupancy is greater than 16 * 32b
+    time_ready      : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);  -- FIFO_DATA occupancy is greater than 16 * 32b
+    data_ready      : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);  -- FIFO_DATA occupancy is greater than 16 * 32b
     
     ---------------------------------------------------------------------------
     time_ren   : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -115,7 +116,7 @@ BEGIN
       GENERIC MAP (
         offset       => 32*I + 20,
         length       => 10,
-        enable_ready => '0')
+        enable_ready => '1')
       PORT MAP (
         clk          => clk,
         rstn         => rstn,
@@ -125,7 +126,7 @@ BEGIN
         mem_we       => time_mem_wen(I),
         mem_addr_ren => time_mem_addr_r(I),
         mem_addr_wen => time_mem_addr_w(I),
-        ready        => OPEN);
+        ready        => time_ready(I));
   END GENERATE gen_fifo_ctrl_time;
 
   gen_fifo_ctrl_data: FOR I IN 3 DOWNTO 0 GENERATE
@@ -143,7 +144,7 @@ BEGIN
         mem_we       => data_mem_wen(I),
         mem_addr_ren => data_mem_addr_r(I),
         mem_addr_wen => data_mem_addr_w(I),
-        ready        => ready(I));
+        ready        => data_ready(I));
   END GENERATE gen_fifo_ctrl_data;
 
   

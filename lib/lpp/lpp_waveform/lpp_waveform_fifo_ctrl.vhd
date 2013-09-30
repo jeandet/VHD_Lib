@@ -133,7 +133,7 @@ BEGIN
   mem_addr_ren <= std_logic_vector(to_unsigned((Raddr_vect + offset), mem_addr_ren'length));
 
   ready_gen: IF enable_ready = '1' GENERATE
-    ready <= '1' WHEN Waddr_vect > Raddr_vect AND (Waddr_vect - Raddr_vect) > 15 ELSE
+    ready <= '1' WHEN Waddr_vect > Raddr_vect AND (Waddr_vect - Raddr_vect) > 15          ELSE
              '1' WHEN Waddr_vect < Raddr_vect AND (length + Waddr_vect - Raddr_vect) > 15 ELSE
              '0';
   END GENERATE ready_gen;

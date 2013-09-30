@@ -104,7 +104,7 @@ BEGIN
     END IF;
   END PROCESS;
 
---nclk <= NOT clk;
+  --nclk <= NOT clk;
   ssram_clk_pad : outpad GENERIC MAP (tech => tech)
     PORT MAP (SSRAM_CLK, NOT clk);
 

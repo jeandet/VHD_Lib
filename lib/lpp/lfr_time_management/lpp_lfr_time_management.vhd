@@ -17,67 +17,68 @@
 -- Additional Comments: 
 --
 ----------------------------------------------------------------------------------
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-library grlib;
-use grlib.amba.all;
-use grlib.stdlib.all;
-use grlib.devices.all;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+LIBRARY grlib;
+USE grlib.amba.ALL;
+USE grlib.stdlib.ALL;
+USE grlib.devices.ALL;
 
-package lpp_lfr_time_management is
+PACKAGE lpp_lfr_time_management IS
 
 --***************************
 -- APB_LFR_TIME_MANAGEMENT
 
-component apb_lfr_time_management is
+  COMPONENT apb_lfr_time_management IS
 
-    generic(
-			pindex      : integer := 0;			--! APB slave index
-			paddr       : integer := 0;			--! ADDR field of the APB BAR
-			pmask       : integer := 16#fff#;	--! MASK field of the APB BAR
-			pirq        : integer := 0;			--! 2 consecutive IRQ lines are used
-			masterclk 	: integer := 25000000;		--! master clock in Hz
-			timeclk  	: integer := 49152000;      --! other clock in Hz
-			finetimeclk	: integer := 65536			--! divided clock used for the fine time counter
-			);
+    GENERIC(
+      pindex      : INTEGER := 0;       --! APB slave index
+      paddr       : INTEGER := 0;       --! ADDR field of the APB BAR
+      pmask       : INTEGER := 16#fff#;   --! MASK field of the APB BAR
+      pirq        : INTEGER := 0
+      );
 
-    Port (
-			clk25MHz		: in	STD_LOGIC;	--! Clock
-			clk49_152MHz	: in    STD_LOGIC;  --! secondary clock
-			resetn      	: in	STD_LOGIC;	--! Reset
-			grspw_tick		: in	STD_LOGIC;	--! grspw signal asserted when a valid time-code is received
-			apbi       		: in	apb_slv_in_type;	--! APB slave input signals
-			apbo       		: out	apb_slv_out_type;	--! APB slave output signals
-			coarse_time		: out	std_logic_vector(31 downto 0);	--! coarse time
-			fine_time		: out	std_logic_vector(31 downto 0)	--! fine time
-			);
+    PORT (
+      clk25MHz     : IN  STD_LOGIC;     --! Clock
+      clk49_152MHz : IN  STD_LOGIC;     --! secondary clock
+      resetn       : IN  STD_LOGIC;     --! Reset
+      grspw_tick   : IN  STD_LOGIC;  --! grspw signal asserted when a valid time-code is received
+      apbi         : IN  apb_slv_in_type;   --! APB slave input signals
+      apbo         : OUT apb_slv_out_type;  --! APB slave output signals
+      coarse_time  : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --! coarse time
+      fine_time    : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)   --! fine time
+      );
 
-end component;
+  END COMPONENT;
 
-component lfr_time_management is	
+  COMPONENT lfr_time_management
+    GENERIC (
+      nb_time_code_missing_limit : INTEGER);
+    PORT (
+      clk            : IN  STD_LOGIC;
+      rstn           : IN  STD_LOGIC;
+      new_timecode   : IN  STD_LOGIC;
+      new_coarsetime : IN  STD_LOGIC;
+      coarsetime_reg : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      fine_time      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      fine_time_new   : OUT STD_LOGIC;
+      coarse_time    : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      coarse_time_new : OUT STD_LOGIC
+      );
+  END COMPONENT;
 
-    generic (
-		masterclk	: integer := 25000000;		-- master clock in Hz
-		timeclk		: integer := 49152000;      -- 2nd clock in Hz
-		finetimeclk	: integer := 65536;			-- divided clock used for the fine time counter
-		nb_clk_div_ticks	: integer   := 1    -- nb ticks before commutation to AUTO state
-		);
-    Port ( 
-		master_clock		: in    std_logic;				--! Clock
-		time_clock        	: in    std_logic;				--! 2nd Clock
-		resetn      		: in    std_logic;				--! Reset
-		grspw_tick			: in    std_logic;
-		soft_tick			: in    std_logic;				--! soft tick, load the coarse_time value
-		coarse_time_load	: in    std_logic_vector(31 downto 0);
-		coarse_time			: out   std_logic_vector(31 downto 0);
-		fine_time			: out	std_logic_vector(31 downto 0);
-		next_commutation	: in	std_logic_vector(31 downto 0);
---		reset_next_commutation: out  std_logic;
-		irq1                : out std_logic;
-		irq2                : out std_logic
-		);
-				
-end component;
+  COMPONENT lpp_counter
+    GENERIC (
+      nb_wait_period : INTEGER;
+      nb_bit_of_data : INTEGER);
+    PORT (
+      clk   : IN  STD_LOGIC;
+      rstn  : IN  STD_LOGIC;
+      clear : IN  STD_LOGIC;
+      full  : OUT STD_LOGIC;
+      data  : OUT STD_LOGIC_VECTOR(nb_bit_of_data-1 DOWNTO 0);
+      new_data : OUT STD_LOGIC );
+  END COMPONENT;
 
-end lpp_lfr_time_management;
+END lpp_lfr_time_management;
 

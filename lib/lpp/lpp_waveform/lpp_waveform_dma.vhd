@@ -57,10 +57,12 @@ ENTITY lpp_waveform_dma IS
     AHB_Master_In      : IN  AHB_Mst_In_Type;
     AHB_Master_Out     : OUT AHB_Mst_Out_Type;
     --
-    data_ready         : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);   -- todo
-    data               : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);  -- todo
-    data_data_ren      : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);   -- todo
-    data_time_ren      : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);   -- todo
+    enable             : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);   -- todo
+    time_ready         : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);   -- todo
+    data_ready         : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);   
+    data               : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);  
+    data_data_ren      : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);   
+    data_time_ren      : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);   
     -- Reg
     nb_burst_available : IN  STD_LOGIC_VECTOR(nb_burst_available_size-1 DOWNTO 0);
     status_full        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -79,7 +81,7 @@ ARCHITECTURE Behavioral OF lpp_waveform_dma IS
   SIGNAL DMAIn  : DMA_In_Type;
   SIGNAL DMAOut : DMA_OUt_Type;
   -----------------------------------------------------------------------------
-  TYPE state_DMAWriteBurst IS (IDLE,
+  TYPE state_DMAWriteBurst IS (IDLE,TRASH_FIFO_TIME,TRASH_FIFO_DATA,
                                  SEND_TIME_0, WAIT_TIME_0,
                                  SEND_TIME_1, WAIT_TIME_1,
                                  SEND_5_TIME,
@@ -88,9 +90,12 @@ ARCHITECTURE Behavioral OF lpp_waveform_dma IS
   -----------------------------------------------------------------------------
   -- CONTROL 
   SIGNAL sel_data_s           : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL sel_data_ss          : STD_LOGIC;
+  SIGNAL sel_time_s           : STD_LOGIC;
   SIGNAL sel_data             : STD_LOGIC_VECTOR(1 DOWNTO 0);
   SIGNAL update               : STD_LOGIC_VECTOR(1 DOWNTO 0);
   SIGNAL time_select          : STD_LOGIC;
+  SIGNAL enable_sel          : STD_LOGIC;
   SIGNAL time_write           : STD_LOGIC;
   SIGNAL time_already_send    : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL time_already_send_s  : STD_LOGIC;
@@ -109,6 +114,7 @@ ARCHITECTURE Behavioral OF lpp_waveform_dma IS
   SIGNAL data_send_ok         : STD_LOGIC;
   SIGNAL data_send_ko         : STD_LOGIC;
   SIGNAL data_fifo_ren        : STD_LOGIC;
+  SIGNAL trash_fifo_ren        : STD_LOGIC;
   SIGNAL data_ren             : STD_LOGIC;
   -----------------------------------------------------------------------------
   -- SELECT ADDRESS
@@ -170,6 +176,21 @@ BEGIN
                 "01" WHEN data_ready(1) = '1' ELSE
                 "10" WHEN data_ready(2) = '1' ELSE
                 "11";
+
+  sel_data_ss <= data_ready(0) WHEN sel_data = "00" ELSE
+                 data_ready(1) WHEN sel_data = "01" ELSE
+                 data_ready(2) WHEN sel_data = "10" ELSE
+                 data_ready(3);
+
+  sel_time_s <= time_ready(0) WHEN sel_data = "00" ELSE
+                time_ready(1) WHEN sel_data = "01" ELSE
+                time_ready(2) WHEN sel_data = "10" ELSE
+                time_ready(3);
+
+  enable_sel <= enable(0) WHEN sel_data = "00" ELSE
+                enable(1) WHEN sel_data = "01" ELSE
+                enable(2) WHEN sel_data = "10" ELSE
+                enable(3);
   
   time_already_send_s <= time_already_send(0) WHEN data_ready(0) = '1' ELSE
                          time_already_send(1) WHEN data_ready(1) = '1' ELSE
@@ -186,6 +207,7 @@ BEGIN
       update         <= "00";
       time_select    <= '0';
       time_fifo_ren  <= '1';
+      trash_fifo_ren   <= '1';
       data_send      <= '0';
       time_send      <= '0';
       time_write     <= '0';
@@ -203,13 +225,36 @@ BEGIN
           data_send       <= '0';
           time_send       <= '0';
           time_write      <= '0';
-
+          trash_fifo_ren   <= '1';
           IF data_ready = "0000" THEN
             state <= IDLE;
           ELSE
-            sel_data            <= sel_data_s;
-            state <= SEND_5_TIME;
+            sel_data <= sel_data_s;
+            IF enable_sel  = '1' THEN
+              state    <= SEND_5_TIME;
+            ELSE
+              state    <= TRASH_FIFO_TIME;
+            END IF;
+
           END IF;
+
+        WHEN TRASH_FIFO_TIME =>
+          time_select     <= '1';
+          time_fifo_ren   <= '0';
+          IF sel_time_s = '1' THEN
+            time_fifo_ren   <= '1';
+            state <= TRASH_FIFO_DATA;
+          END IF;
+          
+
+        WHEN TRASH_FIFO_DATA =>
+          time_select     <= '1';
+          trash_fifo_ren   <= '0';
+          IF sel_data_ss = '1' THEN
+            trash_fifo_ren   <= '1';
+            state <= IDLE;
+          END IF;
+          
 
         WHEN SEND_5_TIME =>
           update          <= "00";
@@ -283,9 +328,9 @@ BEGIN
       send_ok => data_send_ok,
       send_ko => data_send_ko);         
 
-  DMAIn    <= time_dmai     WHEN time_select = '1' ELSE data_dmai;
-  data_ren <= '1'           WHEN time_select = '1' ELSE data_fifo_ren;
-  time_ren <= time_fifo_ren WHEN time_select = '1' ELSE '1';
+  DMAIn    <= time_dmai      WHEN time_select = '1' ELSE data_dmai;
+  data_ren <= trash_fifo_ren WHEN time_select = '1' ELSE data_fifo_ren;
+  time_ren <= time_fifo_ren  WHEN time_select = '1' ELSE '1';
 
   all_data_ren : FOR I IN 3 DOWNTO 0 GENERATE
     data_data_ren(I) <= data_ren WHEN UNSIGNED(sel_data) = I ELSE '1';
@@ -306,6 +351,7 @@ BEGIN
       PORT MAP (
         HCLK               => HCLK,
         HRESETn            => HRESETn,
+        enable             => enable(I),
         update             => update_and_sel((2*I)+1 DOWNTO 2*I),
         nb_burst_available => nb_burst_available,
         addr_data_reg      => addr_data_reg_vector(32*I+31 DOWNTO 32*I),

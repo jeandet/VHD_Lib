@@ -73,10 +73,10 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
   CONSTANT CoefPerCel       : INTEGER := 5;
   CONSTANT Cels_count       : INTEGER := 5;
 
-  SIGNAL coefs                    : STD_LOGIC_VECTOR((Coef_SZ*CoefCntPerCel*Cels_count)-1 DOWNTO 0);
+  --SIGNAL coefs                    : STD_LOGIC_VECTOR((Coef_SZ*CoefCntPerCel*Cels_count)-1 DOWNTO 0);
   SIGNAL coefs_v2                 : STD_LOGIC_VECTOR((Coef_SZ*CoefPerCel*Cels_count)-1 DOWNTO 0);
   SIGNAL sample_filter_in         : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
-  SIGNAL sample_filter_out        : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
+  --SIGNAL sample_filter_out        : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
   --
   SIGNAL sample_filter_v2_out_val : STD_LOGIC;
   SIGNAL sample_filter_v2_out     : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
@@ -107,10 +107,10 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
   SIGNAL sample_f3                       : samplT(5 DOWNTO 0, 15 DOWNTO 0);
 
   -----------------------------------------------------------------------------
-  SIGNAL data_f0_in_valid : STD_LOGIC_VECTOR(159 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL data_f1_in_valid : STD_LOGIC_VECTOR(159 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL data_f2_in_valid : STD_LOGIC_VECTOR(159 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL data_f3_in_valid : STD_LOGIC_VECTOR(159 DOWNTO 0) := (OTHERS => '0');
+  --SIGNAL data_f0_in_valid : STD_LOGIC_VECTOR(159 DOWNTO 0) := (OTHERS => '0');
+  --SIGNAL data_f1_in_valid : STD_LOGIC_VECTOR(159 DOWNTO 0) := (OTHERS => '0');
+  --SIGNAL data_f2_in_valid : STD_LOGIC_VECTOR(159 DOWNTO 0) := (OTHERS => '0');
+  --SIGNAL data_f3_in_valid : STD_LOGIC_VECTOR(159 DOWNTO 0) := (OTHERS => '0');
   -----------------------------------------------------------------------------
 
   SIGNAL sample_f0_wdata_s : STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);

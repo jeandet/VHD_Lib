@@ -110,17 +110,17 @@ ARCHITECTURE Behavioral OF lpp_dma_ip IS
                                WAIT_DATA_ACK,
                                CHECK_LENGTH
                                );
-  SIGNAL state : state_DMAWriteBurst := IDLE;
+  SIGNAL state : state_DMAWriteBurst;-- := IDLE;
 
-  SIGNAL nbSend                 : INTEGER;
+ -- SIGNAL nbSend                 : INTEGER;
   SIGNAL matrix_type            : STD_LOGIC_VECTOR(1 DOWNTO 0);
   SIGNAL component_type         : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL component_type_pre     : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL header_check_ok        : STD_LOGIC;
   SIGNAL address_matrix         : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL send_matrix            : STD_LOGIC;
-  SIGNAL request                : STD_LOGIC;
-  SIGNAL remaining_data_request : INTEGER;
+ -- SIGNAL request                : STD_LOGIC;
+--  SIGNAL remaining_data_request : INTEGER;
   SIGNAL Address                : STD_LOGIC_VECTOR(31 DOWNTO 0);
   -----------------------------------------------------------------------------
   -----------------------------------------------------------------------------
