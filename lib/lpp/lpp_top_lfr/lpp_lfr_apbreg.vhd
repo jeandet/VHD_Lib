@@ -111,6 +111,8 @@ ENTITY lpp_lfr_apbreg IS
     burst_f1 : OUT STD_LOGIC;
     burst_f2 : OUT STD_LOGIC;
 
+    run : OUT STD_LOGIC;
+
     addr_data_f0 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_data_f1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_data_f2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -126,7 +128,7 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
   CONSTANT REVISION : INTEGER := 1;
   
   CONSTANT pconfig : apb_config_type := (
-    0 => ahb_device_reg (VENDOR_LPP, LPP_DMA_TYPE, 2, REVISION, pirq_wfp),
+    0 => ahb_device_reg (VENDOR_LPP, LPP_LFR, 2, REVISION, pirq_wfp),
     1 => apb_iobar(paddr, pmask));
 
   TYPE lpp_SpectralMatrix_regs IS RECORD
@@ -166,6 +168,7 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
     burst_f0           : STD_LOGIC;
     burst_f1           : STD_LOGIC;
     burst_f2           : STD_LOGIC;
+    run                : STD_LOGIC;
     addr_data_f0       : STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_data_f1       : STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_data_f2       : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -213,6 +216,8 @@ BEGIN  -- beh
   burst_f1 <= reg_wp.burst_f1;
   burst_f2 <= reg_wp.burst_f2;
 
+  run      <= reg_wp.run;
+
   addr_data_f0 <= reg_wp.addr_data_f0;
   addr_data_f1 <= reg_wp.addr_data_f1;
   addr_data_f2 <= reg_wp.addr_data_f2;
@@ -252,6 +257,7 @@ BEGIN  -- beh
       reg_wp.burst_f0           <= '0';
       reg_wp.burst_f1           <= '0';
       reg_wp.burst_f2           <= '0';
+      reg_wp.run                <= '0';
       reg_wp.addr_data_f0       <= (OTHERS => '0');
       reg_wp.addr_data_f1       <= (OTHERS => '0');
       reg_wp.addr_data_f2       <= (OTHERS => '0');
@@ -313,6 +319,7 @@ BEGIN  -- beh
                            prdata(4) <= reg_wp.burst_f0;
                            prdata(5) <= reg_wp.burst_f1;
                            prdata(6) <= reg_wp.burst_f2;
+                           prdata(7) <= reg_wp.run;
           WHEN "001010" => prdata             <= reg_wp.addr_data_f0;
           WHEN "001011" => prdata             <= reg_wp.addr_data_f1;
           WHEN "001100" => prdata             <= reg_wp.addr_data_f2;
@@ -357,6 +364,7 @@ BEGIN  -- beh
                              reg_wp.burst_f0  <= apbi.pwdata(4);
                              reg_wp.burst_f1  <= apbi.pwdata(5);
                              reg_wp.burst_f2  <= apbi.pwdata(6);
+                             reg_wp.run       <= apbi.pwdata(7);
             WHEN "001010" => reg_wp.addr_data_f0 <= apbi.pwdata;
             WHEN "001011" => reg_wp.addr_data_f1 <= apbi.pwdata;
             WHEN "001100" => reg_wp.addr_data_f2 <= apbi.pwdata;

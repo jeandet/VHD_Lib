@@ -50,6 +50,78 @@ PACKAGE lpp_ad_conv IS
 
   TYPE Samples IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
 
+  -----------------------------------------------------------------------------
+  -----------------------------------------------------------------------------
+  SUBTYPE Samples24 IS STD_LOGIC_VECTOR(23 DOWNTO 0);
+
+  SUBTYPE Samples16 IS STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+  SUBTYPE Samples14 IS STD_LOGIC_VECTOR(13 DOWNTO 0);
+
+  SUBTYPE Samples12 IS STD_LOGIC_VECTOR(11 DOWNTO 0);
+
+  SUBTYPE Samples10 IS STD_LOGIC_VECTOR(9 DOWNTO 0);
+
+  SUBTYPE Samples8 IS STD_LOGIC_VECTOR(7 DOWNTO 0);
+
+  TYPE Samples24v IS ARRAY(NATURAL RANGE <>) OF Samples24;
+
+  TYPE Samples16v IS ARRAY(NATURAL RANGE <>) OF Samples16;
+
+  TYPE Samples14v IS ARRAY(NATURAL RANGE <>) OF Samples14;
+
+  TYPE Samples12v IS ARRAY(NATURAL RANGE <>) OF Samples12;
+
+  TYPE Samples10v IS ARRAY(NATURAL RANGE <>) OF Samples10;
+
+  TYPE Samples8v IS ARRAY(NATURAL RANGE <>) OF Samples8;
+
+  COMPONENT RHF1401_drvr IS
+    GENERIC(
+      ChanelCount : INTEGER := 8);
+    PORT (
+      cnv_clk    : IN  STD_LOGIC;
+      clk        : IN  STD_LOGIC;
+      rstn       : IN  STD_LOGIC;
+      ADC_data   : IN  Samples14;
+      --ADC_smpclk : OUT STD_LOGIC;
+      ADC_nOE    : OUT STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+      sample     : OUT Samples14v(ChanelCount-1 DOWNTO 0);
+      sample_val : OUT STD_LOGIC
+      );
+  END COMPONENT;
+
+  COMPONENT top_ad_conv_RHF1401
+    GENERIC (
+      ChanelCount : INTEGER;
+      ncycle_cnv_high : INTEGER := 79;
+      ncycle_cnv      : INTEGER := 500);
+    PORT (
+      cnv_clk    : IN  STD_LOGIC;
+      cnv_rstn   : IN  STD_LOGIC;
+      cnv        : OUT STD_LOGIC;
+      clk        : IN  STD_LOGIC;
+      rstn       : IN  STD_LOGIC;
+      ADC_data   : IN  Samples14;
+      ADC_nOE    : OUT STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+      sample     : OUT Samples14v(ChanelCount-1 DOWNTO 0);
+      sample_val : OUT STD_LOGIC);
+  END COMPONENT;
+
+  COMPONENT TestModule_RHF1401
+    GENERIC (
+      freq      : INTEGER;
+      amplitude : INTEGER;
+      impulsion : INTEGER);
+    PORT (
+      ADC_smpclk  : IN  STD_LOGIC;
+      ADC_OEB_bar : IN  STD_LOGIC;
+      ADC_data    : OUT STD_LOGIC_VECTOR(13 DOWNTO 0));
+  END COMPONENT;
+
+  -----------------------------------------------------------------------------
+  -----------------------------------------------------------------------------
+  
   COMPONENT ADS7886_drvr
     GENERIC (
       ChanelCount     : INTEGER;

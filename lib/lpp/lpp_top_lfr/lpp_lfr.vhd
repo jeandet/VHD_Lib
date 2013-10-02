@@ -139,6 +139,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL data_f2_wfp : STD_LOGIC_VECTOR(159 DOWNTO 0) ;
   SIGNAL data_f3_wfp : STD_LOGIC_VECTOR(159 DOWNTO 0) ;
 
+  SIGNAL run : STD_LOGIC;
  -- SIGNAL val_f0_wfp : STD_LOGIC;
  --  SIGNAL val_f1_wfp : STD_LOGIC;
  --  SIGNAL val_f2_wfp : STD_LOGIC;
@@ -234,6 +235,7 @@ BEGIN
       burst_f0           => burst_f0,
       burst_f1           => burst_f1,
       burst_f2           => burst_f2,
+      run                => run,
       addr_data_f0       => addr_data_f0,
       addr_data_f1       => addr_data_f1,
       addr_data_f2       => addr_data_f2,
@@ -267,6 +269,9 @@ BEGIN
       burst_f0           => burst_f0,
       burst_f1           => burst_f1,
       burst_f2           => burst_f2,
+      
+      run                => run,
+      
       nb_burst_available => nb_burst_available,
       nb_snapshot_param  => nb_snapshot_param,
       status_full        => status_full,

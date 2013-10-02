@@ -33,7 +33,8 @@ ENTITY lpp_waveform_fifo_arbiter IS
   PORT(
     clk  : IN STD_LOGIC;
     rstn : IN STD_LOGIC;
-
+    ---------------------------------------------------------------------------
+    run  : IN STD_LOGIC;
     ---------------------------------------------------------------------------
     data_f0_valid : IN STD_LOGIC;
     data_f1_valid : IN STD_LOGIC;
@@ -111,7 +112,7 @@ BEGIN
           data_wen       <= (OTHERS => '1');
           data           <= (OTHERS => '0');
           data_temp      <= (OTHERS => '0');
-          IF data_ready_to_go = '1' THEN
+          IF data_ready_to_go = '1' AND run = '1' THEN
             state          <= T1;
             data_valid_ack <= data_valid_selected;
             time_wen       <= NOT data_valid_selected;
@@ -120,20 +121,32 @@ BEGIN
             data_temp      <= data_selected(159 DOWNTO 32);
           END IF;
         WHEN T1 =>
-          state                      <= T2;
+          IF run = '0' THEN
+            state <= IDLE;
+          ELSE
+            state <= T2;
+          END IF;
           data_valid_ack             <= (OTHERS => '0');
           data                       <= data_temp(31 DOWNTO 0);
           data_temp(32*3-1 DOWNTO 0) <= data_temp(32*4-1 DOWNTO 32);
           
         WHEN T2 =>
-          state                      <= D1;
+          IF run = '0' THEN
+            state <= IDLE;
+          ELSE
+            state <= D1;
+          END IF;
           time_wen                   <= (OTHERS => '1');
           data_wen                   <= time_en_temp;
           data                       <= data_temp(31 DOWNTO 0);
           data_temp(32*3-1 DOWNTO 0) <= data_temp(32*4-1 DOWNTO 32);
           
         WHEN D1 =>
-          state                      <= D2;
+          IF run = '0' THEN
+            state <= IDLE;
+          ELSE
+            state <= D2;
+          END IF;
           data                       <= data_temp(31 DOWNTO 0);
           data_temp(32*3-1 DOWNTO 0) <= data_temp(32*4-1 DOWNTO 32);
           

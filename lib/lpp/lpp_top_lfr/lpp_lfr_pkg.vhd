@@ -159,6 +159,7 @@ PACKAGE lpp_lfr_pkg IS
       burst_f0                               : OUT STD_LOGIC;
       burst_f1                               : OUT STD_LOGIC;
       burst_f2                               : OUT STD_LOGIC;
+      run                                    : OUT STD_LOGIC;
       addr_data_f0                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_data_f1                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_data_f2                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);

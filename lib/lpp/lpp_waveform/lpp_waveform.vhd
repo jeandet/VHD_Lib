@@ -50,6 +50,8 @@ ENTITY lpp_waveform IS
     burst_f1 : IN STD_LOGIC;
     burst_f2 : IN STD_LOGIC;
 
+    run : IN STD_LOGIC;                 -- TODO
+
     nb_burst_available : IN STD_LOGIC_VECTOR(nb_burst_available_size-1 DOWNTO 0);
     nb_snapshot_param : IN STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
     status_full       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -116,6 +118,7 @@ BEGIN  -- beh
     PORT MAP (
       clk               => clk,
       rstn              => rstn,
+      run               => run,
       delta_snapshot    => delta_snapshot,
       delta_f2_f1       => delta_f2_f1,
       delta_f2_f0       => delta_f2_f0,
@@ -133,6 +136,7 @@ BEGIN  -- beh
     PORT MAP (
       clk               => clk,
       rstn              => rstn,
+      run               => run,
       enable            => enable_f0,
       burst_enable      => burst_f0,
       nb_snapshot_param => nb_snapshot_param,
@@ -151,6 +155,7 @@ BEGIN  -- beh
     PORT MAP (
       clk               => clk,
       rstn              => rstn,
+      run               => run,
       enable            => enable_f1,
       burst_enable      => burst_f1,
       nb_snapshot_param => nb_snapshot_param_more_one,
@@ -167,6 +172,7 @@ BEGIN  -- beh
     PORT MAP (
       clk               => clk,
       rstn              => rstn,
+      run               => run,
       enable            => enable_f2,
       burst_enable      => burst_f2,
       nb_snapshot_param => nb_snapshot_param_more_one,
@@ -182,6 +188,7 @@ BEGIN  -- beh
     PORT MAP (
       clk            => clk,
       rstn           => rstn,
+      run            => run,
       enable         => enable_f3,
       data_in        => data_f3_in,
       data_in_valid  => data_f3_in_valid,
@@ -196,6 +203,7 @@ BEGIN  -- beh
       PORT MAP (
         HCLK      => clk,
         HRESETn   => rstn,
+        run       => run,
         valid_in  => valid_in(I),
         ack_in    => valid_ack(I),
         valid_out => valid_out(I),
@@ -207,6 +215,7 @@ BEGIN  -- beh
     PORT MAP (
       clk            => clk,
       rstn           => rstn,
+      run           => run,
       data_f0_valid  => valid_out(0),
       data_f1_valid  => valid_out(1),
       data_f2_valid  => valid_out(2),
@@ -231,6 +240,7 @@ BEGIN  -- beh
     PORT MAP (
       clk      => clk,
       rstn     => rstn,
+      run      => run,
       time_ready    => time_ready,
       data_ready    => data_ready,
       time_ren => time_ren,             -- todo
@@ -251,7 +261,9 @@ BEGIN  -- beh
      nb_burst_available_size => nb_burst_available_size)
    PORT MAP (
      HCLK               => clk,                 
-     HRESETn            => rstn,                
+     HRESETn            => rstn,
+      run      => run,
+     
      AHB_Master_In      => AHB_Master_In,       
      AHB_Master_Out     => AHB_Master_Out,
      enable             => enable,  -- todo

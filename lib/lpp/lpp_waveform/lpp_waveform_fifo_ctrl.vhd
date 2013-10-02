@@ -39,6 +39,8 @@ ENTITY lpp_waveform_fifo_ctrl IS
   PORT(
     clk  : IN STD_LOGIC;
     rstn : IN STD_LOGIC;
+    
+    run : IN STD_LOGIC;
 
     ren : IN STD_LOGIC;
     wen : IN STD_LOGIC;
@@ -92,12 +94,15 @@ BEGIN
       Raddr_vect <= 0;
       sempty     <= '1';
     ELSIF(clk'EVENT AND clk = '1')then
-      sEmpty <= sempty_s;
-
-      IF(sREN = '0' and sempty = '0')then
-        Raddr_vect <= Raddr_vect_s;
+      IF run = '0' THEN
+        Raddr_vect <= 0;
+        sempty     <= '1';
+      ELSE
+        sEmpty <= sempty_s;
+        IF(sREN = '0' and sempty = '0')then
+          Raddr_vect <= Raddr_vect_s;
+        END IF;
       END IF;
-
     END IF;
   END PROCESS;
 
@@ -118,13 +123,16 @@ BEGIN
     IF(rstn = '0')then
       Waddr_vect <= 0;
       sfull      <= '0';
-    ELSIF(clk'EVENT AND clk = '1')then
-      sfull <= sfull_s;
-
-      IF(sWEN = '0' and sfull = '0')THEN
-        Waddr_vect <= Waddr_vect_s;
+    ELSIF(clk'EVENT AND clk = '1')THEN
+      IF run = '0' THEN
+        Waddr_vect <= 0;
+        sfull      <= '0';
+      ELSE
+        sfull <= sfull_s;
+        IF(sWEN = '0' and sfull = '0')THEN
+          Waddr_vect <= Waddr_vect_s;
+        END IF;
       END IF;
-      
     END IF;
   END PROCESS;
 
@@ -143,7 +151,6 @@ BEGIN
   END GENERATE ready_not_gen;
   
 END ARCHITECTURE;
-
 
 
 

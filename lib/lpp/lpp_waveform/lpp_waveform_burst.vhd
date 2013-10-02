@@ -9,6 +9,7 @@ ENTITY lpp_waveform_burst IS
   PORT (
     clk  : IN STD_LOGIC;
     rstn : IN STD_LOGIC;
+    run  : IN STD_LOGIC;
 
     enable            : IN STD_LOGIC;
 
@@ -31,7 +32,7 @@ BEGIN  -- beh
       data_out_valid          <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN
       data_out <= data_in;
-      IF enable = '0' THEN
+      IF enable = '0' OR run = '0' THEN
         data_out_valid          <= '0';
       ELSE
         data_out_valid          <= data_in_valid;

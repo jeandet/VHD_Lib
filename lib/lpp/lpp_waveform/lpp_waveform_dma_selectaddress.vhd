@@ -37,6 +37,8 @@ ENTITY lpp_waveform_dma_selectaddress IS
     HCLK    : IN STD_ULOGIC;
     HRESETn : IN STD_ULOGIC;
 
+    run : IN STD_ULOGIC;
+
     enable : IN STD_LOGIC;
     update : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
 
@@ -78,55 +80,80 @@ BEGIN
       status_full_err <= '0';
       update_r        <= "00";
     ELSIF HCLK'EVENT AND HCLK = '1' THEN
-      update_r        <= update;
+      update_r <= update;
       CASE state IS
         WHEN IDLE =>
-          IF enable = '0' THEN
-            state <= UPDATED;
-          elsIF update_s = '1' THEN
-            state <= ADD;
-          END IF;
-              
-        WHEN ADD =>
-          IF UNSIGNED(nb_send_next) < UNSIGNED(nb_burst_available) THEN
-            state <= IDLE;
-            IF update_r = "10" THEN
-              address <= STD_LOGIC_VECTOR(UNSIGNED(address) + 64);
-              nb_send <= nb_send_next;
-            ELSIF update_r = "01" THEN
-              address <= STD_LOGIC_VECTOR(UNSIGNED(address) + 4);
-            END IF;
+          IF run = '0' THEN
+            state           <= IDLE;
+            address         <= (OTHERS => '0');
+            nb_send         <= (OTHERS => '0');
+            status_full     <= '0';
+            status_full_err <= '0';
+            update_r        <= "00";
           ELSE
-            state       <= FULL;
-            nb_send     <= (OTHERS => '0');
-            status_full <= '1';
+            IF enable = '0' THEN
+              state <= UPDATED;
+            ELSIF update_s = '1' THEN
+              state <= ADD;
+            END IF;
+          END IF;
+          
+        WHEN ADD =>
+          IF run = '0' THEN
+            state <= IDLE;
+          ELSE
+            IF UNSIGNED(nb_send_next) < UNSIGNED(nb_burst_available) THEN
+              state <= IDLE;
+              IF update_r = "10" THEN
+                address <= STD_LOGIC_VECTOR(UNSIGNED(address) + 64);
+                nb_send <= nb_send_next;
+              ELSIF update_r = "01" THEN
+                address <= STD_LOGIC_VECTOR(UNSIGNED(address) + 4);
+              END IF;
+            ELSE
+              state       <= FULL;
+              nb_send     <= (OTHERS => '0');
+              status_full <= '1';
+            END IF;
           END IF;
           
         WHEN FULL =>
-          status_full <= '0';
-          IF status_full_ack = '1' THEN
-            IF update_s = '1' THEN
-              status_full_err <= '1';
-            END IF;
-            state <= UPDATED;
+          IF run = '0' THEN
+            state <= IDLE;
           ELSE
-            IF update_s = '1' THEN
-              status_full_err <= '1';
-              state           <= ERR;
+            status_full <= '0';
+            IF status_full_ack = '1' THEN
+              IF update_s = '1' THEN
+                status_full_err <= '1';
+              END IF;
+              state <= UPDATED;
+            ELSE
+              IF update_s = '1' THEN
+                status_full_err <= '1';
+                state           <= ERR;
+              END IF;
             END IF;
           END IF;
           
         WHEN ERR =>
-          status_full_err <= '0';
-          IF status_full_ack = '1' THEN
-            state <= UPDATED;
+          IF run = '0' THEN
+            state <= IDLE;
+          ELSE
+            status_full_err <= '0';
+            IF status_full_ack = '1' THEN
+              state <= UPDATED;
+            END IF;
           END IF;
           
         WHEN UPDATED =>
-          status_full_err <= '0';
-          address         <= addr_data_reg;
-          IF enable = '1' THEN
-            state     <= IDLE;
+          IF run = '0' THEN
+            state <= IDLE;
+          ELSE
+            status_full_err <= '0';
+            address         <= addr_data_reg;
+            IF enable = '1' THEN
+              state <= IDLE;
+            END IF;
           END IF;
           
         WHEN OTHERS => NULL;

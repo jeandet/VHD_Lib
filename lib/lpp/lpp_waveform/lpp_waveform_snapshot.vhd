@@ -11,6 +11,7 @@ ENTITY lpp_waveform_snapshot IS
   PORT (
     clk  : IN STD_LOGIC;
     rstn : IN STD_LOGIC;
+    run         : IN STD_LOGIC;       
 
     enable            : IN STD_LOGIC;
     burst_enable      : IN STD_LOGIC;
@@ -39,7 +40,7 @@ BEGIN  -- beh
       counter_points_snapshot <= 0;
     ELSIF clk'EVENT AND clk = '1' THEN
       data_out <= data_in;
-      IF enable = '0' THEN
+      IF enable = '0' OR run = '0' THEN
         data_out_valid          <= '0';
         counter_points_snapshot <= 0;
       ELSE

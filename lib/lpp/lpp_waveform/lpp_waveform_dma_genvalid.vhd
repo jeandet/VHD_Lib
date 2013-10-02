@@ -31,14 +31,15 @@ USE ieee.numeric_std.ALL;
 
 ENTITY lpp_waveform_dma_gen_valid IS
   PORT (
-    HCLK              : IN  STD_LOGIC;
-    HRESETn           : IN  STD_LOGIC;
-    
-    valid_in          : IN  STD_LOGIC;
-    ack_in            : IN  STD_LOGIC;
-    
-    valid_out         : OUT STD_LOGIC;
-    error             : OUT STD_LOGIC
+    HCLK    : IN STD_LOGIC;
+    HRESETn : IN STD_LOGIC;
+    run     : IN STD_LOGIC;
+
+    valid_in : IN STD_LOGIC;
+    ack_in   : IN STD_LOGIC;
+
+    valid_out : OUT STD_LOGIC;
+    error     : OUT STD_LOGIC
     );                                      
 END;
 
@@ -50,34 +51,43 @@ BEGIN
   FSM_SELECT_ADDRESS : PROCESS (HCLK, HRESETn)
   BEGIN
     IF HRESETn = '0' THEN
-      state           <= IDLE;
-      valid_out <=  '0';
-      error <=  '0';
+      state     <= IDLE;
+      valid_out <= '0';
+      error     <= '0';
     ELSIF HCLK'EVENT AND HCLK = '1' THEN
       CASE state IS
         WHEN IDLE =>
-          valid_out <=  '0';
-          error     <=  '0';
-          IF valid_in = '1' THEN
-            state <= VALID;
-            valid_out <=  '1';
+          valid_out <= '0';
+          error     <= '0';
+          IF run = '0' THEN
+            state     <= IDLE;
+            valid_out <= '0';
+          ELSIF valid_in = '1' THEN
+            state     <= VALID;
+            valid_out <= '1';
           END IF;
 
         WHEN VALID =>
-          valid_out <=  '1';
-          error     <=  '0';
-          IF valid_in = '1' THEN
-            IF ack_in = '1' THEN
-              state <= VALID;
-              valid_out <=  '1';
-            ELSE
-              state <= IDLE;
-              error     <=  '1';
-              valid_out <=  '0';
+          IF run = '0' THEN
+            state     <= IDLE;
+            valid_out <= '0';
+            error     <= '0';
+          ELSE
+            valid_out <= '1';
+            error <= '0';
+            IF valid_in = '1' THEN
+              IF ack_in = '1' THEN
+                state     <= VALID;
+                valid_out <= '1';
+              ELSE
+                state     <= IDLE;
+                error     <= '1';
+                valid_out <= '0';
+              END IF;
+            ELSIF ack_in = '1' THEN
+              state     <= IDLE;
+              valid_out <= '0';
             END IF;
-          ELSIF ack_in = '1' THEN
-              state <= IDLE;
-              valid_out <=  '0';            
           END IF;
           
         WHEN OTHERS => NULL;

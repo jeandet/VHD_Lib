@@ -21,6 +21,7 @@ PACKAGE lpp_waveform_pkg IS
     PORT (
       clk               : IN  STD_LOGIC;
       rstn              : IN  STD_LOGIC;
+      run               : IN  STD_LOGIC;
       enable            : IN  STD_LOGIC;
       burst_enable      : IN  STD_LOGIC;
       nb_snapshot_param : IN  STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
@@ -37,6 +38,7 @@ PACKAGE lpp_waveform_pkg IS
     PORT (
       clk            : IN  STD_LOGIC;
       rstn           : IN  STD_LOGIC;
+      run            : IN  STD_LOGIC;
       enable         : IN  STD_LOGIC;
       data_in        : IN  STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
       data_in_valid  : IN  STD_LOGIC;
@@ -52,6 +54,7 @@ PACKAGE lpp_waveform_pkg IS
     PORT (
       clk               : IN STD_LOGIC;
       rstn              : IN STD_LOGIC;
+      run               : IN STD_LOGIC;
       delta_snapshot    : IN STD_LOGIC_VECTOR(delta_snapshot_size-1 DOWNTO 0);
       delta_f2_f1       : IN STD_LOGIC_VECTOR(delta_f2_f1_size-1 DOWNTO 0);
       delta_f2_f0       : IN STD_LOGIC_VECTOR(delta_f2_f0_size-1 DOWNTO 0);
@@ -91,6 +94,7 @@ PACKAGE lpp_waveform_pkg IS
       burst_f0          : IN  STD_LOGIC;
       burst_f1          : IN  STD_LOGIC;
       burst_f2          : IN  STD_LOGIC;
+      run               : IN  STD_LOGIC;
       nb_burst_available : IN  STD_LOGIC_VECTOR(nb_burst_available_size-1 DOWNTO 0);
       nb_snapshot_param : IN  STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
       status_full       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -132,6 +136,7 @@ PACKAGE lpp_waveform_pkg IS
     PORT (
       HCLK              : IN  STD_ULOGIC;
       HRESETn           : IN  STD_ULOGIC;
+      run           : IN  STD_LOGIC;
       enable : IN STD_LOGIC;      
       update            : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
       nb_burst_available : IN  STD_LOGIC_VECTOR(nb_burst_available_size-1 DOWNTO 0);
@@ -146,6 +151,7 @@ PACKAGE lpp_waveform_pkg IS
     PORT (
       HCLK      : IN  STD_LOGIC;
       HRESETn   : IN  STD_LOGIC;
+      run       : IN  STD_LOGIC;
       valid_in  : IN  STD_LOGIC;
       ack_in    : IN  STD_LOGIC;
       valid_out : OUT STD_LOGIC;
@@ -161,6 +167,7 @@ PACKAGE lpp_waveform_pkg IS
     PORT (
       HCLK              : IN  STD_ULOGIC;
       HRESETn           : IN  STD_ULOGIC;
+      run : IN STD_LOGIC;
       AHB_Master_In     : IN  AHB_Mst_In_Type;
       AHB_Master_Out    : OUT AHB_Mst_Out_Type;
       enable             : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);   -- todo
@@ -196,6 +203,7 @@ PACKAGE lpp_waveform_pkg IS
     PORT (
       clk          : IN  STD_LOGIC;
       rstn         : IN  STD_LOGIC;
+      run          : IN  STD_LOGIC;
       ren          : IN  STD_LOGIC;
       wen          : IN  STD_LOGIC;
       mem_re       : OUT STD_LOGIC;
@@ -211,6 +219,7 @@ PACKAGE lpp_waveform_pkg IS
     PORT (
       clk            : IN  STD_LOGIC;
       rstn           : IN  STD_LOGIC;
+      run            : IN  STD_LOGIC;
       data_f0_valid  : IN  STD_LOGIC;
       data_f1_valid  : IN  STD_LOGIC;
       data_f2_valid  : IN  STD_LOGIC;
@@ -232,6 +241,7 @@ PACKAGE lpp_waveform_pkg IS
     PORT (
       clk      : IN  STD_LOGIC;
       rstn     : IN  STD_LOGIC;
+      run            : IN  STD_LOGIC;
       time_ready    : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       data_ready    : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       time_ren : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);

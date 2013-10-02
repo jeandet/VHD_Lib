@@ -48,6 +48,7 @@ ENTITY lpp_dma_send_1word IS
     -- 
     send    : IN  STD_LOGIC;
     address : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+    
     data    : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
     --
     send_ok : OUT STD_LOGIC;

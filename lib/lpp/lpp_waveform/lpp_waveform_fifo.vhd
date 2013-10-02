@@ -37,6 +37,8 @@ ENTITY lpp_waveform_fifo IS
   PORT(
     clk  : IN STD_LOGIC;
     rstn : IN STD_LOGIC;
+    ---------------------------------------------------------------------------
+    run  : IN STD_LOGIC;
 
     ---------------------------------------------------------------------------
     time_ready      : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);  -- FIFO_DATA occupancy is greater than 16 * 32b
@@ -120,6 +122,7 @@ BEGIN
       PORT MAP (
         clk          => clk,
         rstn         => rstn,
+        run          => run,
         ren          => time_ren(I), 
         wen          => time_wen(I),
         mem_re       => time_mem_ren(I),
@@ -138,6 +141,7 @@ BEGIN
       PORT MAP (
         clk          => clk,
         rstn         => rstn,
+        run          => run,
         ren          => data_ren(I), 
         wen          => data_wen(I),
         mem_re       => data_mem_ren(I),

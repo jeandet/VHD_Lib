@@ -53,6 +53,8 @@ ENTITY lpp_waveform_dma IS
     -- AMBA AHB system signals
     HCLK               : IN  STD_ULOGIC;
     HRESETn            : IN  STD_ULOGIC;
+    --
+    run : IN STD_LOGIC;
     -- AMBA AHB Master Interface
     AHB_Master_In      : IN  AHB_Mst_In_Type;
     AHB_Master_Out     : OUT AHB_Mst_Out_Type;
@@ -351,6 +353,9 @@ BEGIN
       PORT MAP (
         HCLK               => HCLK,
         HRESETn            => HRESETn,
+
+        run => run,
+        
         enable             => enable(I),
         update             => update_and_sel((2*I)+1 DOWNTO 2*I),
         nb_burst_available => nb_burst_available,
