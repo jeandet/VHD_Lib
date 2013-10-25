@@ -32,7 +32,7 @@ PACKAGE lpp_lfr_pkg IS
       ready_matrix_f0_1                      : OUT STD_LOGIC;
       ready_matrix_f1                        : OUT STD_LOGIC;
       ready_matrix_f2                        : OUT STD_LOGIC;
-      error_anticipating_empty_fifo          : OUT STD_LOGIC;
+      error_anticipating_empty_fifo           : OUT STD_LOGIC;
       error_bad_component_error              : OUT STD_LOGIC;
       debug_reg                              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       status_ready_matrix_f0_0               : IN  STD_LOGIC;
@@ -73,47 +73,43 @@ PACKAGE lpp_lfr_pkg IS
 
   COMPONENT lpp_lfr
     GENERIC (
-      Mem_use                 : INTEGER;
-      nb_burst_available_size : INTEGER;
-      nb_snapshot_param_size  : INTEGER;
-      delta_snapshot_size     : INTEGER;
-      delta_f2_f0_size        : INTEGER;
-      delta_f2_f1_size        : INTEGER;
-      pindex                  : INTEGER;
-      paddr                   : INTEGER;
-      pmask                   : INTEGER;
-      pirq_ms                 : INTEGER;
-      pirq_wfp                : INTEGER;
-      hindex_wfp              : INTEGER;
-      hindex_ms               : INTEGER);
+      Mem_use                : INTEGER;
+      nb_data_by_buffer_size : INTEGER;
+      nb_snapshot_param_size : INTEGER;
+      delta_vector_size      : INTEGER;
+      delta_vector_size_f0_2 : INTEGER;
+      pindex                 : INTEGER;
+      paddr                  : INTEGER;
+      pmask                  : INTEGER;
+      pirq_ms                : INTEGER;
+      pirq_wfp               : INTEGER;
+      hindex                 : INTEGER);
     PORT (
       clk             : IN  STD_LOGIC;
       rstn            : IN  STD_LOGIC;
-      sample_B   : IN Samples14v(2 DOWNTO 0);
-      sample_E   : IN Samples14v(4 DOWNTO 0);
+      sample_B        : IN  Samples14v(2 DOWNTO 0);
+      sample_E        : IN  Samples14v(4 DOWNTO 0);
       sample_val      : IN  STD_LOGIC;
       apbi            : IN  apb_slv_in_type;
       apbo            : OUT apb_slv_out_type;
-      ahbi_wfp        : IN  AHB_Mst_In_Type;
-      ahbo_wfp        : OUT AHB_Mst_Out_Type;
-      ahbi_ms         : IN  AHB_Mst_In_Type;
-      ahbo_ms         : OUT AHB_Mst_Out_Type;
-      coarse_time_0   : IN  STD_LOGIC;
+      ahbi            : IN  AHB_Mst_In_Type;
+      ahbo            : OUT AHB_Mst_Out_Type;
+      coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
       data_shaping_BW : OUT STD_LOGIC);
   END COMPONENT;
 
   COMPONENT lpp_lfr_apbreg
     GENERIC (
-      nb_burst_available_size : INTEGER;
-      nb_snapshot_param_size  : INTEGER;
-      delta_snapshot_size     : INTEGER;
-      delta_f2_f0_size        : INTEGER;
-      delta_f2_f1_size        : INTEGER;
-      pindex                  : INTEGER;
-      paddr                   : INTEGER;
-      pmask                   : INTEGER;
-      pirq_ms                 : INTEGER;
-      pirq_wfp                : INTEGER);
+      nb_data_by_buffer_size : INTEGER;
+      nb_snapshot_param_size : INTEGER;
+      delta_vector_size      : INTEGER;
+      delta_vector_size_f0_2 : INTEGER;
+      pindex                 : INTEGER;
+      paddr                  : INTEGER;
+      pmask                  : INTEGER;
+      pirq_ms                : INTEGER;
+      pirq_wfp               : INTEGER);
     PORT (
       HCLK                                   : IN  STD_ULOGIC;
       HRESETn                                : IN  STD_ULOGIC;
@@ -147,10 +143,12 @@ PACKAGE lpp_lfr_pkg IS
       data_shaping_SP1                       : OUT STD_LOGIC;
       data_shaping_R0                        : OUT STD_LOGIC;
       data_shaping_R1                        : OUT STD_LOGIC;
-      delta_snapshot                         : OUT STD_LOGIC_VECTOR(delta_snapshot_size-1 DOWNTO 0);
-      delta_f2_f1                            : OUT STD_LOGIC_VECTOR(delta_f2_f1_size-1 DOWNTO 0);
-      delta_f2_f0                            : OUT STD_LOGIC_VECTOR(delta_f2_f0_size-1 DOWNTO 0);
-      nb_burst_available                     : OUT STD_LOGIC_VECTOR(nb_burst_available_size-1 DOWNTO 0);
+      delta_snapshot                         : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
+      delta_f0                               : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
+      delta_f0_2                             : OUT STD_LOGIC_VECTOR(delta_vector_size_f0_2-1 DOWNTO 0);
+      delta_f1                               : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
+      delta_f2                               : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
+      nb_data_by_buffer                      : OUT STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
       nb_snapshot_param                      : OUT STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
       enable_f0                              : OUT STD_LOGIC;
       enable_f1                              : OUT STD_LOGIC;
@@ -163,9 +161,10 @@ PACKAGE lpp_lfr_pkg IS
       addr_data_f0                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_data_f1                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_data_f2                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      addr_data_f3                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0));
+      addr_data_f3                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      start_date                             : OUT STD_LOGIC_VECTOR(30 DOWNTO 0));
   END COMPONENT;
-
+  
   COMPONENT lpp_top_ms
     GENERIC (
       Mem_use                 : INTEGER;

@@ -1,4 +1,3 @@
-
 ------------------------------------------------------------------------------
 --  This file is a part of the LPP VHDL IP LIBRARY
 --  Copyright (C) 2009 - 2010, Laboratory of Plasmas Physic - CNRS
@@ -29,21 +28,23 @@ USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 
 
-ENTITY lpp_waveform_dma_gen_valid IS
+ENTITY lpp_waveform_dma_genvalid IS
   PORT (
     HCLK    : IN STD_LOGIC;
     HRESETn : IN STD_LOGIC;
     run     : IN STD_LOGIC;
 
     valid_in : IN STD_LOGIC;
-    ack_in   : IN STD_LOGIC;
+    time_in  : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
 
+    ack_in    : IN STD_LOGIC;
     valid_out : OUT STD_LOGIC;
+    time_out  : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
     error     : OUT STD_LOGIC
     );                                      
 END;
 
-ARCHITECTURE Behavioral OF lpp_waveform_dma_gen_valid IS
+ARCHITECTURE Behavioral OF lpp_waveform_dma_genvalid IS
   TYPE   state_fsm IS (IDLE, VALID);
   SIGNAL state : state_fsm;
 BEGIN
@@ -54,17 +55,17 @@ BEGIN
       state     <= IDLE;
       valid_out <= '0';
       error     <= '0';
+      time_out <= (OTHERS => '0');
     ELSIF HCLK'EVENT AND HCLK = '1' THEN
       CASE state IS
         WHEN IDLE =>
+          
           valid_out <= '0';
           error     <= '0';
-          IF run = '0' THEN
-            state     <= IDLE;
-            valid_out <= '0';
-          ELSIF valid_in = '1' THEN
+          IF run = '1' AND valid_in = '1' THEN
             state     <= VALID;
             valid_out <= '1';
+            time_out  <= time_in;
           END IF;
 
         WHEN VALID =>
@@ -73,12 +74,11 @@ BEGIN
             valid_out <= '0';
             error     <= '0';
           ELSE
-            valid_out <= '1';
-            error <= '0';
             IF valid_in = '1' THEN
               IF ack_in = '1' THEN
                 state     <= VALID;
                 valid_out <= '1';
+                time_out  <= time_in;
               ELSE
                 state     <= IDLE;
                 error     <= '1';

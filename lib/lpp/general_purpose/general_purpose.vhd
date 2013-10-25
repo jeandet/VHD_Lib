@@ -344,6 +344,14 @@ Constant CLR_MAC_V0 : std_logic_vector(3 downto 0) := "0100";
       sout : OUT STD_LOGIC);
   END COMPONENT;
 
+  COMPONENT lpp_front_positive_detection
+    PORT (
+      clk  : IN  STD_LOGIC;
+      rstn : IN  STD_LOGIC;
+      sin  : IN  STD_LOGIC;
+      sout : OUT STD_LOGIC);
+  END COMPONENT;
+  
   COMPONENT SYNC_VALID_BIT
     GENERIC (
       NB_FF_OF_SYNC : INTEGER);
@@ -354,5 +362,13 @@ Constant CLR_MAC_V0 : std_logic_vector(3 downto 0) := "0100";
       sin  : IN  STD_LOGIC;
       sout : OUT STD_LOGIC);
   END COMPONENT;
-  
+
+  COMPONENT RR_Arbiter_4
+    PORT (
+      clk       : IN  STD_LOGIC;
+      rstn      : IN  STD_LOGIC;
+      in_valid  : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      out_grant : OUT STD_LOGIC_VECTOR(3 DOWNTO 0));
+  END COMPONENT;
+
 END;

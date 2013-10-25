@@ -33,8 +33,7 @@ USE techmap.gencomp.ALL;
 ENTITY lpp_waveform_fifo_ctrl IS
   generic(
     offset        : INTEGER := 0;
-    length        : INTEGER := 20;
-    enable_ready  : STD_LOGIC := '1'    
+    length        : INTEGER := 20  
     );
   PORT(
     clk  : IN STD_LOGIC;
@@ -50,8 +49,12 @@ ENTITY lpp_waveform_fifo_ctrl IS
     
     mem_addr_ren : out STD_LOGIC_VECTOR(6 DOWNTO 0);
     mem_addr_wen : out STD_LOGIC_VECTOR(6 DOWNTO 0);
-
-    ready : OUT STD_LOGIC
+    ---------------------------------------------------------------------------
+    empty_almost : OUT STD_LOGIC; --occupancy is lesser than 16 * 32b
+    empty        : OUT STD_LOGIC;
+    full_almost  : OUT STD_LOGIC; --occupancy is greater than MAX - 5 * 32b
+    full         : OUT STD_LOGIC
+    
     );
 END ENTITY;
 
@@ -73,6 +76,9 @@ ARCHITECTURE ar_lpp_waveform_fifo_ctrl OF lpp_waveform_fifo_ctrl IS
   SIGNAL Waddr_vect_s : INTEGER RANGE 0 TO length := 0;
   SIGNAL Raddr_vect_s : INTEGER RANGE 0 TO length := 0;
 
+  SIGNAL space_busy   : INTEGER RANGE 0 TO length := 0;
+  SIGNAL space_free   : INTEGER RANGE 0 TO length := 0;
+  
 BEGIN
   mem_re <= sRE;
   mem_we <= sWE;
@@ -140,15 +146,32 @@ BEGIN
   mem_addr_wen <= std_logic_vector(to_unsigned((Waddr_vect + offset), mem_addr_wen'length));
   mem_addr_ren <= std_logic_vector(to_unsigned((Raddr_vect + offset), mem_addr_ren'length));
 
-  ready_gen: IF enable_ready = '1' GENERATE
-    ready <= '1' WHEN Waddr_vect > Raddr_vect AND (Waddr_vect - Raddr_vect) > 15          ELSE
-             '1' WHEN Waddr_vect < Raddr_vect AND (length + Waddr_vect - Raddr_vect) > 15 ELSE
-             '0';
-  END GENERATE ready_gen;
+
+  -----------------------------------------------------------------------------
+  -- 
+  -----------------------------------------------------------------------------
+  --empty_almost <= '0' WHEN Waddr_vect > Raddr_vect AND (         Waddr_vect - Raddr_vect) > 15 ELSE
+  --                '0' WHEN Waddr_vect < Raddr_vect AND (length + Waddr_vect - Raddr_vect) > 15 ELSE
+  --                '1';
+  empty_almost <= '0' WHEN space_busy > 15 ELSE '1';
+  empty        <= sEmpty;
   
-  ready_not_gen: IF enable_ready = '0' GENERATE
-    ready <= '0';
-  END GENERATE ready_not_gen;
+  --full_almost  <= '0' WHEN Waddr_vect > Raddr_vect AND (length + Raddr_vect - Waddr_vect) > 5 ELSE
+  --                '0' WHEN Waddr_vect < Raddr_vect AND (         Raddr_vect - Waddr_vect) > 5 ELSE
+  --                sfull WHEN  Waddr_vect = Raddr_vect ELSE
+  --                '1';
+  full_almost  <= '0' WHEN space_free > 4 ELSE '1';
+  full         <= sfull;
+
+  -----------------------------------------------------------------------------
+  -- 
+  -----------------------------------------------------------------------------
+  space_busy <= length                            WHEN sfull = '1' ELSE
+                length + Waddr_vect - Raddr_vect  WHEN Waddr_vect < Raddr_vect ELSE
+                Waddr_vect - Raddr_vect;
+
+  space_free <= length - space_busy;
+
   
 END ARCHITECTURE;
 

@@ -39,33 +39,23 @@ ENTITY lpp_waveform_fifo IS
     rstn : IN STD_LOGIC;
     ---------------------------------------------------------------------------
     run  : IN STD_LOGIC;
-
-    ---------------------------------------------------------------------------
-    time_ready      : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);  -- FIFO_DATA occupancy is greater than 16 * 32b
-    data_ready      : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);  -- FIFO_DATA occupancy is greater than 16 * 32b
     
     ---------------------------------------------------------------------------
-    time_ren   : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    data_ren   : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    
-    rdata      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    empty_almost : OUT STD_LOGIC_VECTOR(3 DOWNTO 0); --occupancy is lesser than 16 * 32b
+    empty        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    data_ren     : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    rdata        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     
     ---------------------------------------------------------------------------
-    time_wen   : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    data_wen   : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    
-    wdata      : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
+    full_almost : OUT STD_LOGIC_VECTOR(3 DOWNTO 0); --occupancy is greater than MAX - 5 * 32b
+    full        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    data_wen    : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    wdata       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
 END ENTITY;
 
 
 ARCHITECTURE ar_lpp_waveform_fifo OF lpp_waveform_fifo IS
-
-  
-  SIGNAL time_mem_addr_r : LPP_TYPE_ADDR_FIFO_WAVEFORM(3 DOWNTO 0);
-  SIGNAL time_mem_addr_w : LPP_TYPE_ADDR_FIFO_WAVEFORM(3 DOWNTO 0);
-  SIGNAL time_mem_ren    : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL time_mem_wen    : STD_LOGIC_VECTOR(3 DOWNTO 0);
 
   SIGNAL data_mem_addr_r : LPP_TYPE_ADDR_FIFO_WAVEFORM(3 DOWNTO 0);
   SIGNAL data_mem_addr_w : LPP_TYPE_ADDR_FIFO_WAVEFORM(3 DOWNTO 0);
@@ -84,60 +74,31 @@ BEGIN
     PORT MAP(clk, ren, data_addr_r, rdata,       
              clk, wen, data_addr_w, wdata);      
 
+  ren <= data_mem_ren(3) OR
+         data_mem_ren(2) OR
+         data_mem_ren(1) OR
+         data_mem_ren(0);
 
-  ren <= time_mem_ren(3) OR data_mem_ren(3) OR
-         time_mem_ren(2) OR data_mem_ren(2) OR
-         time_mem_ren(1) OR data_mem_ren(1) OR
-         time_mem_ren(0) OR data_mem_ren(0);
-
-  wen <= time_mem_wen(3) OR data_mem_wen(3) OR
-         time_mem_wen(2) OR data_mem_wen(2) OR
-         time_mem_wen(1) OR data_mem_wen(1) OR
-         time_mem_wen(0) OR data_mem_wen(0);
-
-  data_addr_r <= time_mem_addr_r(0) WHEN time_mem_ren(0) = '1' ELSE
-                 time_mem_addr_r(1) WHEN time_mem_ren(1) = '1' ELSE
-                 time_mem_addr_r(2) WHEN time_mem_ren(2) = '1' ELSE
-                 time_mem_addr_r(3) WHEN time_mem_ren(3) = '1' ELSE
-                 data_mem_addr_r(0) WHEN data_mem_ren(0) = '1' ELSE
+  wen <= data_mem_wen(3) OR
+         data_mem_wen(2) OR
+         data_mem_wen(1) OR
+         data_mem_wen(0);
+  
+  data_addr_r <= data_mem_addr_r(0) WHEN data_mem_ren(0) = '1' ELSE
                  data_mem_addr_r(1) WHEN data_mem_ren(1) = '1' ELSE
                  data_mem_addr_r(2) WHEN data_mem_ren(2) = '1' ELSE
                  data_mem_addr_r(3);
   
-  data_addr_w <= time_mem_addr_w(0) WHEN time_mem_wen(0) = '1' ELSE
-                 time_mem_addr_w(1) WHEN time_mem_wen(1) = '1' ELSE
-                 time_mem_addr_w(2) WHEN time_mem_wen(2) = '1' ELSE
-                 time_mem_addr_w(3) WHEN time_mem_wen(3) = '1' ELSE
-                 data_mem_addr_w(0) WHEN data_mem_wen(0) = '1' ELSE
+  data_addr_w <= data_mem_addr_w(0) WHEN data_mem_wen(0) = '1' ELSE
                  data_mem_addr_w(1) WHEN data_mem_wen(1) = '1' ELSE
                  data_mem_addr_w(2) WHEN data_mem_wen(2) = '1' ELSE
-                 data_mem_addr_w(3);   
-  
-  gen_fifo_ctrl_time: FOR I IN 3 DOWNTO 0 GENERATE
-    lpp_waveform_fifo_ctrl_time: lpp_waveform_fifo_ctrl
-      GENERIC MAP (
-        offset       => 32*I + 20,
-        length       => 10,
-        enable_ready => '1')
-      PORT MAP (
-        clk          => clk,
-        rstn         => rstn,
-        run          => run,
-        ren          => time_ren(I), 
-        wen          => time_wen(I),
-        mem_re       => time_mem_ren(I),
-        mem_we       => time_mem_wen(I),
-        mem_addr_ren => time_mem_addr_r(I),
-        mem_addr_wen => time_mem_addr_w(I),
-        ready        => time_ready(I));
-  END GENERATE gen_fifo_ctrl_time;
+                 data_mem_addr_w(3); 
 
   gen_fifo_ctrl_data: FOR I IN 3 DOWNTO 0 GENERATE
     lpp_waveform_fifo_ctrl_data: lpp_waveform_fifo_ctrl
       GENERIC MAP (
         offset       => 32*I,
-        length       => 20,
-        enable_ready => '1')
+        length       => 32)
       PORT MAP (
         clk          => clk,
         rstn         => rstn,
@@ -148,7 +109,11 @@ BEGIN
         mem_we       => data_mem_wen(I),
         mem_addr_ren => data_mem_addr_r(I),
         mem_addr_wen => data_mem_addr_w(I),
-        ready        => data_ready(I));
+        empty_almost => empty_almost(I),
+        empty        => empty(I),
+        full_almost  => full_almost(I),
+        full         => full(I)
+        );
   END GENERATE gen_fifo_ctrl_data;
 
   

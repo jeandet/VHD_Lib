@@ -4,3 +4,4 @@ lpp_dma.vhd
 lpp_dma_ip.vhd
 lpp_dma_send_16word.vhd
 lpp_dma_send_1word.vhd
+lpp_dma_singleOrBurst.vhd

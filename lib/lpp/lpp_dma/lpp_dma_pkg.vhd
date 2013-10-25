@@ -196,5 +196,23 @@ PACKAGE lpp_dma_pkg IS
       addr_matrix_f1                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f2                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
   END COMPONENT;
+
+  COMPONENT lpp_dma_singleOrBurst
+    GENERIC (
+      tech   : INTEGER;
+      hindex : INTEGER);
+    PORT (
+      HCLK           : IN  STD_ULOGIC;
+      HRESETn        : IN  STD_ULOGIC;
+      run            : IN  STD_LOGIC;
+      AHB_Master_In  : IN  AHB_Mst_In_Type;
+      AHB_Master_Out : OUT AHB_Mst_Out_Type;
+      send           : IN  STD_LOGIC;
+      valid_burst    : IN  STD_LOGIC;
+      done           : OUT STD_LOGIC;
+      ren            : OUT STD_LOGIC;
+      address        : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      data           : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
+  END COMPONENT;
   
 END;
