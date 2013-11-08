@@ -87,6 +87,7 @@ ARCHITECTURE ar_lpp_waveform_fifo_arbiter OF lpp_waveform_fifo_arbiter IS
   SIGNAL shift_data       : INTEGER;
   SIGNAL reg_shift_data_s : Counter_Vector(3 DOWNTO 0);
   -- SHIFT_TIME ---------------------------------------------------------------
+  SIGNAL reg_shift_time_pre   : INTEGER;
   SIGNAL shift_time_pre   : INTEGER;
   SIGNAL shift_time       : INTEGER;
   SIGNAL reg_shift_time_s : Counter_Vector(3 DOWNTO 0);
@@ -117,10 +118,10 @@ BEGIN
       data_temp_2(I)(J) <= data_in(I,J+32*2);
     END GENERATE all_bit_of_time;
     
-    data_temp_v(I) <= time_temp_0(I)                     WHEN shift_time = 0 ELSE
-                      time_temp_1(I)                     WHEN shift_time = 1 ELSE
-                      data_temp_0(I)            WHEN shift_data = 0 ELSE
-                      data_temp_1(I)           WHEN shift_data = 1 ELSE
+    data_temp_v(I) <= time_temp_0(I)   WHEN reg_shift_time_pre = 0 ELSE
+                      time_temp_1(I)   WHEN reg_shift_time_pre = 1 ELSE
+                      data_temp_0(I)   WHEN shift_data = 0 ELSE
+                      data_temp_1(I)   WHEN shift_data = 1 ELSE
                       data_temp_2(I);
   END GENERATE all_input;
 
@@ -198,10 +199,10 @@ BEGIN
 
   shift_data <= shift_data_pre + 1 WHEN shift_data_pre < 2 ELSE 0;
 
-  reg_shift_data_s(0) <= shift_data WHEN valid_out_rr(0) = '1' ELSE reg_shift_data_s(0);
-  reg_shift_data_s(1) <= shift_data WHEN valid_out_rr(1) = '1' ELSE reg_shift_data_s(1);
-  reg_shift_data_s(2) <= shift_data WHEN valid_out_rr(2) = '1' ELSE reg_shift_data_s(2);
-  reg_shift_data_s(3) <= shift_data WHEN valid_out_rr(3) = '1' ELSE reg_shift_data_s(3);
+  reg_shift_data_s(0) <= shift_data WHEN valid_out_rr(0) = '1' ELSE reg_shift_data(0);--_s
+  reg_shift_data_s(1) <= shift_data WHEN valid_out_rr(1) = '1' ELSE reg_shift_data(1);--_s
+  reg_shift_data_s(2) <= shift_data WHEN valid_out_rr(2) = '1' ELSE reg_shift_data(2);--_s
+  reg_shift_data_s(3) <= shift_data WHEN valid_out_rr(3) = '1' ELSE reg_shift_data(3);--_s
 
   -- SHIFT_TIME ---------------------------------------------------------------
   shift_time_pre <= reg_shift_time(0) WHEN valid_out_rr(0) = '1' ELSE
@@ -211,10 +212,10 @@ BEGIN
 
   shift_time <= shift_time_pre + 1 WHEN shift_time_pre < 2 ELSE 0;
 
-  reg_shift_time_s(0) <= shift_time WHEN valid_out_rr(0) = '1' ELSE reg_shift_time_s(0);
-  reg_shift_time_s(1) <= shift_time WHEN valid_out_rr(1) = '1' ELSE reg_shift_time_s(1);
-  reg_shift_time_s(2) <= shift_time WHEN valid_out_rr(2) = '1' ELSE reg_shift_time_s(2);
-  reg_shift_time_s(3) <= shift_time WHEN valid_out_rr(3) = '1' ELSE reg_shift_time_s(3);
+  reg_shift_time_s(0) <= shift_time WHEN valid_out_rr(0) = '1' ELSE reg_shift_time(0);--_s
+  reg_shift_time_s(1) <= shift_time WHEN valid_out_rr(1) = '1' ELSE reg_shift_time(1);--_s
+  reg_shift_time_s(2) <= shift_time WHEN valid_out_rr(2) = '1' ELSE reg_shift_time(2);--_s
+  reg_shift_time_s(3) <= shift_time WHEN valid_out_rr(3) = '1' ELSE reg_shift_time(3);--_s
 
   -- COUNT_DATA ---------------------------------------------------------------
   count_data_pre <= reg_count_data(0) WHEN valid_out_rr(0) = '1' ELSE
@@ -224,11 +225,20 @@ BEGIN
 
   count_data <= count_data_pre + 1 WHEN count_data_pre < UNSIGNED(nb_data_by_buffer) ELSE 0;
 
-  reg_count_data_s(0) <= count_data WHEN valid_out_rr(0) = '1' ELSE reg_count_data_s(0);
-  reg_count_data_s(1) <= count_data WHEN valid_out_rr(1) = '1' ELSE reg_count_data_s(1);
-  reg_count_data_s(2) <= count_data WHEN valid_out_rr(2) = '1' ELSE reg_count_data_s(2);
-  reg_count_data_s(3) <= count_data WHEN valid_out_rr(3) = '1' ELSE reg_count_data_s(3);
+  reg_count_data_s(0) <= count_data WHEN valid_out_rr(0) = '1' ELSE reg_count_data(0);--_s
+  reg_count_data_s(1) <= count_data WHEN valid_out_rr(1) = '1' ELSE reg_count_data(1);--_s
+  reg_count_data_s(2) <= count_data WHEN valid_out_rr(2) = '1' ELSE reg_count_data(2);--_s
+  reg_count_data_s(3) <= count_data WHEN valid_out_rr(3) = '1' ELSE reg_count_data(3);--_s
   -----------------------------------------------------------------------------
+
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS 	
+    IF rstn = '0' THEN                  -- asynchronous reset (active low)
+      reg_shift_time_pre <= 0;
+    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      reg_shift_time_pre <= shift_time_pre;
+    END IF;
+  END PROCESS 	;
   
 END ARCHITECTURE;
 
