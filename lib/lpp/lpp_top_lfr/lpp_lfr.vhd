@@ -26,9 +26,10 @@ ENTITY lpp_lfr IS
   GENERIC (
     Mem_use                 : INTEGER := use_RAM;
     nb_data_by_buffer_size : INTEGER := 11;
+    nb_word_by_buffer_size : INTEGER := 11;
     nb_snapshot_param_size  : INTEGER := 11;
     delta_vector_size       : INTEGER := 20;
-    delta_vector_size_f0_2  : INTEGER := 3;
+    delta_vector_size_f0_2  : INTEGER := 7;
 
     pindex : INTEGER := 4;
     paddr  : INTEGER := 4;
@@ -36,7 +37,9 @@ ENTITY lpp_lfr IS
     pirq_ms   : INTEGER := 0;
     pirq_wfp  : INTEGER := 1;
 
-    hindex : INTEGER := 2
+    hindex : INTEGER := 2;
+
+    top_lfr_version : STD_LOGIC_VECTOR(31 DOWNTO 0)
         
     );
   PORT (
@@ -120,6 +123,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL delta_f2     : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
   
   SIGNAL nb_data_by_buffer : STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
+  SIGNAL nb_word_by_buffer : STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
   SIGNAL nb_snapshot_param  : STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
   SIGNAL enable_f0          : STD_LOGIC;
   SIGNAL enable_f1          : STD_LOGIC;
@@ -186,7 +190,18 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL dma_sel       : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL dma_rr_valid  : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL dma_rr_grant  : STD_LOGIC_VECTOR(3 DOWNTO 0);
-    
+
+  -----------------------------------------------------------------------------
+  -- DMA_REG
+  -----------------------------------------------------------------------------
+  SIGNAL ongoing_reg         : STD_LOGIC;
+  SIGNAL dma_sel_reg         : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL dma_send_reg        : STD_LOGIC;
+  SIGNAL dma_valid_burst_reg : STD_LOGIC;  -- (1 => BURST , 0 => SINGLE)
+  SIGNAL dma_address_reg     : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL dma_data_reg        : STD_LOGIC_VECTOR(31 DOWNTO 0);
+      
+
   -----------------------------------------------------------------------------
   -- DMA
   -----------------------------------------------------------------------------
@@ -196,6 +211,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL dma_ren         : STD_LOGIC;
   SIGNAL dma_address     : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL dma_data        : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL dma_data_2        : STD_LOGIC_VECTOR(31 DOWNTO 0);
   
 BEGIN
   
@@ -232,6 +248,7 @@ BEGIN
   lpp_lfr_apbreg_1: lpp_lfr_apbreg
     GENERIC MAP (
       nb_data_by_buffer_size => nb_data_by_buffer_size,
+      nb_word_by_buffer_size => nb_word_by_buffer_size,
       nb_snapshot_param_size => nb_snapshot_param_size,
       delta_vector_size      => delta_vector_size,
       delta_vector_size_f0_2 => delta_vector_size_f0_2,
@@ -239,7 +256,8 @@ BEGIN
       paddr                  => paddr,
       pmask                  => pmask,
       pirq_ms                => pirq_ms,
-      pirq_wfp               => pirq_wfp)
+      pirq_wfp               => pirq_wfp,
+      top_lfr_version        => top_lfr_version)
     PORT MAP (
       HCLK                                   => clk,
       HRESETn                                => rstn,
@@ -279,6 +297,7 @@ BEGIN
       delta_f1                               => delta_f1,
       delta_f2                               => delta_f2,
       nb_data_by_buffer                      => nb_data_by_buffer,
+      nb_word_by_buffer                      => nb_word_by_buffer,
       nb_snapshot_param                      => nb_snapshot_param,
       enable_f0                              => enable_f0,
       enable_f1                              => enable_f1,
@@ -299,7 +318,8 @@ BEGIN
     GENERIC MAP (
       tech                    => inferred,
       data_size               => 6*16,
-      nb_data_by_buffer_size => nb_data_by_buffer_size,
+      nb_data_by_buffer_size  => nb_data_by_buffer_size,
+      nb_word_by_buffer_size  => nb_word_by_buffer_size,
       nb_snapshot_param_size  => nb_snapshot_param_size,
       delta_vector_size       => delta_vector_size,
       delta_vector_size_f0_2  => delta_vector_size_f0_2
@@ -325,6 +345,7 @@ BEGIN
       burst_f2           => burst_f2,
       
       nb_data_by_buffer => nb_data_by_buffer,
+      nb_word_by_buffer => nb_word_by_buffer,
       nb_snapshot_param  => nb_snapshot_param,
       status_full        => status_full,
       status_full_ack    => status_full_ack,
@@ -386,34 +407,30 @@ BEGIN
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      data_f0_addr_out             <= (OTHERS => '0');
       data_f0_data_out_valid       <= '0';
       data_f0_data_out_valid_burst <= '0';
-      data_f1_addr_out             <= (OTHERS => '0');
       data_f1_data_out_valid       <= '0';
       data_f1_data_out_valid_burst <= '0';
-      data_f2_addr_out             <= (OTHERS => '0');
       data_f2_data_out_valid       <= '0';
       data_f2_data_out_valid_burst <= '0';
-      data_f3_addr_out             <= (OTHERS => '0');
       data_f3_data_out_valid       <= '0';
       data_f3_data_out_valid_burst <= '0';
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      data_f0_addr_out             <= data_f0_addr_out_s;             
+    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge        
       data_f0_data_out_valid       <= data_f0_data_out_valid_s;       
-      data_f0_data_out_valid_burst <= data_f0_data_out_valid_burst_s;
-      data_f1_addr_out             <= data_f1_addr_out_s;             
+      data_f0_data_out_valid_burst <= data_f0_data_out_valid_burst_s;  
       data_f1_data_out_valid       <= data_f1_data_out_valid_s;       
-      data_f1_data_out_valid_burst <= data_f1_data_out_valid_burst_s;
-      data_f2_addr_out             <= data_f2_addr_out_s;             
+      data_f1_data_out_valid_burst <= data_f1_data_out_valid_burst_s;  
       data_f2_data_out_valid       <= data_f2_data_out_valid_s;       
-      data_f2_data_out_valid_burst <= data_f2_data_out_valid_burst_s;
-      data_f3_addr_out             <= data_f3_addr_out_s;             
+      data_f2_data_out_valid_burst <= data_f2_data_out_valid_burst_s;  
       data_f3_data_out_valid       <= data_f3_data_out_valid_s;       
       data_f3_data_out_valid_burst <= data_f3_data_out_valid_burst_s;      
     END IF;
   END PROCESS;
-
+  
+  data_f0_addr_out             <= data_f0_addr_out_s;   
+  data_f1_addr_out             <= data_f1_addr_out_s;   
+  data_f2_addr_out             <= data_f2_addr_out_s; 
+  data_f3_addr_out             <= data_f3_addr_out_s;                              
   
   -----------------------------------------------------------------------------
   -- RoundRobin Selection For DMA
@@ -430,17 +447,46 @@ BEGIN
       rstn      => rstn,
       in_valid  => dma_rr_valid,
       out_grant => dma_rr_grant);
-  
+
+
+  -----------------------------------------------------------------------------
+  -- in  : dma_rr_grant
+  --       send
+  -- out : dma_sel
+  --       dma_valid_burst
+  --       dma_sel_valid
+  -----------------------------------------------------------------------------
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN               -- asynchronous reset (active low)
-      dma_sel <= (OTHERS => '0');
+      dma_sel  <= (OTHERS => '0');
+      dma_send        <= '0';
+      dma_valid_burst <= '0';
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      IF dma_sel = "0000" OR dma_send = '1' THEN
+--      IF dma_sel = "0000" OR dma_send = '1' THEN
+      IF dma_sel = "0000" OR dma_done = '1' THEN
         dma_sel <= dma_rr_grant;
+        IF dma_rr_grant(0) = '1' THEN
+          dma_send        <= '1';
+          dma_valid_burst <= data_f0_data_out_valid_burst;
+          dma_sel_valid   <= data_f0_data_out_valid;
+        ELSIF dma_rr_grant(1) = '1' THEN
+          dma_send        <= '1';
+          dma_valid_burst <= data_f1_data_out_valid_burst;
+          dma_sel_valid   <= data_f1_data_out_valid;
+        ELSIF dma_rr_grant(2) = '1' THEN
+          dma_send        <= '1';
+          dma_valid_burst <= data_f2_data_out_valid_burst;
+          dma_sel_valid   <= data_f2_data_out_valid;
+        ELSIF dma_rr_grant(3) = '1' THEN
+          dma_send        <= '1';
+          dma_valid_burst <= data_f3_data_out_valid_burst;  
+          dma_sel_valid   <= data_f3_data_out_valid;          
+        END IF;
       ELSE
-        dma_sel <= dma_sel;        
-      END IF;      
+        dma_sel   <= dma_sel;
+        dma_send        <= '0';
+      END IF;  
     END IF;
   END PROCESS;
 
@@ -454,25 +500,69 @@ BEGIN
               data_f1_data_out WHEN dma_sel(1) = '1' ELSE
               data_f2_data_out WHEN dma_sel(2) = '1' ELSE
               data_f3_data_out ;
+
+  --dma_valid_burst <= data_f0_data_out_valid_burst WHEN dma_sel(0) = '1' ELSE
+  --                   data_f1_data_out_valid_burst WHEN dma_sel(1) = '1' ELSE
+  --                   data_f2_data_out_valid_burst WHEN dma_sel(2) = '1' ELSE
+  --                   data_f3_data_out_valid_burst WHEN dma_sel(3) = '1' ELSE
+  --                   '0';
   
-  dma_valid_burst <= data_f0_data_out_valid_burst WHEN dma_sel(0) = '1' ELSE
-                     data_f1_data_out_valid_burst WHEN dma_sel(1) = '1' ELSE
-                     data_f2_data_out_valid_burst WHEN dma_sel(2) = '1' ELSE
-                     data_f3_data_out_valid_burst WHEN dma_sel(3) = '1' ELSE
-                     '0';
+  --dma_sel_valid <= data_f0_data_out_valid WHEN dma_sel(0) = '1' ELSE
+  --                 data_f1_data_out_valid WHEN dma_sel(1) = '1' ELSE
+  --                 data_f2_data_out_valid WHEN dma_sel(2) = '1' ELSE
+  --                 data_f3_data_out_valid WHEN dma_sel(3) = '1' ELSE
+  --                 '0';
+
+  -- TODO
+  --dma_send       <= dma_sel_valid OR dma_valid_burst;
   
-  dma_sel_valid <= data_f0_data_out_valid WHEN dma_sel(0) = '1' ELSE
-                   data_f1_data_out_valid WHEN dma_sel(1) = '1' ELSE
-                   data_f2_data_out_valid WHEN dma_sel(2) = '1' ELSE
-                   data_f3_data_out_valid WHEN dma_sel(3) = '1' ELSE
-                   '0';
-  
-  dma_send       <= dma_sel_valid OR dma_valid_burst;
-  
+  --data_f0_data_out_ren <= dma_ren WHEN dma_sel_reg(0) = '1' ELSE '1';
+  --data_f1_data_out_ren <= dma_ren WHEN dma_sel_reg(1) = '1' ELSE '1';
+  --data_f2_data_out_ren <= dma_ren WHEN dma_sel_reg(2) = '1' ELSE '1';
+  --data_f3_data_out_ren <= dma_ren WHEN dma_sel_reg(3) = '1' ELSE '1';
+ 
   data_f0_data_out_ren <= dma_ren WHEN dma_sel(0) = '1' ELSE '1';
   data_f1_data_out_ren <= dma_ren WHEN dma_sel(1) = '1' ELSE '1';
   data_f2_data_out_ren <= dma_ren WHEN dma_sel(2) = '1' ELSE '1';
   data_f3_data_out_ren <= dma_ren WHEN dma_sel(3) = '1' ELSE '1';
+ 
+  
+  --PROCESS (clk, rstn)
+  --BEGIN  -- PROCESS
+  --  IF rstn = '0' THEN                  -- asynchronous reset (active low)
+  --    ongoing_reg             <= '0';
+  --    dma_sel_reg         <= (OTHERS => '0');
+  --    dma_send_reg        <= '0';
+  --    dma_valid_burst_reg <= '0';
+  --    dma_address_reg     <= (OTHERS => '0');
+  --    dma_data_reg        <= (OTHERS => '0');
+  --  ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+  --    IF (dma_send = '1' AND ongoing_reg = '0') OR (dma_send = '1' AND dma_done = '1')THEN
+  --      ongoing_reg             <= '1';
+  --      dma_valid_burst_reg     <= dma_valid_burst;
+  --      dma_sel_reg             <= dma_sel;
+  --    ELSE
+  --      IF dma_done = '1' THEN
+  --        ongoing_reg <= '0';
+  --      END IF;
+  --    END IF;
+  --    dma_send_reg        <= dma_send;
+  --    dma_address_reg     <= dma_address;
+  --    dma_data_reg        <= dma_data;
+  --  END IF;
+  --END PROCESS;
+
+  dma_data_2 <= dma_data;
+  --PROCESS (clk, rstn)
+  --BEGIN  -- PROCESS
+  --  IF rstn = '0' THEN                  -- asynchronous reset (active low)
+  --    dma_data_2 <= (OTHERS => '0');
+  --  ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+  --    dma_data_2 <= dma_data;
+      
+  --  END IF;
+  --END PROCESS;
+
   
   -----------------------------------------------------------------------------
   -- DMA
@@ -488,12 +578,12 @@ BEGIN
       AHB_Master_In  => ahbi,
       AHB_Master_Out => ahbo,
       
-      send           => dma_send,
-      valid_burst    => dma_valid_burst,
+      send           => dma_send,--_reg,
+      valid_burst    => dma_valid_burst,--_reg,
       done           => dma_done,
       ren            => dma_ren,
-      address        => dma_address,
-      data           => dma_data);
+      address        => dma_address,--_reg,
+      data           => dma_data_2);--_reg);
   
   -----------------------------------------------------------------------------
   -- Matrix Spectral - TODO

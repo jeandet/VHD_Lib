@@ -129,8 +129,8 @@ BEGIN  -- beh
   BEGIN  -- PROCESS Decounter_Cyclic_DeltaSnapshot
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
       counter_delta_snapshot <= 0;
-      first_decount          <= '0';
-      first_init             <= '0';
+      first_decount          <= '1';
+      first_init             <= '1';
       start_snapshot_f0_pre  <= '0';
       start_snapshot_f1      <= '0';
       start_snapshot_f2      <= '0';

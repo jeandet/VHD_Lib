@@ -37,6 +37,7 @@ USE techmap.gencomp.ALL;
 ENTITY lpp_lfr_apbreg IS
   GENERIC (
     nb_data_by_buffer_size : INTEGER := 11;
+    nb_word_by_buffer_size : INTEGER := 11;
     nb_snapshot_param_size  : INTEGER := 11;
     delta_vector_size       : INTEGER := 20;
     delta_vector_size_f0_2  : INTEGER := 3;
@@ -45,7 +46,8 @@ ENTITY lpp_lfr_apbreg IS
     paddr    : INTEGER := 4;
     pmask    : INTEGER := 16#fff#;
     pirq_ms  : INTEGER := 0;
-    pirq_wfp : INTEGER := 1);
+    pirq_wfp : INTEGER := 1;
+    top_lfr_version    : STD_LOGIC_VECTOR(31 DOWNTO 0));
   PORT (
     -- AMBA AHB system signals
     HCLK    : IN STD_ULOGIC;
@@ -101,6 +103,7 @@ ENTITY lpp_lfr_apbreg IS
     delta_f1           : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
     delta_f2           : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
     nb_data_by_buffer : OUT STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
+    nb_word_by_buffer : OUT STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
     nb_snapshot_param  : OUT STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
 
     enable_f0 : OUT STD_LOGIC;
@@ -164,6 +167,7 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
     delta_f1           : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
     delta_f2           : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
     nb_data_by_buffer : STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
+    nb_word_by_buffer : STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
     nb_snapshot_param  : STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
     enable_f0          : STD_LOGIC;
     enable_f1          : STD_LOGIC;
@@ -212,6 +216,7 @@ BEGIN  -- beh
   delta_f1           <= reg_wp.delta_f1;
   delta_f2           <= reg_wp.delta_f2;
   nb_data_by_buffer <= reg_wp.nb_data_by_buffer;
+  nb_word_by_buffer <= reg_wp.nb_word_by_buffer;
   nb_snapshot_param  <= reg_wp.nb_snapshot_param;
 
   enable_f0 <= reg_wp.enable_f0;
@@ -293,10 +298,11 @@ BEGIN  -- beh
 
       reg_sp.status_error_anticipating_empty_fifo <= reg_sp.status_error_anticipating_empty_fifo OR error_anticipating_empty_fifo;
       reg_sp.status_error_bad_component_error     <= reg_sp.status_error_bad_component_error OR error_bad_component_error;
-
-      reg_wp.status_full     <= reg_wp.status_full OR status_full;
-      reg_wp.status_full_err <= reg_wp.status_full_err OR status_full_err;
-      reg_wp.status_new_err  <= reg_wp.status_new_err OR status_new_err;
+      all_status: FOR I IN 3 DOWNTO 0 LOOP
+        reg_wp.status_full(I)     <= (reg_wp.status_full(I) OR status_full(I)) AND reg_wp.run;
+        reg_wp.status_full_err(I) <= (reg_wp.status_full_err(I) OR status_full_err(I))  AND reg_wp.run;
+        reg_wp.status_new_err(I)  <= (reg_wp.status_new_err(I) OR status_new_err(I)) AND reg_wp.run ;
+      END LOOP all_status;
 
       paddr             := "000000";
       paddr(7 DOWNTO 2) := apbi.paddr(7 DOWNTO 2);
@@ -347,7 +353,9 @@ BEGIN  -- beh
           WHEN "010100" => prdata(nb_data_by_buffer_size-1 DOWNTO 0) <= reg_wp.nb_data_by_buffer;
           WHEN "010101" => prdata(nb_snapshot_param_size-1 DOWNTO 0)  <= reg_wp.nb_snapshot_param;
           WHEN "010110" => prdata(30 DOWNTO 0)                        <= reg_wp.start_date;
-                           --
+          WHEN "010111" => prdata(nb_word_by_buffer_size-1 DOWNTO 0) <= reg_wp.nb_word_by_buffer;
+          ----------------------------------------------------
+          WHEN "111100" => prdata(31 DOWNTO 0) <= top_lfr_version(31 DOWNTO 0);
           WHEN OTHERS   => NULL;
         END CASE;
         IF (apbi.pwrite AND apbi.penable) = '1' THEN
@@ -399,21 +407,22 @@ BEGIN  -- beh
             WHEN "010100" => reg_wp.nb_data_by_buffer <= apbi.pwdata(nb_data_by_buffer_size-1 DOWNTO 0);
             WHEN "010101" => reg_wp.nb_snapshot_param  <= apbi.pwdata(nb_snapshot_param_size-1 DOWNTO 0);
             WHEN "010110" => reg_wp.start_date         <= apbi.pwdata(30 DOWNTO 0);
+            WHEN "010111" => reg_wp.nb_word_by_buffer <= apbi.pwdata(nb_word_by_buffer_size-1 DOWNTO 0);
                              --
             WHEN OTHERS   => NULL;
           END CASE;
         END IF;
       END IF;
 
-      apbo.pirq(pirq_ms) <= (reg_sp.config_active_interruption_onNewMatrix AND (ready_matrix_f0_0 OR
-                                                                                ready_matrix_f0_1 OR
-                                                                                ready_matrix_f1 OR
-                                                                                ready_matrix_f2)
+      apbo.pirq(pirq_ms) <= ((reg_sp.config_active_interruption_onNewMatrix AND (ready_matrix_f0_0 OR
+                                                                                 ready_matrix_f0_1 OR
+                                                                                 ready_matrix_f1 OR
+                                                                                 ready_matrix_f2)
                              )
                             OR
                             (reg_sp.config_active_interruption_onError AND (error_anticipating_empty_fifo OR
                                                                             error_bad_component_error)
-                             );
+                             ));
 
       apbo.pirq(pirq_wfp) <= (status_full(0) OR status_full_err(0) OR status_new_err(0) OR
                               status_full(1) OR status_full_err(1) OR status_new_err(1) OR

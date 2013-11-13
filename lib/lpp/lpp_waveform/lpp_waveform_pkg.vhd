@@ -105,6 +105,7 @@ PACKAGE lpp_waveform_pkg IS
       tech                    : INTEGER;
       data_size               : INTEGER;
       nb_data_by_buffer_size : INTEGER;
+      nb_word_by_buffer_size : INTEGER;
       nb_snapshot_param_size  : INTEGER;
       delta_vector_size       : INTEGER;
       delta_vector_size_f0_2  : INTEGER);
@@ -126,6 +127,7 @@ PACKAGE lpp_waveform_pkg IS
       burst_f1                     : IN  STD_LOGIC;
       burst_f2                     : IN  STD_LOGIC;
       nb_data_by_buffer           : IN  STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
+      nb_word_by_buffer           : IN  STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
       nb_snapshot_param            : IN  STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
       status_full                  : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       status_full_ack              : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -238,6 +240,43 @@ PACKAGE lpp_waveform_pkg IS
       wdata        : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
   END COMPONENT;
 
+  COMPONENT lpp_waveform_fifo_latencyCorrection
+    GENERIC (
+      tech : INTEGER);
+    PORT (
+      clk               : IN  STD_LOGIC;
+      rstn              : IN  STD_LOGIC;
+      run               : IN  STD_LOGIC;
+      empty_almost      : OUT STD_LOGIC;
+      empty             : OUT STD_LOGIC;
+      data_ren          : IN  STD_LOGIC;
+      rdata             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      empty_almost_fifo : IN  STD_LOGIC;
+      empty_fifo        : IN  STD_LOGIC;
+      data_ren_fifo     : OUT STD_LOGIC;
+      rdata_fifo        : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
+  END COMPONENT;
+
+  COMPONENT lpp_waveform_fifo_withoutLatency
+    GENERIC (
+      tech : INTEGER);
+    PORT (
+      clk          : IN  STD_LOGIC;
+      rstn         : IN  STD_LOGIC;
+      run          : IN  STD_LOGIC;
+      empty_almost : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      empty        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      data_ren     : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      rdata_0      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      rdata_1      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      rdata_2      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      rdata_3      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      full_almost  : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      full         : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      data_wen     : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      wdata        : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
+  END COMPONENT;
+  
   -----------------------------------------------------------------------------
   -- GEN ADDRESS
   -----------------------------------------------------------------------------
@@ -273,5 +312,22 @@ PACKAGE lpp_waveform_pkg IS
       data_f3_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0));
   END COMPONENT;
   
+  -----------------------------------------------------------------------------
+  -- lpp_waveform_fifo_arbiter_reg
+  -----------------------------------------------------------------------------
+  COMPONENT lpp_waveform_fifo_arbiter_reg
+    GENERIC (
+      data_size : INTEGER;
+      data_nb   : INTEGER);
+    PORT (
+      clk       : IN  STD_LOGIC;
+      rstn      : IN  STD_LOGIC;
+      run       : IN  STD_LOGIC;
+      max_count : IN  STD_LOGIC_VECTOR(data_size -1 DOWNTO 0);
+      enable    : IN  STD_LOGIC;
+      sel       : IN  STD_LOGIC_VECTOR(data_nb-1 DOWNTO 0);
+      data      : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+      data_s    : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0));
+  END COMPONENT;
   
 END lpp_waveform_pkg;

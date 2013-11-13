@@ -1,6 +1,8 @@
 lpp_waveform_pkg.vhd
 lpp_waveform.vhd
 lpp_waveform_burst.vhd
+lpp_waveform_fifo_withoutLatency.vhd
+lpp_waveform_fifo_latencyCorrection.vhd
 lpp_waveform_fifo.vhd
 lpp_waveform_fifo_arbiter.vhd
 lpp_waveform_fifo_ctrl.vhd
@@ -8,3 +10,4 @@ lpp_waveform_snapshot.vhd
 lpp_waveform_snapshot_controler.vhd
 lpp_waveform_genaddress.vhd 
 lpp_waveform_dma_genvalid.vhd
+lpp_waveform_fifo_arbiter_reg.vhd

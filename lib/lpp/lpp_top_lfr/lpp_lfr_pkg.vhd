@@ -75,6 +75,7 @@ PACKAGE lpp_lfr_pkg IS
     GENERIC (
       Mem_use                : INTEGER;
       nb_data_by_buffer_size : INTEGER;
+      nb_word_by_buffer_size : INTEGER;
       nb_snapshot_param_size : INTEGER;
       delta_vector_size      : INTEGER;
       delta_vector_size_f0_2 : INTEGER;
@@ -83,7 +84,9 @@ PACKAGE lpp_lfr_pkg IS
       pmask                  : INTEGER;
       pirq_ms                : INTEGER;
       pirq_wfp               : INTEGER;
-      hindex                 : INTEGER);
+      hindex                 : INTEGER;
+      top_lfr_version        : STD_LOGIC_VECTOR(31 DOWNTO 0)
+      );
     PORT (
       clk             : IN  STD_LOGIC;
       rstn            : IN  STD_LOGIC;
@@ -102,6 +105,7 @@ PACKAGE lpp_lfr_pkg IS
   COMPONENT lpp_lfr_apbreg
     GENERIC (
       nb_data_by_buffer_size : INTEGER;
+      nb_word_by_buffer_size : INTEGER;
       nb_snapshot_param_size : INTEGER;
       delta_vector_size      : INTEGER;
       delta_vector_size_f0_2 : INTEGER;
@@ -109,7 +113,8 @@ PACKAGE lpp_lfr_pkg IS
       paddr                  : INTEGER;
       pmask                  : INTEGER;
       pirq_ms                : INTEGER;
-      pirq_wfp               : INTEGER);
+      pirq_wfp               : INTEGER;
+      top_lfr_version        : STD_LOGIC_VECTOR(31 DOWNTO 0));
     PORT (
       HCLK                                   : IN  STD_ULOGIC;
       HRESETn                                : IN  STD_ULOGIC;
@@ -149,6 +154,7 @@ PACKAGE lpp_lfr_pkg IS
       delta_f1                               : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
       delta_f2                               : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
       nb_data_by_buffer                      : OUT STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
+      nb_word_by_buffer                      : OUT STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
       nb_snapshot_param                      : OUT STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
       enable_f0                              : OUT STD_LOGIC;
       enable_f1                              : OUT STD_LOGIC;

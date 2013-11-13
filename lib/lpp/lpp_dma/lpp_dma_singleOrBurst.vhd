@@ -82,6 +82,7 @@ ARCHITECTURE Behavioral OF lpp_dma_singleOrBurst IS
   
   SIGNAL single_send_ok         : STD_LOGIC;
   SIGNAL single_send_ko         : STD_LOGIC;
+  SIGNAL single_ren             : STD_LOGIC;
   -----------------------------------------------------------------------------
   -- SEND SINGLE MODULE  
   SIGNAL burst_dmai            : DMA_In_Type;
@@ -112,16 +113,26 @@ BEGIN
       AHBIn   => AHB_Master_In,
       AHBOut  => AHB_Master_Out);
   -----------------------------------------------------------------------------
- 
+
+  -----------------------------------------------------------------------------
+  -----------------------------------------------------------------------------
+  -- LE PROBLEME EST LA !!!!!
+  -----------------------------------------------------------------------------
+  -----------------------------------------------------------------------------
+  -- C'est le signal valid_burst qui n'est pas assez long.
+  -----------------------------------------------------------------------------
   single_send   <= send             WHEN valid_burst = '0' ELSE '0';
   burst_send    <= send             WHEN valid_burst = '1' ELSE '0';
   DMAIn         <= single_dmai      WHEN valid_burst = '0' ELSE burst_dmai;
 
-  done  <= single_send_ok OR single_send_ko WHEN valid_burst = '0' ELSE
-           burst_send_ok  OR burst_send_ko;
+  -- TODO : verifier
+  done  <= single_send_ok OR single_send_ko OR burst_send_ok  OR burst_send_ko;
+  --done  <= single_send_ok OR single_send_ko WHEN valid_burst = '0' ELSE
+  --         burst_send_ok  OR burst_send_ko;
 
-  ren   <= burst_ren     WHEN valid_burst = '1' ELSE
-           NOT single_send_ok;
+  --ren   <= burst_ren     WHEN valid_burst = '1' ELSE
+  --         NOT single_send_ok;
+  ren   <= burst_ren AND single_ren;
   
   -----------------------------------------------------------------------------
   -- SEND 1 word by DMA
@@ -136,6 +147,7 @@ BEGIN
       send    => single_send,
       address => address,
       data    => data,
+      ren     => single_ren,
       
       send_ok => single_send_ok,        -- TODO
       send_ko => single_send_ko         -- TODO

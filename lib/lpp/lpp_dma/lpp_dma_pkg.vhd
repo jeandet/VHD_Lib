@@ -131,6 +131,7 @@ PACKAGE lpp_dma_pkg IS
       send    : IN  STD_LOGIC;
       address : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       data    : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      ren     : OUT STD_LOGIC;
       send_ok : OUT STD_LOGIC;
       send_ko : OUT STD_LOGIC);
   END COMPONENT;

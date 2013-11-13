@@ -58,83 +58,155 @@ END ENTITY;
 
 
 ARCHITECTURE ar_lpp_waveform_fifo_arbiter OF lpp_waveform_fifo_arbiter IS
-
   -----------------------------------------------------------------------------
-  -- DATA FLOW
+  -- DATA MUX
   -----------------------------------------------------------------------------
+  SIGNAL data_0_v   : STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);
+  SIGNAL data_1_v   : STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);
+  SIGNAL data_2_v   : STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);
+  SIGNAL data_3_v   : STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);
   TYPE WORD_VECTOR IS ARRAY (NATURAL RANGE <>) OF STD_LOGIC_VECTOR(31 DOWNTO 0); 
-  SIGNAL time_temp_0      : WORD_VECTOR(3 DOWNTO 0);  
-  SIGNAL time_temp_1      : WORD_VECTOR(3 DOWNTO 0); 
-  SIGNAL data_temp_0      : WORD_VECTOR(3 DOWNTO 0);  
-  SIGNAL data_temp_1      : WORD_VECTOR(3 DOWNTO 0);  
-  SIGNAL data_temp_2      : WORD_VECTOR(3 DOWNTO 0); 
-  SIGNAL data_temp_v      : WORD_VECTOR(3 DOWNTO 0);
-  SIGNAL sel_input        : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  -----------------------------------------------------------------------------
-  -- CHANNEL SELECTION (RoundRobin)
-  -----------------------------------------------------------------------------
-  SIGNAL valid_in_rr      : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL valid_out_rr     : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  -----------------------------------------------------------------------------
-  -- FSM CONTROL
-  -----------------------------------------------------------------------------
-  TYPE   Counter_Vector IS ARRAY (NATURAL RANGE <>) OF INTEGER;
-  SIGNAL reg_shift_data   : Counter_Vector(3 DOWNTO 0);
-  SIGNAL reg_shift_time   : Counter_Vector(3 DOWNTO 0);
-  SIGNAL reg_count_data   : Counter_Vector(3 DOWNTO 0);
-  -- SHIFT_DATA ---------------------------------------------------------------
-  SIGNAL shift_data_pre   : INTEGER;
-  SIGNAL shift_data       : INTEGER;
-  SIGNAL reg_shift_data_s : Counter_Vector(3 DOWNTO 0);
-  -- SHIFT_TIME ---------------------------------------------------------------
-  SIGNAL reg_shift_time_pre   : INTEGER;
-  SIGNAL shift_time_pre   : INTEGER;
-  SIGNAL shift_time       : INTEGER;
-  SIGNAL reg_shift_time_s : Counter_Vector(3 DOWNTO 0);
-  -- COUNT_DATA ---------------------------------------------------------------
-  SIGNAL count_data_pre   : INTEGER;
-  SIGNAL count_data       : INTEGER;
-  SIGNAL reg_count_data_s : Counter_Vector(3 DOWNTO 0);
-    
-BEGIN
-
-  -----------------------------------------------------------------------------
-  -- DATA FLOW
-  -----------------------------------------------------------------------------
-
+  SIGNAL data_0   : WORD_VECTOR(4 DOWNTO 0);
+  SIGNAL data_1   : WORD_VECTOR(4 DOWNTO 0);
+  SIGNAL data_2   : WORD_VECTOR(4 DOWNTO 0);
+  SIGNAL data_3   : WORD_VECTOR(4 DOWNTO 0);
+  SIGNAL data_sel : WORD_VECTOR(4 DOWNTO 0);  
   
-  all_input : FOR I IN 3 DOWNTO 0 GENERATE
-    
-    all_bit_of_time: FOR J IN 31 DOWNTO 0 GENERATE
-      time_temp_0(I)(J) <= time_in(I,J);
-      J_47DOWNTO32: IF J+32 < 48 GENERATE
-        time_temp_1(I)(J) <= time_in(I,32+J);
-      END GENERATE J_47DOWNTO32;
-      J_63DOWNTO48: IF J+32 > 47 GENERATE
-        time_temp_1(I)(J) <= '0';
-      END GENERATE J_63DOWNTO48; 
-      data_temp_0(I)(J) <= data_in(I,J);
-      data_temp_1(I)(J) <= data_in(I,J+32);
-      data_temp_2(I)(J) <= data_in(I,J+32*2);
-    END GENERATE all_bit_of_time;
-    
-    data_temp_v(I) <= time_temp_0(I)   WHEN reg_shift_time_pre = 0 ELSE
-                      time_temp_1(I)   WHEN reg_shift_time_pre = 1 ELSE
-                      data_temp_0(I)   WHEN shift_data = 0 ELSE
-                      data_temp_1(I)   WHEN shift_data = 1 ELSE
-                      data_temp_2(I);
-  END GENERATE all_input;
-
-  data_out <= data_temp_v(0) WHEN sel_input = "0001" ELSE
-              data_temp_v(1) WHEN sel_input = "0010" ELSE
-              data_temp_v(2) WHEN sel_input = "0100" ELSE
-              data_temp_v(3);
-
   -----------------------------------------------------------------------------
-  -- CHANNEL SELECTION (RoundRobin)
+  -- RR and SELECTION
+  -----------------------------------------------------------------------------
+  SIGNAL valid_in_rr : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL sel         : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL no_sel      : STD_LOGIC;
+  
+  -----------------------------------------------------------------------------
+  -- REG
+  -----------------------------------------------------------------------------
+  SIGNAL count_enable : STD_LOGIC;
+  SIGNAL count        : STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
+  SIGNAL count_s      : STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
+  
+  SIGNAL shift_data_enable : STD_LOGIC;
+  SIGNAL shift_data        : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL shift_data_s      : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  
+  SIGNAL shift_time_enable : STD_LOGIC;
+  SIGNAL shift_time        : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL shift_time_s      : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  
+BEGIN
+  
+  -----------------------------------------------------------------------------
+  -- CONTROL
+  -----------------------------------------------------------------------------
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS
+    IF rstn = '0' THEN                  -- asynchronous reset (active low)
+      count_enable      <= '0';
+      shift_time_enable <= '0';
+      shift_data_enable <= '0';
+      data_in_ack       <= (OTHERS => '0');
+      data_out_wen      <= (OTHERS => '1');
+    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      IF run = '0' OR no_sel = '1' THEN
+        count_enable      <= '0';
+        shift_time_enable <= '0';
+        shift_data_enable <= '0';
+        data_in_ack       <= (OTHERS => '0');
+        data_out_wen      <= (OTHERS => '1');
+      ELSE
+        --COUNT
+        IF shift_data_s = "10" THEN
+          count_enable <= '1';
+        ELSE          
+          count_enable <= '0';
+        END IF;
+        --DATA
+        IF shift_time_s = "10" THEN
+          shift_data_enable <= '1';
+        ELSE
+          shift_data_enable <= '0';
+        END IF;
+
+        --TIME
+        IF ((shift_data_s = "10") AND (count = nb_data_by_buffer)) OR
+          shift_time_s = "00" OR
+          shift_time_s = "01"
+        THEN
+          shift_time_enable <= '1';
+        ELSE
+          shift_time_enable <= '0';
+        END IF;
+        
+        --ACK
+        IF shift_data_s = "10" THEN
+          data_in_ack <= sel;
+        ELSE
+          data_in_ack <= (OTHERS => '0');
+        END IF;
+        
+        --VALID OUT
+        all_wen: FOR I IN 3 DOWNTO 0 LOOP
+          IF sel(I) = '1' AND count_enable = '0' THEN
+            data_out_wen(I) <= '0';
+          ELSE
+            data_out_wen(I) <= '1';
+          END IF;
+        END LOOP all_wen;
+
+      END IF;
+    END IF;
+  END PROCESS;
+  
+  -----------------------------------------------------------------------------
+  -- DATA MUX
+  -----------------------------------------------------------------------------
+  all_bit_data_in: FOR I IN 32*5-1 DOWNTO 0 GENERATE
+    I_time_in: IF I < 48 GENERATE
+      data_0_v(I) <= time_in(0,I);
+      data_1_v(I) <= time_in(1,I);
+      data_2_v(I) <= time_in(2,I);
+      data_3_v(I) <= time_in(3,I);
+    END GENERATE I_time_in;
+    I_null: IF (I > 47) AND (I < 32*2)  GENERATE
+      data_0_v(I) <= '0';
+      data_1_v(I) <= '0';
+      data_2_v(I) <= '0';
+      data_3_v(I) <= '0';
+    END GENERATE I_null;
+    I_data_in: IF I > 32*2-1  GENERATE
+      data_0_v(I) <= data_in(0,I-32*2);
+      data_1_v(I) <= data_in(1,I-32*2);
+      data_2_v(I) <= data_in(2,I-32*2);
+      data_3_v(I) <= data_in(3,I-32*2);
+    END GENERATE I_data_in;
+  END GENERATE all_bit_data_in;
+
+  all_word: FOR J IN 4 DOWNTO 0 GENERATE
+    all_data_bit: FOR I IN 31 DOWNTO 0 GENERATE
+        data_0(J)(I) <= data_0_v(J*32+I);      
+        data_1(J)(I) <= data_1_v(J*32+I);      
+        data_2(J)(I) <= data_2_v(J*32+I);      
+        data_3(J)(I) <= data_3_v(J*32+I);      
+    END GENERATE all_data_bit;    
+  END GENERATE all_word;
+
+  data_sel <= data_0 WHEN sel(0) = '1' ELSE
+              data_1 WHEN sel(1) = '1' ELSE
+              data_2 WHEN sel(2) = '1' ELSE
+              data_3;
+
+  data_out <= data_sel(0) WHEN shift_time = "00" ELSE
+              data_sel(1) WHEN shift_time = "01" ELSE
+              data_sel(2) WHEN shift_data = "00" ELSE
+              data_sel(3) WHEN shift_data = "01" ELSE
+              data_sel(4);
+              
+  
+  -----------------------------------------------------------------------------
+  -- RR and SELECTION
   -----------------------------------------------------------------------------
   all_input_rr : FOR I IN 3 DOWNTO 0 GENERATE
---    valid_in_rr(I) <= data_in_valid(I) AND NOT full_almost(I);
     valid_in_rr(I) <= data_in_valid(I) AND NOT full(I);
   END GENERATE all_input_rr;
 
@@ -143,103 +215,59 @@ BEGIN
       clk       => clk,
       rstn      => rstn,
       in_valid  => valid_in_rr,
-      out_grant => valid_out_rr);
+      out_grant => sel);
+
+  no_sel <= '1' WHEN sel = "0000" ELSE '0';
 
   -----------------------------------------------------------------------------
-  -- FSM CONTROL
+  -- REG
   -----------------------------------------------------------------------------
+  reg_count_i: lpp_waveform_fifo_arbiter_reg
+    GENERIC MAP (
+      data_size => nb_data_by_buffer_size,
+      data_nb   => 4)
+    PORT MAP (
+      clk       => clk,
+      rstn      => rstn,
+      run       => run,
+      max_count => nb_data_by_buffer,
+      enable    => count_enable,
+      sel       => sel,
+      data      => count,
+      data_s    => count_s);
 
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      reg_shift_data <= (0, 0, 0, 0);
-      reg_shift_time <= (0, 0, 0, 0);
-      reg_count_data <= (0, 0, 0, 0);
-      sel_input      <= (OTHERS => '0');
-    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      IF run = '0' THEN
-        reg_shift_data <= (0, 0, 0, 0);
-        reg_shift_time <= (0, 0, 0, 0);
-        reg_count_data <= (0, 0, 0, 0);
-        sel_input      <= (OTHERS => '0');
-      ELSE
-        sel_input <= valid_out_rr;
+  reg_shift_data_i: lpp_waveform_fifo_arbiter_reg
+    GENERIC MAP (
+      data_size => 2,
+      data_nb   => 4)
+    PORT MAP (
+      clk       => clk,
+      rstn      => rstn,
+      run       => run,
+      max_count => "10",                -- 2
+      enable    => shift_data_enable,
+      sel       => sel,
+      data      => shift_data,
+      data_s    => shift_data_s);
 
-        IF count_data_pre = 0 THEN      -- first buffer data
-          IF shift_time_pre < 2 THEN    -- TIME not completly send
-            reg_shift_time <= reg_shift_time_s;
-          ELSE
-            reg_shift_data <= reg_shift_data_s;
-            IF shift_data_pre = 2 THEN
-              reg_count_data <= reg_count_data_s;
-            END IF;
-          END IF;
-        ELSE
-          reg_shift_data <= reg_shift_data_s;
-          IF shift_data_pre = 2 THEN
-            reg_count_data <= reg_count_data_s;
-            IF count_data = 0 THEN
-              reg_shift_time <= reg_shift_time_s;
-            END IF;
-          END IF;
-        END IF;
-      END IF;
-    END IF;
-  END PROCESS;
 
-  -----------------------------------------------------------------------------
-  data_out_wen <= NOT sel_input;
-  data_in_ack  <= sel_input;
-
-  -- SHIFT_DATA ---------------------------------------------------------------
-  shift_data_pre <= reg_shift_data(0) WHEN valid_out_rr(0) = '1' ELSE
-                    reg_shift_data(1) WHEN valid_out_rr(1) = '1' ELSE
-                    reg_shift_data(2) WHEN valid_out_rr(2) = '1' ELSE
-                    reg_shift_data(3);
-
-  shift_data <= shift_data_pre + 1 WHEN shift_data_pre < 2 ELSE 0;
-
-  reg_shift_data_s(0) <= shift_data WHEN valid_out_rr(0) = '1' ELSE reg_shift_data(0);--_s
-  reg_shift_data_s(1) <= shift_data WHEN valid_out_rr(1) = '1' ELSE reg_shift_data(1);--_s
-  reg_shift_data_s(2) <= shift_data WHEN valid_out_rr(2) = '1' ELSE reg_shift_data(2);--_s
-  reg_shift_data_s(3) <= shift_data WHEN valid_out_rr(3) = '1' ELSE reg_shift_data(3);--_s
-
-  -- SHIFT_TIME ---------------------------------------------------------------
-  shift_time_pre <= reg_shift_time(0) WHEN valid_out_rr(0) = '1' ELSE
-                    reg_shift_time(1) WHEN valid_out_rr(1) = '1' ELSE
-                    reg_shift_time(2) WHEN valid_out_rr(2) = '1' ELSE
-                    reg_shift_time(3);
-
-  shift_time <= shift_time_pre + 1 WHEN shift_time_pre < 2 ELSE 0;
-
-  reg_shift_time_s(0) <= shift_time WHEN valid_out_rr(0) = '1' ELSE reg_shift_time(0);--_s
-  reg_shift_time_s(1) <= shift_time WHEN valid_out_rr(1) = '1' ELSE reg_shift_time(1);--_s
-  reg_shift_time_s(2) <= shift_time WHEN valid_out_rr(2) = '1' ELSE reg_shift_time(2);--_s
-  reg_shift_time_s(3) <= shift_time WHEN valid_out_rr(3) = '1' ELSE reg_shift_time(3);--_s
-
-  -- COUNT_DATA ---------------------------------------------------------------
-  count_data_pre <= reg_count_data(0) WHEN valid_out_rr(0) = '1' ELSE
-                    reg_count_data(1) WHEN valid_out_rr(1) = '1' ELSE
-                    reg_count_data(2) WHEN valid_out_rr(2) = '1' ELSE
-                    reg_count_data(3);
-
-  count_data <= count_data_pre + 1 WHEN count_data_pre < UNSIGNED(nb_data_by_buffer) ELSE 0;
-
-  reg_count_data_s(0) <= count_data WHEN valid_out_rr(0) = '1' ELSE reg_count_data(0);--_s
-  reg_count_data_s(1) <= count_data WHEN valid_out_rr(1) = '1' ELSE reg_count_data(1);--_s
-  reg_count_data_s(2) <= count_data WHEN valid_out_rr(2) = '1' ELSE reg_count_data(2);--_s
-  reg_count_data_s(3) <= count_data WHEN valid_out_rr(3) = '1' ELSE reg_count_data(3);--_s
-  -----------------------------------------------------------------------------
-
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS 	
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      reg_shift_time_pre <= 0;
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      reg_shift_time_pre <= shift_time_pre;
-    END IF;
-  END PROCESS 	;
+  reg_shift_time_i: lpp_waveform_fifo_arbiter_reg
+    GENERIC MAP (
+      data_size => 2,
+      data_nb   => 4)
+    PORT MAP (
+      clk       => clk,
+      rstn      => rstn,
+      run       => run,
+      max_count => "10",                -- 2
+      enable    => shift_time_enable,
+      sel       => sel,
+      data      => shift_time,
+      data_s    => shift_time_s);
   
+  
+
+
 END ARCHITECTURE;
 
 

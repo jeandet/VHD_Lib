@@ -49,6 +49,8 @@ ARCHITECTURE Behavioral OF lfr_time_management IS
 
   SIGNAL nb_time_code_missing : INTEGER;
   SIGNAL coarse_time_s        : INTEGER;
+
+  SIGNAL new_coarsetime_s : STD_LOGIC;
   
 BEGIN
   
@@ -72,9 +74,15 @@ BEGIN
       coarse_time_s <= 0;
       coarse_time_new <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
+      IF new_coarsetime = '1' THEN
+        new_coarsetime_s <= '1';
+      ELSIF new_timecode = '1' THEN
+        new_coarsetime_s <= '0';        
+      END IF;
+      
       IF new_timecode = '1' THEN
         coarse_time_new <= '1';
-        IF new_coarsetime = '1' THEN
+        IF new_coarsetime_s = '1' THEN
           coarse_time_s <= to_integer(unsigned(coarsetime_reg));
         ELSE
           coarse_time_s <= coarse_time_s + 1;

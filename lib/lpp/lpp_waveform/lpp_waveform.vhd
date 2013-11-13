@@ -41,7 +41,8 @@ ENTITY lpp_waveform IS
   GENERIC (
     tech                    : INTEGER := inferred;
     data_size               : INTEGER := 96;  --16*6
-    nb_data_by_buffer_size : INTEGER := 11;
+    nb_data_by_buffer_size  : INTEGER := 11;
+    nb_word_by_buffer_size  : INTEGER := 11;
     nb_snapshot_param_size  : INTEGER := 11;
     delta_vector_size       : INTEGER := 20;
     delta_vector_size_f0_2  : INTEGER := 3);
@@ -73,6 +74,7 @@ ENTITY lpp_waveform IS
     burst_f2 : IN STD_LOGIC;
 
     nb_data_by_buffer : IN  STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
+    nb_word_by_buffer : IN  STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
     nb_snapshot_param  : IN  STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
     status_full        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
     status_full_ack    : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -314,10 +316,10 @@ BEGIN  -- beh
       rstn          => rstn,
       run           => run,
       nb_data_by_buffer => nb_data_by_buffer,
-      data_in_valid => valid_out,
-      data_in_ack => valid_ack,
-      data_in => data_out,
-      time_in => time_out_2,
+      data_in_valid     => valid_out,
+      data_in_ack       => valid_ack,
+      data_in           => data_out,
+      time_in           => time_out_2,
 
       data_out     => wdata,
       data_out_wen => data_wen,
@@ -332,49 +334,57 @@ BEGIN  -- beh
 
       empty        => empty,
       empty_almost => empty_almost,
-      
+    
       data_ren   => data_ren,          
       rdata      => rdata,
 
-      
+    
       full_almost => full_almost,
       full        => full,
       data_wen    => data_wen,
       wdata       => wdata);
 
+  data_f0_data_out <= rdata;
+  data_f1_data_out <= rdata;
+  data_f2_data_out <= rdata;
+  data_f3_data_out <= rdata;
+    
+  --lpp_waveform_fifo_withoutLatency_1: lpp_waveform_fifo_withoutLatency
+  --  GENERIC MAP (
+  --    tech => tech)
+  --  PORT MAP (
+  --    clk          => clk,
+  --    rstn         => rstn,
+  --    run          => run,
+      
+  --    empty_almost => empty_almost,
+  --    empty        => empty,
+  --    data_ren     => data_ren,
+      
+  --    rdata_0      => data_f0_data_out,
+  --    rdata_1      => data_f1_data_out,
+  --    rdata_2      => data_f2_data_out,
+  --    rdata_3      => data_f3_data_out,
+      
+  --    full_almost  => full_almost,
+  --    full         => full,
+  --    data_wen     => data_wen,
+  --    wdata        => wdata);
 
 
-
-
-  -----------------------------------------------------------------------------
-  -- TODO : set the alterance : time, data, data, .....
-  -----------------------------------------------------------------------------
 
   
-  -----------------------------------------------------------------------------
-  -- 
-  -----------------------------------------------------------------------------
-
   data_ren <= data_f3_data_out_ren &
               data_f2_data_out_ren &
               data_f1_data_out_ren &
               data_f0_data_out_ren;
   
-  data_f3_data_out <= rdata;
-  data_f2_data_out <= rdata;
-  data_f1_data_out <= rdata;
-  data_f0_data_out <= rdata;
-
-
-
-  
-
   -----------------------------------------------------------------------------
-  -- TODO
+  -- TODO : set the alterance : time, data, data, .....
   -----------------------------------------------------------------------------
   lpp_waveform_gen_address_1 : lpp_waveform_genaddress
     GENERIC MAP (
-      nb_data_by_buffer_size => nb_data_by_buffer_size)
+      nb_data_by_buffer_size => nb_word_by_buffer_size)
     PORT MAP (
       clk  => clk,
       rstn => rstn,
@@ -383,7 +393,7 @@ BEGIN  -- beh
       -------------------------------------------------------------------------
       -- CONFIG
       -------------------------------------------------------------------------
-      nb_data_by_buffer => nb_data_by_buffer, 
+      nb_data_by_buffer => nb_word_by_buffer, 
       
       addr_data_f0       => addr_data_f0,
       addr_data_f1       => addr_data_f1,

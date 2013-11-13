@@ -48,8 +48,8 @@ ENTITY lpp_dma_send_1word IS
     -- 
     send    : IN  STD_LOGIC;
     address : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-    
     data    : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+    ren     : OUT STD_LOGIC;
     --
     send_ok : OUT STD_LOGIC;
     send_ko : OUT STD_LOGIC
@@ -79,7 +79,9 @@ BEGIN  -- beh
       send_ok      <= '0';
       send_ko      <= '0';
       DMAIn.Lock    <= '0';
+      ren <= '1';
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
+      ren <= '1';
       CASE state IS
         WHEN IDLE =>
           DMAIn.Store   <= '1';
@@ -97,6 +99,7 @@ BEGIN  -- beh
             DMAIn.Request <= '0';
             DMAIn.Store   <= '0';
             state        <= SEND_DATA;
+            ren <= '0';
           END IF;
         WHEN SEND_DATA =>
           IF DMAOut.Fault = '1' THEN
@@ -106,9 +109,9 @@ BEGIN  -- beh
           ELSIF DMAOut.Ready = '1' THEN
             DMAIn.Request <= '0';
             DMAIn.Store   <= '0';
-            send_ok      <= '1';
-            send_ko      <= '0';
-            state        <= IDLE;
+            send_ok       <= '1';
+            send_ko       <= '0';
+            state         <= IDLE;
           END IF;
         WHEN ERROR0 =>
           state <= ERROR1;
