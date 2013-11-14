@@ -187,6 +187,16 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
 
   SIGNAL prdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
+  -----------------------------------------------------------------------------
+  -- IRQ
+  -----------------------------------------------------------------------------
+  CONSTANT IRQ_WFP_SIZE : INTEGER := 12;
+  SIGNAL irq_wfp_ZERO  : STD_LOGIC_VECTOR(IRQ_WFP_SIZE-1 DOWNTO 0);
+  SIGNAL irq_wfp_reg_s : STD_LOGIC_VECTOR(IRQ_WFP_SIZE-1 DOWNTO 0);
+  SIGNAL irq_wfp_reg   : STD_LOGIC_VECTOR(IRQ_WFP_SIZE-1 DOWNTO 0);
+  SIGNAL irq_wfp       : STD_LOGIC_VECTOR(IRQ_WFP_SIZE-1 DOWNTO 0);
+  SIGNAL ored_irq_wfp  : STD_LOGIC;
+  
 BEGIN  -- beh
 
   status_ready_matrix_f0_0             <= reg_sp.status_ready_matrix_f0_0;
@@ -424,12 +434,12 @@ BEGIN  -- beh
                                                                             error_bad_component_error)
                              ));
 
-      apbo.pirq(pirq_wfp) <= (status_full(0) OR status_full_err(0) OR status_new_err(0) OR
-                              status_full(1) OR status_full_err(1) OR status_new_err(1) OR
-                              status_full(2) OR status_full_err(2) OR status_new_err(2) OR
-                              status_full(3) OR status_full_err(3) OR status_new_err(3)
-                              );
-
+      --apbo.pirq(pirq_wfp) <= (status_full(0) OR status_full_err(0) OR status_new_err(0) OR
+      --                        status_full(1) OR status_full_err(1) OR status_new_err(1) OR
+      --                        status_full(2) OR status_full_err(2) OR status_new_err(2) OR
+      --                        status_full(3) OR status_full_err(3) OR status_new_err(3)
+      --                        );
+      apbo.pirq(pirq_wfp) <= ored_irq_wfp;
       
     END IF;
   END PROCESS lpp_lfr_apbreg;
@@ -438,5 +448,25 @@ BEGIN  -- beh
   apbo.pconfig <= pconfig;
   apbo.prdata  <= prdata;
 
+  -----------------------------------------------------------------------------
+  -- IRQ
+  -----------------------------------------------------------------------------
+  irq_wfp_reg_s <= status_full & status_full_err & status_new_err;
+  
+  PROCESS (HCLK, HRESETn)
+  BEGIN  -- PROCESS
+    IF HRESETn = '0' THEN               -- asynchronous reset (active low)
+      irq_wfp_reg     <= (OTHERS => '0');
+    ELSIF HCLK'event AND HCLK = '1' THEN  -- rising clock edge
+      irq_wfp_reg <= irq_wfp_reg_s;      
+    END IF;
+  END PROCESS;
 
+  all_irq_wfp: FOR I IN IRQ_WFP_SIZE-1 DOWNTO 0 GENERATE
+    irq_wfp(I) <= (NOT irq_wfp_reg(I)) AND irq_wfp_reg_s(I);
+  END GENERATE all_irq_wfp;
+
+  irq_wfp_ZERO <= (OTHERS => '0');
+  ored_irq_wfp <= '0' WHEN irq_wfp = irq_wfp_ZERO ELSE '1';
+  
 END beh;

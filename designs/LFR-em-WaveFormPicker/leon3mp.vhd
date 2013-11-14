@@ -490,7 +490,7 @@ BEGIN
       pirq_ms                 => 6,
       pirq_wfp                => 14,
       hindex                  => 2,
-      top_lfr_version         => X"00000002")
+      top_lfr_version         => X"00000003")
     PORT MAP (
       clk               => clkm,
       rstn              => rstn,
