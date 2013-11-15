@@ -34,7 +34,7 @@ generic(
     Mem_use       :   integer := use_RAM;
     Enable_ReUse  :   std_logic := '0';
     DataSz        :   integer range 1 to 32 := 8;
-    abits         :   integer range 2 to 12 := 8
+    AddrSz        :   integer range 2 to 12 := 8
     );
 port(
     rstn    :   in std_logic;
@@ -43,12 +43,12 @@ port(
     ren     :   in std_logic;
     rdata   :   out std_logic_vector(DataSz-1 downto 0);
     empty   :   out std_logic;
-    raddr   :   out std_logic_vector(abits-1 downto 0);
+    raddr   :   out std_logic_vector(AddrSz-1 downto 0);
     wclk    :   in std_logic;
     wen     :   in std_logic;
     wdata   :   in std_logic_vector(DataSz-1 downto 0);
     full    :   out std_logic;
-    waddr   :   out std_logic_vector(abits-1 downto 0)
+    waddr   :   out std_logic_vector(AddrSz-1 downto 0)
 );
 end entity;
 
@@ -65,10 +65,10 @@ signal sWEN         : std_logic;
 signal sRE          : std_logic;
 signal sWE          : std_logic;
 
-signal Waddr_vect   : std_logic_vector(abits-1 downto 0):=(others =>'0');
-signal Raddr_vect   : std_logic_vector(abits-1 downto 0):=(others =>'0');
-signal Waddr_vect_s : std_logic_vector(abits-1 downto 0):=(others =>'0');
-signal Raddr_vect_s : std_logic_vector(abits-1 downto 0):=(others =>'0');
+signal Waddr_vect   : std_logic_vector(AddrSz-1 downto 0):=(others =>'0');
+signal Raddr_vect   : std_logic_vector(AddrSz-1 downto 0):=(others =>'0');
+signal Waddr_vect_s : std_logic_vector(AddrSz-1 downto 0):=(others =>'0');
+signal Raddr_vect_s : std_logic_vector(AddrSz-1 downto 0):=(others =>'0');
 
 begin
 
@@ -78,13 +78,13 @@ begin
 --==================================================================================
 memRAM : IF Mem_use = use_RAM GENERATE
   SRAM : syncram_2p
-      generic map(tech,abits,DataSz)
+      generic map(tech,AddrSz,DataSz)
       port map(RCLK,sRE,Raddr_vect,rdata,WCLK,sWE,Waddr_vect,wdata);
 END GENERATE;
 --================================================================================== 
 memCEL : IF Mem_use = use_CEL GENERATE
   CRAM : RAM_CEL
-      generic map(DataSz,abits)
+      generic map(DataSz,AddrSz)
       port map(wdata, rdata, sWEN, sREN, Waddr_vect, Raddr_vect, WCLK, rstn);
 END GENERATE;
 --================================================================================== 
@@ -152,7 +152,6 @@ waddr   <= Waddr_vect;
 raddr   <= Raddr_vect;
 
 end architecture;
-
 
 
 

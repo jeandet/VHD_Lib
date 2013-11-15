@@ -44,37 +44,37 @@ end CNA_TabloC;
 
 architecture ar_CNA_TabloC of CNA_TabloC is
 
-component CLKINT
-port( A : in    std_logic := 'U';
-      Y : out   std_logic);
-end component;
+--component CLKINT
+--port( A : in    std_logic := 'U';
+--      Y : out   std_logic);
+--end component;
 
-signal clk      : std_logic;
+--signal clk      : std_logic;
 
-signal raz          : std_logic;
+--signal raz          : std_logic;
 signal s_SCLK      : std_logic;
 signal OKAI_send    : std_logic;
 
 begin
 
-CLKINT_0 : CLKINT
-    port map(A => clock, Y => clk);
+--CLKINT_0 : CLKINT
+--    port map(A => clock, Y => clk);
 
-CLKINT_1 : CLKINT
-    port map(A => rst, Y => raz);
+--CLKINT_1 : CLKINT
+--    port map(A => rst, Y => raz);
 
 
 SystemCLK : entity work.Systeme_Clock
     generic map (nb_serial)
-    port map (clk,raz,s_SCLK);
+    port map (clock,rst,s_SCLK);
 
 
 Signal_sync : entity work.Gene_SYNC
-    port map (s_SCLK,raz,enable,OKAI_send,SYNC);
+    port map (s_SCLK,rst,enable,OKAI_send,SYNC);
 
 
 Serial : entity work.serialize
-    port map (clk,raz,s_SCLK,Data_C,OKAI_send,flag_sd,Data);
+    port map (clock,rst,s_SCLK,Data_C,OKAI_send,flag_sd,Data);
 
 
 SCLK        <= s_SCLK;

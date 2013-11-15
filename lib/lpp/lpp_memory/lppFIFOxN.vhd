@@ -33,12 +33,12 @@ generic(
     tech          :   integer := 0;
     Mem_use       :   integer := use_RAM;
     Data_sz       :   integer range 1 to 32 := 8;
-    Addr_sz       :   integer range 1 to 32 := 8;
-    FifoCnt : integer := 1;
+    Addr_sz       :   integer range 2 to 12 := 8;
+    FifoCnt       :   integer := 1;
     Enable_ReUse  :   std_logic := '0'
     );
 port(
-    rst     :   in std_logic;
+    rstn     :   in std_logic;
     wclk    :   in std_logic;    
     rclk    :   in std_logic;
     ReUse   :   in std_logic_vector(FifoCnt-1 downto 0);
@@ -59,8 +59,7 @@ begin
 fifos: for i in 0 to FifoCnt-1 generate
     FIFO0 : lpp_fifo
         generic map (tech,Mem_use,Enable_ReUse,Data_sz,Addr_sz)
-        port map(rst,ReUse(i),rclk,ren(i),rdata((i+1)*Data_sz-1 downto i*Data_sz),empty(i),open,wclk,wen(i),wdata((i+1)*Data_sz-1 downto i*Data_sz),full(i),open);
+        port map(rstn,ReUse(i),rclk,ren(i),rdata((i+1)*Data_sz-1 downto i*Data_sz),empty(i),open,wclk,wen(i),wdata((i+1)*Data_sz-1 downto i*Data_sz),full(i),open);
 end generate;
 
 end architecture;
-
