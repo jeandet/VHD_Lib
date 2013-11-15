@@ -94,6 +94,7 @@ entity leon3mp is
 ---  AJOUT TEST ------------------------In/Out-----------------------
 ---------------------------------------------------------------------
 -- DAC
+    DAC_EN   : out std_logic;
     DAC_SYNC : out std_logic;
     DAC_SCLK : out std_logic;
     DAC_DATA : out std_logic;
@@ -177,7 +178,7 @@ begin
 
     CAL0 : APB_CNA
         generic map (pindex => 4, paddr => 4)
-        port map(clkm,rstn,apbi,apbo(4),DAC_SYNC,DAC_SCLK,DAC_DATA);
+        port map(clkm,rstn,apbi,apbo(4),DAC_EN,DAC_SYNC,DAC_SCLK,DAC_DATA);
 
 
 --- UART -------------------------------------------------------------
