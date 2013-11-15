@@ -44,6 +44,7 @@ entity APB_CNA is
     rst     : in  std_logic;           --! Reset general du composant
     apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
     apbo    : out apb_slv_out_type;    --! Registre de gestion des sorties du bus
+    Cal_EN  : out std_logic;           --! Signal Enable du multiplex pour la CAL
     SYNC    : out std_logic;           --! Signal de synchronisation du convertisseur
     SCLK    : out std_logic;           --! Horloge systeme du convertisseur
     DATA    : out std_logic            --! Donnée numérique sérialisé
@@ -120,4 +121,5 @@ Rec.CNA_Cfg(1) <= flag_sd;
     end process;
 
 apbo.prdata     <=   Rdata when apbi.penable = '1';
+Cal_EN <= enable;
 end ar_APB_CNA;
