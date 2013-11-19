@@ -309,9 +309,12 @@ BEGIN  -- beh
       reg_sp.status_error_anticipating_empty_fifo <= reg_sp.status_error_anticipating_empty_fifo OR error_anticipating_empty_fifo;
       reg_sp.status_error_bad_component_error     <= reg_sp.status_error_bad_component_error OR error_bad_component_error;
       all_status: FOR I IN 3 DOWNTO 0 LOOP
-        reg_wp.status_full(I)     <= (reg_wp.status_full(I) OR status_full(I)) AND reg_wp.run;
-        reg_wp.status_full_err(I) <= (reg_wp.status_full_err(I) OR status_full_err(I))  AND reg_wp.run;
-        reg_wp.status_new_err(I)  <= (reg_wp.status_new_err(I) OR status_new_err(I)) AND reg_wp.run ;
+        --reg_wp.status_full(I)     <= (reg_wp.status_full(I) OR status_full(I)) AND reg_wp.run;
+        --reg_wp.status_full_err(I) <= (reg_wp.status_full_err(I) OR status_full_err(I))  AND reg_wp.run;
+        --reg_wp.status_new_err(I)  <= (reg_wp.status_new_err(I) OR status_new_err(I)) AND reg_wp.run ;
+        reg_wp.status_full(I)     <= status_full(I) AND reg_wp.run;
+        reg_wp.status_full_err(I) <= status_full_err(I)  AND reg_wp.run;
+        reg_wp.status_new_err(I)  <= status_new_err(I) AND reg_wp.run ;
       END LOOP all_status;
 
       paddr             := "000000";

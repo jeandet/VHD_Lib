@@ -127,9 +127,17 @@ ENTITY lpp_waveform IS
     data_f3_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f3_data_out_valid       : OUT STD_LOGIC;
     data_f3_data_out_valid_burst : OUT STD_LOGIC;
-    data_f3_data_out_ren         : IN STD_LOGIC
+    data_f3_data_out_ren         : IN STD_LOGIC;
 
-    
+    --debug
+    debug_f0_data                : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    debug_f0_data_valid          : OUT STD_LOGIC;
+    debug_f1_data                : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    debug_f1_data_valid          : OUT STD_LOGIC;
+    debug_f2_data                : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    debug_f2_data_valid          : OUT STD_LOGIC;
+    debug_f3_data                : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    debug_f3_data_valid          : OUT STD_LOGIC    
     );
 
 END lpp_waveform;
@@ -219,7 +227,7 @@ BEGIN  -- beh
       data_in_valid     => data_f0_in_valid,
       data_out          => data_f0_out,
       data_out_valid    => data_f0_out_valid);
-
+  
   nb_snapshot_param_more_one <= ('0' & nb_snapshot_param) + 1;
 
   lpp_waveform_snapshot_f1 : lpp_waveform_snapshot
@@ -268,6 +276,18 @@ BEGIN  -- beh
       data_in_valid  => data_f3_in_valid,
       data_out       => data_f3_out,
       data_out_valid => data_f3_out_valid);
+
+  -----------------------------------------------------------------------------
+  -- DEBUG
+  debug_f0_data_valid <= data_f0_out_valid;
+  debug_f0_data       <= data_f0_out;
+  debug_f1_data_valid <= data_f1_out_valid;
+  debug_f1_data       <= data_f1_out;
+  debug_f2_data_valid <= data_f2_out_valid;
+  debug_f2_data       <= data_f2_out;
+  debug_f3_data_valid <= data_f3_out_valid;
+  debug_f3_data       <= data_f3_out;
+  -----------------------------------------------------------------------------
 
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
@@ -323,6 +343,7 @@ BEGIN  -- beh
 
       data_out     => wdata,
       data_out_wen => data_wen,
+      full_almost         => full_almost,
       full         => full);
 
   lpp_waveform_fifo_1 : lpp_waveform_fifo

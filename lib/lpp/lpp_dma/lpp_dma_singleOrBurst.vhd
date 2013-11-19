@@ -146,7 +146,7 @@ BEGIN
 
       send    => single_send,
       address => address,
-      data    => data,
+      data    => data_2_halfword,
       ren     => single_ren,
       
       send_ok => single_send_ok,        -- TODO

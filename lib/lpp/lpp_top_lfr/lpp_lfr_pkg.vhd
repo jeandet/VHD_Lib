@@ -99,7 +99,17 @@ PACKAGE lpp_lfr_pkg IS
       ahbo            : OUT AHB_Mst_Out_Type;
       coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-      data_shaping_BW : OUT STD_LOGIC);
+      data_shaping_BW : OUT STD_LOGIC;
+
+    --debug
+    debug_f0_data                : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
+    debug_f0_data_valid          : OUT STD_LOGIC;
+    debug_f1_data                : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
+    debug_f1_data_valid          : OUT STD_LOGIC;
+    debug_f2_data                : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
+    debug_f2_data_valid          : OUT STD_LOGIC;
+    debug_f3_data                : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
+    debug_f3_data_valid          : OUT STD_LOGIC );
   END COMPONENT;
 
   COMPONENT lpp_lfr_apbreg
