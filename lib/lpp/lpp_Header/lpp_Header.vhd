@@ -38,7 +38,6 @@ component HeaderBuilder is
         clkm            : in std_logic;
         rstn            : in std_logic;
 
-        pong : in std_logic;
         Statu : in std_logic_vector(3 downto 0);
         Matrix_Type : in std_logic_vector(1 downto 0);
         Matrix_Write : in std_logic;

@@ -31,7 +31,7 @@ use lpp.lpp_amba.all;
 
 package lpp_cna is
 
-component APB_CNA is
+component APB_DAC is
   generic (
     pindex   : integer := 0;
     paddr    : integer := 0;
@@ -43,6 +43,7 @@ component APB_CNA is
     rst     : in  std_logic;
     apbi    : in  apb_slv_in_type;
     apbo    : out apb_slv_out_type;
+    Cal_EN  : out std_logic;
     SYNC    : out std_logic;
     SCLK    : out std_logic;
     DATA    : out std_logic
@@ -50,9 +51,9 @@ component APB_CNA is
 end component;
 
 
-component CNA_TabloC is
+component DacDriver is
     port(
-        clock       : in std_logic;
+        clk       : in std_logic;
         rst         : in std_logic;
         enable      : in std_logic;
         Data_C      : in std_logic_vector(15 downto 0);

@@ -29,14 +29,12 @@ generic(
 port(
     clk         : in std_logic;
     reset       : in std_logic;
-    Acq         : in std_logic;
+    Ack         : in std_logic;
     Data        : in std_logic_vector(Data_SZ-1 downto 0);
     Write       : in std_logic;
     Valid       : in std_logic;
---    Full        : in std_logic_vector(1 downto 0);
     FifoData    : out std_logic_vector(2*Data_SZ-1 downto 0);
     FifoWrite   : out std_logic_vector(1 downto 0);
-    Pong        : out std_logic;
     Error       : out std_logic
 );
 end entity;
@@ -47,15 +45,14 @@ architecture ar_Dispatch of Dispatch is
 type etat is (eX,e0,e1,e2);
 signal ect : etat;
 
-signal Pong_int : std_logic;
---signal FifoCpt : integer range 0 to 1 := 0;
+signal Pong : std_logic;
 
 begin
 
  process (clk,reset)
     begin
         if(reset='0')then
-            Pong_int    <= '0';
+            Pong    <= '0';
             Error   <= '0';
             ect <= e0;   
             
@@ -64,14 +61,13 @@ begin
             case ect is
 
                 when e0 =>
---                    if(Full(FifoCpt) = '1')then
                     if(Valid = '1')then
-                        Pong_int <= not Pong_int;
+                        Pong <= not Pong;
                         ect <= e1;
                     end if;
 
                 when e1 =>
-                    if(Acq = '0')then
+                    if(Ack = '0')then
                         Error <= '1';
                         ect <= e1;
                     else
@@ -80,7 +76,7 @@ begin
                     end if;                  
                         
                 when others =>
-                    null;  
+                    null;
 
             end case;
 
@@ -88,10 +84,6 @@ begin
     end process;
 
 FifoData <= Data & Data;
-Pong <= Pong_int;
-
---FifoCpt <= 0 when Pong_int='0' else 1;
-
-FifoWrite <= '1' & not Write when Pong_int='0' else not Write & '1';
+FifoWrite <= '1' & not Write when Pong='0' else not Write & '1';
                     
 end architecture;

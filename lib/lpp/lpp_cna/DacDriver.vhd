@@ -23,12 +23,13 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.Convertisseur_config.all;
+use lpp.lpp_cna.all;
 
 --! Programme du Convertisseur Numérique/Analogique
 
-entity CNA_TabloC is
+entity DacDriver is
   port(
-    clock       : in std_logic;                        --! Horloge du composant
+    clk         : in std_logic;                        --! Horloge du composant
     rst         : in std_logic;                        --! Reset general du composant
     enable      : in std_logic;                        --! Autorise ou non l'utilisation du composant
     Data_C      : in std_logic_vector(15 downto 0);    --! Donnée Numérique d'entrée sur 16 bits
@@ -37,46 +38,31 @@ entity CNA_TabloC is
     flag_sd     : out std_logic;                       --! Flag, signale la fin de la sérialisation d'une donnée
     Data        : out std_logic                        --! Donnée numérique sérialisé
     );
-end CNA_TabloC;
+end entity;
 
 --! @details Un driver C va permettre de génerer un tableau de données sur 16 bits, 
 --! qui seront sérialisé pour étre ensuite dirigées vers le convertisseur.
 
-architecture ar_CNA_TabloC of CNA_TabloC is
+architecture ar_DacDriver of DacDriver is
 
-component CLKINT
-port( A : in    std_logic := 'U';
-      Y : out   std_logic);
-end component;
-
-signal clk      : std_logic;
-
-signal raz          : std_logic;
 signal s_SCLK      : std_logic;
 signal OKAI_send    : std_logic;
 
 begin
 
-CLKINT_0 : CLKINT
-    port map(A => clock, Y => clk);
-
-CLKINT_1 : CLKINT
-    port map(A => rst, Y => raz);
-
-
-SystemCLK : entity work.Systeme_Clock
+SystemCLK : Systeme_Clock
     generic map (nb_serial)
-    port map (clk,raz,s_SCLK);
+    port map (clk,rst,s_SCLK);
 
 
-Signal_sync : entity work.Gene_SYNC
-    port map (s_SCLK,raz,enable,OKAI_send,SYNC);
+Signal_sync : Gene_SYNC
+    port map (s_SCLK,rst,enable,OKAI_send,SYNC);
 
 
-Serial : entity work.serialize
-    port map (clk,raz,s_SCLK,Data_C,OKAI_send,flag_sd,Data);
+Serial : serialize
+    port map (clk,rst,s_SCLK,Data_C,OKAI_send,flag_sd,Data);
 
 
 SCLK        <= s_SCLK;
 
-end ar_CNA_TabloC;
+end architecture;

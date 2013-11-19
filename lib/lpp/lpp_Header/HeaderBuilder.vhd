@@ -30,7 +30,6 @@ entity HeaderBuilder is
         clkm            : in std_logic;
         rstn            : in std_logic;
 
-        pong : in std_logic;
         Statu : in std_logic_vector(3 downto 0);
         Matrix_Type : in std_logic_vector(1 downto 0);
         Matrix_Write : in std_logic;
@@ -57,7 +56,6 @@ signal Matrix_Param     : std_logic_vector(3 downto 0);
 signal Write_reg : std_logic;
 signal Data_cpt : integer;
 signal MAX : integer;
-signal pong_reg : std_logic;
 
 type etat is (idle0,idle1,pong0,pong1);
 signal ect : etat;
@@ -69,7 +67,6 @@ begin
         if(rstn='0')then
             ect <= idle0;
             Valid <= '0';
-            pong_reg <= '0';
             header_val <= '0';
             header(5 downto 0) <= (others => '0');
             Write_reg    <= '0';
@@ -79,24 +76,12 @@ begin
             
         elsif(clkm' event and clkm='1')then
             Write_reg <= Matrix_Write;
-            pong_reg <= pong;
 
             if(Statu="0001" or Statu="0011" or Statu="0110" or Statu="1010" or Statu="1111")then
                 MAX <= 128;
             else
                 MAX <= 256;
             end if;
-
---            if(Write_reg = '0' and Matrix_Write = '1')then
---                if(Data_cpt = MAX)then
---                    Data_cpt <= 0;
---                    Valid <= '1';
---                    header_val <= '1';
---                else
---                    Data_cpt <= Data_cpt + 1;
---                    Valid <= '0';
---                end if;
---            end if;
 
             if(Write_reg = '0' and Matrix_Write = '1')then     
                 Data_cpt <= Data_cpt + 1;
@@ -107,19 +92,7 @@ begin
                 header_val <= '1';
             else
                 Valid <= '0';
-            end if;
-
---            if(header_ack = '1')then
---                header_val <= '0';
---            end if;
-            
---            if(emptyIN = "10")then
---                ping <= '0';
---            elsif(emptyIN = "01")then
---                ping <= '1';
---            else
---                ping <= ping;
---            end if;
+            end if; 
 
 
             case ect is
@@ -127,11 +100,7 @@ begin
                 when idle0 =>
                     if(header_ack = '1')then
                         header_val <= '0';
-                        --if(pong = '1')then
-                            ect <= pong0;
-                        --elsif(pong = '0')then
-                            --ect <= pong1;
-                        --end if;
+                        ect <= pong0;
                     end if;
 
                 when pong0 =>
@@ -160,8 +129,6 @@ begin
 
 Matrix_Param <= std_logic_vector(to_unsigned(to_integer(unsigned(Statu))-1,4));
 
---header(1 downto 0) <= Matrix_Type;
---header(5 downto 2) <= Matrix_Param;
 header(31 downto 6) <= (others => '0');
 
 with ect select

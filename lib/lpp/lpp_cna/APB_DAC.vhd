@@ -32,7 +32,7 @@ use lpp.lpp_cna.all;
 
 --! Driver APB, va faire le lien entre l'IP VHDL du convertisseur et le bus Amba
 
-entity APB_CNA is
+entity APB_DAC is
   generic (
     pindex   : integer := 0;
     paddr    : integer := 0;
@@ -44,16 +44,17 @@ entity APB_CNA is
     rst     : in  std_logic;           --! Reset general du composant
     apbi    : in  apb_slv_in_type;     --! Registre de gestion des entrées du bus
     apbo    : out apb_slv_out_type;    --! Registre de gestion des sorties du bus
+    Cal_EN  : out std_logic;           --! Signal Enable du multiplex pour la CAL
     SYNC    : out std_logic;           --! Signal de synchronisation du convertisseur
     SCLK    : out std_logic;           --! Horloge systeme du convertisseur
     DATA    : out std_logic            --! Donnée numérique sérialisé
     );
-end APB_CNA;
+end entity;
 
 --! @details Les deux registres (apbi,apbo) permettent de gérer la communication sur le bus
 --! et les sorties seront cablées vers le convertisseur. 
 
-architecture ar_APB_CNA of APB_CNA is
+architecture ar_APB_DAC of APB_DAC is
 
 constant REVISION : integer := 1;
 
@@ -64,27 +65,27 @@ constant pconfig : apb_config_type := (
 signal enable   : std_logic;
 signal flag_sd : std_logic;
 
-type CNA_ctrlr_Reg is record
-     CNA_Cfg  : std_logic_vector(1 downto 0);
-     CNA_Data : std_logic_vector(15 downto 0);
+type DAC_ctrlr_Reg is record
+     DAC_Cfg  : std_logic_vector(1 downto 0);
+     DAC_Data : std_logic_vector(15 downto 0);
 end record;
 
-signal Rec : CNA_ctrlr_Reg;
+signal Rec : DAC_ctrlr_Reg;
 signal Rdata     : std_logic_vector(31 downto 0);
 
 begin
 
-enable <= Rec.CNA_Cfg(0);
-Rec.CNA_Cfg(1) <= flag_sd;
+enable <= Rec.DAC_Cfg(0);
+Rec.DAC_Cfg(1) <= flag_sd;
 
-    CONVERTER : CNA_TabloC
+    CONV0 : DacDriver
         port map(clk,rst,enable,Rec.CNA_Data,SYNC,SCLK,flag_sd,Data);
 
 
     process(rst,clk)
     begin
         if(rst='0')then
-            Rec.CNA_Data <=  (others => '0');
+            Rec.DAC_Data <=  (others => '0');
 
         elsif(clk'event and clk='1')then 
         
@@ -93,23 +94,23 @@ Rec.CNA_Cfg(1) <= flag_sd;
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
-                        Rec.CNA_Cfg(0) <= apbi.pwdata(0);
+                        Rec.DAC_Cfg(0) <= apbi.pwdata(0);
                     when "000001" =>
-                        Rec.CNA_Data <= apbi.pwdata(15 downto 0);
+                        Rec.DAC_Data <= apbi.pwdata(15 downto 0);
                     when others =>
                         null;
                 end case;
             end if;
 
-    --APB READ OP
+    --APB Read OP
             if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
                 case apbi.paddr(abits-1 downto 2) is
                     when "000000" =>
                         Rdata(31 downto 2) <= X"ABCDEF5" & "00";
-                        Rdata(1 downto 0) <= Rec.CNA_Cfg;
+                        Rdata(1 downto 0) <= Rec.DAC_Cfg;
                     when "000001" =>
                         Rdata(31 downto 16) <= X"FD18";
-                        Rdata(15 downto 0) <= Rec.CNA_Data;
+                        Rdata(15 downto 0) <= Rec.DAC_Data;
                     when others =>
                         Rdata <= (others => '0');
                 end case;
@@ -120,4 +121,5 @@ Rec.CNA_Cfg(1) <= flag_sd;
     end process;
 
 apbo.prdata     <=   Rdata when apbi.penable = '1';
-end ar_APB_CNA;
+Cal_EN <= enable;
+end architecture;
