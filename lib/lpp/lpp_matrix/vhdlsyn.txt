@@ -4,6 +4,7 @@ APB_Matrix.vhd
 Dispatch.vhd
 DriveInputs.vhd
 GetResult.vhd
+lpp_matrix.vhd
 MatriceSpectrale.vhd
 MatriceSpectrale.vhd.bak
 Matrix.vhd
@@ -12,6 +13,5 @@ SpectralMatrix.vhd
 SpectralMatrix.vhd.bak
 Starter.vhd
 TopMatrix_PDR.vhd
-TopSpecMatrix.vhd
 Top_MatrixSpec.vhd
-lpp_matrix.vhd
+TopSpecMatrix.vhd

@@ -25,6 +25,14 @@ use work.Convertisseur_config.all;
 
 
 use work.config.all;
+--==================================================================
+--
+--
+--			FPGA FREQ = 48MHz
+--			ADC Oscillator frequency = 12MHz
+--
+--
+--==================================================================
 
 entity ici4 is
   generic (
@@ -35,20 +43,25 @@ entity ici4 is
 WordSize : integer := 8; WordCnt    :   integer := 144;MinFCount   :   integer := 64
   );
   port (
-    reset       : in  std_ulogic;
-    clk         : in  std_ulogic;
-    sclk    :   in  std_logic;
-    Gate    :   in  std_logic;
-    MinF    :   in  std_logic;
-    MajF    :   in  std_logic;
-    Data    :   out std_logic;
-    DC_ADC_Sclk     :   out std_logic;
-    DC_ADC_IN       :   in  std_logic_vector(1 downto 0);
-    DC_ADC_ClkDiv   :   out std_logic;
-    DC_ADC_FSynch   :   out std_logic;
-	 SET_RESET0      :   out std_logic;
-	 SET_RESET1      :   out std_logic;
-	 LED             :   out std_logic
+    reset         : in  std_ulogic;
+    clk           : in  std_ulogic;
+    sclk          : in  std_logic;
+    Gate          : in  std_logic;
+    MinF          : in  std_logic;
+    MajF          : in  std_logic;
+    Data          : out std_logic;
+	 LF_SCK	      : out std_logic;
+    LF_CNV	      : out std_logic;
+    LF_SDO1	      : in  std_logic;
+	 LF_SDO2	      : in  std_logic;
+	 LF_SDO3	      : in  std_logic;
+    DC_ADC_Sclk   : out std_logic;
+    DC_ADC_IN     : in  std_logic_vector(1 downto 0);
+    DC_ADC_ClkDiv : out std_logic;
+    DC_ADC_FSynch : out std_logic;
+	 SET_RESET0    : out std_logic;
+	 SET_RESET1    : out std_logic;
+	 LED           : out std_logic
    );
 end;
 
@@ -58,17 +71,10 @@ signal  clk_buf,reset_buf   :   std_logic;
 
 Constant FramePlacerCount    :   integer := 2;
 
-signal  MinF_Inv    :   std_logic;
-signal  Gate_Inv    :   std_logic;
-signal  sclk_Inv    :   std_logic;
+
 signal  WordCount   :   integer range 0 to WordCnt-1;
 signal  WordClk     :   std_logic;
 
-signal  data_int    :   std_logic;
-
-signal  MuxOUT      :   std_logic_vector(WordSize-1 downto 0);
-signal  MuxIN       :   std_logic_vector((2*WordSize)-1 downto 0);
-signal  Sel         :   integer range 0 to 1;
 
 signal  AMR1X   :     std_logic_vector(23 downto 0);
 signal  AMR1Y   :     std_logic_vector(23 downto 0);
@@ -86,229 +92,155 @@ signal  AMR4X   :     std_logic_vector(23 downto 0);
 signal  AMR4Y   :     std_logic_vector(23 downto 0);
 signal  AMR4Z   :     std_logic_vector(23 downto 0);
 
-signal  Temp1   :     std_logic_vector(23 downto 0);
-signal  Temp2   :     std_logic_vector(23 downto 0);
-signal  Temp3   :     std_logic_vector(23 downto 0);
-signal  Temp4   :     std_logic_vector(23 downto 0);
 
+signal  TEMP1   :     std_logic_vector(23 downto 0);
+signal  TEMP2   :     std_logic_vector(23 downto 0);
+signal  TEMP3   :     std_logic_vector(23 downto 0);
+signal  TEMP4   :     std_logic_vector(23 downto 0);
 
 signal  LF1     :     std_logic_vector(15 downto 0);
 signal  LF2     :     std_logic_vector(15 downto 0);
 signal  LF3     :     std_logic_vector(15 downto 0);
 
+signal  data_int :    std_logic;
 
-signal  LF1_int    :     std_logic_vector(23 downto 0);
-signal  LF2_int    :     std_logic_vector(23 downto 0);
-signal  LF3_int    :     std_logic_vector(23 downto 0);
-
-signal   DC_ADC_SmplClk  :    std_logic;
-signal   LF_ADC_SmplClk  :    std_logic;
-signal   SET_RESET0_sig  :    std_logic;
-signal   SET_RESET1_sig  :    std_logic;
-
-signal  MinFCnt   :   integer range 0 to MinFCount-1;
-
-signal  FramePlacerFlags    :   std_logic_vector(FramePlacerCount-1 downto 0);
+signal  CrossDomainSync	:	std_logic;
 
 begin
 
-
-clk_buf   <= clk;
-reset_buf <= reset;
---    
-
-Gate_Inv    <=  not Gate;
-sclk_Inv    <=  not Sclk;
-MinF_Inv    <=  not MinF;
 
 LED         <= not data_int;
-data        <= data_int;
+data			<=	data_int;
 
 
 
-SD0 : Serial_Driver 
-generic map(WordSize)
-port map(sclk_Inv,MuxOUT,Gate_inv,data_int);
+CDS0 : entity  work.CrossDomainSyncGen
+Port map( 
+		  reset      => reset,
+		  ClockS     => sclk,
+		  ClockF     => clk,
+		  SyncSignal => CrossDomainSync
+);
 
-WC0 :  Word_Cntr
-generic map(WordSize,WordCnt)
-port map(sclk_Inv,MinF,WordClk,WordCount);
-
-MFC0 :  MinF_Cntr
-generic map(MinFCount)
+TM : entity work.TM_MODULE 
+generic map(
+	WordSize   =>  WordSize,
+	WordCnt    =>  WordCnt,
+	MinFCount  =>  MinFCount
+)
 port map(
-    clk     =>  MinF_Inv,
-    reset   =>  MajF,
-    Cnt_out =>  MinFCnt
+
+ reset	=>reset,
+ clk     =>clk,
+ MinF    =>MinF,
+ MajF    =>MajF,
+ sclk    =>sclk,
+ gate		=>gate,
+ data		=>data_int,
+ WordClk =>WordClk,
+
+
+ LF1     =>      LF1,
+ LF2     =>      LF2,
+ LF3     =>      LF3,
+
+ AMR1X   =>      AMR1X,
+ AMR1Y   =>      AMR1Y,
+ AMR1Z   =>      AMR1Z,
+
+ AMR2X   =>      AMR2X,
+ AMR2Y   =>      AMR2Y,
+ AMR2Z   =>      AMR2Z,
+
+ AMR3X   =>      AMR3X,
+ AMR3Y   =>      AMR3Y,
+ AMR3Z   =>      AMR3Z,
+
+ AMR4X   =>      AMR4X,
+ AMR4Y   =>      AMR4Y,
+ AMR4Z   =>      AMR4Z,
+
+ Temp1   =>      Temp1,
+ Temp2   =>      Temp2,
+ Temp3   =>      Temp3,
+ Temp4   =>      Temp4
+);
+
+DC_ADC0:entity work.DC_ACQ_TOP
+generic map (
+	WordSize  => WordSize,
+	WordCnt   => WordCnt,
+	MinFCount => MinFCount,
+	EnableSR  => 0,
+	CstDATA   => SEND_CONSTANT_DATA,
+	FakeADC	 => 0
+)
+port map(
+
+ reset	=>  reset,
+ clk     =>  clk,
+ SyncSig =>  CrossDomainSync,
+ minorF  =>  minF,
+ majorF  =>  majF,
+ sclk    =>  sclk,
+ WordClk =>  WordClk,
+
+ DC_ADC_Sclk     =>  DC_ADC_Sclk,
+ DC_ADC_IN       =>  DC_ADC_IN,
+ DC_ADC_ClkDiv   =>  DC_ADC_ClkDiv,
+ DC_ADC_FSynch   =>  DC_ADC_FSynch,
+ SET_RESET0      =>  SET_RESET0,
+ SET_RESET1      =>  SET_RESET1,
+
+ AMR1X   =>  AMR1X,
+ AMR1Y   =>  AMR1Y,
+ AMR1Z   =>  AMR1Z,
+
+ AMR2X   =>  AMR2X,
+ AMR2Y   =>  AMR2Y,
+ AMR2Z   =>  AMR2Z,
+
+ AMR3X   =>  AMR3X,
+ AMR3Y   =>  AMR3Y,
+ AMR3Z   =>  AMR3Z,
+ 
+ AMR4X   =>  AMR4X,
+ AMR4Y   =>  AMR4Y,
+ AMR4Z   =>  AMR4Z,
+ 
+ Temp1   =>  Temp1,
+ Temp2   =>  Temp2,
+ Temp3   =>  Temp3,
+ Temp4   =>  Temp4
 );
 
 
-MUX0 : Serial_Driver_Multiplexor
-generic map(FramePlacerCount,WordSize)
-port map(sclk_Inv,Sel,MuxIN,MuxOUT);
-
-
-DCFP0 : entity work.DC_FRAME_PLACER 
-generic map(WordSize,WordCnt,MinFCount)
+LF: entity work.LF_ACQ_TOP
+generic map(
+	WordSize  => WordSize,
+	WordCnt   => WordCnt,
+	MinFCount => MinFCount,
+	CstDATA   => SEND_CONSTANT_DATA,
+	IIRFilter => 0
+)
 port map(
-    clk     =>  Sclk,
-    Wcount  =>  WordCount,
-    MinFCnt =>  MinFCnt,
-    Flag    =>  FramePlacerFlags(0),
-    AMR1X   =>  AMR1X,
-    AMR1Y   =>  AMR1Y,
-    AMR1Z   =>  AMR1Z,
-    AMR2X   =>  AMR2X,
-    AMR2Y   =>  AMR2Y,
-    AMR2Z   =>  AMR2Z,
-    AMR3X   =>  AMR3X,
-    AMR3Y   =>  AMR3Y,
-    AMR3Z   =>  AMR3Z,
-    AMR4X   =>  AMR4X,
-    AMR4Y   =>  AMR4Y,
-    AMR4Z   =>  AMR4Z,
-    Temp1   =>  Temp1,
-    Temp2   =>  Temp2,
-    Temp3   =>  Temp3,
-    Temp4   =>  Temp4,
-    WordOut =>  MuxIN(7 downto 0));
 
-
-
-LFP0 : entity  work.LF_FRAME_PLACER
-generic map(WordSize,WordCnt,MinFCount)
-port map(
-    clk     =>  Sclk,
-    Wcount  =>  WordCount,
-    Flag    =>  FramePlacerFlags(1),
-    LF1     =>  LF1,
-    LF2     =>  LF2,
-    LF3     =>  LF3,
-    WordOut =>  MuxIN(15 downto 8));
-
-
-
-DC_SMPL_CLK0 : entity work.DC_SMPL_CLK 
-port map(MinF_Inv,DC_ADC_SmplClk);
-
-process(reset,DC_ADC_SmplClk)
-begin
-if reset = '0' then
-	SET_RESET0_sig <= '0';
-elsif DC_ADC_SmplClk'event and DC_ADC_SmplClk = '1' then
-	SET_RESET0_sig <= not SET_RESET0_sig;
-end if;
-end process;
-
-SET_RESET1_sig	<= SET_RESET0_sig;
-SET_RESET0 	<= SET_RESET0_sig;
-SET_RESET1  <= SET_RESET1_sig;
---
-
-
-
-send_ADC_DATA : IF SEND_CONSTANT_DATA = 0 GENERATE
-    DC_ADC0 : DUAL_ADS1278_DRIVER                      --With AMR down ! => 24bits DC TM -> SC high res on Spin
-		port map(
-			 Clk     =>  clk_buf,
-			 reset   =>  reset_buf,
-			 SpiClk  =>  DC_ADC_Sclk,
-			 DIN     =>  DC_ADC_IN,
-			 SmplClk =>  DC_ADC_SmplClk,
-			 OUT00   =>  AMR1X,
-			 OUT01   =>  AMR1Y,
-			 OUT02   =>  AMR1Z,
-			 OUT03   =>  AMR2X,
-			 OUT04   =>  AMR2Y,
-			 OUT05   =>  AMR2Z,
-			 OUT06   =>  Temp1,
-			 OUT07   =>  Temp2,
-			 OUT10   =>  AMR3X,
-			 OUT11   =>  AMR3Y,
-			 OUT12   =>  AMR3Z,
-			 OUT13   =>  AMR4X,
-			 OUT14   =>  AMR4Y,
-			 OUT15   =>  AMR4Z,
-			 OUT16   =>  Temp3,
-			 OUT17   =>  Temp4,
-			 FSynch  =>  DC_ADC_FSynch
-		);
-	LF1 <=  LF1cst;
-	LF2 <=  LF2cst;
-	LF3 <=  LF3cst;
-  END GENERATE;
-
-send_CST_DATA : IF (SEND_CONSTANT_DATA = 1) and (SEND_MINF_VALUE = 0) GENERATE
-	AMR1X   <= AMR1Xcst;
-	AMR1Y   <= AMR1Ycst;
-	AMR1Z   <= AMR1Zcst;
-	AMR2X   <= AMR2Xcst;
-	AMR2Y   <= AMR2Ycst;
-	AMR2Z   <= AMR2Zcst;
-	Temp1   <= Temp1cst;
-	Temp2   <= Temp2cst;
-	AMR3X   <= AMR3Xcst;
-	AMR3Y   <= AMR3Ycst;
-	AMR3Z   <= AMR3Zcst;
-	AMR4X   <= AMR4Xcst;
-	AMR4Y   <= AMR4Ycst;
-	AMR4Z   <= AMR4Zcst;
-	Temp3   <= Temp3cst;
-	Temp4   <= Temp4cst;
-	
-	LF1 <=  LF1cst;
-	LF2 <=  LF2cst;
-	LF3 <=  LF3cst;	
-  END GENERATE;
-  
-  
-
-
-send_minF_valuelbl : IF (SEND_CONSTANT_DATA = 1) and (SEND_MINF_VALUE = 1) GENERATE
-	AMR1X   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	AMR1Y   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	AMR1Z   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	AMR2X   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	AMR2Y   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	AMR2Z   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	Temp1   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	Temp2   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	AMR3X   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	AMR3Y   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	AMR3Z   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	AMR4X   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	AMR4Y   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	AMR4Z   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	Temp3   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	Temp4   <= X"000" & "000" & std_logic_vector(TO_UNSIGNED(MinFCnt,9));
-	
-	LF1 <=  LF1cst;
-	LF2 <=  LF2cst;
-	LF3 <=  LF3cst;	
-  END GENERATE;
-
-LF_SMPL_CLK0 : entity work.LF_SMPL_CLK
-port map(
-    Wclck    => WordClk,
-    MinF     => MinF,
-    SMPL_CLK => LF_ADC_SmplClk
+ reset	=>  reset,
+ clk     =>  clk,
+ SyncSig =>  CrossDomainSync,
+ minorF  =>  minF,
+ majorF  =>  majF,
+ sclk    =>  sclk,
+ WordClk =>  WordClk,
+ LF_SCK	=>  LF_SCK,
+ LF_CNV	=>  LF_CNV,
+ LF_SDO1	=>  LF_SDO1,
+ LF_SDO2	=>  LF_SDO2,
+ LF_SDO3	=>  LF_SDO3,
+ LF1   	=>  LF1,
+ LF2   	=>  LF2,
+ LF3   	=>  LF3
 );
-
-
-
-process(clk)
-variable SelVar :   integer range 0 to 1;
-begin
-    if clk'event and clk ='1' then
-        Decoder: FOR i IN 0 to FramePlacerCount-1 loop
-            if FramePlacerFlags(i) = '1' then
-                SelVar := i;
-            end if;
-        END loop Decoder;
-        Sel <=  SelVar;
-    end if;
-end process;
-
 
 end rtl;
 

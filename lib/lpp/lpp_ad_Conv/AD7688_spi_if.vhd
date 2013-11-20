@@ -32,13 +32,13 @@ entity AD7688_spi_if is
             cnv       : in  STD_LOGIC;
 	    DataReady : out std_logic;
             sdi       : in  AD7688_in(ChanelCount-1 downto 0);
-            smpout    : out Samples_out(ChanelCount-1 downto 0)
+            smpout    : out Samples(ChanelCount-1 downto 0)
      );
 end AD7688_spi_if;
 
 architecture ar_AD7688_spi_if of AD7688_spi_if is
 
-signal	shift_reg	:	Samples_out(ChanelCount-1 downto 0);
+signal	shift_reg	:	Samples(ChanelCount-1 downto 0);
 signal	i	:	integer range 0 to 16 :=0;
 signal	cnv_reg	:	std_logic := '0';
 
