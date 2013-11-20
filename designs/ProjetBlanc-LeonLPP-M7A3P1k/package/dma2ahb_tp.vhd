@@ -76,9 +76,9 @@ use      Std.TextIO.all;
 
 library  GRLIB;
 use      GRLIB.AMBA.all;
-use      GRLIB.STDIO.all;
+use      GRLIB.StdLib.all;
+use      GRLIB.StdIO.all;
 use      GRLIB.DMA2AHB_Package.all;
-use      GRLIB.STDLIB.all;
 
 package DMA2AHB_TestPackage is
 
@@ -1606,4 +1606,6 @@ package body DMA2AHB_TestPackage is
       end if;
    end procedure DMACompBurst;
 
-end package body DMA2AHB_TestPackage; --======================================--
+--end package body DMA2AHB_TestPackage; 
+end DMA2AHB_TestPackage; 
+--======================================--

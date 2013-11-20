@@ -1,6 +1,7 @@
 
 alib grlib grlib.lib 
 alib proasic3 proasic3.lib 
+alib dware dware.lib 
 alib synplify synplify.lib 
 alib techmap techmap.lib 
 alib spw spw.lib 

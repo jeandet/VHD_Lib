@@ -54,7 +54,9 @@ component FX2_WithFIFO is
 generic(
     tech          :   integer := 0;
     Mem_use       :   integer := 0;
-    Enable_ReUse  :   std_logic := '0'
+    Enable_ReUse  :   std_logic := '0';
+    fifoCount     :   integer range 2 to 100 := 8;
+    abits         :   integer range 2 to 12 := 8
     );
 port(
         clk         : in STD_LOGIC;

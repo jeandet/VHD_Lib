@@ -2,7 +2,7 @@ source compile.synp
 add_file -vhdl -lib work config.vhd
 add_file -vhdl -lib work ahbrom.vhd
 add_file -vhdl -lib work leon3mp.vhd
-add_file -constraint  ../../boards/Projet-Blanc-M7A3P1K/synplify.sdc
+add_file -constraint  ../../../grlib-gpl-1.1.0-b4108/boards/LeonLPP-M7A3P1k/synplify.sdc
 
 #implementation: "synplify"
 impl -add synplify

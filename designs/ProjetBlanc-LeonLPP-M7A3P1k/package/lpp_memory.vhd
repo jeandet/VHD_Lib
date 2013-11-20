@@ -26,6 +26,7 @@ use grlib.amba.all;
 use std.textio.all;
 library lpp;
 use lpp.lpp_amba.all;
+use lpp.iir_filter.all;
 library gaisler;
 use gaisler.misc.all;
 use gaisler.memctrl.all;
@@ -48,6 +49,7 @@ generic (
     Data_sz      : integer := 16;
     Addr_sz        : integer := 9;
     Enable_ReUse   : std_logic := '0';
+    Mem_use        : integer := use_RAM;
     R            : integer := 1;
     W            : integer := 1
     );
@@ -70,10 +72,34 @@ generic (
     );
 end component;
 
+component FIFO_pipeline is
+generic(
+    tech          :   integer := 0;
+    Mem_use       :   integer := use_RAM;
+    fifoCount     :   integer range 2 to 32 := 8;
+    DataSz        :   integer range 1 to 32 := 8;
+    abits         :   integer range 2 to 12 := 8
+    );
+port(
+    rstn    :   in std_logic;
+    ReUse   :   in std_logic;
+    rclk    :   in std_logic;
+    ren     :   in std_logic;
+    rdata   :   out std_logic_vector(DataSz-1 downto 0);
+    empty   :   out std_logic;
+    raddr   :   out std_logic_vector(abits-1 downto 0);
+    wclk    :   in std_logic;
+    wen     :   in std_logic;
+    wdata   :   in std_logic_vector(DataSz-1 downto 0);
+    full    :   out std_logic;
+    waddr   :   out std_logic_vector(abits-1 downto 0)
+);
+end component;
 
 component lpp_fifo is
 generic(
     tech          :   integer := 0;
+    Mem_use       :   integer := use_RAM;
     Enable_ReUse  :   std_logic := '0';
     DataSz        :   integer range 1 to 32 := 8;
     abits         :   integer range 2 to 12 := 8
@@ -95,27 +121,42 @@ port(
 end component;
 
 
-component lppFIFOx5 is
+component lppFIFOxN is
 generic(
     tech          :   integer := 0;
-    Data_sz       :   integer range 1 to 32 := 16;
-    Addr_sz       :   integer range 2 to 12 := 8;
+    Mem_use       :   integer := use_RAM;
+    Data_sz       :   integer range 1 to 32 := 8;
+    Addr_sz       :   integer range 1 to 32 := 8;
+    FifoCnt : integer := 1;
     Enable_ReUse  :   std_logic := '0'
     );
 port(
     rst     :   in std_logic;
     wclk    :   in std_logic;    
     rclk    :   in std_logic;
-    ReUse   :   in std_logic_vector(4 downto 0);
-    wen     :   in std_logic_vector(4 downto 0); 
-    ren     :   in std_logic_vector(4 downto 0);
-    wdata   :   in std_logic_vector((5*Data_sz)-1 downto 0);
-    rdata   :   out std_logic_vector((5*Data_sz)-1 downto 0);
-    full    :   out std_logic_vector(4 downto 0);
-    empty   :   out std_logic_vector(4 downto 0)    
+    ReUse   :   in std_logic_vector(FifoCnt-1 downto 0);
+    wen     :   in std_logic_vector(FifoCnt-1 downto 0);
+    ren     :   in std_logic_vector(FifoCnt-1 downto 0);
+    wdata   :   in std_logic_vector((FifoCnt*Data_sz)-1 downto 0);
+    rdata   :   out std_logic_vector((FifoCnt*Data_sz)-1 downto 0);
+    full    :   out std_logic_vector(FifoCnt-1 downto 0);
+    empty   :   out std_logic_vector(FifoCnt-1 downto 0)
 );
 end component;
 
+component FillFifo is
+generic(
+    Data_sz  : integer range 1 to 32 := 16;
+    Fifo_cnt : integer range 1 to 8 := 5
+    );
+port(
+    clk         : in std_logic;
+    raz        : in std_logic;
+    write : out std_logic_vector(Fifo_cnt-1 downto 0);
+    reuse : out std_logic_vector(Fifo_cnt-1 downto 0);
+    data : out std_logic_vector(Fifo_cnt*Data_sz-1 downto 0)
+);
+end component;
 
 component ssram_plugin is
 generic (tech : integer := 0);

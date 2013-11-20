@@ -1,6 +1,7 @@
 vlib modelsim
 vlib modelsim/grlib 
 vlib modelsim/proasic3 
+vlib modelsim/dware 
 vlib modelsim/synplify 
 vlib modelsim/techmap 
 vlib modelsim/spw 

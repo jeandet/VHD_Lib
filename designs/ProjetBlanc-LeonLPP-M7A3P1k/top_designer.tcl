@@ -6,14 +6,14 @@ import_source -format "edif" -edif_flavor "GENERIC"  -merge_physical "no" -merge
 import_source -format "edif" -edif_flavor "GENERIC"  -merge_physical "no" -merge_timing "no" {synplify/top.edf}
 }
 compile -combine_register 1
-if {[file exist ../../boards/Projet-Blanc-M7A3P1K/Projet-Blanc-M7A3P1K.pdc]} {
-   import_aux -format "pdc" -abort_on_error "no" {../../boards/Projet-Blanc-M7A3P1K/Projet-Blanc-M7A3P1K.pdc}
+if {[file exist ../../../grlib-gpl-1.1.0-b4108/boards/LeonLPP-M7A3P1k/Projet-Blanc-M7A3P1k.pdc]} {
+   import_aux -format "pdc" -abort_on_error "no" {../../../grlib-gpl-1.1.0-b4108/boards/LeonLPP-M7A3P1k/Projet-Blanc-M7A3P1k.pdc}
    pin_commit
 } else {
    puts "WARNING: No PDC file imported."
 }
-if {[file exist ../../boards/Projet-Blanc-M7A3P1K/leon3mp.sdc]} {
-   import_aux -format "sdc" -merge_timing "no" {../../boards/Projet-Blanc-M7A3P1K/leon3mp.sdc}
+if {[file exist ../../../grlib-gpl-1.1.0-b4108/boards/LeonLPP-M7A3P1k/leon3mp.sdc]} {
+   import_aux -format "sdc" -merge_timing "no" {../../../grlib-gpl-1.1.0-b4108/boards/LeonLPP-M7A3P1k/leon3mp.sdc}
 } else {
    puts "WARNING: No SDC file imported."
 }

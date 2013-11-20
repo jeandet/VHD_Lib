@@ -20,108 +20,289 @@
 --                     Mail : alexis.jeandet@lpp.polytechnique.fr
 ----------------------------------------------------------------------------
 
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-library grlib;
-use grlib.amba.all;
-use grlib.stdlib.all;
-use grlib.devices.all;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+LIBRARY grlib;
+USE grlib.amba.ALL;
+USE grlib.stdlib.ALL;
+USE grlib.devices.ALL;
 
 
-package lpp_ad_conv is
+PACKAGE lpp_ad_conv IS
 
 
-  constant    AD7688    : integer := 0;
-  constant    ADS7886   : integer := 1;
-
-  
-  type AD7688_out is
-    record
-        CNV        : std_logic;
-        SCK        : std_logic;
-    end record;
-	 
-  type AD7688_in_element is
-    record
-        SDI        : std_logic;
-    end record;
-	 
-	 type AD7688_in is array(natural range <>) of AD7688_in_element;
-
-	type Samples_out is array(natural range <>) of std_logic_vector(15 downto 0);
-
-	component  AD7688_drvr is
-		    generic(ChanelCount	:	integer; 
-				clkkHz		:	integer);
-		 Port ( clk 	: in  STD_LOGIC;
-                                rstn        :      in  STD_LOGIC;
-                                enable      :      in  std_logic;
-				  smplClk: in	STD_LOGIC;
-				  DataReady : out std_logic;
-				  smpout : out Samples_out(ChanelCount-1 downto 0);	
-				  AD_in	: in	AD7688_in(ChanelCount-1 downto 0);	
-				  AD_out : out AD7688_out);
-	end component;
+  --CONSTANT AD7688  : INTEGER := 0;
+  --CONSTANT ADS7886 : INTEGER := 1;
 
 
-component AD7688_spi_if is
-	 generic(ChanelCount	:	integer);
-    Port(    clk      : in  STD_LOGIC;
-             reset    : in  STD_LOGIC;
-             cnv      : in  STD_LOGIC;
-	     DataReady:	out std_logic;
-             sdi      : in	AD7688_in(ChanelCount-1 downto 0);
-             smpout   :  out Samples_out(ChanelCount-1 downto 0)
-     );
-end component;
+  --TYPE AD7688_out IS
+  --RECORD
+  --  CNV : STD_LOGIC;
+  --  SCK : STD_LOGIC;
+  --END RECORD;
+
+  --TYPE AD7688_in_element IS
+  --RECORD
+  --  SDI : STD_LOGIC;
+  --END RECORD;
+
+  --TYPE AD7688_in IS ARRAY(NATURAL RANGE <>) OF AD7688_in_element;
+
+  TYPE Samples IS ARRAY(NATURAL RANGE <>) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+  SUBTYPE Samples24 IS STD_LOGIC_VECTOR(23 DOWNTO 0);
+
+  SUBTYPE Samples16 IS STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+  SUBTYPE Samples14 IS STD_LOGIC_VECTOR(13 DOWNTO 0);
+
+  SUBTYPE Samples12 IS STD_LOGIC_VECTOR(11 DOWNTO 0);
+
+  SUBTYPE Samples10 IS STD_LOGIC_VECTOR(9 DOWNTO 0);
+
+  SUBTYPE Samples8 IS STD_LOGIC_VECTOR(7 DOWNTO 0);
+
+  TYPE Samples24v IS ARRAY(NATURAL RANGE <>) OF Samples24;
+
+  TYPE Samples16v IS ARRAY(NATURAL RANGE <>) OF Samples16;
+
+  TYPE Samples14v IS ARRAY(NATURAL RANGE <>) OF Samples14;
+
+  TYPE Samples12v IS ARRAY(NATURAL RANGE <>) OF Samples12;
+
+  TYPE Samples10v IS ARRAY(NATURAL RANGE <>) OF Samples10;
+
+  TYPE Samples8v IS ARRAY(NATURAL RANGE <>) OF Samples8;
+
+  COMPONENT AD7688_drvr
+    GENERIC (
+      ChanelCount     : INTEGER;
+      ncycle_cnv_high : INTEGER := 79;
+      ncycle_cnv      : INTEGER := 500);
+    PORT (
+      cnv_clk    : IN  STD_LOGIC;
+      cnv_rstn   : IN  STD_LOGIC;
+      cnv_run    : IN  STD_LOGIC;
+      cnv        : OUT STD_LOGIC;
+      clk        : IN  STD_LOGIC;
+      rstn       : IN  STD_LOGIC;
+      sck        : OUT STD_LOGIC;
+      sdo        : IN  STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+      sample     : OUT Samples(ChanelCount-1 DOWNTO 0);
+      sample_val : OUT STD_LOGIC);
+  END COMPONENT;
+
+  COMPONENT RHF1401_drvr IS
+    GENERIC(
+      ChanelCount : INTEGER := 8);
+    PORT (
+      cnv_clk    : IN  STD_LOGIC;
+      clk        : IN  STD_LOGIC;
+      rstn       : IN  STD_LOGIC;
+      ADC_data   : IN  Samples14;
+      --ADC_smpclk : OUT STD_LOGIC;
+      ADC_nOE    : OUT STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+      sample     : OUT Samples14v(ChanelCount-1 DOWNTO 0);
+      sample_val : OUT STD_LOGIC
+      );
+  END COMPONENT;
+
+  COMPONENT top_ad_conv_RHF1401
+    GENERIC (
+      ChanelCount : INTEGER;
+      ncycle_cnv_high : INTEGER := 79;
+      ncycle_cnv      : INTEGER := 500);
+    PORT (
+      cnv_clk    : IN  STD_LOGIC;
+      cnv_rstn   : IN  STD_LOGIC;
+      cnv        : OUT STD_LOGIC;
+      clk        : IN  STD_LOGIC;
+      rstn       : IN  STD_LOGIC;
+      ADC_data   : IN  Samples14;
+      ADC_nOE    : OUT STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+      sample     : OUT Samples14v(ChanelCount-1 DOWNTO 0);
+      sample_val : OUT STD_LOGIC);
+  END COMPONENT;
 
 
-component lpp_apb_ad_conv
-        generic(
-          pindex      : integer := 0;
-          paddr       : integer := 0;
-          pmask       : integer := 16#fff#;
-          pirq        : integer := 0;
-          abits       : integer := 8;
-          ChanelCount : integer := 1; 
-          clkkHz      : integer := 50000;
-	  smpClkHz    : integer := 100;
-          ADCref      : integer := AD7688);
-    Port ( 
-          clk        : in   STD_LOGIC;
-          reset      : in   STD_LOGIC;
-          apbi       : in   apb_slv_in_type;
-          apbo       : out  apb_slv_out_type;
-          AD_in      : in   AD7688_in(ChanelCount-1 downto 0);	
-          AD_out     : out  AD7688_out);
-end component;
+  COMPONENT AD7688_drvr_sync
+    GENERIC (
+      ChanelCount     : INTEGER;
+      ncycle_cnv_high : INTEGER;
+      ncycle_cnv      : INTEGER);
+    PORT (
+      cnv_clk    : IN  STD_LOGIC;
+      cnv_rstn   : IN  STD_LOGIC;
+      cnv_run    : IN  STD_LOGIC;
+      cnv        : OUT STD_LOGIC;
+      sck        : OUT STD_LOGIC;
+      sdo        : IN  STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+      sample     : OUT Samples(ChanelCount-1 DOWNTO 0);
+      sample_val : OUT STD_LOGIC);
+  END COMPONENT;
 
-component ADS7886_drvr is
-    generic(ChanelCount :      integer; 
-            clkkHz      :      integer);
-    Port ( 
-            clk         :      in  STD_LOGIC;
-             reset 	: in  STD_LOGIC;
-            smplClk     :      in  STD_LOGIC;
-            DataReady   :      out std_logic;
-            smpout      :      out Samples_out(ChanelCount-1 downto 0);	
-            AD_in       :      in  AD7688_in(ChanelCount-1 downto 0);	
-            AD_out      :      out AD7688_out
-           );
-end component;
+  COMPONENT TestModule_RHF1401
+    GENERIC (
+      freq      : INTEGER;
+      amplitude : INTEGER;
+      impulsion : INTEGER);
+    PORT (
+      ADC_smpclk  : IN  STD_LOGIC;
+      ADC_OEB_bar : IN  STD_LOGIC;
+      ADC_data    : OUT STD_LOGIC_VECTOR(13 DOWNTO 0));
+  END COMPONENT;
 
-component WriteGen_ADC is
-    port(
-        clk         : in std_logic;
-        rstn        : in std_logic;
-        SmplCLK     : in std_logic;
-        DataReady   : in std_logic;
-        Full        : in std_logic_vector(4 downto 0);
-        ReUse       : out std_logic_vector(4 downto 0);
-        Write       : out std_logic_vector(4 downto 0)
-    );
-end component;
+  --COMPONENT AD7688_drvr IS
+  --  GENERIC(ChanelCount : INTEGER;
+  --          clkkHz      : INTEGER);
+  --  PORT (clk        : IN  STD_LOGIC;
+  --         rstn      : IN  STD_LOGIC;
+  --         enable    : IN  STD_LOGIC;
+  --         smplClk   : IN  STD_LOGIC;
+  --         DataReady : OUT STD_LOGIC;
+  --         smpout    : OUT Samples_out(ChanelCount-1 DOWNTO 0);
+  --         AD_in     : IN  AD7688_in(ChanelCount-1 DOWNTO 0);
+  --         AD_out    : OUT AD7688_out);
+  --END COMPONENT;
 
-end lpp_ad_conv;
+
+  --COMPONENT AD7688_spi_if IS
+  --  GENERIC(ChanelCount : INTEGER);
+  --  PORT(clk           : IN  STD_LOGIC;
+  --           reset     : IN  STD_LOGIC;
+  --           cnv       : IN  STD_LOGIC;
+  --           DataReady : OUT STD_LOGIC;
+  --           sdi       : IN  AD7688_in(ChanelCount-1 DOWNTO 0);
+  --           smpout    : OUT Samples_out(ChanelCount-1 DOWNTO 0)
+  --           );
+  --END COMPONENT;
+
+
+  --COMPONENT lpp_apb_ad_conv
+  --  GENERIC(
+  --    pindex      : INTEGER := 0;
+  --    paddr       : INTEGER := 0;
+  --    pmask       : INTEGER := 16#fff#;
+  --    pirq        : INTEGER := 0;
+  --    abits       : INTEGER := 8;
+  --    ChanelCount : INTEGER := 1;
+  --    clkkHz      : INTEGER := 50000;
+  --    smpClkHz    : INTEGER := 100;
+  --    ADCref      : INTEGER := AD7688);
+  --  PORT (
+  --    clk    : IN  STD_LOGIC;
+  --    reset  : IN  STD_LOGIC;
+  --    apbi   : IN  apb_slv_in_type;
+  --    apbo   : OUT apb_slv_out_type;
+  --    AD_in  : IN  AD7688_in(ChanelCount-1 DOWNTO 0);
+  --    AD_out : OUT AD7688_out);
+  --END COMPONENT;
+
+  --COMPONENT ADS7886_drvr IS
+  --  GENERIC(ChanelCount : INTEGER;
+  --          clkkHz      : INTEGER);
+  --  PORT (
+  --    clk       : IN  STD_LOGIC;
+  --    reset     : IN  STD_LOGIC;
+  --    smplClk   : IN  STD_LOGIC;
+  --    DataReady : OUT STD_LOGIC;
+  --    smpout    : OUT Samples_out(ChanelCount-1 DOWNTO 0);
+  --    AD_in     : IN  AD7688_in(ChanelCount-1 DOWNTO 0);
+  --    AD_out    : OUT AD7688_out
+  --    );
+  --END COMPONENT;
+
+  --COMPONENT WriteGen_ADC IS
+  --  PORT(
+  --    clk       : IN  STD_LOGIC;
+  --    rstn      : IN  STD_LOGIC;
+  --    SmplCLK   : IN  STD_LOGIC;
+  --    DataReady : IN  STD_LOGIC;
+  --    Full      : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
+  --    ReUse     : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+  --    Write     : OUT STD_LOGIC_VECTOR(4 DOWNTO 0)
+  --    );
+  --END COMPONENT;
+
+
+--===========================================================|
+--=======================  ADS 127X =========================|
+--===========================================================|
+
+  TYPE     ADS127X_FORMAT_Type IS ARRAY(2 DOWNTO 0) OF STD_LOGIC;
+  CONSTANT ADS127X_SPI_FORMAT   : ADS127X_FORMAT_Type := "010";
+  CONSTANT ADS127X_FSYNC_FORMAT : ADS127X_FORMAT_Type := "101";
+
+  TYPE     ADS127X_MODE_Type IS ARRAY(1 DOWNTO 0) OF STD_LOGIC;
+  CONSTANT ADS127X_MODE_low_power       : ADS127X_MODE_Type := "10";
+  CONSTANT ADS127X_MODE_low_speed       : ADS127X_MODE_Type := "11";
+  CONSTANT ADS127X_MODE_high_resolution : ADS127X_MODE_Type := "01";
+
+  TYPE ADS127X_config IS
+  RECORD
+    SYNC   : STD_LOGIC;
+    CLKDIV : STD_LOGIC;
+    FORMAT : ADS127X_FORMAT_Type;
+    MODE   : ADS127X_MODE_Type;
+  END RECORD;
+
+  COMPONENT ADS1274_DRIVER IS
+    GENERIC(modeCfg : ADS127X_MODE_Type := ADS127X_MODE_low_power; formatCfg : ADS127X_FORMAT_Type := ADS127X_FSYNC_FORMAT);
+    PORT(
+      Clk     : IN  STD_LOGIC;
+      reset   : IN  STD_LOGIC;
+      SpiClk  : OUT STD_LOGIC;
+      DIN     : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      Ready   : IN  STD_LOGIC;
+      Format  : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+      Mode    : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+      ClkDiv  : OUT STD_LOGIC;
+      PWDOWN  : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      SmplClk : IN  STD_LOGIC;
+      OUT0    : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT1    : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT2    : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT3    : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      FSynch  : OUT STD_LOGIC;
+      test    : OUT STD_LOGIC
+      );
+  END COMPONENT;
+
+-- todo clean file
+  COMPONENT DUAL_ADS1278_DRIVER IS
+    PORT(
+      Clk     : IN  STD_LOGIC;
+      reset   : IN  STD_LOGIC;
+      SpiClk  : OUT STD_LOGIC;
+      DIN     : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+      SmplClk : IN  STD_LOGIC;
+      OUT00   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT01   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT02   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT03   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT04   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT05   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT06   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT07   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT10   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT11   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT12   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT13   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT14   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT15   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT16   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      OUT17   : OUT STD_LOGIC_VECTOR(23 DOWNTO 0);
+      FSynch  : OUT STD_LOGIC
+      );
+  END COMPONENT;
+
+
+END lpp_ad_conv;
+
+
+
+
+
+
 
 

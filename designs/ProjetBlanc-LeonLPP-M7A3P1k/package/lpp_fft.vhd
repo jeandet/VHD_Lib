@@ -26,8 +26,7 @@ use grlib.amba.all;
 use std.textio.all;
 library lpp;
 use lpp.lpp_amba.all;
-use lpp.lpp_memory.all;
-use work.fft_components.all;
+use lpp.fft_components.all;
 
 --! Package contenant tous les programmes qui forment le composant intégré dans le léon 
 
@@ -75,6 +74,23 @@ component APB_FFT_half is
     );
 end component;
 
+component FFT is
+    generic(
+        Data_sz : integer := 16;
+        NbData : integer := 256);
+    port(
+        clkm            : in std_logic;
+        rstn            : in std_logic;
+        FifoIN_Empty    : in std_logic_vector(4 downto 0);
+        FifoIN_Data     : in std_logic_vector(79 downto 0);
+        FifoOUT_Full    : in std_logic_vector(4 downto 0);
+        Load            : out std_logic;
+        Read            : out std_logic_vector(4 downto 0);
+        Write           : out std_logic_vector(4 downto 0);
+        ReUse           : out std_logic_vector(4 downto 0);
+        Data            : out std_logic_vector(79 downto 0)
+        );
+end component;
 
 component Flag_Extremum is
   port(
@@ -89,7 +105,8 @@ end component;
 
 component Linker_FFT is
 generic(
-    Data_sz  : integer range 1 to 32 := 16
+    Data_sz  : integer range 1 to 32 := 16;
+    NbData : integer range 1 to 512 := 256
     );
 port(
     clk         : in std_logic;
@@ -109,14 +126,14 @@ end component;
 
 component Driver_FFT is
 generic(
-    Data_sz  : integer range 1 to 32 := 16
+    Data_sz  : integer range 1 to 32 := 16;
+    NbData : integer range 1 to 512 := 256
     );
 port(
     clk         : in std_logic;
     rstn        : in std_logic;
     Load        : in std_logic;
     Empty       : in std_logic_vector(4 downto 0);
-    Full        : in std_logic_vector(4 downto 0);
     DATA        : in std_logic_vector((5*Data_sz)-1 downto 0);
     Valid       : out std_logic;
     Read        : out std_logic_vector(4 downto 0);
@@ -125,6 +142,43 @@ port(
 );
 end component;
 
+component FFTamont is
+generic(
+    Data_sz  : integer range 1 to 32 := 16;
+    NbData : integer range 1 to 512 := 256
+    );
+port(
+    clk         : in std_logic;
+    rstn        : in std_logic;
+    Load        : in std_logic;
+    Empty       : in std_logic;
+    DATA        : in std_logic_vector(Data_sz-1 downto 0);
+    Valid       : out std_logic;
+    Read        : out std_logic;
+    Data_re     : out std_logic_vector(Data_sz-1 downto 0);
+    Data_im     : out std_logic_vector(Data_sz-1 downto 0)
+);
+end component;
+
+component FFTaval is
+generic(
+    Data_sz  : integer range 1 to 32 := 8;
+    NbData : integer range 1 to 512 := 256
+    );
+port(
+    clk         : in std_logic;
+    rstn        : in std_logic;
+    Ready       : in std_logic;
+    Valid       : in std_logic;
+    Full        : in std_logic;
+    Data_re     : in std_logic_vector(Data_sz-1 downto 0);
+    Data_im     : in std_logic_vector(Data_sz-1 downto 0);
+    Read        : out std_logic;
+    Write       : out std_logic;
+    ReUse       : out std_logic;
+    DATA        : out std_logic_vector(Data_sz-1 downto 0)
+);
+end component;
 --==============================================================|
 --================== IP VHDL de la FFT actel ===================|
 --================ non partagé dans la VHD_Lib =================|

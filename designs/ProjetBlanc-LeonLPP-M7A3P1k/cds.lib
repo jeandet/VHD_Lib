@@ -1,6 +1,7 @@
 include $CDS_INST_DIR/tools/inca/files/cds.lib
 DEFINE grlib xncsim/grlib 
 DEFINE proasic3 xncsim/proasic3 
+DEFINE dware xncsim/dware 
 DEFINE synplify xncsim/synplify 
 DEFINE techmap xncsim/techmap 
 DEFINE spw xncsim/spw 

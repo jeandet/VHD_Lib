@@ -19,190 +19,254 @@
 --                    Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@lpp.polytechnique.fr
 ----------------------------------------------------------------------------
-library ieee;
-use ieee.std_logic_1164.all;
+--UPDATE
+-------------------------------------------------------------------------------
+-- 14-03-2013 - Jean-christophe Pellion
+-- ADD MUXN (a parametric multiplexor (N stage of MUX2))
+-------------------------------------------------------------------------------
+
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
 
 
 
-package general_purpose is
+PACKAGE general_purpose IS
 
 
 
-component Clk_divider is
-	 generic(OSC_freqHz	:	integer := 50000000;
-		TargetFreq_Hz	:	integer := 50000);
-    Port ( clk         : in   STD_LOGIC;
-           reset       : in   STD_LOGIC;
-           clk_divided : out  STD_LOGIC);
-end component;
+  COMPONENT Clk_divider IS
+    GENERIC(OSC_freqHz    : INTEGER := 50000000;
+            TargetFreq_Hz : INTEGER := 50000);
+    PORT (clk          : IN  STD_LOGIC;
+           reset       : IN  STD_LOGIC;
+           clk_divided : OUT STD_LOGIC);
+  END COMPONENT;
 
 
-component Adder is 
-generic(
-    Input_SZ_A     :   integer := 16;
-    Input_SZ_B     :   integer := 16
+  COMPONENT Clk_divider2 IS
+    generic(N : integer := 16);
+    port(
+    clk_in  :   in  std_logic;
+    clk_out :   out std_logic);
+  END COMPONENT;
 
-);
-port(
-    clk     :   in  std_logic;
-    reset   :   in  std_logic;
-    clr     :   in  std_logic;
-    add     :   in  std_logic;
-    OP1     :   in  std_logic_vector(Input_SZ_A-1 downto 0);
-    OP2     :   in  std_logic_vector(Input_SZ_B-1 downto 0);
-    RES     :   out std_logic_vector(Input_SZ_A-1 downto 0)
-);
-end component;
+  COMPONENT Adder IS
+    GENERIC(
+      Input_SZ_A : INTEGER := 16;
+      Input_SZ_B : INTEGER := 16
 
-component ADDRcntr is 
-port(
-    clk     :   in  std_logic;
-    reset   :   in  std_logic;
-    count   :   in  std_logic;
-    clr     :   in  std_logic;
-    Q       :   out std_logic_vector(7 downto 0)
-);
-end component;
+      );
+    PORT(
+      clk   : IN  STD_LOGIC;
+      reset : IN  STD_LOGIC;
+      clr   : IN  STD_LOGIC;
+      load  : IN STD_LOGIC;
+      add   : IN  STD_LOGIC;
+      OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+      OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
+      RES   : OUT STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0)
+      );
+  END COMPONENT;
 
-component ALU is
-generic(
-    Arith_en        :   integer := 1;
-    Logic_en        :   integer := 1;
-    Input_SZ_1      :   integer := 16;
-    Input_SZ_2      :   integer := 9
+  COMPONENT ADDRcntr IS
+    PORT(
+      clk   : IN  STD_LOGIC;
+      reset : IN  STD_LOGIC;
+      count : IN  STD_LOGIC;
+      clr   : IN  STD_LOGIC;
+      Q     : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+      );
+  END COMPONENT;
 
-);
-port(
-    clk     :   in  std_logic;
-    reset   :   in  std_logic;
-    ctrl    :   in  std_logic_vector(3 downto 0);
-    OP1     :   in  std_logic_vector(Input_SZ_1-1 downto 0);
-    OP2     :   in  std_logic_vector(Input_SZ_2-1 downto 0);
-    RES     :   out std_logic_vector(Input_SZ_1+Input_SZ_2-1 downto 0)
-);
-end component;
+  COMPONENT ALU IS
+    GENERIC(
+      Arith_en   : INTEGER := 1;
+      Logic_en   : INTEGER := 1;
+      Input_SZ_1 : INTEGER := 16;
+      Input_SZ_2 : INTEGER := 9;
+      COMP_EN    : INTEGER := 0 -- 1 =>  No Comp
 
+      );
+    PORT(
+      clk   : IN  STD_LOGIC;
+      reset : IN  STD_LOGIC;
+      ctrl  : IN  STD_LOGIC_VECTOR(2 downto 0);
+      comp  : IN  STD_LOGIC_VECTOR(1 downto 0);
+      OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
+      OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_2-1 DOWNTO 0);
+      RES   : OUT STD_LOGIC_VECTOR(Input_SZ_1+Input_SZ_2-1 DOWNTO 0)
+      );
+  END COMPONENT;
 
-component MAC is 
-generic(
-    Input_SZ_A     :   integer := 8;
-    Input_SZ_B     :   integer := 8
+---------------------------------------------------------
+-------- // Sélection grace a l'entrée "ctrl" \\ --------
+---------------------------------------------------------
+Constant ctrl_IDLE   : std_logic_vector(2 downto 0) := "000";
+Constant ctrl_MAC    : std_logic_vector(2 downto 0) := "001";
+Constant ctrl_MULT   : std_logic_vector(2 downto 0) := "010";
+Constant ctrl_ADD    : std_logic_vector(2 downto 0) := "011";
+Constant ctrl_CLRMAC : std_logic_vector(2 downto 0) := "100";
+---------------------------------------------------------
 
-);
-port(
-    clk     :   in  std_logic;
-    reset   :   in  std_logic;
-    clr_MAC :   in  std_logic;
-    MAC_MUL_ADD :   in  std_logic_vector(1 downto 0);
-    OP1     :   in  std_logic_vector(Input_SZ_A-1 downto 0);
-    OP2     :   in  std_logic_vector(Input_SZ_B-1 downto 0);
-    RES     :   out std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0)
-);
-end component;
+  COMPONENT MAC IS
+    GENERIC(
+      Input_SZ_A : INTEGER := 8;
+      Input_SZ_B : INTEGER := 8;
+      COMP_EN    : INTEGER := 0 -- 1 =>  No Comp
+      );
+    PORT(
+      clk         : IN  STD_LOGIC;
+      reset       : IN  STD_LOGIC;
+      clr_MAC     : IN  STD_LOGIC;
+      MAC_MUL_ADD : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+      Comp_2C     : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+      OP1         : IN  STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+      OP2         : IN  STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
+      RES         : OUT STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0)
+      );
+  END COMPONENT;
 
+  COMPONENT TwoComplementer is
+  generic(
+      Input_SZ : integer := 16);
+  port(
+      clk     : in  std_logic;                                --! Horloge du composant
+      reset   : in  std_logic;                                --! Reset general du composant
+      clr     : in  std_logic;                                --! Un reset spécifique au programme
+      TwoComp : in  std_logic;                                --! Autorise l'utilisation du complément
+      OP      : in  std_logic_vector(Input_SZ-1 downto 0);    --! Opérande d'entrée
+      RES     : out std_logic_vector(Input_SZ-1 downto 0)     --! Résultat, opérande complémenté ou non
+  );
+  end COMPONENT;
 
-component MAC_CONTROLER is
-port(
-    ctrl        :   in  std_logic_vector(1 downto 0);
-    MULT        :   out std_logic;
-    ADD         :   out std_logic;
-    MACMUX_sel  :   out std_logic;
-    MACMUX2_sel :   out std_logic
+  COMPONENT MAC_CONTROLER IS
+    PORT(
+      ctrl        : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+      MULT        : OUT STD_LOGIC;
+      ADD         : OUT STD_LOGIC;
+      LOAD_ADDER  : out std_logic;
+      MACMUX_sel  : OUT STD_LOGIC;
+      MACMUX2_sel : OUT STD_LOGIC
+      );
+  END COMPONENT;
 
-);
-end component;
+  COMPONENT MAC_MUX IS
+    GENERIC(
+      Input_SZ_A : INTEGER := 16;
+      Input_SZ_B : INTEGER := 16
 
-component MAC_MUX is 
-generic(
-    Input_SZ_A     :   integer := 16;
-    Input_SZ_B     :   integer := 16
-
-);
-port(
-    sel     :   in  std_logic;
-    INA1    :   in  std_logic_vector(Input_SZ_A-1 downto 0);
-    INA2    :   in  std_logic_vector(Input_SZ_A-1 downto 0);
-    INB1    :   in  std_logic_vector(Input_SZ_B-1 downto 0);
-    INB2    :   in  std_logic_vector(Input_SZ_B-1 downto 0);
-    OUTA    :   out std_logic_vector(Input_SZ_A-1 downto 0);
-    OUTB    :   out std_logic_vector(Input_SZ_B-1 downto 0)
-);
-end component;
-
-
-component MAC_MUX2 is 
-generic(Input_SZ     :   integer := 16);
-port(
-    sel     :   in  std_logic;
-    RES1    :   in  std_logic_vector(Input_SZ-1 downto 0);
-    RES2    :   in  std_logic_vector(Input_SZ-1 downto 0);
-    RES     :   out std_logic_vector(Input_SZ-1 downto 0)
-);
-end component;
-
-
-component MAC_REG is 
-generic(size    :   integer := 16);
-port(
-    reset   :   in  std_logic;
-    clk     :   in  std_logic;
-    D       :   in  std_logic_vector(size-1 downto 0);
-    Q       :   out std_logic_vector(size-1 downto 0)
-);
-end component;
-
-
-component MUX2 is 
-generic(Input_SZ     :   integer := 16);
-port(
-    sel     :   in  std_logic;
-    IN1     :   in  std_logic_vector(Input_SZ-1 downto 0);
-    IN2     :   in  std_logic_vector(Input_SZ-1 downto 0);
-    RES     :   out std_logic_vector(Input_SZ-1 downto 0)
-);
-end component;
-
-component Multiplier is 
-generic(
-    Input_SZ_A     :   integer := 16;
-    Input_SZ_B     :   integer := 16
-
-);
-port(
-    clk     :   in  std_logic;
-    reset   :   in  std_logic;
-    mult    :   in  std_logic;
-    OP1     :   in  std_logic_vector(Input_SZ_A-1 downto 0);
-    OP2     :   in  std_logic_vector(Input_SZ_B-1 downto 0);
-    RES     :   out std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0)
-);
-end component;
-
-component REG is 
-generic(size    :   integer := 16 ; initial_VALUE : integer := 0);
-port(
-    reset   :   in  std_logic;
-    clk     :   in  std_logic;
-    D       :   in  std_logic_vector(size-1 downto 0);
-    Q       :   out std_logic_vector(size-1 downto 0)
-);
-end component;
+      );
+    PORT(
+      sel  : IN  STD_LOGIC;
+      INA1 : IN  STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+      INA2 : IN  STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+      INB1 : IN  STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
+      INB2 : IN  STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
+      OUTA : OUT STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+      OUTB : OUT STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0)
+      );
+  END COMPONENT;
 
 
+  COMPONENT MAC_MUX2 IS
+    GENERIC(Input_SZ : INTEGER := 16);
+    PORT(
+      sel  : IN  STD_LOGIC;
+      RES1 : IN  STD_LOGIC_VECTOR(Input_SZ-1 DOWNTO 0);
+      RES2 : IN  STD_LOGIC_VECTOR(Input_SZ-1 DOWNTO 0);
+      RES  : OUT STD_LOGIC_VECTOR(Input_SZ-1 DOWNTO 0)
+      );
+  END COMPONENT;
 
-component RShifter is 
-generic(
-    Input_SZ       :   integer := 16;
-    shift_SZ       :   integer := 4
-);
-port(
-    clk     :   in  std_logic;
-    reset   :   in  std_logic;
-    shift   :   in  std_logic;
-    OP      :   in  std_logic_vector(Input_SZ-1 downto 0);
-    cnt     :   in  std_logic_vector(shift_SZ-1 downto 0);
-    RES     :   out std_logic_vector(Input_SZ-1 downto 0)
-);
-end component;
 
-end;
+  COMPONENT MAC_REG IS
+    GENERIC(size : INTEGER := 16);
+    PORT(
+      reset : IN  STD_LOGIC;
+      clk   : IN  STD_LOGIC;
+      D     : IN  STD_LOGIC_VECTOR(size-1 DOWNTO 0);
+      Q     : OUT STD_LOGIC_VECTOR(size-1 DOWNTO 0)
+      );
+  END COMPONENT;
+
+
+  COMPONENT MUX2 IS
+    GENERIC(Input_SZ : INTEGER := 16);
+    PORT(
+      sel : IN  STD_LOGIC;
+      IN1 : IN  STD_LOGIC_VECTOR(Input_SZ-1 DOWNTO 0);
+      IN2 : IN  STD_LOGIC_VECTOR(Input_SZ-1 DOWNTO 0);
+      RES : OUT STD_LOGIC_VECTOR(Input_SZ-1 DOWNTO 0)
+      );
+  END COMPONENT;
+
+  TYPE MUX_INPUT_TYPE IS ARRAY (NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
+  TYPE MUX_OUTPUT_TYPE IS ARRAY (NATURAL RANGE <>) OF STD_LOGIC;
+  
+  COMPONENT MUXN
+    GENERIC (
+      Input_SZ : INTEGER;
+      NbStage  : INTEGER);
+    PORT (
+      sel   : IN  STD_LOGIC_VECTOR(NbStage-1 DOWNTO 0);
+      INPUT : IN  MUX_INPUT_TYPE(0 TO (2**NbStage)-1,Input_SZ-1 DOWNTO 0);
+      --INPUT : IN  ARRAY (0 TO (2**NbStage)-1) OF STD_LOGIC_VECTOR(Input_SZ-1 DOWNTO 0);
+      RES   : OUT MUX_OUTPUT_TYPE(Input_SZ-1 DOWNTO 0));
+  END COMPONENT;
+
+  
+
+  COMPONENT Multiplier IS
+    GENERIC(
+      Input_SZ_A : INTEGER := 16;
+      Input_SZ_B : INTEGER := 16
+
+      );
+    PORT(
+      clk   : IN  STD_LOGIC;
+      reset : IN  STD_LOGIC;
+      mult  : IN  STD_LOGIC;
+      OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+      OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
+      RES   : OUT STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0)
+      );
+  END COMPONENT;
+
+  COMPONENT REG IS
+    GENERIC(size : INTEGER := 16; initial_VALUE : INTEGER := 0);
+    PORT(
+      reset : IN  STD_LOGIC;
+      clk   : IN  STD_LOGIC;
+      D     : IN  STD_LOGIC_VECTOR(size-1 DOWNTO 0);
+      Q     : OUT STD_LOGIC_VECTOR(size-1 DOWNTO 0)
+      );
+  END COMPONENT;
+
+
+
+  COMPONENT RShifter IS
+    GENERIC(
+      Input_SZ : INTEGER := 16;
+      shift_SZ : INTEGER := 4
+      );
+    PORT(
+      clk   : IN  STD_LOGIC;
+      reset : IN  STD_LOGIC;
+      shift : IN  STD_LOGIC;
+      OP    : IN  STD_LOGIC_VECTOR(Input_SZ-1 DOWNTO 0);
+      cnt   : IN  STD_LOGIC_VECTOR(shift_SZ-1 DOWNTO 0);
+      RES   : OUT STD_LOGIC_VECTOR(Input_SZ-1 DOWNTO 0)
+      );
+  END COMPONENT;
+
+  COMPONENT SYNC_FF
+    GENERIC (
+      NB_FF_OF_SYNC : INTEGER);
+    PORT (
+      clk    : IN  STD_LOGIC;
+      rstn   : IN  STD_LOGIC;
+      A      : IN  STD_LOGIC;
+      A_sync : OUT STD_LOGIC);
+  END COMPONENT;
+
+END;

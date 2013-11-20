@@ -221,7 +221,7 @@ port map(
 
 
 USB2: entity work.FX2_WithFIFO
-generic map(CFG_MEMTECH,use_RAM)
+generic map(CFG_MEMTECH,use_RAM,'0',15,11)
 port map(
         clk         => clk,
         if_clk      => if_clk,

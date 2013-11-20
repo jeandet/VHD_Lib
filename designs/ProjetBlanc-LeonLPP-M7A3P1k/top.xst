@@ -10,4 +10,4 @@ run
 -ifmt mixed
 -p PROASIC3-""Std
 -top top
--ofn top -define {XSTDUMMY } -sd ../../netlists/xilinx/PROASIC3
+-ofn top -define {XSTDUMMY } -sd ../../../grlib-gpl-1.1.0-b4108/netlists/xilinx/PROASIC3
