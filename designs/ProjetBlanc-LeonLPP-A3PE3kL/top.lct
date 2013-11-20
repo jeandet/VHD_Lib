@@ -1,8 +1,0 @@
-[Device]
-Family = ;
-PartNumber = A3PE3000LStd"";
-Package = ;
-PartType = A3PE3000L;
-Speed = Std;
-Operating_condition = COM;
-Status = Production;
