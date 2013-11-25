@@ -20,15 +20,48 @@
 --                     Mail : martin.morlot@lpp.polytechnique.fr
 ------------------------------------------------------------------------------
 library IEEE;
-use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+use IEEE.std_logic_1164.all;
 
-Package Convertisseur_config is
+entity ReadFifo_GEN is
+  port(
+    clk,raz : in std_logic;                      --! Horloge et Reset du composant
+    SYNC : in std_logic;
+    Readn : out std_logic
+    );
+end entity;
 
---===========================================================|
---============= Fréquence de sérialisation ==================|
---===========================================================|
-constant Freq_serial : integer := 5_000_000;
-constant nb_serial : integer := 30_000_000 / Freq_serial;
 
-end;
+architecture ar_ReadFifo_GEN of ReadFifo_GEN is
+
+type etat is (eX,e0);
+signal ect      : etat;
+
+signal SYNC_reg : std_logic;
+
+begin
+    process(clk,raz)
+        begin
+        if(raz='0')then           
+            ect         <= eX;
+            Readn  <= '1';           
+
+        elsif(clk'event and clk='1')then
+            SYNC_reg <= SYNC;
+          
+            case ect is
+                when eX =>                     
+                    if (SYNC_reg='0' and  SYNC='1') then 
+                        Readn    <= '0';                   
+                        ect     <= e0;                      
+                    end if;
+                
+                when e0 => 
+                    Readn <= '1';                    
+                    ect <= eX;
+
+            end case;
+        end if;
+    end process;
+
+end architecture;

@@ -37,13 +37,16 @@ component APB_DAC is
     paddr    : integer := 0;
     pmask    : integer := 16#fff#;
     pirq     : integer := 0;
-    abits    : integer := 8);
+    abits    : integer := 8;
+    cpt_serial : integer := 6);
   port (
     clk     : in  std_logic;
     rst     : in  std_logic;
     apbi    : in  apb_slv_in_type;
     apbo    : out apb_slv_out_type;
+    DataIN : in std_logic_vector(15 downto 0);
     Cal_EN  : out std_logic;
+    Readn   : out std_logic;
     SYNC    : out std_logic;
     SCLK    : out std_logic;
     DATA    : out std_logic
@@ -52,14 +55,15 @@ end component;
 
 
 component DacDriver is
+    generic(cpt_serial : integer := 6);
     port(
         clk       : in std_logic;
         rst         : in std_logic;
         enable      : in std_logic;
-        Data_C      : in std_logic_vector(15 downto 0);
+        Data_reg      : in std_logic_vector(15 downto 0);
         SYNC        : out std_logic;
         SCLK        : out std_logic;
-        flag_sd     : out std_logic;
+        Readn     : out std_logic;
         Data        : out std_logic
         );
 end component;
@@ -74,12 +78,12 @@ end component;
 
 
 component Gene_SYNC is
-    port(
-        clk,raz     : in std_logic;
-        send     : in std_logic;
-        Sysclk      : in std_logic;
-        OKAI_send   : out std_logic;
-        SYNC        : out std_logic);
+  port(
+    SCLK,raz : in std_logic;     --! Horloge systeme et Reset du composant
+    enable : in std_logic;       --! Autorise ou non l'utilisation du composant
+--    OKAI_send : out std_logic;   --! Flag, Autorise l'envoi (sérialisation) d'une nouvelle donnée
+    SYNC : out std_logic         --! Signal de synchronisation du convertisseur généré
+    );
 end component;
 
 
@@ -89,8 +93,16 @@ port(
     sclk    : in std_logic;
     vectin  : in std_logic_vector(15 downto 0);
     send    : in std_logic;
-    sended  : out std_logic;
+--    sended  : out std_logic;
     Data    : out std_logic);
+end component;
+
+component ReadFifo_GEN is
+  port(
+    clk,raz : in std_logic;
+    SYNC : in std_logic;
+    Readn : out std_logic
+    );
 end component;
 
 end;

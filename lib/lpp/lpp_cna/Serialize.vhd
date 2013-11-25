@@ -31,7 +31,7 @@ entity Serialize is
     sclk    : in std_logic;                      --! Horloge Systeme
     vectin  : in std_logic_vector(15 downto 0);  --! Vecteur d'entrée
     send    : in std_logic;                      --! Flag, Une nouvelle donnée est présente
-    sended  : out std_logic;                     --! Flag, La donnée a été sérialisée
+--    sended  : out std_logic;                     --! Flag, La donnée a été sérialisée
     Data    : out std_logic                      --! Donnée numérique sérialisé
     );
 end Serialize;
@@ -39,7 +39,7 @@ end Serialize;
 
 architecture ar_Serialize of Serialize is
 
-type etat is (attente,serialize);
+type etat is (attente,serialize,reg);
 signal ect      : etat;
 
 signal vector_int   : std_logic_vector(16 downto 0);
@@ -47,6 +47,7 @@ signal vectin_reg   : std_logic_vector(15 downto 0);
 signal load         : std_logic;
 signal N            : integer range 0 to 16;
 signal CPT_ended    : std_logic:='0';
+signal i            : std_logic;
 
 begin
     process(clk,raz)
@@ -55,7 +56,8 @@ begin
             ect         <= attente;
             vectin_reg  <= (others=> '0');
             load        <= '0';
-            sended      <= '1';            
+            i <= '1';
+--            sended      <= '1';            
 
         elsif(clk'event and clk='1')then
             vectin_reg <= vectin;
@@ -63,18 +65,25 @@ begin
             case ect is
                 when attente =>                     
                     if (send='1') then 
-                        sended  <= '0'; 
-                        load    <= '1';                   
-                        ect     <= serialize;                        
-                    else
-                        ect <= attente;                       
+--                        sended  <= '0';                        
+                        if(i='1')then
+                            i <= '0';
+                            ect <= reg;                  
+                        else
+                            load    <= '1';
+                            ect     <= serialize;                        
+                        end if;                        
                     end if;
+                
+                when reg =>
+                    load    <= '1';
+                    ect <= serialize;
                 
                 when serialize => 
                     load <= '0';                    
                     if(CPT_ended='1')then 
                         ect     <= attente;
-                        sended  <= '1';                        
+--                        sended  <= '1';                        
                     end if;
 
             end case;
