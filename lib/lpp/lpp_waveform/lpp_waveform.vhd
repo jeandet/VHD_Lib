@@ -183,6 +183,7 @@ ARCHITECTURE beh OF lpp_waveform IS
   SIGNAL data_out  : Data_Vector(3 DOWNTO 0, 95 DOWNTO 0);
   SIGNAL time_out_2  : Data_Vector(3 DOWNTO 0, 47 DOWNTO 0);
   SIGNAL time_out  : TIME_VECTOR(3 DOWNTO 0);
+  SIGNAL time_out_debug   : TIME_VECTOR(3 DOWNTO 0);  -- TODO : debug
   SIGNAL time_reg1 : STD_LOGIC_VECTOR(47 DOWNTO 0);
   SIGNAL time_reg2 : STD_LOGIC_VECTOR(47 DOWNTO 0);
   
@@ -322,9 +323,22 @@ BEGIN  -- beh
     data_out(3,I) <= data_f3_out(I);
   END GENERATE all_bit_of_data_out;
 
+  -----------------------------------------------------------------------------
+  -- TODO : debug
+  -----------------------------------------------------------------------------
+  --all_bit_of_time_out: FOR I IN 47 DOWNTO 0 GENERATE
+  --  all_sample_of_time_out: FOR J IN 3 DOWNTO 0 GENERATE
+  --    time_out_2(J,I) <= time_out(J)(I);      
+  --  END GENERATE all_sample_of_time_out;
+  --END GENERATE all_bit_of_time_out;
+  time_out_debug(0) <= x"0A0A" & x"0A0A0A0A";
+  time_out_debug(1) <= x"1B1B" & x"1B1B1B1B";
+  time_out_debug(2) <= x"2C2C" & x"2C2C2C2C";
+  time_out_debug(3) <= x"3D3D" & x"3D3D3D3D";
+  
   all_bit_of_time_out: FOR I IN 47 DOWNTO 0 GENERATE
     all_sample_of_time_out: FOR J IN 3 DOWNTO 0 GENERATE
-      time_out_2(J,I) <= time_out(J)(I);
+      time_out_2(J,I) <= time_out_debug(J)(I);      
     END GENERATE all_sample_of_time_out;
   END GENERATE all_bit_of_time_out;
   

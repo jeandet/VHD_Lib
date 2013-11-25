@@ -41,6 +41,8 @@ USE lpp.lpp_lfr_pkg.ALL;
 USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
 USE lpp.lpp_lfr_time_management.ALL;
+use lpp.lpp_cna.all;
+
 
 ENTITY leon3mp IS
   GENERIC (
@@ -94,6 +96,12 @@ ENTITY leon3mp IS
     ADC_OEB_bar_CH : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
     ADC_smpclk     : OUT STD_LOGIC;
     ADC_data       : IN  STD_LOGIC_VECTOR(13 DOWNTO 0);
+
+    -- SCM CALIBRATION --------------------------------------------------------
+    SCM_CAL_EN    : OUT STD_LOGIC;      -- TODO A6
+    SCM_CAL_DIN   : OUT STD_LOGIC;      -- TODO A4
+    SCM_CAL_SCLK  : OUT STD_LOGIC;      -- TODO A5
+    SCM_CAL_nSYNC : OUT STD_LOGIC;      -- TODO B6
 
     ---------------------------------------------------------------------------
     led : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
@@ -190,15 +198,6 @@ ARCHITECTURE Behavioral OF leon3mp IS
   SIGNAL sample_val       : STD_LOGIC;
   -----------------------------------------------------------------------------
   SIGNAL ADC_OEB_bar_CH_s : STD_LOGIC_VECTOR(7 DOWNTO 0);
-  -----------------------------------------------------------------------------
-  SIGNAL  debug_f0_data       : STD_LOGIC_VECTOR(95 DOWNTO 0);
-  SIGNAL  debug_f0_data_valid : STD_LOGIC;
-  SIGNAL  debug_f1_data       : STD_LOGIC_VECTOR(95 DOWNTO 0);
-  SIGNAL  debug_f1_data_valid : STD_LOGIC;
-  SIGNAL  debug_f2_data       : STD_LOGIC_VECTOR(95 DOWNTO 0);
-  SIGNAL  debug_f2_data_valid : STD_LOGIC;
-  SIGNAL  debug_f3_data       : STD_LOGIC_VECTOR(95 DOWNTO 0);
-  SIGNAL  debug_f3_data_valid : STD_LOGIC;
 
 BEGIN
 
@@ -380,6 +379,27 @@ BEGIN
   noua0 : IF CFG_UART1_ENABLE = 0 GENERATE apbo(1) <= apb_none; END GENERATE;
 
 -------------------------------------------------------------------------------
+-- APB_DAC --------------------------------------------------------------------
+-------------------------------------------------------------------------------
+  APB_DAC_1: APB_DAC
+    GENERIC MAP (
+      pindex => 14,
+      paddr  => 14,
+      pmask  => 16#fff#,
+      pirq   => 13,
+      abits  => 8)
+    PORT MAP (
+      clk    => clk,
+      rst    => rst,
+      apbi   => apbi,
+      apbo   => apbo(14),
+      
+      Cal_EN => SCM_CAL_EN,                
+      SYNC   => SCM_CAL_nSYNC,             
+      SCLK   => SCM_CAL_SCLK,              
+      DATA   => SCM_CAL_DIN);              
+
+-------------------------------------------------------------------------------
 -- APB_LFR_TIME_MANAGEMENT ----------------------------------------------------
 -------------------------------------------------------------------------------
   apb_lfr_time_management_1: apb_lfr_time_management
@@ -499,7 +519,7 @@ BEGIN
       pirq_ms                 => 6,
       pirq_wfp                => 14,
       hindex                  => 2,
-      top_lfr_version         => X"00000007")
+      top_lfr_version         => X"00000005")
     PORT MAP (
       clk               => clkm,
       rstn              => rstn,
@@ -512,18 +532,7 @@ BEGIN
       ahbo              => ahbmo(2),
       coarse_time       => coarse_time,
       fine_time         => fine_time,
-      data_shaping_BW   => bias_fail_sw,
-
-      -------------------------------------------------------------------------
-      debug_f0_data        => debug_f0_data      ,  
-      debug_f0_data_valid  => debug_f0_data_valid,     
-      debug_f1_data        => debug_f1_data      ,     
-      debug_f1_data_valid  => debug_f1_data_valid,     
-      debug_f2_data        => debug_f2_data      ,     
-      debug_f2_data_valid  => debug_f2_data_valid,     
-      debug_f3_data        => debug_f3_data      ,     
-      debug_f3_data_valid  => debug_f3_data_valid
-      );
+      data_shaping_BW   => bias_fail_sw);
 
   top_ad_conv_RHF1401_1 : top_ad_conv_RHF1401
     GENERIC MAP (

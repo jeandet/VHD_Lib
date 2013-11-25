@@ -121,7 +121,16 @@ ENTITY lpp_lfr_apbreg IS
     addr_data_f1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_data_f2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_data_f3 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    start_date   : OUT STD_LOGIC_VECTOR(30 DOWNTO 0)
+    start_date   : OUT STD_LOGIC_VECTOR(30 DOWNTO 0);
+    ---------------------------------------------------------------------------
+    debug_reg0   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_reg1   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_reg2   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_reg3   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_reg4   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_reg5   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_reg6   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_reg7   : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
 
     ---------------------------------------------------------------------------
     );
@@ -367,6 +376,15 @@ BEGIN  -- beh
           WHEN "010101" => prdata(nb_snapshot_param_size-1 DOWNTO 0)  <= reg_wp.nb_snapshot_param;
           WHEN "010110" => prdata(30 DOWNTO 0)                        <= reg_wp.start_date;
           WHEN "010111" => prdata(nb_word_by_buffer_size-1 DOWNTO 0) <= reg_wp.nb_word_by_buffer;
+          ----------------------------------------------------
+          WHEN "100000" => prdata(31 DOWNTO 0) <= debug_reg0(31 DOWNTO 0);
+          WHEN "100001" => prdata(31 DOWNTO 0) <= debug_reg1(31 DOWNTO 0);
+          WHEN "100010" => prdata(31 DOWNTO 0) <= debug_reg2(31 DOWNTO 0);
+          WHEN "100011" => prdata(31 DOWNTO 0) <= debug_reg3(31 DOWNTO 0);
+          WHEN "100100" => prdata(31 DOWNTO 0) <= debug_reg4(31 DOWNTO 0);
+          WHEN "100101" => prdata(31 DOWNTO 0) <= debug_reg5(31 DOWNTO 0);
+          WHEN "100110" => prdata(31 DOWNTO 0) <= debug_reg6(31 DOWNTO 0);
+          WHEN "100111" => prdata(31 DOWNTO 0) <= debug_reg7(31 DOWNTO 0);
           ----------------------------------------------------
           WHEN "111100" => prdata(31 DOWNTO 0) <= top_lfr_version(31 DOWNTO 0);
           WHEN OTHERS   => NULL;
