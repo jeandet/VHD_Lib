@@ -38,6 +38,7 @@ DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	./lpp_usb \
 
 FILESKIP = i2cmst.vhd \
+	lpp_lfr_ms.vhd \
 	APB_MULTI_DIODE.vhd \
 	APB_MULTI_DIODE.vhd \
 	Top_MatrixSpec.vhd \
