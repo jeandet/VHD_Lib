@@ -4,20 +4,20 @@ SCRIPTSDIR=$(VHDLIB)/scripts/
 GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
 TOP=TOP_EGSE2
 BOARD=GSE_ICI
-include $(GRLIB)/boards/$(BOARD)/Makefile.inc
+include $(VHDLIB)/boards/$(BOARD)/Makefile.inc
 DEVICE=$(PART)-$(PACKAGE)$(SPEED)
-UCF=$(GRLIB)/boards/$(BOARD)/$(TOP).ucf
-QSF=$(GRLIB)/boards/$(BOARD)/$(TOP).qsf
+UCF=$(VHDLIB)/boards/$(BOARD)/$(TOP).ucf
+QSF=$(VHDLIB)/boards/$(BOARD)/$(TOP).qsf
 EFFORT=high
 XSTOPT=
 SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_constraint 0"
 VHDLSYNFILES=config.vhd EGSE_ICI.vhd DC_GATE_GEN.vhd LF_GATE_GEN.vhd MajF_Gen.vhd MinF_Gen.vhd Serial_driver.vhd ICI_EGSE_PROTOCOL.vhd 
 VHDLSIMFILES=testbench.vhd
 SIMTOP=testbench
-SDCFILE=$(GRLIB)/boards/$(BOARD)/synplify.sdc
-SDC=$(GRLIB)/boards/$(BOARD)/default.sdc
-PDC=$(GRLIB)/boards/$(BOARD)/GSE_ICI.pdc
-BITGEN=$(GRLIB)/boards/$(BOARD)/default.ut
+SDCFILE=$(VHDLIB)/boards/$(BOARD)/synplify.sdc
+SDC=$(VHDLIB)/boards/$(BOARD)/default.sdc
+PDC=$(VHDLIB)/boards/$(BOARD)/GSE_ICI.pdc
+BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut
 CLEAN=soft-clean
 
 TECHLIBS = proasic3

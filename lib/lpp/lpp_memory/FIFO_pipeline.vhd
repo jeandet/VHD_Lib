@@ -33,7 +33,7 @@ entity FIFO_pipeline is
 generic(
     tech          :   integer := 0;
     Mem_use       :   integer := use_RAM;
-    fifoCount     :   integer range 2 to 32 := 8;
+    fifoCount     :   integer range 2 to 100 := 8;
     DataSz        :   integer range 1 to 32 := 8;
     abits         :   integer range 2 to 12 := 8
     );
@@ -55,59 +55,49 @@ end entity;
 
 architecture Ar_FIFO_pipeline of FIFO_pipeline is
 
-type FX2State is (idle);
+type    FIFO_DATA_t  is   array(NATURAL RANGE <>) of   std_logic_vector(DataSz-1 downto 0);
 
-Signal  DATA0      :   std_logic_vector(DataSz-1 downto 0);
-Signal  FULL_REN0,WEN_EMPTY0      :   std_logic; 
+
+Signal  DATAi      :  FIFO_DATA_t(fifoCount downto 0);
+Signal  FULL_RENi,WEN_EMPTYi      :   std_logic_vector(fifoCount downto 0);
 
 begin
 
 
-FIFO0: lpp_fifo 
-generic map(
-    tech          => tech,
-    Mem_use       => Mem_use,
-    Enable_ReUse  => '0',
-    DataSz        =>  DataSz,
-    abits         =>  abits
-    )
-port map(
-    rstn    =>   rstn,
-    ReUse   =>   '0',
-    rclk    =>   rclk,
-    ren     =>   FULL_REN0,
-    rdata   =>   DATA0, 
-    empty   =>   WEN_EMPTY0,
-    raddr   =>   open,
-    wclk    =>   wclk,
-    wen     =>   wen,
-    wdata   =>   wdata,
-    full    =>   full,
-    waddr   =>   open
-);
+fifos : for i in 0 to fifoCount-1 generate
+      fifo0 : lpp_fifo
+      generic map(
+        tech          => tech,
+        Mem_use       => Mem_use,
+        Enable_ReUse  => '0',
+        DataSz        =>  DataSz,
+        abits         =>  abits
+        )
+      port map(
+        rstn    =>   rstn,
+        ReUse   =>   '0',
+        rclk    =>   rclk,
+        ren     =>   FULL_RENi(i+1),
+        rdata   =>   DATAi(i+1),
+        empty   =>   WEN_EMPTYi(i+1),
+        raddr   =>   open,
+        wclk    =>   wclk,
+        wen     =>   WEN_EMPTYi(i),
+        wdata   =>   DATAi(i),
+        full    =>   FULL_RENi(i),
+        waddr   =>   open
+        );
 
-FIFO1: lpp_fifo 
-generic map(
-    tech          => tech,
-    Mem_use       => Mem_use,
-    Enable_ReUse  => '0',
-    DataSz        =>  DataSz,
-    abits         =>  abits
-    )
-port map(
-    rstn    =>   rstn,
-    ReUse   =>   '0',
-    rclk    =>   rclk,
-    ren     =>   ren,
-    rdata   =>   rdata, 
-    empty   =>   empty,
-    raddr   =>   open,
-    wclk    =>   wclk,
-    wen     =>   WEN_EMPTY0,
-    wdata   =>   DATA0,
-    full    =>   FULL_REN0,
-    waddr   =>   open
-);
+end generate;
+
+WEN_EMPTYi(0)  <= wen;
+DATAi(0)       <= wdata;
+full           <= FULL_RENi(0);
+
+
+empty                  <= WEN_EMPTYi(fifoCount);
+rdata                  <= DATAi(fifoCount);
+FULL_RENi(fifoCount)   <= ren;
 
 end ar_FIFO_pipeline; 
 

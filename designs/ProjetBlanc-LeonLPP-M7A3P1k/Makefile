@@ -1,4 +1,7 @@
 #GRLIB=../..
+VHDLIB=../..
+SCRIPTSDIR=$(VHDLIB)/scripts/
+GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
 TOP=top
 BOARD=LeonLPP-M7A3P1k
 include $(GRLIB)/boards/$(BOARD)/Makefile.inc
