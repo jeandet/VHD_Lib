@@ -1,7 +1,0 @@
-leon3mp port ADC_in_0.SDI ADC_in[0]
-leon3mp port ADC_in_1.SDI ADC_in[1]
-leon3mp port ADC_in_2.SDI ADC_in[2]
-leon3mp port ADC_in_3.SDI ADC_in[3]
-leon3mp port ADC_in_4.SDI ADC_in[4]
-leon3mp port ADC_out.CNV ADC_out[0]
-leon3mp port ADC_out.SCK ADC_out[1]

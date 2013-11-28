@@ -1,8 +1,0 @@
-[Device]
-Family = ;
-PartNumber = PROASIC3Std"";
-Package = ;
-PartType = PROASIC3;
-Speed = Std;
-Operating_condition = COM;
-Status = Production;
