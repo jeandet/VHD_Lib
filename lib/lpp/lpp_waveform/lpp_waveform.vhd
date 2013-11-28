@@ -331,6 +331,7 @@ BEGIN  -- beh
   --    time_out_2(J,I) <= time_out(J)(I);      
   --  END GENERATE all_sample_of_time_out;
   --END GENERATE all_bit_of_time_out;
+  
   time_out_debug(0) <= x"0A0A" & x"0A0A0A0A";
   time_out_debug(1) <= x"1B1B" & x"1B1B1B1B";
   time_out_debug(2) <= x"2C2C" & x"2C2C2C2C";
@@ -383,40 +384,12 @@ BEGIN  -- beh
   data_f1_data_out <= rdata;
   data_f2_data_out <= rdata;
   data_f3_data_out <= rdata;
-    
-  --lpp_waveform_fifo_withoutLatency_1: lpp_waveform_fifo_withoutLatency
-  --  GENERIC MAP (
-  --    tech => tech)
-  --  PORT MAP (
-  --    clk          => clk,
-  --    rstn         => rstn,
-  --    run          => run,
-      
-  --    empty_almost => empty_almost,
-  --    empty        => empty,
-  --    data_ren     => data_ren,
-      
-  --    rdata_0      => data_f0_data_out,
-  --    rdata_1      => data_f1_data_out,
-  --    rdata_2      => data_f2_data_out,
-  --    rdata_3      => data_f3_data_out,
-      
-  --    full_almost  => full_almost,
-  --    full         => full,
-  --    data_wen     => data_wen,
-  --    wdata        => wdata);
-
-
-
   
   data_ren <= data_f3_data_out_ren &
               data_f2_data_out_ren &
               data_f1_data_out_ren &
               data_f0_data_out_ren;
   
-  -----------------------------------------------------------------------------
-  -- TODO : set the alterance : time, data, data, .....
-  -----------------------------------------------------------------------------
   lpp_waveform_gen_address_1 : lpp_waveform_genaddress
     GENERIC MAP (
       nb_data_by_buffer_size => nb_word_by_buffer_size)
