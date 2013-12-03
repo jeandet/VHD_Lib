@@ -124,7 +124,6 @@ ARCHITECTURE beh OF MINI_LFR_top IS
       pclow   : INTEGER);
     PORT (
       clk100MHz    : IN    STD_ULOGIC;
-      clk49_152MHz : IN    STD_ULOGIC;
       reset        : IN    STD_ULOGIC;
       errorn       : OUT   STD_ULOGIC;
       ahbrxd       : IN    STD_ULOGIC;
@@ -148,13 +147,33 @@ ARCHITECTURE beh OF MINI_LFR_top IS
       spw2_sin     : IN    STD_LOGIC;
       spw2_dout    : OUT   STD_LOGIC;
       spw2_sout    : OUT   STD_LOGIC;
-      apbi_wfp     : OUT   apb_slv_in_type;
+      apbi_ext     : OUT   apb_slv_in_type;
       apbo_wfp     : IN    apb_slv_out_type;
-      ahbi_wfp     : OUT   AHB_Mst_In_Type;
-      ahbo_wfp     : IN    AHB_Mst_Out_Type;
-      coarse_time  : OUT   STD_LOGIC_VECTOR(31 DOWNTO 0);
-      fine_time    : OUT   STD_LOGIC_VECTOR(15 DOWNTO 0));
+      apbo_ltm     : IN    apb_slv_out_type;
+      ahbi_ext     : OUT   AHB_Mst_In_Type;
+      ahbo_wfp     : IN    AHB_Mst_Out_Type);
   END COMPONENT;
+
+  -----------------------------------------------------------------------------
+  SIGNAL apbi      : apb_slv_in_type;
+  SIGNAL apbo_wfp  : apb_slv_out_type;
+  SIGNAL apbo_ltm  : apb_slv_out_type;
+  SIGNAL ahbi      : AHB_Mst_In_Type;
+  SIGNAL ahbo_wfp  : AHB_Mst_Out_Type;
+  --
+  SIGNAL coarse_time  :  STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL fine_time    :  STD_LOGIC_VECTOR(15 DOWNTO 0);
+  --
+  SIGNAL errorn : STD_LOGIC;
+  -- UART AHB ---------------------------------------------------------------
+  SIGNAL  ahbrxd : STD_ULOGIC;            -- DSU rx data  
+  SIGNAL  ahbtxd : STD_ULOGIC;            -- DSU tx data
+
+  -- UART APB ---------------------------------------------------------------
+  SIGNAL  urxd1 :  STD_ULOGIC;             -- UART1 rx data
+  SIGNAL  utxd1 :  STD_ULOGIC;             -- UART1 tx data
+                                           --
+  SIGNAL I00_s : STD_LOGIC;
   
 BEGIN  -- beh
 
@@ -164,98 +183,104 @@ BEGIN  -- beh
       LED0 <= '0';
       LED1 <= '0';
       LED2 <= '0';
+      IO1  <= '0';
+      IO2  <= '1';  
+      IO3  <= '0';
+      IO4  <= '0';
+      IO5  <= '0';
+      IO6  <= '0';
+      IO7  <= '0';
+      IO8  <= '0';
+      IO9  <= '0';
+      IO10 <= '0';
+      IO11 <= '0';
     ELSIF clk_50'event AND clk_50 = '1' THEN  -- rising clock edge
       LED0 <= '0';
       LED1 <= '1';
       LED2 <= BP0;
+      IO1  <= '1';
+      IO2  <= '0';  
+      IO3  <= ADC_SDO(0);
+      IO4  <= ADC_SDO(1);
+      IO5  <= ADC_SDO(2);
+      IO6  <= ADC_SDO(3);
+      IO7  <= ADC_SDO(4);
+      IO8  <= ADC_SDO(5);
+      IO9  <= ADC_SDO(6);
+      IO10 <= ADC_SDO(7);
+      IO11  <= BP1 OR  nDTR2 OR nRTS2 OR nRTS1;
     END IF;
   END PROCESS;
   
+  PROCESS (clk_49, reset)
+  BEGIN  -- PROCESS
+    IF reset = '0' THEN                 -- asynchronous reset (active low)
+      I00_s  <= '0';            
+    ELSIF clk_49'event AND clk_49 = '1' THEN  -- rising clock edge
+        I00_s  <= NOT I00_s;
+      END IF;
+  END PROCESS;
+  IO0 <= I00_s;
+
   --UARTs
-  RXD1   <= '0';
-  nCTS1  <= '0';        
-  RXD2   <= '0';
+  nCTS1  <= '0';
   nCTS2  <= '0';           
   nDCD2  <= '0';      
 
   --EXT CONNECTOR
-  IO0  <= clk_49;
-  IO1  <= clk_50;
-  
-  IO2 <= SPW_NOM_DIN OR
-         SPW_NOM_SIN OR
-         SPW_RED_DIN OR
-         SPW_RED_SIN;
-  
-  IO3  <= ADC_SDO(0);
-  IO4  <= ADC_SDO(1);
-  IO5  <= ADC_SDO(2);
-  IO6  <= ADC_SDO(3);
-  IO7  <= ADC_SDO(4);
-  IO8  <= ADC_SDO(5);
-  IO9  <= ADC_SDO(6);
-  IO10 <= ADC_SDO(7);
-  IO11  <= BP1 OR TXD1 OR TXD2 OR nDTR2 OR nRTS2 OR nRTS1;
 
   --SPACE WIRE
   SPW_EN       <= '0';                     -- 0 => off
-  SPW_NOM_DOUT <= '0';
-  SPW_NOM_SOUT <= '0';
-  SPW_RED_DOUT <= '0';
-  SPW_RED_SOUT <= '0';
+  
   ADC_nCS      <= '0';
   ADC_CLK      <= '0';
   
-  -- SRAM
-  SRAM_nWE <= '1';
-  SRAM_CE  <= '0';
-  SRAM_nOE <= '1';
-  SRAM_nBE <= (OTHERS => '1');
-  SRAM_A   <= (OTHERS => '0');
-  SRAM_DQ  <= (OTHERS => '0');
-
-
   leon3mp_1: leon3_soc
     GENERIC MAP (
-      fabtech => fabtech,
-      memtech => memtech,
-      padtech => padtech,
-      clktech => clktech,
-      disas   => disas,
-      dbguart => dbguart,
-      pclow   => pclow)
+      fabtech => CFG_FABTECH,
+      memtech => CFG_MEMTECH,
+      padtech => CFG_PADTECH,
+      clktech => CFG_CLKTECH,
+      disas   => CFG_DISAS,
+      dbguart => CFG_DUART,
+      pclow   => CFG_PCLOW)
     PORT MAP (
-      clk100MHz    => clk100MHz,
-      clk49_152MHz => clk49_152MHz,
-      reset        => reset,
-      errorn       => errorn,
-      ahbrxd       => ahbrxd,
-      ahbtxd       => ahbtxd,
-      urxd1        => urxd1,
-      utxd1        => utxd1,
-      address      => address,
-      data         => data,
-      nSRAM_BE0    => nSRAM_BE0,
-      nSRAM_BE1    => nSRAM_BE1,
-      nSRAM_BE2    => nSRAM_BE2,
-      nSRAM_BE3    => nSRAM_BE3,
-      nSRAM_WE     => nSRAM_WE,
-      nSRAM_CE     => nSRAM_CE,
-      nSRAM_OE     => nSRAM_OE,
-      spw1_din     => spw1_din,
-      spw1_sin     => spw1_sin,
-      spw1_dout    => spw1_dout,
-      spw1_sout    => spw1_sout,
-      spw2_din     => spw2_din,
-      spw2_sin     => spw2_sin,
-      spw2_dout    => spw2_dout,
-      spw2_sout    => spw2_sout,
-      apbi_wfp     => apbi_wfp,
-      apbo_wfp     => apbo_wfp,
-      ahbi_wfp     => ahbi_wfp,
-      ahbo_wfp     => ahbo_wfp,
-      coarse_time  => coarse_time,
-      fine_time    => fine_time);
+      clk100MHz    => clk_50,           --
+      reset        => reset,            --
+      errorn       => errorn,           --
+      
+      ahbrxd       => TXD1,           --
+      ahbtxd       => RXD1,           --
+      urxd1        => TXD2,            --
+      utxd1        => RXD2,            --
+      --RAM
+      address      => SRAM_A,           --
+      data         => SRAM_DQ,          --
+      nSRAM_BE0    => SRAM_nBE(0),      -- 
+      nSRAM_BE1    => SRAM_nBE(1),      --
+      nSRAM_BE2    => SRAM_nBE(2),      --
+      nSRAM_BE3    => SRAM_nBE(3),      --
+      nSRAM_WE     => SRAM_nWE,         --
+      nSRAM_CE     => SRAM_CE,          --
+      nSRAM_OE     => SRAM_nOE,         --
+      --SPW
+      spw1_din     => SPW_NOM_DIN,      --       
+      spw1_sin     => SPW_NOM_SIN,      --      
+      spw1_dout    => SPW_NOM_DOUT,     --       
+      spw1_sout    => SPW_NOM_SOUT,     --       
+      spw2_din     => SPW_RED_DIN,      --       
+      spw2_sin     => SPW_RED_SIN,      --      
+      spw2_dout    => SPW_RED_DOUT,     --     
+      spw2_sout    => SPW_RED_SOUT,     --
+      
+      apbi_ext     => apbi,             -- 
+      apbo_wfp     => apbo_wfp,         -- 
+      apbo_ltm     => apbo_ltm,         -- lfr time management
+      ahbi_ext     => ahbi,             -- 
+      ahbo_wfp     => ahbo_wfp);       --
   
+  apbo_wfp  <= apb_none;
+  apbo_ltm  <= apb_none;
+  ahbo_wfp  <= ahbm_none;
 
 END beh;

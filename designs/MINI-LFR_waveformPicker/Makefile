@@ -10,8 +10,8 @@ QSF=$(VHDLIB)/boards/$(BOARD)/$(TOP).qsf
 EFFORT=high
 XSTOPT=
 SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_constraint 0"
-VHDLSYNFILES=	MINI_LFR_top.vhd \
-		config.vhd \
+VHDLSYNFILES=	config.vhd \
+		MINI_LFR_top.vhd \
 		leon3_soc.vhd
 
 PDC=$(VHDLIB)/boards/$(BOARD)/default.pdc
@@ -38,9 +38,12 @@ DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	./lpp_usb \
 	./lpp_Header \
 
-FILESKIP = i2cmst.vhd \
+FILESKIP =lpp_lfr_ms.vhd \
+	i2cmst.vhd \
 	APB_MULTI_DIODE.vhd \
-	APB_SIMPLE_DIODE.vhd 
+	APB_SIMPLE_DIODE.vhd \
+	Top_MatrixSpec.vhd \
+	APB_FFT.vhd
 
 include $(GRLIB)/bin/Makefile
 include $(GRLIB)/software/leon3/Makefile

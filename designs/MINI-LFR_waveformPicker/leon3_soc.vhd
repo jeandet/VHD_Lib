@@ -54,7 +54,6 @@ ENTITY leon3_soc IS
     );
   PORT (
     clk100MHz    : IN STD_ULOGIC;
-    clk49_152MHz : IN STD_ULOGIC;
     reset        : IN STD_ULOGIC;
 
     errorn : OUT STD_ULOGIC;
@@ -90,13 +89,11 @@ ENTITY leon3_soc IS
     spw2_sout : OUT STD_LOGIC;
 
     -- WAVEFORM PICKER --------------------------------------------------------
-    apbi_wfp  : OUT apb_slv_in_type;
+    apbi_ext  : OUT apb_slv_in_type;
     apbo_wfp  : IN  apb_slv_out_type;
-    ahbi_wfp  : OUT AHB_Mst_In_Type;
-    ahbo_wfp  : IN  AHB_Mst_Out_Type;
-    -- TIME -------------------------------------------------------------------
-    coarse_time  : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    fine_time    : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+    apbo_ltm  : IN  apb_slv_out_type;
+    ahbi_ext  : OUT AHB_Mst_In_Type;
+    ahbo_wfp  : IN  AHB_Mst_Out_Type
     
     );
 END;
@@ -358,26 +355,7 @@ BEGIN
     apbuarti.ctsn   <= '0';
   END GENERATE;
   noua0 : IF CFG_UART1_ENABLE = 0 GENERATE apbo(1) <= apb_none; END GENERATE;
-
--------------------------------------------------------------------------------
--- APB_LFR_TIME_MANAGEMENT ----------------------------------------------------
--------------------------------------------------------------------------------
-  apb_lfr_time_management_1: apb_lfr_time_management
-    GENERIC MAP (
-      pindex => 6,
-      paddr  => 6,
-      pmask  => 16#fff#,
-      pirq   => 12)
-    PORT MAP (
-      clk25MHz     => clkm,
-      clk49_152MHz => clk49_152MHz,
-      resetn       => rstn,
-      grspw_tick   => swno.tickout,
-      apbi         => apbi,
-      apbo         => apbo(6),
-      coarse_time  => coarse_time,
-      fine_time    => fine_time);
-
+  
 -----------------------------------------------------------------------
 ---  SpaceWire --------------------------------------------------------
 -----------------------------------------------------------------------
@@ -465,9 +443,10 @@ BEGIN
 -------------------------------------------------------------------------------
 -- LFR
 -------------------------------------------------------------------------------
-  apbi_wfp  <= apbi;
+  apbi_ext  <= apbi;
   apbo(15)  <= apbo_wfp;
-  ahbi_wfp  <= ahbmi;
+  apbo(6)   <= apbo_ltm;
+  ahbi_ext  <= ahbmi;
   ahbmo(2)  <= ahbo_wfp;
 
 END Behavioral;
