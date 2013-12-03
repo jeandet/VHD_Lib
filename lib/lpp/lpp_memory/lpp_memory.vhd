@@ -135,6 +135,17 @@ port(
 );
 end component;
 
+component Bridge is
+    port(
+        clk         : in std_logic;
+        raz        : in std_logic;
+        EmptyUp : in std_logic;
+        FullDwn : in std_logic;
+        WriteDwn : out std_logic;
+        ReadUp : out std_logic
+        );
+end component;
+
 component ssram_plugin is
 generic (tech : integer := 0);
 port

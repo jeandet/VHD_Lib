@@ -29,7 +29,7 @@ entity Gene_SYNC is
   port(
     SCLK,raz : in std_logic;     --! Horloge systeme et Reset du composant
     enable : in std_logic;       --! Autorise ou non l'utilisation du composant
---    OKAI_send : out std_logic;   --! Flag, Autorise l'envoi (sérialisation) d'une nouvelle donnée
+    Sended : out std_logic;   --! Flag, Autorise l'envoi (sérialisation) d'une nouvelle donnée
     SYNC : out std_logic         --! Signal de synchronisation du convertisseur généré
     );
 end Gene_SYNC;
@@ -46,22 +46,21 @@ begin
         if(raz='0')then
             SYNC <= '0';
             count <= 14;  
---            OKAI_send <= '0';         
+            Sended <= '0';
         
         elsif(SCLK' event and SCLK='1')then    
             if(enable='1')then
 
                 if(count=15)then
                     SYNC <= '1';
---                    count <= count+1;
---                elsif(count=16)then
+                    count <= count+1;
+                elsif(count=16)then
                     count <= 0;
---                    SYNC <= '0';
---                    OKAI_send <= '1';
+                    SYNC <= '0';
+                    Sended <= '1';
                 else
                     count <= count+1;
-                    SYNC <= '0';
---                    OKAI_send <= '0';
+                    Sended <= '0';
                 end if;
 
             end if;

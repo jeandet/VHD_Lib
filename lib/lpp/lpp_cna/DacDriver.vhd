@@ -27,15 +27,15 @@ use lpp.lpp_cna.all;
 --! Programme du Convertisseur Numérique/Analogique
 
 entity DacDriver is
-  generic(cpt_serial : integer := 6);  --! Générique contenant le résultat de la division clk/sclk  !!! clk=25Mhz
+generic(cpt_serial : integer := 6);  --! Générique contenant le résultat de la division clk/sclk  !!! clk=25Mhz
   port(
     clk         : in std_logic;                        --! Horloge du composant
     rst         : in std_logic;                        --! Reset general du composant
     enable      : in std_logic;                        --! Autorise ou non l'utilisation du composant
-    Data_reg    : in std_logic_vector(15 downto 0);    --! Donnée Numérique d'entrée sur 16 bits
+    Data_C      : in std_logic_vector(15 downto 0);    --! Donnée Numérique d'entrée sur 16 bits
     SYNC        : out std_logic;                       --! Signal de synchronisation du convertisseur
     SCLK        : out std_logic;                       --! Horloge systeme du convertisseur
-    Readn       : out std_logic;                       
+    Ready     : out std_logic;                       --! Flag, signale la fin de la sérialisation d'une donnée
     Data        : out std_logic                        --! Donnée numérique sérialisé
     );
 end entity;
@@ -46,7 +46,7 @@ end entity;
 architecture ar_DacDriver of DacDriver is
 
 signal s_SCLK      : std_logic;
-signal s_SYNC    : std_logic;
+signal Sended    : std_logic;
 
 begin
 
@@ -56,16 +56,13 @@ SystemCLK : Systeme_Clock
 
 
 Signal_sync : Gene_SYNC
-    port map (s_SCLK,rst,enable,s_SYNC);
+    port map (s_SCLK,rst,enable,Sended,SYNC);
 
 
 Serial : serialize
-    port map (clk,rst,s_SCLK,Data_reg,s_SYNC,Data);
+    port map (clk,rst,s_SCLK,Data_C,Sended,Ready,Data);
 
-RenGEN : ReadFifo_GEN
-    port map (clk,rst,s_SYNC,Readn);
 
 SCLK        <= s_SCLK;
-SYNC        <= s_SYNC;
 
 end architecture;

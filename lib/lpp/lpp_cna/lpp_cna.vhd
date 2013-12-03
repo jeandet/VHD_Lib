@@ -37,16 +37,13 @@ component APB_DAC is
     paddr    : integer := 0;
     pmask    : integer := 16#fff#;
     pirq     : integer := 0;
-    abits    : integer := 8;
-    cpt_serial : integer := 6);
+    abits    : integer := 8);
   port (
     clk     : in  std_logic;
     rst     : in  std_logic;
     apbi    : in  apb_slv_in_type;
     apbo    : out apb_slv_out_type;
-    DataIN : in std_logic_vector(15 downto 0);
     Cal_EN  : out std_logic;
-    Readn   : out std_logic;
     SYNC    : out std_logic;
     SCLK    : out std_logic;
     DATA    : out std_logic
@@ -55,15 +52,15 @@ end component;
 
 
 component DacDriver is
-    generic(cpt_serial : integer := 6);
+generic(cpt_serial : integer := 6);  --! Générique contenant le résultat de la division clk/sclk  !!! clk=25Mhz
     port(
         clk       : in std_logic;
         rst         : in std_logic;
         enable      : in std_logic;
-        Data_reg      : in std_logic_vector(15 downto 0);
+        Data_C      : in std_logic_vector(15 downto 0);
         SYNC        : out std_logic;
         SCLK        : out std_logic;
-        Readn     : out std_logic;
+        Ready     : out std_logic;
         Data        : out std_logic
         );
 end component;
@@ -73,17 +70,16 @@ component Systeme_Clock is
     generic(N :integer := 695);
     port(
         clk, raz   : in std_logic ;
-        clock      : out std_logic);
+        sclk      : out std_logic);
 end component;
 
 
 component Gene_SYNC is
-  port(
+    port(
     SCLK,raz : in std_logic;     --! Horloge systeme et Reset du composant
     enable : in std_logic;       --! Autorise ou non l'utilisation du composant
---    OKAI_send : out std_logic;   --! Flag, Autorise l'envoi (sérialisation) d'une nouvelle donnée
-    SYNC : out std_logic         --! Signal de synchronisation du convertisseur généré
-    );
+    Sended : out std_logic;   --! Flag, Autorise l'envoi (sérialisation) d'une nouvelle donnée
+    SYNC : out std_logic);         --! Signal de synchronisation du convertisseur généré
 end component;
 
 
@@ -93,16 +89,8 @@ port(
     sclk    : in std_logic;
     vectin  : in std_logic_vector(15 downto 0);
     send    : in std_logic;
---    sended  : out std_logic;
+    sended  : out std_logic;
     Data    : out std_logic);
-end component;
-
-component ReadFifo_GEN is
-  port(
-    clk,raz : in std_logic;
-    SYNC : in std_logic;
-    Readn : out std_logic
-    );
 end component;
 
 end;
