@@ -20,50 +20,48 @@
 --                     Mail : martin.morlot@lpp.polytechnique.fr
 ------------------------------------------------------------------------------
 library IEEE;
-use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+use IEEE.std_logic_1164.all;
 
---! Programme qui va permettre de générer le signal SYNC
-
-entity Gene_SYNC is
+entity ReadFifo_GEN is
   port(
-    SCLK,raz : in std_logic;     --! Horloge systeme et Reset du composant
-    enable : in std_logic;       --! Autorise ou non l'utilisation du composant
-    Send : out std_logic;   --! Flag, Autorise l'envoi (sérialisation) d'une nouvelle donnée
-    SYNC : out std_logic         --! Signal de synchronisation du convertisseur généré
+    clk,raz : in std_logic;                      --! Horloge et Reset du composant
+    SYNC : in std_logic;
+    Readn : out std_logic
     );
-end Gene_SYNC;
+end entity;
 
---! @details NB: Ce programme est uniquement synchronisé sur l'horloge Systeme (sclk)
 
-architecture ar_Gene_SYNC of Gene_SYNC is
+architecture ar_ReadFifo_GEN of ReadFifo_GEN is
 
-signal count : integer;
+type etat is (eX,e0);
+signal ect      : etat;
 
-begin 
-    process (SCLK,raz)
-    begin
-        if(raz='0')then
-            SYNC <= '0';
-            count <= 14;  
-            Send <= '0';
-        
-        elsif(SCLK' event and SCLK='1')then    
-            if(enable='1')then
+signal SYNC_reg : std_logic;
 
-                if(count=15)then
-                    SYNC <= '1';
-                    count <= count+1;
-                elsif(count=16)then
-                    count <= 0;
-                    SYNC <= '0';
-                    Send <= '1';
-                else
-                    count <= count+1;
-                    Send <= '0';
-                end if;
+begin
+    process(clk,raz)
+        begin
+        if(raz='0')then           
+            ect         <= eX;
+            Readn  <= '1';           
 
-            end if;
-      	end if;
+        elsif(clk'event and clk='1')then
+            SYNC_reg <= SYNC;
+          
+            case ect is
+                when eX =>                     
+                    if (SYNC_reg='0' and  SYNC='1') then 
+                        Readn    <= '0';                   
+                        ect     <= e0;
+                    end if;
+
+                when e0 =>
+                    Readn <= '1';                    
+                    ect <= eX;
+
+            end case;
+        end if;
     end process;
-end ar_Gene_SYNC;
+
+end architecture;

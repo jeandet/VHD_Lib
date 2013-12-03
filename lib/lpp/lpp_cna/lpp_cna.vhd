@@ -37,15 +37,18 @@ component APB_DAC is
     paddr    : integer := 0;
     pmask    : integer := 16#fff#;
     pirq     : integer := 0;
-    abits    : integer := 8);
+    abits    : integer := 8;
+    cpt_serial : integer := 6);
   port (
     clk     : in  std_logic;
     rst     : in  std_logic;
     apbi    : in  apb_slv_in_type;
     apbo    : out apb_slv_out_type;
-    Cal_EN  : out std_logic;
-    SYNC    : out std_logic;
-    SCLK    : out std_logic;
+    DataIN : in std_logic_vector(15 downto 0);
+    Cal_EN  : out std_logic;           --! Signal Enable du multiplex pour la CAL
+    Readn   : out std_logic;
+    SYNC    : out std_logic;           --! Signal de synchronisation du convertisseur
+    SCLK    : out std_logic;           --! Horloge systeme du convertisseur
     DATA    : out std_logic
     );
 end component;
@@ -57,9 +60,10 @@ generic(cpt_serial : integer := 6);  --! Générique contenant le résultat de la d
         clk       : in std_logic;
         rst         : in std_logic;
         enable      : in std_logic;
-        Data_C      : in std_logic_vector(15 downto 0);
-        SYNC        : out std_logic;
-        SCLK        : out std_logic;
+        Data_IN      : in std_logic_vector(15 downto 0);    --! Donnée Numérique d'entrée sur 16 bits
+        SYNC        : out std_logic;                       --! Signal de synchronisation du convertisseur
+        SCLK        : out std_logic;                       --! Horloge systeme du convertisseur
+        Readn       : out std_logic;
         Ready     : out std_logic;
         Data        : out std_logic
         );
@@ -78,7 +82,7 @@ component Gene_SYNC is
     port(
     SCLK,raz : in std_logic;     --! Horloge systeme et Reset du composant
     enable : in std_logic;       --! Autorise ou non l'utilisation du composant
-    Sended : out std_logic;   --! Flag, Autorise l'envoi (sérialisation) d'une nouvelle donnée
+    Send : out std_logic;   --! Flag, Autorise l'envoi (sérialisation) d'une nouvelle donnée
     SYNC : out std_logic);         --! Signal de synchronisation du convertisseur généré
 end component;
 
@@ -91,6 +95,14 @@ port(
     send    : in std_logic;
     sended  : out std_logic;
     Data    : out std_logic);
+end component;
+
+component ReadFifo_GEN is
+  port(
+    clk,raz : in std_logic;                      --! Horloge et Reset du composant
+    SYNC : in std_logic;
+    Readn : out std_logic
+    );
 end component;
 
 end;

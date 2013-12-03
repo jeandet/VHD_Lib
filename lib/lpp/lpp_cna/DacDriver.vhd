@@ -32,9 +32,10 @@ generic(cpt_serial : integer := 6);  --! Générique contenant le résultat de la d
     clk         : in std_logic;                        --! Horloge du composant
     rst         : in std_logic;                        --! Reset general du composant
     enable      : in std_logic;                        --! Autorise ou non l'utilisation du composant
-    Data_C      : in std_logic_vector(15 downto 0);    --! Donnée Numérique d'entrée sur 16 bits
+    Data_IN      : in std_logic_vector(15 downto 0);    --! Donnée Numérique d'entrée sur 16 bits
     SYNC        : out std_logic;                       --! Signal de synchronisation du convertisseur
     SCLK        : out std_logic;                       --! Horloge systeme du convertisseur
+    Readn       : out std_logic;
     Ready     : out std_logic;                       --! Flag, signale la fin de la sérialisation d'une donnée
     Data        : out std_logic                        --! Donnée numérique sérialisé
     );
@@ -46,7 +47,7 @@ end entity;
 architecture ar_DacDriver of DacDriver is
 
 signal s_SCLK      : std_logic;
-signal Sended    : std_logic;
+signal Send    : std_logic;
 
 begin
 
@@ -56,12 +57,14 @@ SystemCLK : Systeme_Clock
 
 
 Signal_sync : Gene_SYNC
-    port map (s_SCLK,rst,enable,Sended,SYNC);
+    port map (s_SCLK,rst,enable,Send,SYNC);
 
 
 Serial : serialize
-    port map (clk,rst,s_SCLK,Data_C,Sended,Ready,Data);
+    port map (clk,rst,s_SCLK,Data_IN,Send,Ready,Data);
 
+RenGEN : ReadFifo_GEN
+    port map (clk,rst,Send,Readn);
 
 SCLK        <= s_SCLK;
 
