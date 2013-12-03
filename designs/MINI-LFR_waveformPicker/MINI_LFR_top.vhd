@@ -223,9 +223,9 @@ BEGIN  -- beh
   IO0 <= I00_s;
 
   --UARTs
-  nCTS1  <= '0';
-  nCTS2  <= '0';           
-  nDCD2  <= '0';      
+  nCTS1  <= '1';
+  nCTS2  <= '1';           
+  nDCD2  <= '1';      
 
   --EXT CONNECTOR
 
