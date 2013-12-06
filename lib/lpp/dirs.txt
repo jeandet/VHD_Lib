@@ -22,3 +22,4 @@
 ./lpp_top_lfr
 ./lpp_Header
 ./lpp_leon3_soc
+./lpp_debug_lfr

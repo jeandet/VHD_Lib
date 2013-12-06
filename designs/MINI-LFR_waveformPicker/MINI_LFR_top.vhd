@@ -43,6 +43,7 @@ USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
 USE lpp.lpp_lfr_time_management.ALL;
 USE lpp.lpp_leon3_soc_pkg.ALL;
+USE lpp.lpp_debug_lfr_pkg.ALL;
 
 ENTITY MINI_LFR_top IS
   
@@ -212,8 +213,6 @@ BEGIN  -- beh
   nCTS2  <= '1';           
   nDCD2  <= '1';      
 
-  --EXT CONNECTOR
-
   --SPACE WIRE
   SPW_EN       <= '0';                     -- 0 => off
 
@@ -225,6 +224,24 @@ BEGIN  -- beh
   ADC_nCS      <= '0';
   ADC_CLK      <= '0';
 
+ 
+  -----------------------------------------------------------------------------
+  lpp_debug_dma_singleOrBurst_1: lpp_debug_dma_singleOrBurst
+    GENERIC MAP (
+      tech   => apa3e,
+      hindex => 1,
+      pindex => 5,
+      paddr  => 5,
+      pmask  => 16#fff#)
+    PORT MAP (
+      HCLK    => clk_25,
+      HRESETn => reset ,
+      ahbmi   => ahbi_m_ext ,
+      ahbmo   => ahbo_m_ext(1),
+      apbi    => apbi_ext,
+      apbo    => apbo_ext(5));
+  
+  -----------------------------------------------------------------------------
 
   leon3_soc_1: leon3_soc
     GENERIC MAP (
