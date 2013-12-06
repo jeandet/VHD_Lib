@@ -77,6 +77,9 @@ ENTITY leon3_soc IS
     nSRAM_CE  : OUT   STD_LOGIC;
     nSRAM_OE  : OUT   STD_LOGIC;
 
+    -- APB --------------------------------------------------------------------
+    
+
     -- SPW --------------------------------------------------------------------
     spw1_din  : IN  STD_LOGIC;          -- PLE
     spw1_sin  : IN  STD_LOGIC;          -- PLE
@@ -115,7 +118,7 @@ ARCHITECTURE Behavioral OF leon3_soc IS
   SIGNAL gnd        : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL resetnl    : STD_ULOGIC;
   SIGNAL clk2x      : STD_ULOGIC;
-  SIGNAL lclk2x     : STD_ULOGIC;
+--  SIGNAL lclk2x     : STD_ULOGIC;
   SIGNAL lclk25MHz  : STD_ULOGIC;
   SIGNAL lclk50MHz  : STD_ULOGIC;
   SIGNAL lclk100MHz : STD_ULOGIC;
@@ -200,22 +203,9 @@ BEGIN
                  CFG_CLK_NOFB, 0, 0, 0, boardfreq, 0, 0, CFG_OCLKDIV)
     PORT MAP (lclk25MHz, lclk25MHz, clkm, clkmn, clk2x, sdclkl, pciclk, cgi, cgo);
 
-  PROCESS(lclk100MHz)
-  BEGIN
-    IF lclk100MHz'EVENT AND lclk100MHz = '1' THEN
-      lclk50MHz <= NOT lclk50MHz;
-    END IF;
-  END PROCESS;
 
-  PROCESS(lclk50MHz)
-  BEGIN
-    IF lclk50MHz'EVENT AND lclk50MHz = '1' THEN
-      lclk25MHz <= NOT lclk25MHz;
-    END IF;
-  END PROCESS;
 
-  lclk2x  <= lclk50MHz;
-  spw_clk <= lclk50MHz;
+--  lclk2x  <= lclk50MHz;
 
 ----------------------------------------------------------------------
 ---  LEON3 processor / DSU / IRQ  ------------------------------------
@@ -355,91 +345,6 @@ BEGIN
     apbuarti.ctsn   <= '0';
   END GENERATE;
   noua0 : IF CFG_UART1_ENABLE = 0 GENERATE apbo(1) <= apb_none; END GENERATE;
-  
------------------------------------------------------------------------
----  SpaceWire --------------------------------------------------------
------------------------------------------------------------------------
-
-  spw_rxtxclk <= spw_clk;
-  spw_rxclkn  <= NOT spw_rxtxclk;
-
-  -- PADS for SPW1
-  spw1_rxd_pad : inpad GENERIC MAP (tech => padtech)
-    PORT MAP (spw1_din, dtmp(0));
-  spw1_rxs_pad : inpad GENERIC MAP (tech => padtech)
-    PORT MAP (spw1_sin, stmp(0));
-  spw1_txd_pad : outpad GENERIC MAP (tech => padtech)
-    PORT MAP (spw1_dout, swno.d(0));
-  spw1_txs_pad : outpad GENERIC MAP (tech => padtech)
-    PORT MAP (spw1_sout, swno.s(0));
-  -- PADS FOR SPW2
-  spw2_rxd_pad : inpad GENERIC MAP (tech => padtech)
-    PORT MAP (spw2_din, dtmp(1));
-  spw2_rxs_pad : inpad GENERIC MAP (tech => padtech)
-    PORT MAP (spw2_sin, stmp(1));
-  spw2_txd_pad : outpad GENERIC MAP (tech => padtech)
-    PORT MAP (spw2_dout, swno.d(1));
-  spw2_txs_pad : outpad GENERIC MAP (tech => padtech)
-    PORT MAP (spw2_sout, swno.s(1));
-
-  -- GRSPW PHY
-  --spw1_input: if CFG_SPW_GRSPW = 1 generate
-  spw_inputloop : FOR j IN 0 TO 1 GENERATE
-    spw_phy0 : grspw_phy
-      GENERIC MAP(
-        tech         => fabtech,
-        rxclkbuftype => 1,
-        scantest     => 0)
-      PORT MAP(
-        rxrst    => swno.rxrst,
-        di       => dtmp(j),
-        si       => stmp(j),
-        rxclko   => spw_rxclk(j),
-        do       => swni.d(j),
-        ndo      => swni.nd(j*5+4 DOWNTO j*5),
-        dconnect => swni.dconnect(j*2+1 DOWNTO j*2));
-  END GENERATE spw_inputloop;
-
-  -- SPW core
-  sw0 : grspwm
-    GENERIC MAP(
-      tech         => apa3e,
-      hindex       => 1,
-      pindex       => 5,
-      paddr        => 5,
-      pirq         => 11,
-      sysfreq      => 25000,            -- CPU_FREQ
-      rmap         => 1,
-      rmapcrc      => 1,
-      fifosize1    => 16,
-      fifosize2    => 16,
-      rxclkbuftype => 1,
-      rxunaligned  => 0,
-      rmapbufs     => 4,
-      ft           => 0,
-      netlist      => 0,
-      ports        => 2,
-      --dmachan => CFG_SPW_DMACHAN, -- not used byt the spw core 1
-      memtech      => apa3e,
-      destkey      => 2,
-      spwcore      => 1
-      --input_type => CFG_SPW_INPUT, -- not used byt the spw core 1
-      --output_type => CFG_SPW_OUTPUT,  -- not used byt the spw core 1
-      --rxtx_sameclk => CFG_SPW_RTSAME -- not used byt the spw core 1
-      )
-    PORT MAP(rstn, clkm, spw_rxclk(0),
-             spw_rxclk(1), spw_rxtxclk, spw_rxtxclk,
-             ahbmi, ahbmo(1), apbi, apbo(5),
-             swni, swno);
-
-  swni.tickin      <= '0';
-  swni.rmapen      <= '1';
-  swni.clkdiv10    <= "00000100";       -- 50 MHz / (4 + 1) = 10 MHz
-  swni.tickinraw   <= '0';
-  swni.timein      <= (OTHERS => '0');
-  swni.dcrstval    <= (OTHERS => '0');
-  swni.timerrstval <= (OTHERS => '0');
-
 -------------------------------------------------------------------------------
 -- LFR
 -------------------------------------------------------------------------------

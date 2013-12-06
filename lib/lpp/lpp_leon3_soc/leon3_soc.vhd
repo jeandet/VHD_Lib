@@ -33,37 +33,43 @@ USE gaisler.misc.ALL;
 USE gaisler.spacewire.ALL;              -- PLE
 LIBRARY esa;
 USE esa.memoryctrl.ALL;
-USE work.config.ALL;
 LIBRARY lpp;
---use lpp.lpp_amba.all;
 USE lpp.lpp_memory.ALL;
 USE lpp.lpp_ad_conv.ALL;
-USE lpp.lpp_top_lfr_pkg.ALL;
---use lpp.lpp_uart.all;
---use lpp.lpp_matrix.all;
---use lpp.lpp_delay.all;
---use lpp.lpp_fft.all;
---use lpp.fft_components.all;
-use lpp.iir_filter.all;
+USE lpp.lpp_lfr_pkg.ALL;
+USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
---use lpp.Filtercfg.all;
-USE lpp.lpp_lfr_time_management.ALL;    -- PLE
---use lpp.lpp_lfr_spectral_matrices_DMA.all;  -- PLE
+USE lpp.lpp_lfr_time_management.ALL;
+USE lpp.lpp_leon3_soc_pkg.ALL;
 
-ENTITY leon3mp IS
+ENTITY leon3_soc IS
   GENERIC (
-    fabtech : INTEGER := CFG_FABTECH;
-    memtech : INTEGER := CFG_MEMTECH;
-    padtech : INTEGER := CFG_PADTECH;
-    clktech : INTEGER := CFG_CLKTECH;
-    disas   : INTEGER := CFG_DISAS;     -- Enable disassembly to console
-    dbguart : INTEGER := CFG_DUART;     -- Print UART on console
-    pclow   : INTEGER := CFG_PCLOW
+    fabtech : INTEGER := apa3e;
+    memtech : INTEGER := apa3e;
+    padtech : INTEGER := inferred;
+    clktech : INTEGER := inferred;
+    disas   : INTEGER := 0;     -- Enable disassembly to console
+    dbguart : INTEGER := 0;     -- Print UART on console
+    pclow   : INTEGER := 2;
+    --
+    clk_freq : INTEGER := 25000;       --kHz
+    --
+    NB_CPU      : INTEGER := 1;
+    ENABLE_FPU  : INTEGER := 1;
+    FPU_NETLIST : INTEGER := 1;
+    ENABLE_DSU : INTEGER := 1;
+    ENABLE_AHB_UART : INTEGER := 1;
+    ENABLE_APB_UART : INTEGER := 1;
+    ENABLE_IRQMP : INTEGER := 1;
+    ENABLE_GPT : INTEGER := 1;
+    --
+    NB_AHB_MASTER : INTEGER := 0;
+    NB_AHB_SLAVE  : INTEGER := 0;
+    NB_APB_SLAVE  : INTEGER := 0
     );
   PORT (
-    clk50MHz     : IN STD_ULOGIC;
-    clk49_152MHz : IN STD_ULOGIC;
-    reset        : IN STD_ULOGIC;
+    clk    : IN STD_ULOGIC;
+    reset  : IN STD_ULOGIC;
 
     errorn : OUT STD_ULOGIC;
 
@@ -86,43 +92,113 @@ ENTITY leon3mp IS
     nSRAM_CE  : OUT   STD_LOGIC;
     nSRAM_OE  : OUT   STD_LOGIC;
 
-    -- SPW --------------------------------------------------------------------
-    spw1_din  : IN  STD_LOGIC;          -- PLE
-    spw1_sin  : IN  STD_LOGIC;          -- PLE
-    spw1_dout : OUT STD_LOGIC;          -- PLE
-    spw1_sout : OUT STD_LOGIC;          -- PLE
-
-    -- ADC --------------------------------------------------------------------
-    bias_fail_sw   : OUT STD_LOGIC;
-    ADC_OEB_bar_CH : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-    ADC_smpclk     : OUT STD_LOGIC;
-    ADC_data       : IN  STD_LOGIC_VECTOR(13 DOWNTO 0);
+    -- APB --------------------------------------------------------------------
+    apbi_ext    : OUT apb_slv_in_type;
+    apbo_ext    : IN  soc_apb_slv_out_vector(NB_APB_SLAVE-1+5  DOWNTO 5);
+    -- AHB_Slave --------------------------------------------------------------
+    ahbi_s_ext  : OUT ahb_slv_in_type;
+    ahbo_s_ext  : IN  soc_ahb_slv_out_vector(NB_AHB_SLAVE-1+3  DOWNTO 3);
+    -- AHB_Master -------------------------------------------------------------
+    ahbi_m_ext  : OUT AHB_Mst_In_Type;
+    ahbo_m_ext  : IN  soc_ahb_mst_out_vector(NB_AHB_MASTER-1+NB_CPU DOWNTO NB_CPU)
     
-    ---------------------------------------------------------------------------
-    led : OUT STD_LOGIC_VECTOR(2 DOWNTO 0)
     );
 END;
 
-ARCHITECTURE Behavioral OF leon3mp IS
+ARCHITECTURE Behavioral OF leon3_soc IS
 
---constant maxahbmsp : integer := CFG_NCPU+CFG_AHB_UART+
---      CFG_GRETH+CFG_AHB_JTAG;
-  CONSTANT maxahbmsp : INTEGER := CFG_NCPU+
-                                  CFG_AHB_UART+
-                                  CFG_GRETH+
-                                  CFG_AHB_JTAG
-                                  +2;  -- 1 is for the SpaceWire module grspw2, which is a master
-  CONSTANT maxahbm : INTEGER := maxahbmsp;
+  -----------------------------------------------------------------------------
+  -- CONFIG -------------------------------------------------------------------
+  -----------------------------------------------------------------------------
 
---Clk & Rst géné
-  SIGNAL vcc        : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL gnd        : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL resetnl    : STD_ULOGIC;
+  -- Clock generator
+  constant CFG_CLKMUL : integer := (1);
+  constant CFG_CLKDIV : integer := (1); -- divide 50MHz by 2 to get 25MHz
+  constant CFG_OCLKDIV : integer := (1);
+  constant CFG_CLK_NOFB : integer := 0;
+  -- LEON3 processor core
+  constant CFG_LEON3 : integer := 1;
+  constant CFG_NCPU  : integer := NB_CPU;
+  constant CFG_NWIN  : integer := (8); -- to be compatible with BCC and RCC
+  constant CFG_V8    : integer := 0;
+  constant CFG_MAC   : integer := 0;
+  constant CFG_SVT    : integer := 0;
+  constant CFG_RSTADDR : integer := 16#00000#;
+  constant CFG_LDDEL : integer := (1);
+  constant CFG_NWP : integer := (0);
+  constant CFG_PWD : integer := 1*2;
+  constant CFG_FPU : integer := ENABLE_FPU *(8 + 16 * FPU_NETLIST);
+  -- 1*(8 + 16 * 0) => grfpu-light
+  -- 1*(8 + 16 * 1) => netlist
+  -- 0*(8 + 16 * 0) => No FPU
+  -- 0*(8 + 16 * 1) => No FPU;
+  constant CFG_ICEN : integer := 1;
+  constant CFG_ISETS : integer := 1;
+  constant CFG_ISETSZ : integer := 4;
+  constant CFG_ILINE : integer := 4;
+  constant CFG_IREPL : integer := 0;
+  constant CFG_ILOCK : integer := 0;
+  constant CFG_ILRAMEN : integer := 0;
+  constant CFG_ILRAMADDR: integer := 16#8E#;
+  constant CFG_ILRAMSZ : integer := 1;
+  constant CFG_DCEN : integer := 1;
+  constant CFG_DSETS : integer := 1;
+  constant CFG_DSETSZ : integer := 4;
+  constant CFG_DLINE : integer := 4;
+  constant CFG_DREPL : integer := 0;
+  constant CFG_DLOCK : integer := 0;
+  constant CFG_DSNOOP : integer := 0 + 0 + 4*0;
+  constant CFG_DLRAMEN : integer := 0;
+  constant CFG_DLRAMADDR: integer := 16#8F#;
+  constant CFG_DLRAMSZ : integer := 1;
+  constant CFG_MMUEN : integer := 0;
+  constant CFG_ITLBNUM : integer := 2;
+  constant CFG_DTLBNUM : integer := 2;
+  constant CFG_TLB_TYPE : integer := 1 + 0*2;
+  constant CFG_TLB_REP : integer := 1;
+  
+  constant CFG_DSU : integer := ENABLE_DSU;
+  constant CFG_ITBSZ : integer := 0;
+  constant CFG_ATBSZ : integer := 0;
+
+  -- AMBA settings
+  constant CFG_DEFMST : integer := (0);
+  constant CFG_RROBIN : integer := 1;
+  constant CFG_SPLIT : integer := 0;
+  constant CFG_AHBIO : integer := 16#FFF#;
+  constant CFG_APBADDR : integer := 16#800#;
+
+  -- DSU UART
+  constant CFG_AHB_UART : integer := ENABLE_AHB_UART;
+
+  -- LEON2 memory controller
+  constant CFG_MCTRL_SDEN : integer := 0;
+  
+  -- UART 1
+  constant CFG_UART1_ENABLE : integer := ENABLE_APB_UART;
+  constant CFG_UART1_FIFO : integer := 1;
+
+  -- LEON3 interrupt controller
+  constant CFG_IRQ3_ENABLE : integer := ENABLE_IRQMP;
+
+  -- Modular timer
+  constant CFG_GPT_ENABLE : integer := ENABLE_GPT;
+  constant CFG_GPT_NTIM : integer := (2);
+  constant CFG_GPT_SW : integer := (8);
+  constant CFG_GPT_TW : integer := (32);
+  constant CFG_GPT_IRQ : integer := (8);
+  constant CFG_GPT_SEPIRQ : integer := 1;
+  constant CFG_GPT_WDOGEN : integer := 0;
+  constant CFG_GPT_WDOG : integer := 16#0#;
+  -----------------------------------------------------------------------------
+
+  -----------------------------------------------------------------------------
+  -- SIGNALs
+  -----------------------------------------------------------------------------
+  CONSTANT maxahbmsp : INTEGER := CFG_NCPU + CFG_AHB_UART + NB_AHB_MASTER;
+  -- CLK & RST --
   SIGNAL clk2x      : STD_ULOGIC;
-  SIGNAL lclk2x     : STD_ULOGIC;
-  SIGNAL lclk25MHz  : STD_ULOGIC;
-  SIGNAL lclk50MHz  : STD_ULOGIC;
-  SIGNAL lclk100MHz : STD_ULOGIC;
+  SIGNAL clkmn       : STD_ULOGIC;
   SIGNAL clkm       : STD_ULOGIC;
   SIGNAL rstn       : STD_ULOGIC;
   SIGNAL rstraw     : STD_ULOGIC;
@@ -130,66 +206,35 @@ ARCHITECTURE Behavioral OF leon3mp IS
   SIGNAL sdclkl     : STD_ULOGIC;
   SIGNAL cgi        : clkgen_in_type;
   SIGNAL cgo        : clkgen_out_type;
---- AHB / APB
+  --- AHB / APB
   SIGNAL apbi       : apb_slv_in_type;
   SIGNAL apbo       : apb_slv_out_vector := (OTHERS => apb_none);
   SIGNAL ahbsi      : ahb_slv_in_type;
   SIGNAL ahbso      : ahb_slv_out_vector := (OTHERS => ahbs_none);
   SIGNAL ahbmi      : ahb_mst_in_type;
   SIGNAL ahbmo      : ahb_mst_out_vector := (OTHERS => ahbm_none);
---UART
+  --UART
   SIGNAL ahbuarti   : uart_in_type;
   SIGNAL ahbuarto   : uart_out_type;
   SIGNAL apbuarti   : uart_in_type;
   SIGNAL apbuarto   : uart_out_type;
---MEM CTRLR
+  --MEM CTRLR
   SIGNAL memi       : memory_in_type;
   SIGNAL memo       : memory_out_type;
   SIGNAL wpo        : wprot_out_type;
   SIGNAL sdo        : sdram_out_type;
-  SIGNAL ramcs      : STD_ULOGIC;
---IRQ
+  --IRQ
   SIGNAL irqi       : irq_in_vector(0 TO CFG_NCPU-1);
   SIGNAL irqo       : irq_out_vector(0 TO CFG_NCPU-1);
---Timer
+  --Timer
   SIGNAL gpti       : gptimer_in_type;
   SIGNAL gpto       : gptimer_out_type;
---GPIO
-  SIGNAL gpioi      : gpio_in_type;
-  SIGNAL gpioo      : gpio_out_type;
---DSU
+  --DSU
   SIGNAL dbgi       : l3_debug_in_vector(0 TO CFG_NCPU-1);
   SIGNAL dbgo       : l3_debug_out_vector(0 TO CFG_NCPU-1);
   SIGNAL dsui       : dsu_in_type;
   SIGNAL dsuo       : dsu_out_type;
-
----------------------------------------------------------------------
----  AJOUT TEST ------------------------Signaux----------------------
----------------------------------------------------------------------
-
----------------------------------------------------------------------
-  CONSTANT IOAEN     : INTEGER := CFG_CAN;
-  CONSTANT boardfreq : INTEGER := 25000;  -- the board frequency (lclk) is 50 MHz
-
--- time management signal
-  SIGNAL coarse_time : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL fine_time   : STD_LOGIC_VECTOR(31 DOWNTO 0);
-
--- Spacewire signals
-  SIGNAL dtmp   : STD_ULOGIC;           -- PLE
-  SIGNAL stmp   : STD_ULOGIC;           -- PLE
-  SIGNAL rxclko : STD_ULOGIC;           -- PLE
-  SIGNAL swni   : grspw_in_type;        -- PLE
-  SIGNAL swno   : grspw_out_type;       -- PLE
-  SIGNAL clkmn  : STD_ULOGIC;           -- PLE
-  SIGNAL txclk  : STD_ULOGIC;           -- PLE 2013 02 14
-
--- AD Converter RHF1401
-  SIGNAL sample     :  Samples14v(7 DOWNTO 0);
-  SIGNAL sample_val :  STD_LOGIC;
   -----------------------------------------------------------------------------
-  SIGNAL ADC_OEB_bar_CH_s : STD_LOGIC_VECTOR(7 DOWNTO 0);
-
 BEGIN
 
 
@@ -197,34 +242,15 @@ BEGIN
 ---  Reset and Clock generation  -------------------------------------
 ----------------------------------------------------------------------
   
-  vcc         <= (OTHERS => '1'); gnd <= (OTHERS => '0');
-  cgi.pllctrl <= "00"; cgi.pllrst <= rstraw;
+  cgi.pllctrl <= "00";
+  cgi.pllrst  <= rstraw;
 
   rst0 : rstgen PORT MAP (reset, clkm, cgo.clklock, rstn, rstraw);
 
-
-  clk_pad : clkpad GENERIC MAP (tech => padtech) PORT MAP (clk50MHz, lclk100MHz);
-  
   clkgen0 : clkgen                      -- clock generator
     GENERIC MAP (clktech, CFG_CLKMUL, CFG_CLKDIV, CFG_MCTRL_SDEN,
-                 CFG_CLK_NOFB, 0, 0, 0, boardfreq, 0, 0, CFG_OCLKDIV)
-    PORT MAP (lclk25MHz, lclk25MHz, clkm, clkmn, clk2x, sdclkl, pciclk, cgi, cgo); 
-
-  PROCESS(lclk100MHz)
-  BEGIN
-    IF lclk100MHz'EVENT AND lclk100MHz = '1' THEN
-      lclk50MHz <= NOT lclk50MHz;
-    END IF;
-  END PROCESS;
-
-  PROCESS(lclk50MHz)
-  BEGIN
-    IF lclk50MHz'EVENT AND lclk50MHz = '1' THEN
-      lclk25MHz <= NOT lclk25MHz;
-    END IF;
-  END PROCESS;
-
-  lclk2x <= lclk50MHz;
+                 CFG_CLK_NOFB, 0, 0, 0, clk_freq, 0, 0, CFG_OCLKDIV)
+    PORT MAP (clk, clk, clkm, clkmn, clk2x, sdclkl, pciclk, cgi, cgo);
 
 ----------------------------------------------------------------------
 ---  LEON3 processor / DSU / IRQ  ------------------------------------
@@ -251,12 +277,13 @@ BEGIN
         PORT MAP (rstn, clkm, ahbmi, ahbsi, ahbso(2), dbgo, dbgi, dsui, dsuo);
       dsui.enable <= '1';
       dsui.break  <= '0';
-      led(2)      <= dsuo.active;
     END GENERATE;
   END GENERATE;
 
   nodsu : IF CFG_DSU = 0 GENERATE
-    ahbso(2) <= ahbs_none; dsuo.tstop <= '0'; dsuo.active <= '0';
+    ahbso(2) <= ahbs_none;
+    dsuo.tstop <= '0';
+    dsuo.active <= '0';
   END GENERATE;
 
   irqctrl : IF CFG_IRQ3_ENABLE /= 0 GENERATE
@@ -283,9 +310,9 @@ BEGIN
     PORT MAP (rstn, clkm, memi, memo, ahbsi, ahbso(0), apbi, apbo(0), wpo, sdo);
 
   memi.brdyn  <= '1';
-  memi.bexcn <= '1';
+  memi.bexcn  <= '1';
   memi.writen <= '1';
-  memi.wrn <= "1111";
+  memi.wrn    <= "1111";
   memi.bwidth <= "10";
 
   bdr : FOR i IN 0 TO 3 GENERATE
@@ -314,7 +341,7 @@ BEGIN
   ahb0 : ahbctrl                        -- AHB arbiter/multiplexer
     GENERIC MAP (defmast => CFG_DEFMST, split => CFG_SPLIT,
                  rrobin  => CFG_RROBIN, ioaddr => CFG_AHBIO,
-                 ioen    => IOAEN, nahbm => maxahbm, nahbs => 8)
+                 ioen    => 0, nahbm => maxahbmsp, nahbs => 8)
     PORT MAP (rstn, clkm, ahbmi, ahbmo, ahbsi, ahbso);
 
 ----------------------------------------------------------------------
@@ -322,12 +349,10 @@ BEGIN
 ----------------------------------------------------------------------
   dcomgen : IF CFG_AHB_UART = 1 GENERATE
     dcom0 : ahbuart
-      GENERIC MAP ( hindex => 3, pindex => 4, paddr => 4)
-      PORT MAP    ( rstn, clkm, ahbuarti, ahbuarto, apbi, apbo(4), ahbmi, ahbmo(3));
-    dsurx_pad : inpad  GENERIC MAP (tech => padtech) PORT MAP (ahbrxd, ahbuarti.rxd);
+      GENERIC MAP (hindex => maxahbmsp-1, pindex => 4, paddr => 4)
+      PORT MAP (rstn, clkm, ahbuarti, ahbuarto, apbi, apbo(4), ahbmi, ahbmo(maxahbmsp-1));
+    dsurx_pad : inpad GENERIC MAP (tech  => padtech) PORT MAP (ahbrxd, ahbuarti.rxd);
     dsutx_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (ahbtxd, ahbuarto.txd);
-    led(0) <= NOT ahbuarti.rxd;
-    led(1) <= NOT ahbuarto.txd;
   END GENERATE;
   nouah : IF CFG_AHB_UART = 0 GENERATE apbo(4) <= apb_none; END GENERATE;
 
@@ -367,90 +392,33 @@ BEGIN
     apbuarti.ctsn   <= '0';
   END GENERATE;
   noua0 : IF CFG_UART1_ENABLE = 0 GENERATE apbo(1) <= apb_none; END GENERATE;
-
+  
 -------------------------------------------------------------------------------
--- APB_LFR_TIME_MANAGEMENT ----------------------------------------------------
+-- AMBA BUS -------------------------------------------------------------------
 -------------------------------------------------------------------------------
-spw: IF CFG_SPW_ENABLE /= 0 GENERATE
-  lfrtimemanagement0 : apb_lfr_time_management
-    GENERIC MAP(pindex    => 6, paddr => 6, pmask => 16#fff#,
-                masterclk => 25000000, timeclk => 49152000, finetimeclk => 65536,
-                pirq      => 12)
-    PORT MAP(clkm, clk49_152MHz, rstn, swno.tickout, apbi, apbo(6),
-             coarse_time, fine_time);
-END GENERATE;
-IF CFG_SPW_ENABLE = 0 GENERATE
-    apbo(6)  <=  apb_none;
-END GENERATE;
------------------------------------------------------------------------
----  SpaceWire --------------------------------------------------------
------------------------------------------------------------------------
-spw: IF CFG_SPW_ENABLE /= 0 GENERATE
-  spw_phy0 : grspw2_phy
-    GENERIC MAP(
-      scantest   => 0,
-      tech       => memtech,
-      input_type => 0)                  -- self_clocking mode
-    PORT MAP(
-      rstn     => rstn,
-      rxclki   => clkm,
-      rxclkin  => clkmn,
-      nrxclki  => clkm,  -- not used in self-clocking
-      di       => dtmp,
-      si       => stmp,
-      do       => swni.d(1 DOWNTO 0),
-      dov      => swni.dv(1 DOWNTO 0),
-      dconnect => swni.dconnect(1 DOWNTO 0),
-      rxclko   => rxclko);
 
-  sw0 : grspwm
-    GENERIC MAP(
-      tech         => apa3e,
-      hindex       => 1,
-      pindex       => 5,
-      paddr        => 5,
-      pirq         => 11,
-      sysfreq      => 25000,
-      usegen       => 1,  -- sysfreq not used by the core version 2? usegen?
-      nsync        => 1,  -- nsync not used by the core version 2?
-      rmap         => 1,
-      rmapcrc      => 1,
-      fifosize1    => 16,
-      fifosize2    => 16,
-      rxclkbuftype => 2,
-      rxunaligned  => 0,
-      spwcore      => 2,
-      memtech      => apa3e,
-      nodeaddr     => 254,
-      destkey      => 2,  -- added nodeaddr and destkey parameters
-      rmapbufs     => 4,
-      netlist      => 0,
-      ft           => 0,
-      ports        => 2)
-    PORT MAP(
-      rstn, clkm,
-      rxclko, rxclko,
-      txclk, txclk,
-      ahbmi, ahbmo(1),
-      apbi, apbo(5),
-      swni, swno);
-
-  swni.tickin   <= '0';
-  swni.rmapen   <= '1';
-  swni.clkdiv10 <= "00001001";
-
-  spw1_dout <= swno.d(0);
-  spw1_sout <= swno.s(0);
-  dtmp      <= spw1_din;
-  stmp      <= spw1_sin;
-
-  txclk <= lclk100MHz;
-
-  END GENERATE;
-  IF CFG_SPW_ENABLE = 0 GENERATE
-    ahbmo(1) <=  ahbm_none;
-    apbo(5)  <=  apb_none;
-  END GENERATE;
+  -- APB --------------------------------------------------------------------
+  apbi_ext   <= apbi;
+  all_apb: FOR I IN 0 TO NB_APB_SLAVE-1 GENERATE
+    max_16_apb: IF I + 5 < 16 GENERATE
+      apbo(I+5)<= apbo_ext(I+5);
+    END GENERATE max_16_apb;
+  END GENERATE all_apb;
+  -- AHB_Slave --------------------------------------------------------------
+  ahbi_s_ext <= ahbsi;
+  all_ahbs: FOR I IN 0 TO NB_AHB_SLAVE-1 GENERATE
+    max_16_ahbs: IF I + 3 < 16 GENERATE
+      ahbso(I+3) <= ahbo_s_ext(I+3);
+    END GENERATE max_16_ahbs;
+  END GENERATE all_ahbs;
+  -- AHB_Master -------------------------------------------------------------
+  ahbi_m_ext <= ahbmi;
+  all_ahbm: FOR I IN 0 TO NB_AHB_SLAVE-1 GENERATE
+    max_16_ahbm: IF I + CFG_NCPU + CFG_AHB_UART < 16 GENERATE
+      ahbmo(I + CFG_NCPU) <= ahbo_m_ext(I+CFG_NCPU);
+    END GENERATE max_16_ahbm;
+  END GENERATE all_ahbm;
 
   
+
 END Behavioral;

@@ -21,3 +21,4 @@
 ./lpp_waveform
 ./lpp_top_lfr
 ./lpp_Header
+./lpp_leon3_soc

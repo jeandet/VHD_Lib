@@ -10,9 +10,7 @@ QSF=$(VHDLIB)/boards/$(BOARD)/$(TOP).qsf
 EFFORT=high
 XSTOPT=
 SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_constraint 0"
-VHDLSYNFILES=	config.vhd \
-		MINI_LFR_top.vhd \
-		leon3_soc.vhd
+VHDLSYNFILES=	MINI_LFR_top.vhd 
 
 PDC=$(VHDLIB)/boards/$(BOARD)/default.pdc
 BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut
