@@ -54,6 +54,6 @@ begin
         end if;
     end process;
 
-sclk <= clockint(N);
+sclk <= clk when N=0 else clockint(N-1);
 
 end architecture;

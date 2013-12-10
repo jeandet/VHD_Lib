@@ -90,8 +90,8 @@ enable <= Rec.DAC_Cfg(0);
 N <= to_integer(unsigned(Rec.CLK_Cfg));
 
     CLK0 : Clock_Divider
-        generic map (250)
-        port map (clk,rst,clkdiv); --clkdiv = 100KHz
+        generic map (308)        --clkdiv = 80KHz
+        port map (clk,rst,clkdiv);
 
     CLKSET : ClkSetting
         generic map(Nmax)
