@@ -27,42 +27,78 @@ use IEEE.numeric_std.all;
 
 entity Gene_SYNC is
   port(
-    SCLK,raz : in std_logic;     --! Horloge systeme et Reset du composant
+    SysClk,raz : in std_logic;     --! Horloge systeme et Reset du composant
+    SCLK : in std_logic;
     enable : in std_logic;       --! Autorise ou non l'utilisation du composant
-    Send : out std_logic;   --! Flag, Autorise l'envoi (sérialisation) d'une nouvelle donnée
+    sended : in std_logic;
+    send : out std_logic;   --! Flag, Autorise l'envoi (sérialisation) d'une nouvelle donnée
+    Readn : out std_logic;
     SYNC : out std_logic         --! Signal de synchronisation du convertisseur généré
     );
 end Gene_SYNC;
 
---! @details NB: Ce programme est uniquement synchronisé sur l'horloge Systeme (sclk)
 
 architecture ar_Gene_SYNC of Gene_SYNC is
 
-signal count : integer;
+--signal count : integer;
+signal SysClk_reg : std_logic;
+
+type etat is (e0,e1,e2,e3);
+signal ect : etat;
 
 begin 
     process (SCLK,raz)
     begin
         if(raz='0')then
-            SYNC <= '0';
-            count <= 14;  
+            ect <= e0;
+            SYNC <= '1';
+            Readn <= '1';
+----            count <= 14;  
             Send <= '0';
         
-        elsif(SCLK' event and SCLK='1')then    
+        elsif(SCLK' event and SCLK='1')then 
+            SysClk_reg <= SysClk;
+               
             if(enable='1')then
+                
+                case ect is
+                    when e0 => 
+                        if(SysClk_reg='0' and SysClk='1')then
+--                            SYNC <= '0';
+                            Readn <= '0';
+                            Send <= '1';
+                            ect <= e1;
+                        end if;
+                
+                    when e1 =>
+                        Readn <= '1';
+--                        SYNC <= '0';
+                        send <= '0';
+                        ect <= e2;
 
-                if(count=15)then
-                    SYNC <= '1';
-                    count <= count+1;
-                elsif(count=16)then
-                    count <= 0;
-                    SYNC <= '0';
-                    Send <= '1';
-                else
-                    count <= count+1;
-                    Send <= '0';
-                end if;
+                    when e2 =>
+                        SYNC <= '0';
+                        ect <= e3;
 
+                    when e3 =>
+                        if(sended='1')then
+                            SYNC <= '1';                            
+                            ect <= e0;
+                        end if;
+                        
+--                        if(count=15)then
+--                            SYNC <= '1';
+--                            count <= count+1;
+--                        if(Ready='1')then
+----                            count <= 0;
+--                            SYNC <= '1';
+--                            
+--                            ect <= e0;
+----                            count <= count+1;
+--                            Send <= '0';                           
+--                        end if;
+
+                end case;
             end if;
       	end if;
     end process;

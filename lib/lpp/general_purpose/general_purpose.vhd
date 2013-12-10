@@ -269,4 +269,11 @@ Constant ctrl_CLRMAC : std_logic_vector(2 downto 0) := "100";
       A_sync : OUT STD_LOGIC);
   END COMPONENT;
 
+COMPONENT Clock_Divider is
+generic(N :integer := 10);
+port( 
+    clk, rst   : in std_logic;
+    sclk       : out std_logic);
+end COMPONENT;
+
 END;

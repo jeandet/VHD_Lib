@@ -22,50 +22,52 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+library lpp;
 use lpp.lpp_cna.all;
 
 --! Programme du Convertisseur Numérique/Analogique
 
 entity DacDriver is
-generic(cpt_serial : integer := 6);  --! Générique contenant le résultat de la division clk/sclk  !!! clk=25Mhz
+--generic(cpt_serial : integer := 6);  --! Générique contenant le résultat de la division clk/sclk  !!! clk=25Mhz
   port(
     clk         : in std_logic;                        --! Horloge du composant
     rst         : in std_logic;                        --! Reset general du composant
+    SysClk      : in std_logic;
     enable      : in std_logic;                        --! Autorise ou non l'utilisation du composant
-    Data_IN      : in std_logic_vector(15 downto 0);    --! Donnée Numérique d'entrée sur 16 bits
+    Data_IN     : in std_logic_vector(15 downto 0);    --! Donnée Numérique d'entrée sur 16 bits
     SYNC        : out std_logic;                       --! Signal de synchronisation du convertisseur
     SCLK        : out std_logic;                       --! Horloge systeme du convertisseur
     Readn       : out std_logic;
-    Ready     : out std_logic;                       --! Flag, signale la fin de la sérialisation d'une donnée
+--    Ready       : out std_logic;                       --! Flag, signale la fin de la sérialisation d'une donnée
     Data        : out std_logic                        --! Donnée numérique sérialisé
     );
 end entity;
 
---! @details Un driver C va permettre de génerer un tableau de données sur 16 bits, 
---! qui seront sérialisé pour étre ensuite dirigées vers le convertisseur.
 
 architecture ar_DacDriver of DacDriver is
 
-signal s_SCLK      : std_logic;
+--signal s_SCLK      : std_logic;
 signal Send    : std_logic;
+signal Sended : std_logic;
 
 begin
 
-SystemCLK : Systeme_Clock
-    generic map (cpt_serial)
-    port map (clk,rst,s_SCLK);
+--SystemCLK : entity work.Clock_Divider
+--    generic map (cpt_serial)
+--    port map (clk,rst,s_SCLK);
 
 
 Signal_sync : Gene_SYNC
-    port map (s_SCLK,rst,enable,Send,SYNC);
+    port map (SysClk,rst,clk,enable,Sended,Send,Readn,SYNC);
 
 
 Serial : serialize
-    port map (clk,rst,s_SCLK,Data_IN,Send,Ready,Data);
+    port map (clk,rst,clk,Data_IN,Send,Sended,Data);
 
-RenGEN : ReadFifo_GEN
-    port map (clk,rst,Send,Readn);
+--RenGEN : entity work.ReadFifo_GEN
+--    port map (clk,rst,Send,Readn);
 
-SCLK        <= s_SCLK;
+SCLK        <= clk;
+--Ready <= s_Rdy;
 
 end architecture;

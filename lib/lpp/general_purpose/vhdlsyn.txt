@@ -16,3 +16,4 @@ REG.vhd
 SYNC_FF.vhd
 Shifter.vhd
 TwoComplementer.vhd
+Clock_Divider.vhd

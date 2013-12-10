@@ -36,6 +36,7 @@ constant LPP_USB   : amba_device_type := 16#15#;
 constant LPP_DELAY   : amba_device_type := 16#16#;
 constant LPP_DMA_TYPE   : amba_device_type := 16#17#;
 constant LPP_BOOTLOADER_TYPE   : amba_device_type := 16#18#;
+constant LPP_CLKSETTING   : amba_device_type := 16#20#;
 
 
 end;

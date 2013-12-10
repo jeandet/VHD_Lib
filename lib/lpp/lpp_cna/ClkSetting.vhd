@@ -22,40 +22,38 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+use IEEE.std_logic_arith.all; 
+use IEEE.std_logic_unsigned.all;
 
---! Programme qui va permetre de générer l'horloge systeme (sclk)
+--! Programme qui va permetre de générer une horloge systeme (sclk) parametrable
 
-entity Systeme_Clock is
-  generic(N :integer := 695);   --! Générique contenant le résultat de la division clk/sclk
-  port(
-    clk, raz   : in std_logic;   --! Horloge et Reset globale du composant
+entity ClkSetting is
+generic(Nmax    : integer := 7);   
+port( 
+    clk, rst   : in std_logic;   --! Horloge et Reset globale
+    N          : in integer range 0 to Nmax;
     sclk       : out std_logic   --! Horloge Systeme générée
-    );
-end Systeme_Clock;
+);
+end entity;
 
 --! @details Fonctionne a base d'un compteur (countint) qui va permetre de diviser l'horloge N fois
+architecture ar_ClkSetting of ClkSetting is
 
-architecture ar_Systeme_Clock of Systeme_Clock is
-
-signal clockint : std_logic;
-signal countint : integer range 0 to N/2-1;
+signal clockint : std_logic_vector(Nmax downto 0);
 
 begin 
-    process (clk,raz)
+    process (clk,rst)
         begin
-        if(raz = '0') then
-            countint <= 0;
-            clockint <= '0';
+        if(rst = '0') then
+            clockint <= (others => '0');
+        
         elsif (clk' event and clk='1') then
-            if (countint = N/2-1) then 
-                countint <= 0;
-                clockint <= not clockint;
-            else 
-                countint <= countint+1;
-            end if;
+
+            clockint <= clockint + 1;
+
         end if;
     end process;
 
-sclk <= clockint;
+sclk <= clockint(N);
 
-end ar_Systeme_Clock;
+end architecture;
