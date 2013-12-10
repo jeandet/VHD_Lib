@@ -39,13 +39,13 @@ USE techmap.gencomp.ALL;
 ENTITY lpp_waveform IS
   
   GENERIC (
-    tech                    : INTEGER := inferred;
-    data_size               : INTEGER := 96;  --16*6
-    nb_data_by_buffer_size  : INTEGER := 11;
-    nb_word_by_buffer_size  : INTEGER := 11;
-    nb_snapshot_param_size  : INTEGER := 11;
-    delta_vector_size       : INTEGER := 20;
-    delta_vector_size_f0_2  : INTEGER := 3);
+    tech                   : INTEGER := inferred;
+    data_size              : INTEGER := 96;  --16*6
+    nb_data_by_buffer_size : INTEGER := 11;
+    nb_word_by_buffer_size : INTEGER := 11;
+    nb_snapshot_param_size : INTEGER := 11;
+    delta_vector_size      : INTEGER := 20;
+    delta_vector_size_f0_2 : INTEGER := 3);
 
   PORT (
     clk  : IN STD_LOGIC;
@@ -75,32 +75,32 @@ ENTITY lpp_waveform IS
 
     nb_data_by_buffer : IN  STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
     nb_word_by_buffer : IN  STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
-    nb_snapshot_param  : IN  STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
-    status_full        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    status_full_ack    : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    status_full_err    : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    status_new_err     : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);  -- New data f(i) before the current data is write by dma
+    nb_snapshot_param : IN  STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
+    status_full       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    status_full_ack   : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    status_full_err   : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    status_new_err    : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);  -- New data f(i) before the current data is write by dma
     ---------------------------------------------------------------------------
     -- INPUT
-    coarse_time : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    fine_time   : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    coarse_time       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+    fine_time         : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 
     --f0
-    addr_data_f0       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data_f0_in_valid   : IN STD_LOGIC;
-    data_f0_in         : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    addr_data_f0     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    data_f0_in_valid : IN STD_LOGIC;
+    data_f0_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
     --f1
-    addr_data_f1       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data_f1_in_valid   : IN STD_LOGIC;
-    data_f1_in         : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    addr_data_f1     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    data_f1_in_valid : IN STD_LOGIC;
+    data_f1_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
     --f2
-    addr_data_f2       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data_f2_in_valid   : IN STD_LOGIC;
-    data_f2_in         : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    addr_data_f2     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    data_f2_in_valid : IN STD_LOGIC;
+    data_f2_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
     --f3
-    addr_data_f3       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data_f3_in_valid   : IN STD_LOGIC;
-    data_f3_in         : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    addr_data_f3     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    data_f3_in_valid : IN STD_LOGIC;
+    data_f3_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
 
     ---------------------------------------------------------------------------
     -- OUTPUT
@@ -109,35 +109,35 @@ ENTITY lpp_waveform IS
     data_f0_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f0_data_out_valid       : OUT STD_LOGIC;
     data_f0_data_out_valid_burst : OUT STD_LOGIC;
-    data_f0_data_out_ren         : IN STD_LOGIC;
+    data_f0_data_out_ren         : IN  STD_LOGIC;
     --f1
     data_f1_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f1_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f1_data_out_valid       : OUT STD_LOGIC;
     data_f1_data_out_valid_burst : OUT STD_LOGIC;
-    data_f1_data_out_ren         : IN STD_LOGIC;
+    data_f1_data_out_ren         : IN  STD_LOGIC;
     --f2
     data_f2_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f2_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f2_data_out_valid       : OUT STD_LOGIC;
     data_f2_data_out_valid_burst : OUT STD_LOGIC;
-    data_f2_data_out_ren         : IN STD_LOGIC;
+    data_f2_data_out_ren         : IN  STD_LOGIC;
     --f3
     data_f3_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f3_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f3_data_out_valid       : OUT STD_LOGIC;
     data_f3_data_out_valid_burst : OUT STD_LOGIC;
-    data_f3_data_out_ren         : IN STD_LOGIC;
+    data_f3_data_out_ren         : IN  STD_LOGIC;
 
     --debug
-    debug_f0_data                : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    debug_f0_data_valid          : OUT STD_LOGIC;
-    debug_f1_data                : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    debug_f1_data_valid          : OUT STD_LOGIC;
-    debug_f2_data                : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    debug_f2_data_valid          : OUT STD_LOGIC;
-    debug_f3_data                : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    debug_f3_data_valid          : OUT STD_LOGIC    
+    debug_f0_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    debug_f0_data_valid : OUT STD_LOGIC;
+    debug_f1_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    debug_f1_data_valid : OUT STD_LOGIC;
+    debug_f2_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    debug_f2_data_valid : OUT STD_LOGIC;
+    debug_f3_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    debug_f3_data_valid : OUT STD_LOGIC
     );
 
 END lpp_waveform;
@@ -167,10 +167,10 @@ ARCHITECTURE beh OF lpp_waveform IS
   SIGNAL data_wen                   : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL time_wen                   : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL wdata                      : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL full_almost  : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL full         : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL empty_almost : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL empty        : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL full_almost                : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL full                       : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL empty_almost               : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL empty                      : STD_LOGIC_VECTOR(3 DOWNTO 0);
   --
   SIGNAL data_ren                   : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL time_ren                   : STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -179,13 +179,19 @@ ARCHITECTURE beh OF lpp_waveform IS
   --
   SIGNAL run                        : STD_LOGIC;
   --
-  TYPE TIME_VECTOR IS ARRAY (NATURAL RANGE <>) OF STD_LOGIC_VECTOR(47 DOWNTO 0); 
-  SIGNAL data_out  : Data_Vector(3 DOWNTO 0, 95 DOWNTO 0);
-  SIGNAL time_out_2  : Data_Vector(3 DOWNTO 0, 47 DOWNTO 0);
-  SIGNAL time_out  : TIME_VECTOR(3 DOWNTO 0);
-  SIGNAL time_out_debug   : TIME_VECTOR(3 DOWNTO 0);  -- TODO : debug
-  SIGNAL time_reg1 : STD_LOGIC_VECTOR(47 DOWNTO 0);
-  SIGNAL time_reg2 : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  TYPE   TIME_VECTOR IS ARRAY (NATURAL RANGE <>) OF STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL data_out                   : Data_Vector(3 DOWNTO 0, 95 DOWNTO 0);
+  SIGNAL time_out_2                 : Data_Vector(3 DOWNTO 0, 47 DOWNTO 0);
+  SIGNAL time_out                   : TIME_VECTOR(3 DOWNTO 0);
+  SIGNAL time_out_debug             : TIME_VECTOR(3 DOWNTO 0);  -- TODO : debug
+  SIGNAL time_reg1                  : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL time_reg2                  : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  --
+
+  SIGNAL s_empty_almost : STD_LOGIC_VECTOR(3 DOWNTO 0);  --occupancy is lesser than 16 * 32b
+  SIGNAL s_empty        : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL s_data_ren     : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL s_rdata        : STD_LOGIC_VECTOR(31 DOWNTO 0);
   
 BEGIN  -- beh
 
@@ -228,7 +234,7 @@ BEGIN  -- beh
       data_in_valid     => data_f0_in_valid,
       data_out          => data_f0_out,
       data_out_valid    => data_f0_out_valid);
-  
+
   nb_snapshot_param_more_one <= ('0' & nb_snapshot_param) + 1;
 
   lpp_waveform_snapshot_f1 : lpp_waveform_snapshot
@@ -295,12 +301,12 @@ BEGIN  -- beh
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
       time_reg1 <= (OTHERS => '0');
       time_reg2 <= (OTHERS => '0');
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
       time_reg1 <= fine_time & coarse_time;
       time_reg2 <= time_reg1;
     END IF;
   END PROCESS;
-  
+
   valid_in <= data_f3_out_valid & data_f2_out_valid & data_f1_out_valid & data_f0_out_valid;
   all_input_valid : FOR i IN 3 DOWNTO 0 GENERATE
     lpp_waveform_dma_genvalid_I : lpp_waveform_dma_genvalid
@@ -310,46 +316,48 @@ BEGIN  -- beh
         run       => run,
         valid_in  => valid_in(I),
         ack_in    => valid_ack(I),
-        time_in   => time_reg2,            -- Todo
+        time_in   => time_reg2,         -- Todo
         valid_out => valid_out(I),
-        time_out  => time_out(I),          -- Todo
+        time_out  => time_out(I),       -- Todo
         error     => status_new_err(I));
   END GENERATE all_input_valid;
 
-  all_bit_of_data_out: FOR I IN 95 DOWNTO 0 GENERATE
-    data_out(0,I) <= data_f0_out(I);
-    data_out(1,I) <= data_f1_out(I);
-    data_out(2,I) <= data_f2_out(I);
-    data_out(3,I) <= data_f3_out(I);
+  all_bit_of_data_out : FOR I IN 95 DOWNTO 0 GENERATE
+    data_out(0, I) <= data_f0_out(I);
+    data_out(1, I) <= data_f1_out(I);
+    data_out(2, I) <= data_f2_out(I);
+    data_out(3, I) <= data_f3_out(I);
   END GENERATE all_bit_of_data_out;
 
   -----------------------------------------------------------------------------
   -- TODO : debug
   -----------------------------------------------------------------------------
-  --all_bit_of_time_out: FOR I IN 47 DOWNTO 0 GENERATE
-  --  all_sample_of_time_out: FOR J IN 3 DOWNTO 0 GENERATE
-  --    time_out_2(J,I) <= time_out(J)(I);      
-  --  END GENERATE all_sample_of_time_out;
-  --END GENERATE all_bit_of_time_out;
-  
-  time_out_debug(0) <= x"0A0A" & x"0A0A0A0A";
-  time_out_debug(1) <= x"1B1B" & x"1B1B1B1B";
-  time_out_debug(2) <= x"2C2C" & x"2C2C2C2C";
-  time_out_debug(3) <= x"3D3D" & x"3D3D3D3D";
-  
   all_bit_of_time_out: FOR I IN 47 DOWNTO 0 GENERATE
     all_sample_of_time_out: FOR J IN 3 DOWNTO 0 GENERATE
-      time_out_2(J,I) <= time_out_debug(J)(I);      
+      time_out_2(J,I) <= time_out(J)(I);      
     END GENERATE all_sample_of_time_out;
   END GENERATE all_bit_of_time_out;
+
+  -- DEBUG --
+  --time_out_debug(0) <= x"0A0A" & x"0A0A0A0A";
+  --time_out_debug(1) <= x"1B1B" & x"1B1B1B1B";
+  --time_out_debug(2) <= x"2C2C" & x"2C2C2C2C";
+  --time_out_debug(3) <= x"3D3D" & x"3D3D3D3D";
+
+  --all_bit_of_time_out : FOR I IN 47 DOWNTO 0 GENERATE
+  --  all_sample_of_time_out : FOR J IN 3 DOWNTO 0 GENERATE
+  --    time_out_2(J, I) <= time_out_debug(J)(I);
+  --  END GENERATE all_sample_of_time_out;
+  --END GENERATE all_bit_of_time_out;
+  -- DEBUG --
   
   lpp_waveform_fifo_arbiter_1 : lpp_waveform_fifo_arbiter
-    GENERIC MAP (tech => tech,
-      nb_data_by_buffer_size =>nb_data_by_buffer_size)
+    GENERIC MAP (tech                   => tech,
+                 nb_data_by_buffer_size => nb_data_by_buffer_size)
     PORT MAP (
-      clk           => clk,
-      rstn          => rstn,
-      run           => run,
+      clk               => clk,
+      rstn              => rstn,
+      run               => run,
       nb_data_by_buffer => nb_data_by_buffer,
       data_in_valid     => valid_out,
       data_in_ack       => valid_ack,
@@ -358,33 +366,53 @@ BEGIN  -- beh
 
       data_out     => wdata,
       data_out_wen => data_wen,
-      full_almost         => full_almost,
+      full_almost  => full_almost,
       full         => full);
 
   lpp_waveform_fifo_1 : lpp_waveform_fifo
     GENERIC MAP (tech => tech)
     PORT MAP (
-      clk        => clk,
-      rstn       => rstn,
-      run        => run,
+      clk  => clk,
+      rstn => rstn,
+      run  => run,
 
-      empty        => empty,
-      empty_almost => empty_almost,
-    
-      data_ren   => data_ren,          
-      rdata      => rdata,
+      empty        => s_empty,
+      empty_almost => s_empty_almost,
+      data_ren     => s_data_ren,
+      rdata        => s_rdata,
 
-    
+
       full_almost => full_almost,
       full        => full,
       data_wen    => data_wen,
       wdata       => wdata);
 
-  data_f0_data_out <= rdata;
-  data_f1_data_out <= rdata;
-  data_f2_data_out <= rdata;
-  data_f3_data_out <= rdata;
-  
+  lpp_waveform_fifo_headreg_1 : lpp_waveform_fifo_headreg
+    GENERIC MAP (tech => tech)
+    PORT MAP (
+      clk            => clk,
+      rstn           => rstn,
+      run            => run,
+      o_empty_almost => empty_almost,
+      o_empty        => empty,
+
+      o_data_ren => data_ren,
+      o_rdata_0  => data_f0_data_out,
+      o_rdata_1  => data_f1_data_out,
+      o_rdata_2  => data_f2_data_out,
+      o_rdata_3  => data_f3_data_out,
+
+      i_empty_almost => s_empty_almost,
+      i_empty        => s_empty,
+      i_data_ren     => s_data_ren,
+      i_rdata        => s_rdata);
+
+
+  --data_f0_data_out <= rdata;
+  --data_f1_data_out <= rdata;
+  --data_f2_data_out <= rdata;
+  --data_f3_data_out <= rdata;
+
   data_ren <= data_f3_data_out_ren &
               data_f2_data_out_ren &
               data_f1_data_out_ren &
@@ -401,12 +429,12 @@ BEGIN  -- beh
       -------------------------------------------------------------------------
       -- CONFIG
       -------------------------------------------------------------------------
-      nb_data_by_buffer => nb_word_by_buffer, 
-      
-      addr_data_f0       => addr_data_f0,
-      addr_data_f1       => addr_data_f1,
-      addr_data_f2       => addr_data_f2,
-      addr_data_f3       => addr_data_f3,
+      nb_data_by_buffer => nb_word_by_buffer,
+
+      addr_data_f0 => addr_data_f0,
+      addr_data_f1 => addr_data_f1,
+      addr_data_f2 => addr_data_f2,
+      addr_data_f3 => addr_data_f3,
       -------------------------------------------------------------------------
       -- CTRL
       -------------------------------------------------------------------------
@@ -414,14 +442,14 @@ BEGIN  -- beh
       empty        => empty,
       empty_almost => empty_almost,
       data_ren     => data_ren,
-      
+
       -------------------------------------------------------------------------
       -- STATUS
       -------------------------------------------------------------------------
-      status_full        => status_full,
-      status_full_ack    => status_full_ack,
-      status_full_err    => status_full_err,
-      
+      status_full     => status_full,
+      status_full_ack => status_full_ack,
+      status_full_err => status_full_err,
+
       -------------------------------------------------------------------------
       -- ADDR DATA OUT
       -------------------------------------------------------------------------
@@ -429,16 +457,16 @@ BEGIN  -- beh
       data_f1_data_out_valid_burst => data_f1_data_out_valid_burst,
       data_f2_data_out_valid_burst => data_f2_data_out_valid_burst,
       data_f3_data_out_valid_burst => data_f3_data_out_valid_burst,
-      
-      data_f0_data_out_valid       => data_f0_data_out_valid,
-      data_f1_data_out_valid       => data_f1_data_out_valid,
-      data_f2_data_out_valid       => data_f2_data_out_valid,
-      data_f3_data_out_valid       => data_f3_data_out_valid,
-      
+
+      data_f0_data_out_valid => data_f0_data_out_valid,
+      data_f1_data_out_valid => data_f1_data_out_valid,
+      data_f2_data_out_valid => data_f2_data_out_valid,
+      data_f3_data_out_valid => data_f3_data_out_valid,
+
       data_f0_addr_out => data_f0_addr_out,
       data_f1_addr_out => data_f1_addr_out,
       data_f2_addr_out => data_f2_addr_out,
-      data_f3_addr_out => data_f3_addr_out 
+      data_f3_addr_out => data_f3_addr_out
       );
 
 END beh;

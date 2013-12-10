@@ -180,14 +180,14 @@ PACKAGE lpp_lfr_pkg IS
       addr_data_f3                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       start_date                             : OUT STD_LOGIC_VECTOR(30 DOWNTO 0);
       ---------------------------------------------------------------------------
-      debug_reg0   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg1   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg2   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg3   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg4   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg5   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg6   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg7   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0));
+      debug_reg0   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg1   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg2   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg3   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg4   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg5   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg6   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg7   : IN STD_LOGIC_VECTOR(31 DOWNTO 0));
   END COMPONENT;
   
   COMPONENT lpp_top_ms

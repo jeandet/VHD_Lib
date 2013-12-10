@@ -39,7 +39,7 @@ ENTITY lpp_lfr IS
 
     hindex : INTEGER := 2;
 
-    top_lfr_version : STD_LOGIC_VECTOR(31 DOWNTO 0)
+    top_lfr_version : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0')
 
     );
   PORT (
@@ -354,10 +354,10 @@ BEGIN
   debug_reg6 <= sample_f0_data(32*2-1 DOWNTO 32*1);
   debug_reg7 <= sample_f0_data(32*3-1 DOWNTO 32*2);
   -----------------------------------------------------------------------------
-  sample_f0_data_debug <= x"01234567" & x"89ABCDEF" & x"02481357";  -- TODO : debug
-  sample_f1_data_debug <= x"00112233" & x"44556677" & x"8899AABB";  -- TODO : debug
-  sample_f2_data_debug <= x"CDEF1234" & x"ABBAEFFE" & x"01103773";  -- TODO : debug
-  sample_f3_data_debug <= x"FEDCBA98" & x"76543210" & x"78945612";  -- TODO : debug
+  --sample_f0_data_debug <= x"01234567" & x"89ABCDEF" & x"02481357";  -- TODO : debug
+  --sample_f1_data_debug <= x"00112233" & x"44556677" & x"8899AABB";  -- TODO : debug
+  --sample_f2_data_debug <= x"CDEF1234" & x"ABBAEFFE" & x"01103773";  -- TODO : debug
+  --sample_f3_data_debug <= x"FEDCBA98" & x"76543210" & x"78945612";  -- TODO : debug
 
 
   -----------------------------------------------------------------------------
@@ -405,19 +405,19 @@ BEGIN
       --f0
       addr_data_f0                 => addr_data_f0,
       data_f0_in_valid             => sample_f0_val,
-      data_f0_in                   => sample_f0_data_debug,  -- TODO : debug
+      data_f0_in                   => sample_f0_data, -- sample_f0_data_debug,  -- TODO : debug
       --f1
       addr_data_f1                 => addr_data_f1,
       data_f1_in_valid             => sample_f1_val,
-      data_f1_in                   => sample_f1_data_debug,  -- TODO : debug,
+      data_f1_in                   => sample_f1_data, -- sample_f1_data_debug,  -- TODO : debug,
       --f2
       addr_data_f2                 => addr_data_f2,
       data_f2_in_valid             => sample_f2_val,
-      data_f2_in                   => sample_f2_data_debug,  -- TODO : debug,
+      data_f2_in                   => sample_f2_data, -- sample_f2_data_debug,  -- TODO : debug,
       --f3
       addr_data_f3                 => addr_data_f3,
       data_f3_in_valid             => sample_f3_val,
-      data_f3_in                   => sample_f3_data_debug,  -- TODO : debug,
+      data_f3_in                   => sample_f3_data, -- sample_f3_data_debug,  -- TODO : debug,
       -- OUTPUT -- DMA interface
       --f0
       data_f0_addr_out             => data_f0_addr_out_s,

@@ -251,6 +251,26 @@ PACKAGE lpp_waveform_pkg IS
       wdata        : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
   END COMPONENT;
 
+  COMPONENT lpp_waveform_fifo_headreg
+    GENERIC (
+      tech : INTEGER);
+    PORT (
+      clk            : IN  STD_LOGIC;
+      rstn           : IN  STD_LOGIC;
+      run            : IN  STD_LOGIC;
+      o_empty_almost : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      o_empty        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      o_data_ren     : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      o_rdata_0      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      o_rdata_1      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      o_rdata_2      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      o_rdata_3      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      i_empty_almost : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      i_empty        : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      i_data_ren     : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      i_rdata        : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
+  END COMPONENT;
+
   COMPONENT lpp_waveform_fifo_latencyCorrection
     GENERIC (
       tech : INTEGER);

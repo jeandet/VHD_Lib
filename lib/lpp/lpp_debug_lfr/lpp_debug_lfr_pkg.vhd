@@ -40,7 +40,10 @@ PACKAGE lpp_debug_lfr_pkg IS
       ahbmi   : IN  AHB_Mst_In_Type;
       ahbmo   : OUT AHB_Mst_Out_Type;
       apbi    : IN  apb_slv_in_type;
-      apbo    : OUT apb_slv_out_type);
+      apbo    : OUT apb_slv_out_type;
+      out_ren  : OUT STD_LOGIC;
+      out_send : OUT STD_LOGIC;
+      out_done : OUT STD_LOGIC  );
   END COMPONENT;
   
 END;

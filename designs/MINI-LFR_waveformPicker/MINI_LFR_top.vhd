@@ -176,25 +176,19 @@ BEGIN  -- beh
       IO5  <= '0';
       IO6  <= '0';
       IO7  <= '0';
-      IO8  <= '0';
-      IO9  <= '0';
-      IO10 <= '0';
-      IO11 <= '0';
+      IO8  <= '1';
     ELSIF clk_25'event AND clk_25 = '1' THEN  -- rising clock edge
       LED0 <= '0';
       LED1 <= '1';
       LED2 <= BP0;
       IO1  <= '1';
       IO2  <= SPW_NOM_DIN OR SPW_NOM_SIN OR SPW_RED_DIN OR SPW_RED_SIN;  
-      IO3  <= ADC_SDO(0);
-      IO4  <= ADC_SDO(1);
-      IO5  <= ADC_SDO(2);
-      IO6  <= ADC_SDO(3);
-      IO7  <= ADC_SDO(4);
-      IO8  <= ADC_SDO(5);
-      IO9  <= ADC_SDO(6);
-      IO10 <= ADC_SDO(7);
-      IO11  <= BP1 OR  nDTR2 OR nRTS2 OR nRTS1;
+      IO3  <= ADC_SDO(0) OR ADC_SDO(1);
+      IO4  <= ADC_SDO(2) OR ADC_SDO(1);
+      IO5  <= ADC_SDO(3) OR ADC_SDO(4);
+      IO6  <= ADC_SDO(5) OR ADC_SDO(6) OR ADC_SDO(7);
+      IO7  <= BP1 OR  nDTR2 OR nRTS2 OR nRTS1;
+      IO8  <= '0';
     END IF;
   END PROCESS;
   
@@ -239,7 +233,11 @@ BEGIN  -- beh
       ahbmi   => ahbi_m_ext ,
       ahbmo   => ahbo_m_ext(1),
       apbi    => apbi_ext,
-      apbo    => apbo_ext(5));
+      apbo    => apbo_ext(5),
+      out_ren  => IO11,
+      out_send => IO10,
+      out_done => IO9
+      );
   
   -----------------------------------------------------------------------------
 
@@ -263,7 +261,7 @@ BEGIN  -- beh
       ENABLE_GPT      => 1,
       NB_AHB_MASTER   => NB_AHB_MASTER,
       NB_AHB_SLAVE    => NB_AHB_SLAVE,
-      NB_APB_SLAVE    => NB_APB_SLAVE)
+      NB_APB_SLAVE    =>  NB_APB_SLAVE)
     PORT MAP (
       clk        => clk_25,
       reset      => reset,

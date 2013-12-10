@@ -167,10 +167,17 @@ BEGIN  -- beh
 
   DMAIn.Data <= data;
 
+  ren <= '0' WHEN DMAOut.OKAY = '1' AND state = SEND_DATA ELSE
+         '1';
+  -- \/ JC - 10/12/2013 \/
   --ren <= '0' WHEN DMAOut.OKAY = '1' AND state = SEND_DATA ELSE
   --       '0' WHEN state = REQUEST_BUS AND DMAOut.Grant = '1' ELSE
   --       '1';
-  ren <= '0' WHEN state = SEND_DATA ELSE
-         '1';
+  -- /\ JC - 10/12/2013 /\
+
+  -- \/ JC - 09/12/2013 \/
+  --ren <= '0' WHEN state = SEND_DATA ELSE
+  --       '1';
+  -- /\ JC - 09/12/2013 /\
     
 END beh;

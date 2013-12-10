@@ -59,7 +59,11 @@ ENTITY lpp_debug_dma_singleOrBurst IS
     ahbmo   : OUT AHB_Mst_Out_Type;
     -- AMBA AHB Master Interface
     apbi    : IN  apb_slv_in_type;
-    apbo    : OUT apb_slv_out_type
+    apbo    : OUT apb_slv_out_type;
+    -- observation SIGNAL
+    out_ren  : OUT STD_LOGIC;
+    out_send : OUT STD_LOGIC;
+    out_done : OUT STD_LOGIC    
     );                                      
 END;
 
@@ -94,6 +98,9 @@ ARCHITECTURE Behavioral OF lpp_debug_dma_singleOrBurst IS
   SIGNAL prdata : STD_LOGIC_VECTOR(31 DOWNTO 0);
   
 BEGIN
+  out_ren  <= ren;
+  out_send <= send;
+  out_done <= done;
   
   lpp_dma_singleOrBurst_1 : lpp_dma_singleOrBurst
     GENERIC MAP (
@@ -130,7 +137,7 @@ BEGIN
       reg.ren         <= '0';
       reg.addr        <= (OTHERS => '0');
       reg.data        <= (OTHERS => '0');
-      reg.nb_ren         <= (OTHERS => '0');
+      reg.nb_ren      <= (OTHERS => '0');
 
       apbo.pirq <= (OTHERS => '0');
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
@@ -167,14 +174,14 @@ BEGIN
           -- APB DMA WRITE --
           CASE paddr(7 DOWNTO 2) IS
             --
-            WHEN "000000" => reg.run <= apbi.pwdata(0);
+            WHEN "000000" => reg.run         <= apbi.pwdata(0);
                              reg.send        <= apbi.pwdata(1);
                              reg.valid_burst <= apbi.pwdata(2);
                              reg.done        <= apbi.pwdata(3);
                              reg.ren         <= apbi.pwdata(4);
             WHEN "000001" => reg.addr   <= apbi.pwdata;
             WHEN "000010" => reg.data   <= apbi.pwdata;
-            WHEN "000011" => reg.nb_ren <= apbi.pwdata;
+            --WHEN "000011" => reg.nb_ren <= apbi.pwdata;
             WHEN OTHERS   => NULL;
           END CASE;
         END IF;
