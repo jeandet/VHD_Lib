@@ -43,7 +43,9 @@ PACKAGE lpp_debug_lfr_pkg IS
       apbo    : OUT apb_slv_out_type;
       out_ren  : OUT STD_LOGIC;
       out_send : OUT STD_LOGIC;
-      out_done : OUT STD_LOGIC  );
+      out_done : OUT STD_LOGIC;
+      out_dmaout_okay : OUT STD_LOGIC
+      );
   END COMPONENT;
   
 END;

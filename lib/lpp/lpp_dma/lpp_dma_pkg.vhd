@@ -213,7 +213,8 @@ PACKAGE lpp_dma_pkg IS
       done           : OUT STD_LOGIC;
       ren            : OUT STD_LOGIC;
       address        : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-      data           : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
+      data           : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_dmaout_okay : OUT STD_LOGIC);
   END COMPONENT;
   
 END;

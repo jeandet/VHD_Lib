@@ -54,6 +54,7 @@ ENTITY lpp_dma_send_16word IS
     --
     send_ok : OUT STD_LOGIC;
     send_ko : OUT STD_LOGIC
+    
     );  
 END lpp_dma_send_16word;
 
@@ -167,8 +168,14 @@ BEGIN  -- beh
 
   DMAIn.Data <= data;
 
-  ren <= '0' WHEN DMAOut.OKAY = '1' AND state = SEND_DATA ELSE
+  ren <= '0' WHEN DMAOut.OKAY = '1' ELSE --AND (state = SEND_DATA OR state = WAIT_LAST_READY) ELSE
          '1';
+  
+  -- \/ JC - 11/12/2013 \/
+  --ren <= '0' WHEN DMAOut.OKAY = '1' AND state = SEND_DATA ELSE
+  --       '1';
+  -- /\ JC - 11/12/2013 /\
+
   -- \/ JC - 10/12/2013 \/
   --ren <= '0' WHEN DMAOut.OKAY = '1' AND state = SEND_DATA ELSE
   --       '0' WHEN state = REQUEST_BUS AND DMAOut.Grant = '1' ELSE

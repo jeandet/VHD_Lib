@@ -62,7 +62,10 @@ ENTITY lpp_dma_singleOrBurst IS
     done               : OUT STD_LOGIC;
     ren                : OUT STD_LOGIC;
     address            : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data               : IN  STD_LOGIC_VECTOR(31 DOWNTO 0)
+    data               : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --
+    debug_dmaout_okay : OUT STD_LOGIC
+    
     );                                      
 END;
 
@@ -94,6 +97,9 @@ ARCHITECTURE Behavioral OF lpp_dma_singleOrBurst IS
   SIGNAL data_2_halfword      : STD_LOGIC_VECTOR(31 DOWNTO 0);
 BEGIN
 
+  debug_dmaout_okay <= DMAOut.OKAY;
+
+  
   -----------------------------------------------------------------------------
   -- DMA to AHB interface
   DMA2AHB_1 : DMA2AHB
@@ -132,7 +138,10 @@ BEGIN
 
   --ren   <= burst_ren     WHEN valid_burst = '1' ELSE
   --         NOT single_send_ok;
-  ren   <= burst_ren AND single_ren;
+  --ren   <= burst_ren AND single_ren;
+
+  ren <= '0' WHEN DMAOut.OKAY = '1' ELSE
+         '1';
   
   -----------------------------------------------------------------------------
   -- SEND 1 word by DMA

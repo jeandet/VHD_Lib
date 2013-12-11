@@ -63,7 +63,8 @@ ENTITY lpp_debug_dma_singleOrBurst IS
     -- observation SIGNAL
     out_ren  : OUT STD_LOGIC;
     out_send : OUT STD_LOGIC;
-    out_done : OUT STD_LOGIC    
+    out_done : OUT STD_LOGIC;
+    out_dmaout_okay : OUT STD_LOGIC
     );                                      
 END;
 
@@ -117,7 +118,8 @@ BEGIN
       done           => done,           -- out
       ren            => ren,            -- out
       address        => address,
-      data           => data);
+      data           => data,
+      debug_dmaout_okay => out_dmaout_okay);
 
 
   run         <= reg.run;

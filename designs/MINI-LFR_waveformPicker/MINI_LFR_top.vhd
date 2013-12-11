@@ -140,6 +140,8 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   SIGNAL  ahbo_s_ext  :  soc_ahb_slv_out_vector(NB_AHB_SLAVE-1+3  DOWNTO 3):= (OTHERS => ahbs_none);
   SIGNAL  ahbi_m_ext  :  AHB_Mst_In_Type;
   SIGNAL  ahbo_m_ext  :  soc_ahb_mst_out_vector(NB_AHB_MASTER-1+1 DOWNTO 1):= (OTHERS => ahbm_none);
+  --
+  SIGNAL IO_s : STD_LOGIC_VECTOR(11 DOWNTO 0);
   
 BEGIN  -- beh
 
@@ -176,7 +178,10 @@ BEGIN  -- beh
       IO5  <= '0';
       IO6  <= '0';
       IO7  <= '0';
-      IO8  <= '1';
+      IO8  <= '0';
+      IO9  <= '0';
+      IO10 <= '0';
+      IO11 <= '0';
     ELSIF clk_25'event AND clk_25 = '1' THEN  -- rising clock edge
       LED0 <= '0';
       LED1 <= '1';
@@ -188,7 +193,10 @@ BEGIN  -- beh
       IO5  <= ADC_SDO(3) OR ADC_SDO(4);
       IO6  <= ADC_SDO(5) OR ADC_SDO(6) OR ADC_SDO(7);
       IO7  <= BP1 OR  nDTR2 OR nRTS2 OR nRTS1;
-      IO8  <= '0';
+      IO8  <= IO_s(8);
+      IO9  <= IO_s(9);
+      IO10 <= IO_s(10);
+      IO11 <= IO_s(11);
     END IF;
   END PROCESS;
   
@@ -234,9 +242,10 @@ BEGIN  -- beh
       ahbmo   => ahbo_m_ext(1),
       apbi    => apbi_ext,
       apbo    => apbo_ext(5),
-      out_ren  => IO11,
-      out_send => IO10,
-      out_done => IO9
+      out_ren           => IO_s(11),
+      out_send          => IO_s(10),
+      out_done          => IO_s(9),
+      out_dmaout_okay   => IO_s(8)
       );
   
   -----------------------------------------------------------------------------
