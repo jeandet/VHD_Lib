@@ -41,8 +41,7 @@ entity APB_DAC is
     pmask    : integer := 16#fff#;
     pirq     : integer := 0;
     abits    : integer := 8;
-    Nmax     : integer := 7;
-    cpt_serial : integer := 6);
+    Nmax     : integer := 7);
   port (
     clk     : in  std_logic;           --! Horloge du composant
     rst     : in  std_logic;           --! Reset general du composant
@@ -128,6 +127,7 @@ N <= to_integer(unsigned(Rec.CLK_Cfg));
                     when "000000" =>
                         Rdata(31 downto 7) <= (others => '0');
                         Rdata(6 downto 4)  <= Rec.CLK_Cfg;
+                        Rdata(3 downto 1) <= (others => '0');
                         Rdata(0 downto 0)  <= Rec.DAC_Cfg;
                     when others =>
                         Rdata <= (others => '0');

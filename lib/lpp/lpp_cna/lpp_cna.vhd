@@ -38,8 +38,7 @@ component APB_DAC is
     pmask    : integer := 16#fff#;
     pirq     : integer := 0;
     abits    : integer := 8;
-    Nmax     : integer := 7;
-    cpt_serial : integer := 6);
+    Nmax     : integer := 7);
   port (
     clk     : in  std_logic;           --! Horloge du composant
     rst     : in  std_logic;           --! Reset general du composant

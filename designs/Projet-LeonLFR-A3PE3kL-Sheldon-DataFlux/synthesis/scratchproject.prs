@@ -1,0 +1,214 @@
+#-- Synopsys, Inc.
+#-- Version E-2010.09A-1
+#-- Project file C:\opt\GRLIB\grlib-gpl-1.1.0-b4108\designs\Projet-LeonLFR-A3PE3kL-Sheldon\synthesis\scratchproject.prs
+
+#project files
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/SYNC_FF.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/grlib/stdlib/config.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/grlib/stdlib/version.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/grlib/stdlib/stdlib.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/grlib/amba/amba.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/grlib/amba/devices.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_ad_Conv/lpp_ad_Conv.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/general_purpose.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_ad_Conv/AD7688_drvr.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/gencomp/gencomp.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/allclkgen.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/grgates.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/inferred/memory_inferred.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/proasic3/memory_apa3.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/allmem.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/syncram_2p.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/iir_filter/iir_filter.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/iir_filter/FILTERcfg.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/iir_filter/RAM_CTRLR_v2.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/MUXN.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/MAC_CONTROLER.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/Multiplier.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/Adder.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/TwoComplementer.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/MAC_REG.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/MAC_MUX.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/MAC_MUX2.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/MAC.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/ALU.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/iir_filter/IIR_CEL_CTRLR_v2_DATAFLOW.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/iir_filter/IIR_CEL_CTRLR_v2_CONTROL.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/iir_filter/IIR_CEL_CTRLR_v2.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_downsampling/Downsampling.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_amba/lpp_amba.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/misc/misc.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/memctrl/memctrl.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_memory/lpp_memory.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_top_lfr/lpp_top_lfr_pkg.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_top_lfr/lpp_top_acq.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/iir_filter/RAM_CEL.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_memory/lpp_FIFO.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_memory/lppFIFOxN.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_demux/DEMUX.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_fft/Driver_FFT.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_fft/fft_components.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_fft/primitives.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_fft/fftSm.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_fft/actram.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_fft/fftDp.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_fft/actar.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_fft/twiddle.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_fft/CoreFFT.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_fft/Linker_FFT.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_fft/lpp_fft.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./dsp/lpp_fft/FFT.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_matrix/ReUse_CTRLR.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_matrix/TopSpecMatrix.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_matrix/DriveInputs.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_matrix/ALU_Driver.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_matrix/lpp_matrix.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_matrix/Matrix.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_matrix/GetResult.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_matrix/SpectralMatrix.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_matrix/Dispatch.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_matrix/MatriceSpectrale.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_amba/apb_devices_list.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_memory/APB_FIFO.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/Clock_Divider.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_cna/ClkSetting.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_cna/Gene_SYNC.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_cna/Serialize.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_cna/lpp_cna.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_cna/DacDriver.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_cna/APB_DAC.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_uart/BaudGen.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_uart/Shift_REG.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_uart/lpp_uart.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_uart/UART.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_uart/APB_UART.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/misc/rstgen.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/allpads.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/clkpad.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/proasic3/clkgen_proasic3.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/clkgen.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/cpu_disasx.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/grlib/sparc/sparc.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/leon3.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/arith/arith.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mmuconfig.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/libiu.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/grlib/sparc/sparc_disas.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/iu3.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/grlib/modgen/leaves.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/inferred/mul_inferred.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/grlib/modgen/multlib.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/allmul.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/techmult.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/arith/mul32.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/arith/div32.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mmuiface.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/libcache.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mmu_icache.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/libmmu.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mmu_dcache.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mmu_acache.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mmutlbcam.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mmulrue.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mmulru.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/syncram.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mmutlb.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mmutw.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mmu.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mmu_cache.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/proc3.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/syncram_dp.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/cachemem.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/syncram64.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/tbufmem.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/grfpw_net.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/regfile_3p.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/gencomp/netcomp.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/grfpwx.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/mfpwx.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/grlfpw_net.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/grlfpwx.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/libproc3.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/leon3s.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/outpad.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/clkand.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/dsu3x.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/dsu3.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/inpad.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/leon3/irqmp.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/memctrl/sdmctrl.vhd"
+add_file -vhdl -lib esa "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/esa/memoryctrl/memoryctrl.vhd"
+add_file -vhdl -lib esa "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/esa/memoryctrl/mctrl.vhd"
+add_file -vhdl -lib techmap "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/techmap/maps/iopad.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_memory/SSRAM_plugin.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/grlib/amba/ahbctrl.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/misc/ahbmst.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/uart/uart.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/uart/libdcom.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/uart/dcom_uart.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/uart/dcom.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/uart/ahbuart.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/grlib/amba/apbctrl.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/misc/gptimer.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/uart/apbuart.vhd"
+add_file -vhdl -lib gaisler "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/gaisler/misc/grgpio.vhd"
+add_file -vhdl -lib work "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/config.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./general_purpose/lpp_delay/lpp_delay.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_demux/lpp_demux.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_Header/lpp_Header.vhd"
+add_file -vhdl -lib grlib "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/grlib/amba/dma2ahb_pkg.vhd"
+add_file -vhdl -lib lpp "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/../../lib/../../VHD_Lib/lib/lpp/./lpp_dma/lpp_dma_pkg.vhd"
+add_file -vhdl -lib work "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/leon3mp.vhd"
+
+
+#implementation: "synthesis"
+impl -add C:\opt\GRLIB\grlib-gpl-1.1.0-b4108\designs\Projet-LeonLFR-A3PE3kL-Sheldon\synthesis -type fpga
+
+#device options
+set_option -technology ProASIC3L
+set_option -part A3PE3000L
+set_option -package PQFP208
+set_option -speed_grade -1
+set_option -part_companion ""
+
+#compilation/mapping options
+set_option -use_fsm_explorer 0
+set_option -top_module "work.leon3mp"
+
+# mapper_options
+set_option -frequency 100.000
+set_option -write_verilog 0
+set_option -write_vhdl 0
+
+# Actel 500K
+set_option -run_prop_extract 1
+set_option -maxfan 24
+set_option -maxfan_hard3 0
+set_option -disable_io_insertion 0
+set_option -retiming 0
+set_option -report_path 0
+set_option -opcond COMWC
+set_option -update_models_cp 0
+set_option -preserve_registers 0
+
+# Actel 500K
+set_option -globalthreshold 50
+
+# NFilter
+set_option -popfeed 0
+set_option -constprop 0
+set_option -createhierarchy 0
+
+# sequential_optimization_options
+set_option -symbolic_fsm_compiler 1
+
+# Compiler Options
+set_option -compiler_compatible 0
+set_option -resource_sharing 1
+
+#automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+
+#set result format/file last
+project -result_file "C:/opt/GRLIB/grlib-gpl-1.1.0-b4108/designs/Projet-LeonLFR-A3PE3kL-Sheldon/synthesis/leon3mp.edn"
+impl -active "synthesis"
