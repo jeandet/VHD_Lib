@@ -30,14 +30,12 @@ PACKAGE lpp_lfr_time_management IS
 -- APB_LFR_TIME_MANAGEMENT
 
   COMPONENT apb_lfr_time_management IS
-
     GENERIC(
       pindex      : INTEGER := 0;       --! APB slave index
       paddr       : INTEGER := 0;       --! ADDR field of the APB BAR
       pmask       : INTEGER := 16#fff#;   --! MASK field of the APB BAR
       pirq        : INTEGER := 0
       );
-
     PORT (
       clk25MHz     : IN  STD_LOGIC;     --! Clock
       clk49_152MHz : IN  STD_LOGIC;     --! secondary clock
@@ -48,7 +46,6 @@ PACKAGE lpp_lfr_time_management IS
       coarse_time  : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --! coarse time
       fine_time    : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)   --! fine time
       );
-
   END COMPONENT;
 
   COMPONENT lfr_time_management

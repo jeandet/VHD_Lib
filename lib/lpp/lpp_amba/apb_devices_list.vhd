@@ -39,5 +39,6 @@ PACKAGE apb_devices_list IS
   CONSTANT LPP_LFR             : amba_device_type := 16#19#;
   
   CONSTANT LPP_DEBUG_DMA       : amba_device_type := 16#A0#;
+  CONSTANT LPP_DEBUG_LFR       : amba_device_type := 16#A1#;
 
 END;

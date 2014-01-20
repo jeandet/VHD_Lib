@@ -142,7 +142,7 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
   CONSTANT REVISION : INTEGER := 1;
   
   CONSTANT pconfig : apb_config_type := (
-    0 => ahb_device_reg (VENDOR_LPP, LPP_LFR, 2, REVISION, pirq_wfp),
+    0 => ahb_device_reg (VENDOR_LPP, LPP_LFR, 0, REVISION, pirq_wfp),
     1 => apb_iobar(paddr, pmask));
 
   TYPE lpp_SpectralMatrix_regs IS RECORD

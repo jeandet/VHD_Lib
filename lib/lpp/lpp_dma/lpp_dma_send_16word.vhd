@@ -167,9 +167,14 @@ BEGIN  -- beh
   END PROCESS;
 
   DMAIn.Data <= data;
-
-  ren <= '0' WHEN DMAOut.OKAY = '1' ELSE --AND (state = SEND_DATA OR state = WAIT_LAST_READY) ELSE
+  
+  ren <= NOT (DMAOut.OKAY OR DMAOut.GRANT) WHEN state = SEND_DATA ELSE
          '1';
+
+  -- \/ JC - 20/01/2014 \/
+  --ren <= '0' WHEN DMAOut.OKAY = '1' ELSE --AND (state = SEND_DATA OR state = WAIT_LAST_READY) ELSE
+  --       '1';
+  -- /\ JC - 20/01/2014 /\
   
   -- \/ JC - 11/12/2013 \/
   --ren <= '0' WHEN DMAOut.OKAY = '1' AND state = SEND_DATA ELSE

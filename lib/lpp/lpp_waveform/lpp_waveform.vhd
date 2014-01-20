@@ -129,7 +129,7 @@ ENTITY lpp_waveform IS
     data_f3_data_out_valid_burst : OUT STD_LOGIC;
     data_f3_data_out_ren         : IN  STD_LOGIC;
 
-    --debug
+    --debug SNAPSHOT OUT
     debug_f0_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
     debug_f0_data_valid : OUT STD_LOGIC;
     debug_f1_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
@@ -137,7 +137,18 @@ ENTITY lpp_waveform IS
     debug_f2_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
     debug_f2_data_valid : OUT STD_LOGIC;
     debug_f3_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    debug_f3_data_valid : OUT STD_LOGIC
+    debug_f3_data_valid : OUT STD_LOGIC;
+
+    --debug FIFO IN
+    debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
+    debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
+    debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
+    debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f3_data_fifo_in_valid : OUT STD_LOGIC
+
     );
 
 END lpp_waveform;
@@ -285,7 +296,7 @@ BEGIN  -- beh
       data_out_valid => data_f3_out_valid);
 
   -----------------------------------------------------------------------------
-  -- DEBUG
+  -- DEBUG -- SNAPSHOT OUT
   debug_f0_data_valid <= data_f0_out_valid;
   debug_f0_data       <= data_f0_out;
   debug_f1_data_valid <= data_f1_out_valid;
@@ -332,9 +343,9 @@ BEGIN  -- beh
   -----------------------------------------------------------------------------
   -- TODO : debug
   -----------------------------------------------------------------------------
-  all_bit_of_time_out: FOR I IN 47 DOWNTO 0 GENERATE
-    all_sample_of_time_out: FOR J IN 3 DOWNTO 0 GENERATE
-      time_out_2(J,I) <= time_out(J)(I);      
+  all_bit_of_time_out : FOR I IN 47 DOWNTO 0 GENERATE
+    all_sample_of_time_out : FOR J IN 3 DOWNTO 0 GENERATE
+      time_out_2(J, I) <= time_out(J)(I);
     END GENERATE all_sample_of_time_out;
   END GENERATE all_bit_of_time_out;
 
@@ -350,7 +361,7 @@ BEGIN  -- beh
   --  END GENERATE all_sample_of_time_out;
   --END GENERATE all_bit_of_time_out;
   -- DEBUG --
-  
+
   lpp_waveform_fifo_arbiter_1 : lpp_waveform_fifo_arbiter
     GENERIC MAP (tech                   => tech,
                  nb_data_by_buffer_size => nb_data_by_buffer_size)
@@ -368,6 +379,18 @@ BEGIN  -- beh
       data_out_wen => data_wen,
       full_almost  => full_almost,
       full         => full);
+
+  -----------------------------------------------------------------------------
+  -- DEBUG -- SNAPSHOT IN
+  debug_f0_data_fifo_in_valid <= NOT data_wen(0);
+  debug_f0_data_fifo_in       <= wdata;
+  debug_f1_data_fifo_in_valid <= NOT data_wen(1);
+  debug_f1_data_fifo_in       <= wdata;
+  debug_f2_data_fifo_in_valid <= NOT data_wen(2);
+  debug_f2_data_fifo_in       <= wdata;
+  debug_f3_data_fifo_in_valid <= NOT data_wen(3);
+  debug_f3_data_fifo_in       <= wdata;
+  -----------------------------------------------------------------------------
 
   lpp_waveform_fifo_1 : lpp_waveform_fifo
     GENERIC MAP (tech => tech)

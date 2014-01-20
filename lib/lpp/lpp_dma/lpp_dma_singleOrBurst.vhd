@@ -140,8 +140,14 @@ BEGIN
   --         NOT single_send_ok;
   --ren   <= burst_ren AND single_ren;
 
-  ren <= '0' WHEN DMAOut.OKAY = '1' ELSE
-         '1';
+  -- \/ JC - 20/01/2014 \/
+  ren   <= burst_ren    WHEN valid_burst = '1' ELSE
+           single_ren;
+
+  
+  --ren <= '0' WHEN DMAOut.OKAY = '1' ELSE
+  --       '1';
+  -- /\ JC - 20/01/2014 /\
   
   -----------------------------------------------------------------------------
   -- SEND 1 word by DMA

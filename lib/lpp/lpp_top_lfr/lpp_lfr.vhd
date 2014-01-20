@@ -69,7 +69,37 @@ ENTITY lpp_lfr IS
     debug_f2_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
     debug_f2_data_valid : OUT STD_LOGIC;
     debug_f3_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    debug_f3_data_valid : OUT STD_LOGIC
+    debug_f3_data_valid : OUT STD_LOGIC;
+
+    -- debug FIFO_IN
+    debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
+    debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
+    debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
+    debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f3_data_fifo_in_valid : OUT STD_LOGIC;
+
+    --debug FIFO OUT
+    debug_f0_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f0_data_fifo_out_valid : OUT STD_LOGIC;
+    debug_f1_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f1_data_fifo_out_valid : OUT STD_LOGIC;
+    debug_f2_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f2_data_fifo_out_valid : OUT STD_LOGIC;
+    debug_f3_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f3_data_fifo_out_valid : OUT STD_LOGIC;
+    
+    --debug DMA IN
+    debug_f0_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f0_data_dma_in_valid : OUT STD_LOGIC;
+    debug_f1_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f1_data_dma_in_valid : OUT STD_LOGIC;
+    debug_f2_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f2_data_dma_in_valid : OUT STD_LOGIC;
+    debug_f3_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    debug_f3_data_dma_in_valid : OUT STD_LOGIC
     );
 END lpp_lfr;
 
@@ -405,19 +435,19 @@ BEGIN
       --f0
       addr_data_f0                 => addr_data_f0,
       data_f0_in_valid             => sample_f0_val,
-      data_f0_in                   => sample_f0_data, -- sample_f0_data_debug,  -- TODO : debug
+      data_f0_in                   => sample_f0_data,  -- sample_f0_data_debug,  -- TODO : debug
       --f1
       addr_data_f1                 => addr_data_f1,
       data_f1_in_valid             => sample_f1_val,
-      data_f1_in                   => sample_f1_data, -- sample_f1_data_debug,  -- TODO : debug,
+      data_f1_in                   => sample_f1_data,  -- sample_f1_data_debug,  -- TODO : debug,
       --f2
       addr_data_f2                 => addr_data_f2,
       data_f2_in_valid             => sample_f2_val,
-      data_f2_in                   => sample_f2_data, -- sample_f2_data_debug,  -- TODO : debug,
+      data_f2_in                   => sample_f2_data,  -- sample_f2_data_debug,  -- TODO : debug,
       --f3
       addr_data_f3                 => addr_data_f3,
       data_f3_in_valid             => sample_f3_val,
-      data_f3_in                   => sample_f3_data, -- sample_f3_data_debug,  -- TODO : debug,
+      data_f3_in                   => sample_f3_data,  -- sample_f3_data_debug,  -- TODO : debug,
       -- OUTPUT -- DMA interface
       --f0
       data_f0_addr_out             => data_f0_addr_out_s,
@@ -444,7 +474,7 @@ BEGIN
       data_f3_data_out_valid_burst => data_f3_data_out_valid_burst_s,
       data_f3_data_out_ren         => data_f3_data_out_ren,
 
-      --debug
+      -- debug SNAPSHOT_OUT
       debug_f0_data       => debug_f0_data,
       debug_f0_data_valid => debug_f0_data_valid ,
       debug_f1_data       => debug_f1_data ,
@@ -452,9 +482,32 @@ BEGIN
       debug_f2_data       => debug_f2_data ,
       debug_f2_data_valid => debug_f2_data_valid ,
       debug_f3_data       => debug_f3_data ,
-      debug_f3_data_valid => debug_f3_data_valid
+      debug_f3_data_valid => debug_f3_data_valid,
+
+      -- debug FIFO_IN
+      debug_f0_data_fifo_in       => debug_f0_data_fifo_in ,
+      debug_f0_data_fifo_in_valid => debug_f0_data_fifo_in_valid,
+      debug_f1_data_fifo_in       => debug_f1_data_fifo_in ,
+      debug_f1_data_fifo_in_valid => debug_f1_data_fifo_in_valid,
+      debug_f2_data_fifo_in       => debug_f2_data_fifo_in ,
+      debug_f2_data_fifo_in_valid => debug_f2_data_fifo_in_valid,
+      debug_f3_data_fifo_in       => debug_f3_data_fifo_in ,
+      debug_f3_data_fifo_in_valid => debug_f3_data_fifo_in_valid
 
       );
+
+
+  -----------------------------------------------------------------------------
+  -- DEBUG -- WFP OUT
+  debug_f0_data_fifo_out_valid <= NOT data_f0_data_out_ren;
+  debug_f0_data_fifo_out       <= data_f0_data_out;
+  debug_f1_data_fifo_out_valid <= NOT data_f1_data_out_ren;
+  debug_f1_data_fifo_out       <= data_f1_data_out;
+  debug_f2_data_fifo_out_valid <= NOT data_f2_data_out_ren;
+  debug_f2_data_fifo_out       <= data_f2_data_out;
+  debug_f3_data_fifo_out_valid <= NOT data_f3_data_out_ren;
+  debug_f3_data_fifo_out       <= data_f3_data_out;
+  -----------------------------------------------------------------------------
 
 
   -----------------------------------------------------------------------------
@@ -557,70 +610,30 @@ BEGIN
               data_f1_data_out WHEN dma_sel(1) = '1' ELSE
               data_f2_data_out WHEN dma_sel(2) = '1' ELSE
               data_f3_data_out;
-
-  --dma_valid_burst <= data_f0_data_out_valid_burst WHEN dma_sel(0) = '1' ELSE
-  --                   data_f1_data_out_valid_burst WHEN dma_sel(1) = '1' ELSE
-  --                   data_f2_data_out_valid_burst WHEN dma_sel(2) = '1' ELSE
-  --                   data_f3_data_out_valid_burst WHEN dma_sel(3) = '1' ELSE
-  --                   '0';
-
-  --dma_sel_valid <= data_f0_data_out_valid WHEN dma_sel(0) = '1' ELSE
-  --                 data_f1_data_out_valid WHEN dma_sel(1) = '1' ELSE
-  --                 data_f2_data_out_valid WHEN dma_sel(2) = '1' ELSE
-  --                 data_f3_data_out_valid WHEN dma_sel(3) = '1' ELSE
-  --                 '0';
-
-  -- TODO
-  --dma_send       <= dma_sel_valid OR dma_valid_burst;
-
-  --data_f0_data_out_ren <= dma_ren WHEN dma_sel_reg(0) = '1' ELSE '1';
-  --data_f1_data_out_ren <= dma_ren WHEN dma_sel_reg(1) = '1' ELSE '1';
-  --data_f2_data_out_ren <= dma_ren WHEN dma_sel_reg(2) = '1' ELSE '1';
-  --data_f3_data_out_ren <= dma_ren WHEN dma_sel_reg(3) = '1' ELSE '1';
   
   data_f0_data_out_ren <= dma_ren WHEN dma_sel(0) = '1' ELSE '1';
   data_f1_data_out_ren <= dma_ren WHEN dma_sel(1) = '1' ELSE '1';
   data_f2_data_out_ren <= dma_ren WHEN dma_sel(2) = '1' ELSE '1';
   data_f3_data_out_ren <= dma_ren WHEN dma_sel(3) = '1' ELSE '1';
 
-
-  --PROCESS (clk, rstn)
-  --BEGIN  -- PROCESS
-  --  IF rstn = '0' THEN                  -- asynchronous reset (active low)
-  --    ongoing_reg             <= '0';
-  --    dma_sel_reg         <= (OTHERS => '0');
-  --    dma_send_reg        <= '0';
-  --    dma_valid_burst_reg <= '0';
-  --    dma_address_reg     <= (OTHERS => '0');
-  --    dma_data_reg        <= (OTHERS => '0');
-  --  ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-  --    IF (dma_send = '1' AND ongoing_reg = '0') OR (dma_send = '1' AND dma_done = '1')THEN
-  --      ongoing_reg             <= '1';
-  --      dma_valid_burst_reg     <= dma_valid_burst;
-  --      dma_sel_reg             <= dma_sel;
-  --    ELSE
-  --      IF dma_done = '1' THEN
-  --        ongoing_reg <= '0';
-  --      END IF;
-  --    END IF;
-  --    dma_send_reg        <= dma_send;
-  --    dma_address_reg     <= dma_address;
-  --    dma_data_reg        <= dma_data;
-  --  END IF;
-  --END PROCESS;
-
   dma_data_2 <= dma_data;
-  --PROCESS (clk, rstn)
-  --BEGIN  -- PROCESS
-  --  IF rstn = '0' THEN                  -- asynchronous reset (active low)
-  --    dma_data_2 <= (OTHERS => '0');
-  --  ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-  --    dma_data_2 <= dma_data;
-
-  --  END IF;
-  --END PROCESS;
 
 
+  
+
+
+  -----------------------------------------------------------------------------
+  -- DEBUG -- DMA IN
+  debug_f0_data_dma_in_valid <= NOT data_f0_data_out_ren;
+  debug_f0_data_dma_in       <= dma_data;
+  debug_f1_data_dma_in_valid <= NOT data_f1_data_out_ren;
+  debug_f1_data_dma_in       <= dma_data;
+  debug_f2_data_dma_in_valid <= NOT data_f2_data_out_ren;
+  debug_f2_data_dma_in       <= dma_data;
+  debug_f3_data_dma_in_valid <= NOT data_f3_data_out_ren;
+  debug_f3_data_dma_in       <= dma_data;
+  -----------------------------------------------------------------------------
+  
   -----------------------------------------------------------------------------
   -- DMA
   -----------------------------------------------------------------------------
@@ -635,12 +648,12 @@ BEGIN
       AHB_Master_In  => ahbi,
       AHB_Master_Out => ahbo,
 
-      send        => dma_send,          --_reg,
-      valid_burst => dma_valid_burst,   --_reg,
+      send        => dma_send,          
+      valid_burst => dma_valid_burst,   
       done        => dma_done,
       ren         => dma_ren,
-      address     => dma_address,       --_reg,
-      data        => dma_data_2);       --_reg);
+      address     => dma_address,       
+      data        => dma_data_2);       
 
   -----------------------------------------------------------------------------
   -- Matrix Spectral - TODO

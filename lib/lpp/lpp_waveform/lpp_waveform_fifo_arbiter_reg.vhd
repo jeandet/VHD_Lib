@@ -54,8 +54,8 @@ ARCHITECTURE ar_lpp_waveform_fifo_arbiter_reg OF lpp_waveform_fifo_arbiter_reg I
   TYPE   Counter_Vector IS ARRAY (NATURAL RANGE <>) OF INTEGER;
   SIGNAL reg : Counter_Vector(data_nb-1 DOWNTO 0);
 
-  SIGNAL reg_sel   : INTEGER;
-  SIGNAL reg_sel_s : INTEGER;
+  SIGNAL reg_sel   : INTEGER := 0;
+  SIGNAL reg_sel_s : INTEGER := 0;
 
 BEGIN
   

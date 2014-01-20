@@ -24,6 +24,9 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 LIBRARY grlib;
 USE grlib.amba.ALL;
+LIBRARY lpp;
+USE lpp.lpp_lfr_pkg.ALL;
+USE lpp.lpp_ad_conv.ALL;
 
 PACKAGE lpp_debug_lfr_pkg IS
 
@@ -47,5 +50,22 @@ PACKAGE lpp_debug_lfr_pkg IS
       out_dmaout_okay : OUT STD_LOGIC
       );
   END COMPONENT;
+
+  COMPONENT lpp_debug_lfr
+    GENERIC (
+      tech   : INTEGER;
+      hindex : INTEGER;
+      pindex : INTEGER;
+      paddr  : INTEGER;
+      pmask  : INTEGER);
+    PORT (
+      HCLK     : IN  STD_ULOGIC;
+      HRESETn  : IN  STD_ULOGIC;
+      apbi     : IN  apb_slv_in_type;
+      apbo     : OUT apb_slv_out_type;
+      sample_B : OUT Samples14v(2 DOWNTO 0);
+      sample_E : OUT Samples14v(4 DOWNTO 0));
+  END COMPONENT;
+
   
 END;

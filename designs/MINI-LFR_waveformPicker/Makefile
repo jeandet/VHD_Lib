@@ -19,7 +19,7 @@ CLEAN=soft-clean
 TECHLIBS = proasic3e
 
 LIBSKIP = core1553bbc core1553brm core1553brt gr1553 corePCIF \
-	tmtc openchip hynix ihp gleichmann micron usbhc
+	tmtc openchip hynix ihp gleichmann micron usbhc 
 
 DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	pci grusbhc haps slink ascs pwm coremp7 spi ac97 \
@@ -35,6 +35,7 @@ DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	./lpp_uart \
 	./lpp_usb \
 	./lpp_Header \
+	./lpp_sim/CY7C1061DV33 \
 
 FILESKIP =lpp_lfr_ms.vhd \
 	i2cmst.vhd \

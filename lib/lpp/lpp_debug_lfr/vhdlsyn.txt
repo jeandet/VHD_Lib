@@ -1,2 +1,3 @@
 lpp_debug_lfr_pkg.vhd
 lpp_debug_dma_singleOrBurst.vhd
+lpp_debug_lfr.vhd

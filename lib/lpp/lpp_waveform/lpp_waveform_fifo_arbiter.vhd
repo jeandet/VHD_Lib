@@ -30,7 +30,7 @@ USE lpp.general_purpose.ALL;
 ENTITY lpp_waveform_fifo_arbiter IS
   GENERIC(
     tech : INTEGER := 0;
-    nb_data_by_buffer_size : INTEGER
+    nb_data_by_buffer_size : INTEGER := 11
     );
   PORT(
     clk               : IN  STD_LOGIC;

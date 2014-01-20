@@ -32,7 +32,7 @@ PACKAGE lpp_lfr_pkg IS
       ready_matrix_f0_1                      : OUT STD_LOGIC;
       ready_matrix_f1                        : OUT STD_LOGIC;
       ready_matrix_f2                        : OUT STD_LOGIC;
-      error_anticipating_empty_fifo           : OUT STD_LOGIC;
+      error_anticipating_empty_fifo          : OUT STD_LOGIC;
       error_bad_component_error              : OUT STD_LOGIC;
       debug_reg                              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       status_ready_matrix_f0_0               : IN  STD_LOGIC;
@@ -101,15 +101,46 @@ PACKAGE lpp_lfr_pkg IS
       fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
       data_shaping_BW : OUT STD_LOGIC;
 
-    --debug
-    debug_f0_data                : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    debug_f0_data_valid          : OUT STD_LOGIC;
-    debug_f1_data                : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    debug_f1_data_valid          : OUT STD_LOGIC;
-    debug_f2_data                : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    debug_f2_data_valid          : OUT STD_LOGIC;
-    debug_f3_data                : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    debug_f3_data_valid          : OUT STD_LOGIC );
+      --debug
+      debug_f0_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
+      debug_f0_data_valid : OUT STD_LOGIC;
+      debug_f1_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
+      debug_f1_data_valid : OUT STD_LOGIC;
+      debug_f2_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
+      debug_f2_data_valid : OUT STD_LOGIC;
+      debug_f3_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
+      debug_f3_data_valid : OUT STD_LOGIC;
+
+      -- debug FIFO_IN
+      debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
+      debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
+      debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
+      debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_f3_data_fifo_in_valid : OUT STD_LOGIC;
+
+      --debug FIFO OUT
+      debug_f0_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_f0_data_fifo_out_valid : OUT STD_LOGIC;
+      debug_f1_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_f1_data_fifo_out_valid : OUT STD_LOGIC;
+      debug_f2_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_f2_data_fifo_out_valid : OUT STD_LOGIC;
+      debug_f3_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_f3_data_fifo_out_valid : OUT STD_LOGIC;
+
+      --debug DMA IN
+      debug_f0_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_f0_data_dma_in_valid : OUT STD_LOGIC;
+      debug_f1_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_f1_data_dma_in_valid : OUT STD_LOGIC;
+      debug_f2_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_f2_data_dma_in_valid : OUT STD_LOGIC;
+      debug_f3_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_f3_data_dma_in_valid : OUT STD_LOGIC
+      );
   END COMPONENT;
 
   COMPONENT lpp_lfr_apbreg
@@ -180,16 +211,16 @@ PACKAGE lpp_lfr_pkg IS
       addr_data_f3                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       start_date                             : OUT STD_LOGIC_VECTOR(30 DOWNTO 0);
       ---------------------------------------------------------------------------
-      debug_reg0   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg1   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg2   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg3   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg4   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg5   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg6   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_reg7   : IN STD_LOGIC_VECTOR(31 DOWNTO 0));
+      debug_reg0                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg1                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg2                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg3                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg4                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg5                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg6                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      debug_reg7                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
   END COMPONENT;
-  
+
   COMPONENT lpp_top_ms
     GENERIC (
       Mem_use                 : INTEGER;

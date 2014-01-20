@@ -413,7 +413,7 @@ BEGIN
   END GENERATE all_ahbs;
   -- AHB_Master -------------------------------------------------------------
   ahbi_m_ext <= ahbmi;
-  all_ahbm: FOR I IN 0 TO NB_AHB_SLAVE-1 GENERATE
+  all_ahbm: FOR I IN 0 TO NB_AHB_MASTER-1 GENERATE
     max_16_ahbm: IF I + CFG_NCPU + CFG_AHB_UART < 16 GENERATE
       ahbmo(I + CFG_NCPU) <= ahbo_m_ext(I+CFG_NCPU);
     END GENERATE max_16_ahbm;
