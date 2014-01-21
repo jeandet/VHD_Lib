@@ -38,12 +38,12 @@ USE esa.memoryctrl.ALL;
 LIBRARY lpp;
 USE lpp.lpp_memory.ALL;
 USE lpp.lpp_ad_conv.ALL;
-USE lpp.lpp_lfr_pkg.ALL;
+USE lpp.lpp_lfr_pkg.ALL;      -- contains lpp_lfr, not in the 206 rev of the VHD_Lib
+USE lpp.lpp_top_lfr_pkg.ALL;            -- contains top_wf_picker
 USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
 USE lpp.lpp_lfr_time_management.ALL;
 USE lpp.lpp_leon3_soc_pkg.ALL;
-USE lpp.lpp_debug_lfr_pkg.ALL;
 
 ENTITY MINI_LFR_top IS
   
@@ -125,14 +125,17 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   SIGNAL ahbtxd      : STD_ULOGIC;      -- DSU tx data
 
   -- UART APB ---------------------------------------------------------------
-  SIGNAL   urxd1         : STD_ULOGIC;  -- UART1 rx data
-  SIGNAL   utxd1         : STD_ULOGIC;  -- UART1 tx data
+  SIGNAL urxd1 : STD_ULOGIC;            -- UART1 rx data
+  SIGNAL utxd1 : STD_ULOGIC;            -- UART1 tx data
                                         --
-  SIGNAL   I00_s         : STD_LOGIC;
+  SIGNAL I00_s : STD_LOGIC;
+
+  -- CONSTANTS
+  CONSTANT CFG_PADTECH   : INTEGER := inferred;
   --
-  CONSTANT NB_APB_SLAVE  : INTEGER := 4;  -- previous value 1, 3 takes the waveform picker and the time manager into account
+  CONSTANT NB_APB_SLAVE  : INTEGER := 11;  -- 3 = grspw + waveform picker + time manager, 11 allows pindex = f
   CONSTANT NB_AHB_SLAVE  : INTEGER := 1;
-  CONSTANT NB_AHB_MASTER : INTEGER := 2;  -- previous value 1, 2 takes the waveform picker into account
+  CONSTANT NB_AHB_MASTER : INTEGER := 2;   -- 2 = grspw + waveform picker
 
   SIGNAL apbi_ext   : apb_slv_in_type;
   SIGNAL apbo_ext   : soc_apb_slv_out_vector(NB_APB_SLAVE-1+5 DOWNTO 5)  := (OTHERS => apb_none);
@@ -153,18 +156,19 @@ ARCHITECTURE beh OF MINI_LFR_top IS
 --  SIGNAL clkmn                : STD_ULOGIC;
 --  SIGNAL txclk                : STD_ULOGIC;
 
--- AD Converter RHF1401
-  SIGNAL sample             : Samples14v(7 DOWNTO 0);
-  SIGNAL sample_val         : STD_LOGIC;
-  -- ADC --------------------------------------------------------------------
-  SIGNAL ADC_OEB_bar_CH_sig : STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL ADC_smpclk_sig     : STD_LOGIC;
-  SIGNAL ADC_data_sig       : STD_LOGIC_VECTOR(13 DOWNTO 0);
+--GPIO
+  SIGNAL gpioi : gpio_in_type;
+  SIGNAL gpioo : gpio_out_type;
+
+-- AD Converter ADS7886
+  SIGNAL sample      : Samples14v(7 DOWNTO 0);
+  SIGNAL sample_val  : STD_LOGIC;
+  SIGNAL ADC_nCS_sig : STD_LOGIC;
+  SIGNAL ADC_CLK_sig : STD_LOGIC;
+  SIGNAL ADC_SDO_sig : STD_LOGIC_VECTOR(7 DOWNTO 0);
 
   SIGNAL bias_fail_sw_sig : STD_LOGIC;
-  -----------------------------------------------------------------------------
-  SIGNAL sample_val_s : STD_LOGIC;
-  SIGNAL sample_val_s2 : STD_LOGIC;
+  
 BEGIN  -- beh
 
   -----------------------------------------------------------------------------
@@ -193,46 +197,44 @@ BEGIN  -- beh
       LED0 <= '0';
       LED1 <= '0';
       LED2 <= '0';
-      IO0  <= '0';
       --IO1  <= '0';
-      IO2  <= '1';
-      IO3  <= '0';
-      IO4  <= '0';
-      IO5  <= '0';
-      IO6  <= '0';
-      IO7  <= '0';
-      IO8  <= '0';
-      IO9  <= '0';
-      IO10 <= '0';
-      IO11 <= '0';
+      --IO2  <= '1';  
+      --IO3  <= '0';
+      --IO4  <= '0';
+      --IO5  <= '0';
+      --IO6  <= '0';
+      --IO7  <= '0';
+      --IO8  <= '0';
+      --IO9  <= '0';
+      --IO10 <= '0';
+      --IO11 <= '0';
     ELSIF clk_25'EVENT AND clk_25 = '1' THEN  -- rising clock edge
       LED0 <= '0';
       LED1 <= '1';
       LED2 <= BP0;
-      IO0  <= '1';
       --IO1  <= '1';
-      IO2  <= SPW_NOM_DIN OR SPW_NOM_SIN OR SPW_RED_DIN OR SPW_RED_SIN OR BP1 OR nDTR2 OR nRTS2 OR nRTS1;
-      IO3  <= ADC_SDO(0) OR ADC_SDO(1) OR ADC_SDO(2) OR ADC_SDO(3) OR ADC_SDO(4) OR ADC_SDO(5) OR ADC_SDO(6) OR ADC_SDO(7);
-      IO4  <= sample_val;
-      IO5  <= ahbi_m_ext.HREADY;
-      IO6  <= ahbi_m_ext.HRESP(0);
-      IO7  <= ahbi_m_ext.HRESP(1);
-      IO8  <= ahbi_m_ext.HGRANT(2);
-      IO9  <= ahbo_m_ext(2).HLOCK;
-      IO10 <= ahbo_m_ext(2).HBUSREQ;
-      IO11 <= sample_val_s2;
+      --IO2  <= SPW_NOM_DIN OR SPW_NOM_SIN OR SPW_RED_DIN OR SPW_RED_SIN;  
+      --IO3  <= ADC_SDO(0);
+      --IO4  <= ADC_SDO(1);
+      --IO5  <= ADC_SDO(2);
+      --IO6  <= ADC_SDO(3);
+      --IO7  <= ADC_SDO(4);
+      --IO8  <= ADC_SDO(5);
+      --IO9  <= ADC_SDO(6);
+      --IO10 <= ADC_SDO(7);
+      IO11 <= BP1 OR nDTR2 OR nRTS2 OR nRTS1;
     END IF;
   END PROCESS;
 
-  --PROCESS (clk_49, reset)
-  --BEGIN  -- PROCESS
-  --  IF reset = '0' THEN                 -- asynchronous reset (active low)
-  --    I00_s <= '0';
-  --  ELSIF clk_49'EVENT AND clk_49 = '1' THEN  -- rising clock edge
-  --    I00_s <= NOT I00_s;
-  --  END IF;
-  --END PROCESS;
-  --IO0 <= I00_s;
+  PROCESS (clk_49, reset)
+  BEGIN  -- PROCESS
+    IF reset = '0' THEN                 -- asynchronous reset (active low)
+      I00_s <= '0';
+    ELSIF clk_49'EVENT AND clk_49 = '1' THEN  -- rising clock edge
+      I00_s <= NOT I00_s;
+    END IF;
+  END PROCESS;
+--  IO0 <= I00_s;
 
   --UARTs
   nCTS1 <= '1';
@@ -242,10 +244,6 @@ BEGIN  -- beh
   --EXT CONNECTOR
 
   --SPACE WIRE
-
-  ADC_nCS <= '0';
-  ADC_CLK <= '0';
-
 
   leon3_soc_1 : leon3_soc
     GENERIC MAP (
@@ -258,7 +256,7 @@ BEGIN  -- beh
       pclow           => 2,
       clk_freq        => 25000,
       NB_CPU          => 1,
-      ENABLE_FPU      => 0,
+      ENABLE_FPU      => 1,
       FPU_NETLIST     => 0,
       ENABLE_DSU      => 1,
       ENABLE_AHB_UART => 1,
@@ -298,8 +296,8 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
   apb_lfr_time_management_1 : apb_lfr_time_management
     GENERIC MAP (
-      pindex => 7,
-      paddr  => 7,
+      pindex => 6,
+      paddr  => 6,
       pmask  => 16#fff#,
       pirq   => 12)
     PORT MAP (
@@ -308,7 +306,7 @@ BEGIN  -- beh
       resetn       => reset,
       grspw_tick   => swno.tickout,
       apbi         => apbi_ext,
-      apbo         => apbo_ext(7),
+      apbo         => apbo_ext(6),
       coarse_time  => coarse_time,
       fine_time    => fine_time);
 
@@ -409,13 +407,13 @@ BEGIN  -- beh
       nb_snapshot_param_size => 32,
       delta_vector_size      => 32,
       delta_vector_size_f0_2 => 7,      -- log2(96)
-      pindex                 => 6,
-      paddr                  => 6,
+      pindex                 => 15,
+      paddr                  => 15,
       pmask                  => 16#fff#,
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"00000009")
+      top_lfr_version        => X"0000000A")
     PORT MAP (
       clk             => clk_25,
       rstn            => reset,
@@ -423,57 +421,72 @@ BEGIN  -- beh
       sample_E        => sample(7 DOWNTO 3),
       sample_val      => sample_val,
       apbi            => apbi_ext,
-      apbo            => apbo_ext(6),
+      apbo            => apbo_ext(15),
       ahbi            => ahbi_m_ext,
       ahbo            => ahbo_m_ext(2),
       coarse_time     => coarse_time,
       fine_time       => fine_time,
       data_shaping_BW => bias_fail_sw_sig);
 
-  top_ad_conv_RHF1401_1 : top_ad_conv_RHF1401
-    GENERIC MAP (
-      ChanelCount     => 8,
-      ncycle_cnv_high => 79,
-      ncycle_cnv      => 500)
+  top_ad_conv_ADS7886_v2_1 : top_ad_conv_ADS7886_v2
+    GENERIC MAP(
+      ChannelCount    => 8,
+      SampleNbBits    => 14,
+      ncycle_cnv_high => 80,  -- at least 32 cycles at 25 MHz, 32 * 49.152 / 25 = 63
+      ncycle_cnv      => 500)           -- 49 152 000 / 98304
     PORT MAP (
+      -- CONV
       cnv_clk    => clk_49,
       cnv_rstn   => reset,
-      cnv        => ADC_smpclk_sig,
+      cnv        => ADC_nCS_sig,
+      -- DATA
       clk        => clk_25,
       rstn       => reset,
-      ADC_data   => ADC_data_sig,
-      ADC_nOE    => ADC_OEB_bar_CH_sig,
-      sample     => OPEN,
-      sample_val => sample_val);--OPEN );--
+      sck        => ADC_CLK_sig,
+      sdo        => ADC_SDO_sig,
+      -- SAMPLE
+      sample     => sample,
+      sample_val => sample_val);
 
-  ADC_data_sig <= (OTHERS => '1');
+  IO10 <= ADC_SDO_sig(5);
+  IO9  <= ADC_SDO_sig(4);
+  IO8  <= ADC_SDO_sig(3);
 
-  lpp_debug_lfr_1 : lpp_debug_lfr
-    GENERIC MAP (
-      pindex => 8,
-      paddr  => 8,
-      pmask  => 16#fff#)
-    PORT MAP (
-      HCLK     => clk_25,
-      HRESETn  => reset,
-      apbi     => apbi_ext,
-      apbo     => apbo_ext(8),
-      sample_B => sample(2 DOWNTO 0),
-      sample_E => sample(7 DOWNTO 3));
+  ADC_nCS     <= ADC_nCS_sig;
+  ADC_CLK     <= ADC_CLK_sig;
+  ADC_SDO_sig <= ADC_SDO;
 
-  PROCESS (clk_25, reset)
-  BEGIN  -- PROCESS
-    IF reset = '0' THEN                 -- asynchronous reset (active low)
-      sample_val_s2 <= '0';
-      sample_val_s  <= '0';
-      --sample_val    <= '0';
-    ELSIF clk_25'EVENT AND clk_25 = '1' THEN  -- rising clock edge
-      sample_val_s  <= IO1;
-      sample_val_s2 <= sample_val_s;
-      --sample_val    <= (NOT sample_val_s2) AND sample_val_s;
-    END IF;
-  END PROCESS;
+----------------------------------------------------------------------
+---  GPIO  -----------------------------------------------------------
+----------------------------------------------------------------------
 
+  grgpio0 : grgpio
+    GENERIC MAP(pindex => 11, paddr => 11, imask => 16#0000#, nbits => 8)
+    PORT MAP(reset, clk_25, apbi_ext, apbo_ext(11), gpioi, gpioo);
   
-  
+  pio_pad_0 : iopad
+    GENERIC MAP (tech => CFG_PADTECH)
+    PORT MAP (IO0, gpioo.dout(0), gpioo.oen(0), gpioi.din(0));
+  pio_pad_1 : iopad
+    GENERIC MAP (tech => CFG_PADTECH)
+    PORT MAP (IO1, gpioo.dout(1), gpioo.oen(1), gpioi.din(1));
+  pio_pad_2 : iopad
+    GENERIC MAP (tech => CFG_PADTECH)
+    PORT MAP (IO2, gpioo.dout(2), gpioo.oen(2), gpioi.din(2));
+  pio_pad_3 : iopad
+    GENERIC MAP (tech => CFG_PADTECH)
+    PORT MAP (IO3, gpioo.dout(3), gpioo.oen(3), gpioi.din(3));
+  pio_pad_4 : iopad
+    GENERIC MAP (tech => CFG_PADTECH)
+    PORT MAP (IO4, gpioo.dout(4), gpioo.oen(4), gpioi.din(4));
+  pio_pad_5 : iopad
+    GENERIC MAP (tech => CFG_PADTECH)
+    PORT MAP (IO5, gpioo.dout(5), gpioo.oen(5), gpioi.din(5));
+  pio_pad_6 : iopad
+    GENERIC MAP (tech => CFG_PADTECH)
+    PORT MAP (IO6, gpioo.dout(6), gpioo.oen(6), gpioi.din(6));
+  pio_pad_7 : iopad
+    GENERIC MAP (tech => CFG_PADTECH)
+    PORT MAP (IO7, gpioo.dout(7), gpioo.oen(7), gpioi.din(7));
+
 END beh;
