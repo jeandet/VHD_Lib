@@ -68,8 +68,11 @@ ARCHITECTURE behave_arch OF CY7C1061DV33 IS
   CONSTANT tskew        : TIME := 1 ns;
 
   -------------------------------------------------------------------------------JC\/
-  TYPE mem_array_type_t IS ARRAY (127 DOWNTO 0) OF STD_LOGIC_VECTOR(DATA_BITS-1 DOWNTO 0);
-  SIGNAL mem_array_t : mem_array_type_t;
+  TYPE mem_array_type_t IS ARRAY (31 DOWNTO 0) OF STD_LOGIC_VECTOR(DATA_BITS-1 DOWNTO 0);
+  SIGNAL mem_array_0 : mem_array_type_t;
+  SIGNAL mem_array_1 : mem_array_type_t;
+  SIGNAL mem_array_2 : mem_array_type_t;
+  SIGNAL mem_array_3 : mem_array_type_t;
   -------------------------------------------------------------------------------JC/\
 
   
@@ -233,10 +236,11 @@ BEGIN
 
         
         -------------------------------------------------------------------------------JC\/
-        all_mem_array_obs: FOR I IN 0 TO 127 LOOP
-          IF I < depth THEN
-            mem_array_t(I) <= mem_array(I);
-          END IF;
+        all_mem_array_obs: FOR I IN 0 TO 31 LOOP
+          IF I + ((2**15) *0) < depth THEN  mem_array_0(I) <= mem_array(I+((2**15) *0)); END IF;
+          IF I + ((2**15) *1) < depth THEN  mem_array_1(I) <= mem_array(I+((2**15) *1)); END IF;
+          IF I + ((2**15) *2) < depth THEN  mem_array_2(I) <= mem_array(I+((2**15) *2)); END IF;
+          IF I + ((2**15) *3) < depth THEN  mem_array_3(I) <= mem_array(I+((2**15) *3)); END IF;
         END LOOP all_mem_array_obs;
         -------------------------------------------------------------------------------JC/\
 
