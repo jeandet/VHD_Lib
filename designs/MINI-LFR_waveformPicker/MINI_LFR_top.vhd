@@ -413,7 +413,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"0000000A")
+      top_lfr_version        => X"0000000B")
     PORT MAP (
       clk             => clk_25,
       rstn            => reset,

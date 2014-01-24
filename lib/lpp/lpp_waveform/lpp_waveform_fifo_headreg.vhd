@@ -78,7 +78,11 @@ BEGIN
     IF rstn = '0' THEN
       s_ren_reg <= (OTHERS => '1');
     ELSIF clk'EVENT AND clk = '1' THEN
-      s_ren_reg <= s_ren;
+      IF run = '1' THEN
+        s_ren_reg <= s_ren;
+      ELSE
+        s_ren_reg <= (OTHERS => '1');
+      END IF;
     END IF;
   END PROCESS;
 
@@ -118,10 +122,17 @@ BEGIN
       s_rdata_2 <= (OTHERS => '0');
       s_rdata_3 <= (OTHERS => '0');
     ELSIF clk'EVENT AND clk = '1' THEN
-      IF s_ren_reg(0) = '0' THEN s_rdata_0 <= i_rdata; END IF; 
-      IF s_ren_reg(1) = '0' THEN s_rdata_1 <= i_rdata; END IF; 
-      IF s_ren_reg(2) = '0' THEN s_rdata_2 <= i_rdata; END IF; 
-      IF s_ren_reg(3) = '0' THEN s_rdata_3 <= i_rdata; END IF; 
+      IF run = '1' THEN
+        IF s_ren_reg(0) = '0' THEN s_rdata_0 <= i_rdata; END IF; 
+        IF s_ren_reg(1) = '0' THEN s_rdata_1 <= i_rdata; END IF; 
+        IF s_ren_reg(2) = '0' THEN s_rdata_2 <= i_rdata; END IF; 
+        IF s_ren_reg(3) = '0' THEN s_rdata_3 <= i_rdata; END IF; 
+      ELSE
+      s_rdata_0 <= (OTHERS => '0');
+      s_rdata_1 <= (OTHERS => '0');
+      s_rdata_2 <= (OTHERS => '0');
+      s_rdata_3 <= (OTHERS => '0');
+      END IF;
     END IF;
   END PROCESS;
 
@@ -132,9 +143,13 @@ BEGIN
         reg_full(I) <= '0';
       ELSIF clk'EVENT AND clk = '1' THEN
 --        IF s_ren_reg(I) = '0' THEN
-        IF s_ren(I) = '0' THEN
-          reg_full(I) <= '1';
-        ELSIF o_data_ren(I) = '0' THEN
+        IF run = '1' THEN
+          IF s_ren(I) = '0' THEN
+            reg_full(I) <= '1';
+          ELSIF o_data_ren(I) = '0' THEN
+            reg_full(I) <= '0';
+          END IF;
+        ELSE
           reg_full(I) <= '0';
         END IF;
       END IF;
@@ -157,15 +172,18 @@ BEGIN
       IF rstn = '0' THEN                  -- asynchronous reset (active low)
         s_empty_almost(I) <= '1';
       ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
---        IF s_ren_reg(I) = '0' THEN
-        IF s_ren(I) = '0' THEN
-          s_empty_almost(I) <= i_empty_almost(I);
-        ELSIF o_data_ren(I) = '0' THEN
-          s_empty_almost(I) <= '1';
-        ELSE
-          IF i_empty_almost(I) = '0' THEN
-            s_empty_almost(I) <= '0';
+        IF run = '1' THEN
+          IF s_ren(I) = '0' THEN
+            s_empty_almost(I) <= i_empty_almost(I);
+          ELSIF o_data_ren(I) = '0' THEN
+            s_empty_almost(I) <= '1';
+          ELSE
+            IF i_empty_almost(I) = '0' THEN
+              s_empty_almost(I) <= '0';
+            END IF;
           END IF;
+        ELSE
+          s_empty_almost(I) <= '1';
         END IF;
       END IF;
     END PROCESS;

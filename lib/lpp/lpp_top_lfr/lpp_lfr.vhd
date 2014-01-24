@@ -90,7 +90,7 @@ ENTITY lpp_lfr IS
     debug_f2_data_fifo_out_valid : OUT STD_LOGIC;
     debug_f3_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     debug_f3_data_fifo_out_valid : OUT STD_LOGIC;
-    
+
     --debug DMA IN
     debug_f0_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     debug_f0_data_dma_in_valid : OUT STD_LOGIC;
@@ -573,29 +573,35 @@ BEGIN
       dma_send        <= '0';
       dma_valid_burst <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
+      IF run = '1' THEN
 --      IF dma_sel = "0000" OR dma_send = '1' THEN
-      IF dma_sel = "0000" OR dma_done = '1' THEN
-        dma_sel <= dma_rr_grant;
-        IF dma_rr_grant(0) = '1' THEN
-          dma_send        <= '1';
-          dma_valid_burst <= data_f0_data_out_valid_burst;
-          dma_sel_valid   <= data_f0_data_out_valid;
-        ELSIF dma_rr_grant(1) = '1' THEN
-          dma_send        <= '1';
-          dma_valid_burst <= data_f1_data_out_valid_burst;
-          dma_sel_valid   <= data_f1_data_out_valid;
-        ELSIF dma_rr_grant(2) = '1' THEN
-          dma_send        <= '1';
-          dma_valid_burst <= data_f2_data_out_valid_burst;
-          dma_sel_valid   <= data_f2_data_out_valid;
-        ELSIF dma_rr_grant(3) = '1' THEN
-          dma_send        <= '1';
-          dma_valid_burst <= data_f3_data_out_valid_burst;
-          dma_sel_valid   <= data_f3_data_out_valid;
+        IF dma_sel = "0000" OR dma_done = '1' THEN
+          dma_sel <= dma_rr_grant;
+          IF dma_rr_grant(0) = '1' THEN
+            dma_send        <= '1';
+            dma_valid_burst <= data_f0_data_out_valid_burst;
+            dma_sel_valid   <= data_f0_data_out_valid;
+          ELSIF dma_rr_grant(1) = '1' THEN
+            dma_send        <= '1';
+            dma_valid_burst <= data_f1_data_out_valid_burst;
+            dma_sel_valid   <= data_f1_data_out_valid;
+          ELSIF dma_rr_grant(2) = '1' THEN
+            dma_send        <= '1';
+            dma_valid_burst <= data_f2_data_out_valid_burst;
+            dma_sel_valid   <= data_f2_data_out_valid;
+          ELSIF dma_rr_grant(3) = '1' THEN
+            dma_send        <= '1';
+            dma_valid_burst <= data_f3_data_out_valid_burst;
+            dma_sel_valid   <= data_f3_data_out_valid;
+          END IF;
+        ELSE
+          dma_sel  <= dma_sel;
+          dma_send <= '0';
         END IF;
       ELSE
-        dma_sel  <= dma_sel;
-        dma_send <= '0';
+        dma_sel         <= (OTHERS => '0');
+        dma_send        <= '0';
+        dma_valid_burst <= '0';
       END IF;
     END IF;
   END PROCESS;
@@ -619,7 +625,7 @@ BEGIN
   dma_data_2 <= dma_data;
 
 
-  
+
 
 
   -----------------------------------------------------------------------------
@@ -633,7 +639,7 @@ BEGIN
   debug_f3_data_dma_in_valid <= NOT data_f3_data_out_ren;
   debug_f3_data_dma_in       <= dma_data;
   -----------------------------------------------------------------------------
-  
+
   -----------------------------------------------------------------------------
   -- DMA
   -----------------------------------------------------------------------------
@@ -648,11 +654,11 @@ BEGIN
       AHB_Master_In  => ahbi,
       AHB_Master_Out => ahbo,
 
-      send        => dma_send,          
-      valid_burst => dma_valid_burst,   
+      send        => dma_send,
+      valid_burst => dma_valid_burst,
       done        => dma_done,
       ren         => dma_ren,
-      address     => dma_address,       
+      address     => dma_address,
       data        => dma_data_2);       
 
   -----------------------------------------------------------------------------
