@@ -39,7 +39,7 @@ ENTITY lpp_lfr IS
 
     hindex : INTEGER := 2;
 
-    top_lfr_version : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0')
+    top_lfr_version : STD_LOGIC_VECTOR(23 DOWNTO 0) := (OTHERS => '0')
 
     );
   PORT (

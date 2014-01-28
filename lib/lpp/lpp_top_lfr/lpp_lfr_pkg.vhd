@@ -85,7 +85,7 @@ PACKAGE lpp_lfr_pkg IS
       pirq_ms                : INTEGER;
       pirq_wfp               : INTEGER;
       hindex                 : INTEGER;
-      top_lfr_version        : STD_LOGIC_VECTOR(31 DOWNTO 0)
+      top_lfr_version        : STD_LOGIC_VECTOR(23 DOWNTO 0)
       );
     PORT (
       clk             : IN  STD_LOGIC;
@@ -155,7 +155,7 @@ PACKAGE lpp_lfr_pkg IS
       pmask                  : INTEGER;
       pirq_ms                : INTEGER;
       pirq_wfp               : INTEGER;
-      top_lfr_version        : STD_LOGIC_VECTOR(31 DOWNTO 0));
+      top_lfr_version        : STD_LOGIC_VECTOR(23 DOWNTO 0));
     PORT (
       HCLK                                   : IN  STD_ULOGIC;
       HRESETn                                : IN  STD_ULOGIC;

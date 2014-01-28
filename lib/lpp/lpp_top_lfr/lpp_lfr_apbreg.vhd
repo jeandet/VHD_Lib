@@ -47,7 +47,7 @@ ENTITY lpp_lfr_apbreg IS
     pmask    : INTEGER := 16#fff#;
     pirq_ms  : INTEGER := 0;
     pirq_wfp : INTEGER := 1;
-    top_lfr_version    : STD_LOGIC_VECTOR(31 DOWNTO 0));
+    top_lfr_version    : STD_LOGIC_VECTOR(23 DOWNTO 0));
   PORT (
     -- AMBA AHB system signals
     HCLK    : IN STD_ULOGIC;
@@ -386,7 +386,7 @@ BEGIN  -- beh
           WHEN "100110" => prdata(31 DOWNTO 0) <= debug_reg6(31 DOWNTO 0);
           WHEN "100111" => prdata(31 DOWNTO 0) <= debug_reg7(31 DOWNTO 0);
           ----------------------------------------------------
-          WHEN "111100" => prdata(31 DOWNTO 0) <= top_lfr_version(31 DOWNTO 0);
+          WHEN "111100" => prdata(23 DOWNTO 0) <= top_lfr_version(23 DOWNTO 0);
           WHEN OTHERS   => NULL;
         END CASE;
         IF (apbi.pwrite AND apbi.penable) = '1' THEN
