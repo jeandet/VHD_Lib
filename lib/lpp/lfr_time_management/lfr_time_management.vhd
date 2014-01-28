@@ -25,7 +25,8 @@ USE lpp.lpp_lfr_time_management.ALL;
 
 ENTITY lfr_time_management IS
   GENERIC (
-    nb_time_code_missing_limit : INTEGER := 60
+    nb_time_code_missing_limit : INTEGER := 60;
+    nb_wait_pediod             : INTEGER := 375
     );
   PORT (
     clk  : IN STD_LOGIC;

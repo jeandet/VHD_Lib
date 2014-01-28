@@ -44,7 +44,7 @@ USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
 USE lpp.CY7C1061DV33_pkg.ALL;
 
-ENTITY testbench IS
+ENTITY testbenc h IS
 END;
 
 ARCHITECTURE behav OF testbench IS

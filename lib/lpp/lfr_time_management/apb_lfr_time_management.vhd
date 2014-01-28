@@ -35,7 +35,8 @@ ENTITY apb_lfr_time_management IS
     pindex : INTEGER := 0;              --! APB slave index
     paddr  : INTEGER := 0;              --! ADDR field of the APB BAR
     pmask  : INTEGER := 16#fff#;        --! MASK field of the APB BAR
-    pirq   : INTEGER := 0               --! 2 consecutive IRQ lines are used
+    pirq   : INTEGER := 0;              --! 2 consecutive IRQ lines are used
+    nb_wait_pediod             : INTEGER := 375
     );
 
   PORT (
@@ -269,7 +270,8 @@ BEGIN
   -----------------------------------------------------------------------------
   lfr_time_management_1 : lfr_time_management
     GENERIC MAP (
-      nb_time_code_missing_limit => 60)
+      nb_time_code_missing_limit => 60,
+      nb_wait_pediod             => 375)
     PORT MAP (
       clk  => clk49_152MHz,
       rstn => resetn,

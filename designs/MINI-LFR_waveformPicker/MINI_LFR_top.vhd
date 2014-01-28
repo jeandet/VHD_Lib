@@ -115,6 +115,7 @@ END MINI_LFR_top;
 ARCHITECTURE beh OF MINI_LFR_top IS
   SIGNAL clk_50_s    : STD_LOGIC := '0';
   SIGNAL clk_25      : STD_LOGIC := '0';
+  SIGNAL clk_24      : STD_LOGIC := '0';
   -----------------------------------------------------------------------------
   SIGNAL coarse_time : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL fine_time   : STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -169,6 +170,8 @@ ARCHITECTURE beh OF MINI_LFR_top IS
 
   SIGNAL bias_fail_sw_sig : STD_LOGIC;
   
+  -----------------------------------------------------------------------------
+  
 BEGIN  -- beh
 
   -----------------------------------------------------------------------------
@@ -186,6 +189,13 @@ BEGIN  -- beh
   BEGIN
     IF clk_50_s'EVENT AND clk_50_s = '1' THEN
       clk_25 <= NOT clk_25;
+    END IF;
+  END PROCESS;
+
+  PROCESS(clk_49)
+  BEGIN
+    IF clk_49'EVENT AND clk_49 = '1' THEN
+      clk_24 <= NOT clk_24;
     END IF;
   END PROCESS;
 
@@ -226,11 +236,11 @@ BEGIN  -- beh
     END IF;
   END PROCESS;
 
-  PROCESS (clk_49, reset)
+  PROCESS (clk_24, reset)
   BEGIN  -- PROCESS
     IF reset = '0' THEN                 -- asynchronous reset (active low)
       I00_s <= '0';
-    ELSIF clk_49'EVENT AND clk_49 = '1' THEN  -- rising clock edge
+    ELSIF clk_24'EVENT AND clk_24 = '1' THEN  -- rising clock edge
       I00_s <= NOT I00_s;
     END IF;
   END PROCESS;
@@ -299,10 +309,11 @@ BEGIN  -- beh
       pindex => 6,
       paddr  => 6,
       pmask  => 16#fff#,
-      pirq   => 12)
+      pirq   => 12,
+      nb_wait_pediod => 375)            -- (49.152/2) /2^16 = 375
     PORT MAP (
       clk25MHz     => clk_25,
-      clk49_152MHz => clk_49,
+      clk49_152MHz => clk_24,           -- 49.152MHz/2
       resetn       => reset,
       grspw_tick   => swno.tickout,
       apbi         => apbi_ext,
@@ -413,7 +424,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"0000000B")
+      top_lfr_version        => X"00000C")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => reset,
@@ -432,11 +443,11 @@ BEGIN  -- beh
     GENERIC MAP(
       ChannelCount    => 8,
       SampleNbBits    => 14,
-      ncycle_cnv_high => 80,  -- at least 32 cycles at 25 MHz, 32 * 49.152 / 25 = 63
-      ncycle_cnv      => 500)           -- 49 152 000 / 98304
+      ncycle_cnv_high => 40,  -- at least 32 cycles at 25 MHz, 32 * 49.152 / 25 /2 = 31.5
+      ncycle_cnv      => 250) -- 49 152 000 / 98304 /2
     PORT MAP (
       -- CONV
-      cnv_clk    => clk_49,
+      cnv_clk    => clk_24,
       cnv_rstn   => reset,
       cnv        => ADC_nCS_sig,
       -- DATA
