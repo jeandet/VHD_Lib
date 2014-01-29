@@ -371,4 +371,11 @@ Constant CLR_MAC_V0 : std_logic_vector(3 downto 0) := "0100";
       out_grant : OUT STD_LOGIC_VECTOR(3 DOWNTO 0));
   END COMPONENT;
 
+COMPONENT Clock_Divider is
+generic(N :integer := 10);
+port( 
+    clk, rst   : in std_logic;
+    sclk       : out std_logic);
+end COMPONENT;
+
 END;

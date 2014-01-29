@@ -23,27 +23,10 @@
 #include "lpp_apb_functions.h"
 #include <stdio.h>
 
-
 DAC_Device* openDAC(int count)
 {
     DAC_Device* dac0;
     dac0 = (DAC_Device*) apbgetdevice(LPP_CNA,VENDOR_LPP,count);
-    dac0->ConfigReg = DAC_enable;
+    dac0->ConfigReg = DAC_disable;
     return dac0;
 }
-
-/*int DacConst()
-{
-    DAC_Device* dac3;
-    int Value = 0x1FFF;
-    dac3 = (DAC_Device*)0x80000800;
-    dac3->configReg = DAC_enable;
-    while(1)
-    {
-        printf("\nEntrer une valeur entre 4096 et 8191 : ");
-        scanf("%d",&Value);
-        dac3->dataReg = Value;
-    }
-    return 0;
-} */
-
