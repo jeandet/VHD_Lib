@@ -16,7 +16,8 @@ PACKAGE lpp_lfr_pkg IS
 
   COMPONENT lpp_lfr_ms
     GENERIC (
-      hindex : INTEGER);
+      Mem_use : INTEGER 
+      );
     PORT (
       clk                                    : IN  STD_LOGIC;
       rstn                                   : IN  STD_LOGIC;
@@ -26,8 +27,14 @@ PACKAGE lpp_lfr_pkg IS
       sample_f1_wdata                        : IN  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
       sample_f3_wen                          : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
       sample_f3_wdata                        : IN  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
-      AHB_Master_In                          : IN  AHB_Mst_In_Type;
-      AHB_Master_Out                         : OUT AHB_Mst_Out_Type;
+
+      dma_addr        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      dma_data        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      dma_valid       : OUT STD_LOGIC;
+      dma_valid_burst : OUT STD_LOGIC;
+      dma_ren         : IN STD_LOGIC;
+      dma_done        : IN STD_LOGIC;
+      
       ready_matrix_f0_0                      : OUT STD_LOGIC;
       ready_matrix_f0_1                      : OUT STD_LOGIC;
       ready_matrix_f1                        : OUT STD_LOGIC;
@@ -48,6 +55,44 @@ PACKAGE lpp_lfr_pkg IS
       addr_matrix_f1                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f2                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
   END COMPONENT;
+
+  COMPONENT lpp_lfr_ms_fsmdma
+    PORT (
+      HCLK                                   : IN  STD_ULOGIC;
+      HRESETn                                : IN  STD_ULOGIC;
+      fifo_data                              : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      fifo_empty                             : IN  STD_LOGIC;
+      fifo_ren                               : OUT STD_LOGIC;
+      header                                 : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      header_val                             : IN  STD_LOGIC;
+      header_ack                             : OUT STD_LOGIC;
+      dma_addr                               : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      dma_data                               : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      dma_valid                              : OUT STD_LOGIC;
+      dma_valid_burst                        : OUT STD_LOGIC;
+      dma_ren                                : IN  STD_LOGIC;
+      dma_done                               : IN  STD_LOGIC;
+      ready_matrix_f0_0                      : OUT STD_LOGIC;
+      ready_matrix_f0_1                      : OUT STD_LOGIC;
+      ready_matrix_f1                        : OUT STD_LOGIC;
+      ready_matrix_f2                        : OUT STD_LOGIC;
+      error_anticipating_empty_fifo          : OUT STD_LOGIC;
+      error_bad_component_error              : OUT STD_LOGIC;
+      debug_reg                              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      status_ready_matrix_f0_0               : IN  STD_LOGIC;
+      status_ready_matrix_f0_1               : IN  STD_LOGIC;
+      status_ready_matrix_f1                 : IN  STD_LOGIC;
+      status_ready_matrix_f2                 : IN  STD_LOGIC;
+      status_error_anticipating_empty_fifo   : IN  STD_LOGIC;
+      status_error_bad_component_error       : IN  STD_LOGIC;
+      config_active_interruption_onNewMatrix : IN  STD_LOGIC;
+      config_active_interruption_onError     : IN  STD_LOGIC;
+      addr_matrix_f0_0                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      addr_matrix_f0_1                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      addr_matrix_f1                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      addr_matrix_f2                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
+  END COMPONENT;
+  
 
   COMPONENT lpp_lfr_filter
     GENERIC (
@@ -99,47 +144,7 @@ PACKAGE lpp_lfr_pkg IS
       ahbo            : OUT AHB_Mst_Out_Type;
       coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-      data_shaping_BW : OUT STD_LOGIC;
-
-      --debug
-      debug_f0_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-      debug_f0_data_valid : OUT STD_LOGIC;
-      debug_f1_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-      debug_f1_data_valid : OUT STD_LOGIC;
-      debug_f2_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-      debug_f2_data_valid : OUT STD_LOGIC;
-      debug_f3_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-      debug_f3_data_valid : OUT STD_LOGIC;
-
-      -- debug FIFO_IN
-      debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
-      debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
-      debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
-      debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f3_data_fifo_in_valid : OUT STD_LOGIC;
-
-      --debug FIFO OUT
-      debug_f0_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f0_data_fifo_out_valid : OUT STD_LOGIC;
-      debug_f1_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f1_data_fifo_out_valid : OUT STD_LOGIC;
-      debug_f2_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f2_data_fifo_out_valid : OUT STD_LOGIC;
-      debug_f3_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f3_data_fifo_out_valid : OUT STD_LOGIC;
-
-      --debug DMA IN
-      debug_f0_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f0_data_dma_in_valid : OUT STD_LOGIC;
-      debug_f1_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f1_data_dma_in_valid : OUT STD_LOGIC;
-      debug_f2_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f2_data_dma_in_valid : OUT STD_LOGIC;
-      debug_f3_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f3_data_dma_in_valid : OUT STD_LOGIC
+      data_shaping_BW : OUT STD_LOGIC
       );
   END COMPONENT;
 

@@ -6,6 +6,11 @@ vcom -quiet  -93  -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/..
 vcom -quiet  -93  -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_dma/lpp_dma_send_1word.vhd
 vcom -quiet  -93  -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_dma/lpp_dma_singleOrBurst.vhd
 
+vcom -quiet -93 -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_top_lfr/lpp_lfr_pkg.vhd
+vcom -quiet -93 -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_top_lfr/lpp_lfr_test.vhd
+vcom -quiet -93 -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_top_lfr/lpp_lfr_ms_test.vhd
+vcom -quiet -93 -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_top_lfr/lpp_lfr_ms_fsmdma.vhd
+
 vcom -quiet  -93  -work lpp ../../lib/../../tortoiseHG_vhdlib/lib/lpp/./dsp/iir_filter/RAM_CEL_N.vhd
 
 vcom -quiet  -93  -work lpp testbench_package.vhd
@@ -16,6 +21,6 @@ vsim work.testbench
 
 log -r *
 
-do tb_waveform.do
+do wave_ms.do
 
 run -all

@@ -235,6 +235,8 @@ ARCHITECTURE Behavioral OF leon3_soc IS
   SIGNAL dsui       : dsu_in_type;
   SIGNAL dsuo       : dsu_out_type;
   -----------------------------------------------------------------------------
+  
+  SIGNAL nSRAM_CE_s  : STD_LOGIC;
 BEGIN
 
 
@@ -326,8 +328,8 @@ BEGIN
 
   addr_pad : outpadv GENERIC MAP (width => 20, tech => padtech)
     PORT MAP (address, memo.address(21 DOWNTO 2));
-  
-  rams_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_CE, NOT(memo.ramsn(0)));
+  nSRAM_CE_s <= NOT(memo.ramsn(0));
+  rams_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_CE, nSRAM_CE_s);
   oen_pad  : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_OE, memo.ramoen(0));
   nBWE_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_WE, memo.writen);
   nBWa_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE0, memo.mben(3));

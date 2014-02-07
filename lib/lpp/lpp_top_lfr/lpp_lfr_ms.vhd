@@ -17,6 +17,7 @@ USE lpp.lpp_demux.ALL;
 USE lpp.lpp_top_lfr_pkg.ALL;
 USE lpp.lpp_dma_pkg.ALL;
 USE lpp.lpp_Header.ALL;
+USE lpp.lpp_lfr_pkg.ALL;
 
 LIBRARY grlib;
 USE grlib.amba.ALL;
@@ -27,7 +28,7 @@ USE GRLIB.DMA2AHB_Package.ALL;
 
 ENTITY lpp_lfr_ms IS
   GENERIC (
-    hindex : INTEGER := 2    
+    Mem_use : INTEGER 
     );
   PORT (
     clk  : IN STD_LOGIC;
@@ -49,10 +50,12 @@ ENTITY lpp_lfr_ms IS
     ---------------------------------------------------------------------------
     -- DMA
     ---------------------------------------------------------------------------
-    
-    -- AMBA AHB Master Interface
-    AHB_Master_In  : IN  AHB_Mst_In_Type;
-    AHB_Master_Out : OUT AHB_Mst_Out_Type;
+    dma_addr        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    dma_data        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    dma_valid       : OUT STD_LOGIC;
+    dma_valid_burst : OUT STD_LOGIC;
+    dma_ren         : IN STD_LOGIC;
+    dma_done        : IN STD_LOGIC;
 
     -- Reg out
     ready_matrix_f0_0             : OUT STD_LOGIC;
@@ -108,7 +111,7 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
 
   -----------------------------------------------------------------------------
   SIGNAL SM_FlagError : STD_LOGIC;
-  SIGNAL SM_Pong      : STD_LOGIC;
+--  SIGNAL SM_Pong      : STD_LOGIC;
   SIGNAL SM_Wen       : STD_LOGIC;
   SIGNAL SM_Read      : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL SM_Write     : STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -138,10 +141,10 @@ BEGIN
   -----------------------------------------------------------------------------
   Memf0: lppFIFOxN
     GENERIC MAP (
-      tech         => 0, Mem_use      => use_RAM, Data_sz      => 16,
+      tech         => 0, Mem_use      => Mem_use, Data_sz      => 16,
       Addr_sz      => 9, FifoCnt      => 5,       Enable_ReUse => '0')
     PORT MAP (
-      rst   => rstn, wclk  => clk, rclk  => clk,
+      rstn   => rstn, wclk  => clk, rclk  => clk,
       ReUse => (OTHERS => '0'),
       wen   => sample_f0_wen,   ren   => DMUX_Read(4 DOWNTO 0),
       wdata => sample_f0_wdata, rdata => FifoF0_Data,
@@ -149,10 +152,10 @@ BEGIN
   
   Memf1: lppFIFOxN
     GENERIC MAP (
-      tech         => 0, Mem_use      => use_RAM, Data_sz      => 16,
+      tech         => 0, Mem_use      => Mem_use, Data_sz      => 16,
       Addr_sz      => 8, FifoCnt      => 5,       Enable_ReUse => '0')
     PORT MAP (
-      rst   => rstn, wclk  => clk, rclk  => clk,
+      rstn   => rstn, wclk  => clk, rclk  => clk,
       ReUse => (OTHERS => '0'),
       wen   => sample_f1_wen,   ren   => DMUX_Read(9 DOWNTO 5),
       wdata => sample_f1_wdata, rdata => FifoF1_Data,
@@ -161,10 +164,10 @@ BEGIN
   
   Memf2: lppFIFOxN
     GENERIC MAP (
-      tech         => 0, Mem_use      => use_RAM, Data_sz      => 16,
+      tech         => 0, Mem_use      => Mem_use, Data_sz      => 16,
       Addr_sz      => 8, FifoCnt      => 5,       Enable_ReUse => '0')
     PORT MAP (
-      rst   => rstn, wclk  => clk, rclk  => clk,
+      rstn   => rstn, wclk  => clk, rclk  => clk,
       ReUse => (OTHERS => '0'),
       wen   => sample_f3_wen,   ren   => DMUX_Read(14 DOWNTO 10),
       wdata => sample_f3_wdata, rdata => FifoF3_Data,
@@ -217,13 +220,13 @@ BEGIN
   MemInt : lppFIFOxN
     GENERIC MAP (
       tech         => 0,
-      Mem_use      => use_RAM,
+      Mem_use      => Mem_use,
       Data_sz      => 16,
       Addr_sz      => 8,
       FifoCnt      => 5,
       Enable_ReUse => '1')
     PORT MAP (
-      rst   => rstn,
+      rstn   => rstn,
       wclk  => clk,
       rclk  => clk,
       ReUse => SM_ReUse,
@@ -247,10 +250,10 @@ BEGIN
       SetReUse    => FFT_ReUse,
       Valid       => Head_Valid,
       Data_IN     => FifoINT_Data, 
-      ACQ         => DMA_ack,      
+      ACK         => DMA_ack,      
       SM_Write    => SM_Wen,       
       FlagError   => SM_FlagError, 
-      Pong        => SM_Pong,      
+--      Pong        => SM_Pong,      
       Statu       => SM_Param,     
       Write       => SM_Write,
       Read        => SM_Read,
@@ -262,13 +265,13 @@ BEGIN
   MemOut : lppFIFOxN
     GENERIC MAP (
       tech         => 0,
-      Mem_use      => use_RAM,
+      Mem_use      => Mem_use,
       Data_sz      => 32,
       Addr_sz      => 8,
       FifoCnt      => 2,
       Enable_ReUse => '0')
     PORT MAP (
-      rst   => rstn,
+      rstn   => rstn,
       wclk  => clk,
       rclk  => clk,
       ReUse => (OTHERS => '0'),
@@ -287,7 +290,7 @@ BEGIN
     PORT MAP (
       clkm         => clk,
       rstn         => rstn,
-      pong         => SM_Pong,
+--      pong         => SM_Pong,
       Statu        => SM_Param,
       Matrix_Type  => DMUX_WorkFreq, 
       Matrix_Write => SM_Wen, 
@@ -299,28 +302,30 @@ BEGIN
       emptyOUT     => Head_Empty, 
       RenIN        => DMA_Read, 
       header       => Head_Header,
-      header_val   =>  Head_Val,
+      header_val   => Head_Val,
       header_ack   => DMA_ack );
   -----------------------------------------------------------------------------
 
-  -----------------------------------------------------------------------------
-  lpp_dma_ip_1: lpp_dma_ip
-    GENERIC MAP (
-      tech   => 0,
-      hindex => hindex)
+
+  lpp_lfr_ms_fsmdma_1: lpp_lfr_ms_fsmdma
     PORT MAP (
       HCLK                                   => clk,
       HRESETn                                => rstn,
-      AHB_Master_In                          => AHB_Master_In,
-      AHB_Master_Out                         => AHB_Master_Out,
       
       fifo_data                              => Head_Data,
       fifo_empty                             => Head_Empty,
       fifo_ren                               => DMA_Read,
       
-      header                                 => Head_Header,
-      header_val                             => Head_Val,
-      header_ack                             => DMA_ack,
+      header                                 => Head_Header, 
+      header_val                             => Head_Val,    
+      header_ack                             => DMA_ack,     
+      
+      dma_addr                               => dma_addr,
+      dma_data                               => dma_data,
+      dma_valid                              => dma_valid,
+      dma_valid_burst                        => dma_valid_burst,
+      dma_ren                                => dma_ren,
+      dma_done                               => dma_done,
       
       ready_matrix_f0_0                      => ready_matrix_f0_0,
       ready_matrix_f0_1                      => ready_matrix_f0_1,
@@ -341,6 +346,48 @@ BEGIN
       addr_matrix_f0_1                       => addr_matrix_f0_1,
       addr_matrix_f1                         => addr_matrix_f1,
       addr_matrix_f2                         => addr_matrix_f2);
+
+  
+
+  
   -----------------------------------------------------------------------------
+  --lpp_dma_ip_1: lpp_dma_ip
+  --  GENERIC MAP (
+  --    tech   => 0,
+  --    hindex => hindex)
+  --  PORT MAP (
+  --    HCLK                                   => clk,
+  --    HRESETn                                => rstn,
+  --    AHB_Master_In                          => AHB_Master_In,
+  --    AHB_Master_Out                         => AHB_Master_Out,
+      
+  --    fifo_data                              => Head_Data,
+  --    fifo_empty                             => Head_Empty,
+  --    fifo_ren                               => DMA_Read,
+      
+  --    header                                 => Head_Header,
+  --    header_val                             => Head_Val,
+  --    header_ack                             => DMA_ack,     
+      
+  --    ready_matrix_f0_0                      => ready_matrix_f0_0,
+  --    ready_matrix_f0_1                      => ready_matrix_f0_1,
+  --    ready_matrix_f1                        => ready_matrix_f1,
+  --    ready_matrix_f2                        => ready_matrix_f2,
+  --    error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
+  --    error_bad_component_error              => error_bad_component_error,
+  --    debug_reg                              => debug_reg,
+  --    status_ready_matrix_f0_0               => status_ready_matrix_f0_0,
+  --    status_ready_matrix_f0_1               => status_ready_matrix_f0_1,
+  --    status_ready_matrix_f1                 => status_ready_matrix_f1,
+  --    status_ready_matrix_f2                 => status_ready_matrix_f2,
+  --    status_error_anticipating_empty_fifo   => status_error_anticipating_empty_fifo,
+  --    status_error_bad_component_error       => status_error_bad_component_error,
+  --    config_active_interruption_onNewMatrix => config_active_interruption_onNewMatrix,
+  --    config_active_interruption_onError     => config_active_interruption_onError,
+  --    addr_matrix_f0_0                       => addr_matrix_f0_0,
+  --    addr_matrix_f0_1                       => addr_matrix_f0_1,
+  --    addr_matrix_f1                         => addr_matrix_f1,
+  --    addr_matrix_f2                         => addr_matrix_f2);
+  -------------------------------------------------------------------------------
 
 END Behavioral;
