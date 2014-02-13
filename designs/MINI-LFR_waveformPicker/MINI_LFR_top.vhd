@@ -171,6 +171,7 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   SIGNAL bias_fail_sw_sig : STD_LOGIC;
   
   -----------------------------------------------------------------------------
+  SIGNAL observation_reg : STD_LOGIC_VECTOR(31 DOWNTO 0);
   
 BEGIN  -- beh
 
@@ -221,7 +222,7 @@ BEGIN  -- beh
     ELSIF clk_25'EVENT AND clk_25 = '1' THEN  -- rising clock edge
       LED0 <= '0';
       LED1 <= '1';
-      LED2 <= BP0;
+      LED2 <= BP0 OR BP1 OR nDTR2 OR nRTS2 OR nRTS1;
       --IO1  <= '1';
       --IO2  <= SPW_NOM_DIN OR SPW_NOM_SIN OR SPW_RED_DIN OR SPW_RED_SIN;  
       --IO3  <= ADC_SDO(0);
@@ -232,7 +233,7 @@ BEGIN  -- beh
       --IO8  <= ADC_SDO(5);
       --IO9  <= ADC_SDO(6);
       --IO10 <= ADC_SDO(7);
-      IO11 <= BP1 OR nDTR2 OR nRTS2 OR nRTS1;
+      --IO11 <= ;
     END IF;
   END PROCESS;
 
@@ -424,7 +425,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"00000C")  -- aa.bb.cc version
+      top_lfr_version        => X"00000E")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => reset,
@@ -437,7 +438,8 @@ BEGIN  -- beh
       ahbo            => ahbo_m_ext(2),
       coarse_time     => coarse_time,
       fine_time       => fine_time,
-      data_shaping_BW => bias_fail_sw_sig);
+      data_shaping_BW => bias_fail_sw_sig,
+      observation_reg => observation_reg);
 
   top_ad_conv_ADS7886_v2_1 : top_ad_conv_ADS7886_v2
     GENERIC MAP(
@@ -459,9 +461,9 @@ BEGIN  -- beh
       sample     => sample,
       sample_val => sample_val);
 
-  IO10 <= ADC_SDO_sig(5);
-  IO9  <= ADC_SDO_sig(4);
-  IO8  <= ADC_SDO_sig(3);
+  --IO10 <= ADC_SDO_sig(5);
+  --IO9  <= ADC_SDO_sig(4);
+  --IO8  <= ADC_SDO_sig(3);
 
   ADC_nCS     <= ADC_nCS_sig;
   ADC_CLK     <= ADC_CLK_sig;
@@ -475,29 +477,104 @@ BEGIN  -- beh
     GENERIC MAP(pindex => 11, paddr => 11, imask => 16#0000#, nbits => 8)
     PORT MAP(reset, clk_25, apbi_ext, apbo_ext(11), gpioi, gpioo);
   
-  pio_pad_0 : iopad
-    GENERIC MAP (tech => CFG_PADTECH)
-    PORT MAP (IO0, gpioo.dout(0), gpioo.oen(0), gpioi.din(0));
-  pio_pad_1 : iopad
-    GENERIC MAP (tech => CFG_PADTECH)
-    PORT MAP (IO1, gpioo.dout(1), gpioo.oen(1), gpioi.din(1));
-  pio_pad_2 : iopad
-    GENERIC MAP (tech => CFG_PADTECH)
-    PORT MAP (IO2, gpioo.dout(2), gpioo.oen(2), gpioi.din(2));
-  pio_pad_3 : iopad
-    GENERIC MAP (tech => CFG_PADTECH)
-    PORT MAP (IO3, gpioo.dout(3), gpioo.oen(3), gpioi.din(3));
-  pio_pad_4 : iopad
-    GENERIC MAP (tech => CFG_PADTECH)
-    PORT MAP (IO4, gpioo.dout(4), gpioo.oen(4), gpioi.din(4));
-  pio_pad_5 : iopad
-    GENERIC MAP (tech => CFG_PADTECH)
-    PORT MAP (IO5, gpioo.dout(5), gpioo.oen(5), gpioi.din(5));
-  pio_pad_6 : iopad
-    GENERIC MAP (tech => CFG_PADTECH)
-    PORT MAP (IO6, gpioo.dout(6), gpioo.oen(6), gpioi.din(6));
-  pio_pad_7 : iopad
-    GENERIC MAP (tech => CFG_PADTECH)
-    PORT MAP (IO7, gpioo.dout(7), gpioo.oen(7), gpioi.din(7));
+  --pio_pad_0 : iopad
+  --  GENERIC MAP (tech => CFG_PADTECH)
+  --  PORT MAP (IO0, gpioo.dout(0), gpioo.oen(0), gpioi.din(0));
+  --pio_pad_1 : iopad
+  --  GENERIC MAP (tech => CFG_PADTECH)
+  --  PORT MAP (IO1, gpioo.dout(1), gpioo.oen(1), gpioi.din(1));
+  --pio_pad_2 : iopad
+  --  GENERIC MAP (tech => CFG_PADTECH)
+  --  PORT MAP (IO2, gpioo.dout(2), gpioo.oen(2), gpioi.din(2));
+  --pio_pad_3 : iopad
+  --  GENERIC MAP (tech => CFG_PADTECH)
+  --  PORT MAP (IO3, gpioo.dout(3), gpioo.oen(3), gpioi.din(3));
+  --pio_pad_4 : iopad
+  --  GENERIC MAP (tech => CFG_PADTECH)
+  --  PORT MAP (IO4, gpioo.dout(4), gpioo.oen(4), gpioi.din(4));
+  --pio_pad_5 : iopad
+  --  GENERIC MAP (tech => CFG_PADTECH)
+  --  PORT MAP (IO5, gpioo.dout(5), gpioo.oen(5), gpioi.din(5));
+  --pio_pad_6 : iopad
+  --  GENERIC MAP (tech => CFG_PADTECH)
+  --  PORT MAP (IO6, gpioo.dout(6), gpioo.oen(6), gpioi.din(6));
+  --pio_pad_7 : iopad
+  --  GENERIC MAP (tech => CFG_PADTECH)
+  --  PORT MAP (IO7, gpioo.dout(7), gpioo.oen(7), gpioi.din(7));
+
+  PROCESS (clk_25, reset)
+  BEGIN  -- PROCESS
+    IF reset = '0' THEN                  -- asynchronous reset (active low)
+      IO0  <= '0';
+      IO1  <= '0';
+      IO2  <= '0';  
+      IO3  <= '0';
+      IO4  <= '0';
+      IO5  <= '0';
+      IO6  <= '0';
+      IO7  <= '0';
+      IO8  <= '0';
+      IO9  <= '0';
+      IO10 <= '0';
+      IO11 <= '0';
+    ELSIF clk_25'event AND clk_25 = '1' THEN  -- rising clock edge
+      CASE gpioo.dout(1 DOWNTO 0) IS
+        WHEN "00" => 
+          IO0  <= observation_reg(0 );
+          IO1  <= observation_reg(1 );
+          IO2  <= observation_reg(2 );  
+          IO3  <= observation_reg(3 );
+          IO4  <= observation_reg(4 );
+          IO5  <= observation_reg(5 );
+          IO6  <= observation_reg(6 );
+          IO7  <= observation_reg(7 );
+          IO8  <= observation_reg(8 );
+          IO9  <= observation_reg(9 );
+          IO10 <= observation_reg(10);
+          IO11 <= observation_reg(11);
+        WHEN "01" => 
+          IO0  <= observation_reg(0  + 12);
+          IO1  <= observation_reg(1  + 12);
+          IO2  <= observation_reg(2  + 12);  
+          IO3  <= observation_reg(3  + 12);
+          IO4  <= observation_reg(4  + 12);
+          IO5  <= observation_reg(5  + 12);
+          IO6  <= observation_reg(6  + 12);
+          IO7  <= observation_reg(7  + 12);
+          IO8  <= observation_reg(8  + 12);
+          IO9  <= observation_reg(9  + 12);
+          IO10 <= observation_reg(10 + 12);
+          IO11 <= observation_reg(11 + 12);
+        WHEN "10" => 
+          IO0  <= observation_reg(0  + 12 + 12);
+          IO1  <= observation_reg(1  + 12 + 12);
+          IO2  <= observation_reg(2  + 12 + 12);  
+          IO3  <= observation_reg(3  + 12 + 12);
+          IO4  <= observation_reg(4  + 12 + 12);
+          IO5  <= observation_reg(5  + 12 + 12);
+          IO6  <= observation_reg(6  + 12 + 12);
+          IO7  <= observation_reg(7  + 12 + 12);
+          IO8  <= '0';
+          IO9  <= '0';
+          IO10 <= '0';
+          IO11 <= '0';
+        WHEN "11" => 
+          IO0  <= '0';
+          IO1  <= '0';
+          IO2  <= '0';  
+          IO3  <= '0';
+          IO4  <= '0';
+          IO5  <= '0';
+          IO6  <= '0';
+          IO7  <= '0';
+          IO8  <= '0';
+          IO9  <= '0';
+          IO10 <= '0';
+          IO11 <= '0';
+        WHEN OTHERS => NULL;
+      END CASE;
+      
+    END IF;
+  END PROCESS;
 
 END beh;

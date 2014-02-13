@@ -60,46 +60,48 @@ ENTITY lpp_lfr IS
     fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
     -- 
     data_shaping_BW : OUT STD_LOGIC;
+    --
+    observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 
     --debug
-    debug_f0_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    debug_f0_data_valid : OUT STD_LOGIC;
-    debug_f1_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    debug_f1_data_valid : OUT STD_LOGIC;
-    debug_f2_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    debug_f2_data_valid : OUT STD_LOGIC;
-    debug_f3_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    debug_f3_data_valid : OUT STD_LOGIC;
+    --debug_f0_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
+    --debug_f0_data_valid : OUT STD_LOGIC;
+    --debug_f1_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
+    --debug_f1_data_valid : OUT STD_LOGIC;
+    --debug_f2_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
+    --debug_f2_data_valid : OUT STD_LOGIC;
+    --debug_f3_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
+    --debug_f3_data_valid : OUT STD_LOGIC;
 
-    -- debug FIFO_IN
-    debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
-    debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
-    debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
-    debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f3_data_fifo_in_valid : OUT STD_LOGIC;
+    ---- debug FIFO_IN
+    --debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
+    --debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
+    --debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
+    --debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f3_data_fifo_in_valid : OUT STD_LOGIC;
 
-    --debug FIFO OUT
-    debug_f0_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f0_data_fifo_out_valid : OUT STD_LOGIC;
-    debug_f1_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f1_data_fifo_out_valid : OUT STD_LOGIC;
-    debug_f2_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f2_data_fifo_out_valid : OUT STD_LOGIC;
-    debug_f3_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f3_data_fifo_out_valid : OUT STD_LOGIC;
+    ----debug FIFO OUT
+    --debug_f0_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f0_data_fifo_out_valid : OUT STD_LOGIC;
+    --debug_f1_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f1_data_fifo_out_valid : OUT STD_LOGIC;
+    --debug_f2_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f2_data_fifo_out_valid : OUT STD_LOGIC;
+    --debug_f3_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f3_data_fifo_out_valid : OUT STD_LOGIC;
 
-    --debug DMA IN
-    debug_f0_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f0_data_dma_in_valid : OUT STD_LOGIC;
-    debug_f1_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f1_data_dma_in_valid : OUT STD_LOGIC;
-    debug_f2_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f2_data_dma_in_valid : OUT STD_LOGIC;
-    debug_f3_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f3_data_dma_in_valid : OUT STD_LOGIC
+    ----debug DMA IN
+    --debug_f0_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f0_data_dma_in_valid : OUT STD_LOGIC;
+    --debug_f1_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f1_data_dma_in_valid : OUT STD_LOGIC;
+    --debug_f2_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f2_data_dma_in_valid : OUT STD_LOGIC;
+    --debug_f3_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f3_data_dma_in_valid : OUT STD_LOGIC
     );
 END lpp_lfr;
 
@@ -474,39 +476,41 @@ BEGIN
       data_f3_data_out_valid_burst => data_f3_data_out_valid_burst_s,
       data_f3_data_out_ren         => data_f3_data_out_ren,
 
-      -- debug SNAPSHOT_OUT
-      debug_f0_data       => debug_f0_data,
-      debug_f0_data_valid => debug_f0_data_valid ,
-      debug_f1_data       => debug_f1_data ,
-      debug_f1_data_valid => debug_f1_data_valid,
-      debug_f2_data       => debug_f2_data ,
-      debug_f2_data_valid => debug_f2_data_valid ,
-      debug_f3_data       => debug_f3_data ,
-      debug_f3_data_valid => debug_f3_data_valid,
+      -------------------------------------------------------------------------
+      observation_reg => observation_reg
+      ---- debug SNAPSHOT_OUT
+      --debug_f0_data       => debug_f0_data,
+      --debug_f0_data_valid => debug_f0_data_valid ,
+      --debug_f1_data       => debug_f1_data ,
+      --debug_f1_data_valid => debug_f1_data_valid,
+      --debug_f2_data       => debug_f2_data ,
+      --debug_f2_data_valid => debug_f2_data_valid ,
+      --debug_f3_data       => debug_f3_data ,
+      --debug_f3_data_valid => debug_f3_data_valid,
 
-      -- debug FIFO_IN
-      debug_f0_data_fifo_in       => debug_f0_data_fifo_in ,
-      debug_f0_data_fifo_in_valid => debug_f0_data_fifo_in_valid,
-      debug_f1_data_fifo_in       => debug_f1_data_fifo_in ,
-      debug_f1_data_fifo_in_valid => debug_f1_data_fifo_in_valid,
-      debug_f2_data_fifo_in       => debug_f2_data_fifo_in ,
-      debug_f2_data_fifo_in_valid => debug_f2_data_fifo_in_valid,
-      debug_f3_data_fifo_in       => debug_f3_data_fifo_in ,
-      debug_f3_data_fifo_in_valid => debug_f3_data_fifo_in_valid
+      ---- debug FIFO_IN
+      --debug_f0_data_fifo_in       => debug_f0_data_fifo_in ,
+      --debug_f0_data_fifo_in_valid => debug_f0_data_fifo_in_valid,
+      --debug_f1_data_fifo_in       => debug_f1_data_fifo_in ,
+      --debug_f1_data_fifo_in_valid => debug_f1_data_fifo_in_valid,
+      --debug_f2_data_fifo_in       => debug_f2_data_fifo_in ,
+      --debug_f2_data_fifo_in_valid => debug_f2_data_fifo_in_valid,
+      --debug_f3_data_fifo_in       => debug_f3_data_fifo_in ,
+      --debug_f3_data_fifo_in_valid => debug_f3_data_fifo_in_valid
 
       );
 
 
   -----------------------------------------------------------------------------
   -- DEBUG -- WFP OUT
-  debug_f0_data_fifo_out_valid <= NOT data_f0_data_out_ren;
-  debug_f0_data_fifo_out       <= data_f0_data_out;
-  debug_f1_data_fifo_out_valid <= NOT data_f1_data_out_ren;
-  debug_f1_data_fifo_out       <= data_f1_data_out;
-  debug_f2_data_fifo_out_valid <= NOT data_f2_data_out_ren;
-  debug_f2_data_fifo_out       <= data_f2_data_out;
-  debug_f3_data_fifo_out_valid <= NOT data_f3_data_out_ren;
-  debug_f3_data_fifo_out       <= data_f3_data_out;
+  --debug_f0_data_fifo_out_valid <= NOT data_f0_data_out_ren;
+  --debug_f0_data_fifo_out       <= data_f0_data_out;
+  --debug_f1_data_fifo_out_valid <= NOT data_f1_data_out_ren;
+  --debug_f1_data_fifo_out       <= data_f1_data_out;
+  --debug_f2_data_fifo_out_valid <= NOT data_f2_data_out_ren;
+  --debug_f2_data_fifo_out       <= data_f2_data_out;
+  --debug_f3_data_fifo_out_valid <= NOT data_f3_data_out_ren;
+  --debug_f3_data_fifo_out       <= data_f3_data_out;
   -----------------------------------------------------------------------------
 
 
@@ -630,14 +634,14 @@ BEGIN
 
   -----------------------------------------------------------------------------
   -- DEBUG -- DMA IN
-  debug_f0_data_dma_in_valid <= NOT data_f0_data_out_ren;
-  debug_f0_data_dma_in       <= dma_data;
-  debug_f1_data_dma_in_valid <= NOT data_f1_data_out_ren;
-  debug_f1_data_dma_in       <= dma_data;
-  debug_f2_data_dma_in_valid <= NOT data_f2_data_out_ren;
-  debug_f2_data_dma_in       <= dma_data;
-  debug_f3_data_dma_in_valid <= NOT data_f3_data_out_ren;
-  debug_f3_data_dma_in       <= dma_data;
+  --debug_f0_data_dma_in_valid <= NOT data_f0_data_out_ren;
+  --debug_f0_data_dma_in       <= dma_data;
+  --debug_f1_data_dma_in_valid <= NOT data_f1_data_out_ren;
+  --debug_f1_data_dma_in       <= dma_data;
+  --debug_f2_data_dma_in_valid <= NOT data_f2_data_out_ren;
+  --debug_f2_data_dma_in       <= dma_data;
+  --debug_f3_data_dma_in_valid <= NOT data_f3_data_out_ren;
+  --debug_f3_data_dma_in       <= dma_data;
   -----------------------------------------------------------------------------
 
   -----------------------------------------------------------------------------

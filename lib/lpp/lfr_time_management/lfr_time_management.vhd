@@ -57,7 +57,7 @@ BEGIN
   
   lpp_counter_1 : lpp_counter
     GENERIC MAP (
-      nb_wait_period => 750,
+      nb_wait_period => nb_wait_pediod,
       nb_bit_of_data => 16)
     PORT MAP (
       clk   => clk,

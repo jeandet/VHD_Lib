@@ -44,7 +44,7 @@ USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
 USE lpp.CY7C1061DV33_pkg.ALL;
 
-ENTITY testbenc h IS
+ENTITY testbench IS
 END;
 
 ARCHITECTURE behav OF testbench IS
@@ -180,7 +180,13 @@ ARCHITECTURE behav OF testbench IS
 
   CONSTANT padtech : INTEGER := inferred;
   SIGNAL not_ramsn_0 : STD_LOGIC;
-  
+
+  -----------------------------------------------------------------------------
+  SIGNAL status         : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL read_buffer    : STD_LOGIC;
+  -----------------------------------------------------------------------------
+  SIGNAL run_test_waveform_picker : STD_LOGIC := '1';
+  SIGNAL state_read_buffer_on_going : STD_LOGIC;
   
 BEGIN
 
@@ -237,7 +243,7 @@ BEGIN
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 0,
-      top_lfr_version        => X"00000001")
+      top_lfr_version        => X"000001")
     PORT MAP (
       clk             => clk25MHz,
       rstn            => rstn,
@@ -257,7 +263,7 @@ BEGIN
   ahb0 : ahbctrl                        -- AHB arbiter/multiplexer
     GENERIC MAP (defmast => 0, split => 0,
                  rrobin  => 1, ioaddr => 16#FFF#,
-                 ioen    => 0, nahbm => 1, nahbs => 1)
+                 ioen    => 0, nahbm => 2, nahbs => 1)
     PORT MAP (rstn, clk25MHz, ahbmi, ahbmo, ahbsi, ahbso);
 
   ---  AHB RAM ----------------------------------------------------------
@@ -347,6 +353,7 @@ BEGIN
       BLE_b => nSRAM_BE2,
       A     => address,
       DQ    => data(31 DOWNTO 16));
+
   
   
   -----------------------------------------------------------------------------
@@ -381,17 +388,16 @@ BEGIN
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_ADDRESS_F2 , X"40040000");
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_ADDRESS_F3 , X"40060000");
 
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTASNAPSHOT, X"00000020");--"00000020"
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F0     , X"00000019");--"00000019"
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTASNAPSHOT, X"00000080");--"00000020"
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F0     , X"00000060");--"00000019"
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F0_2   , X"00000007");--"00000007"
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F1     , X"00000019");--"00000019"
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F2     , X"00000001");--"00000001"
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F1     , X"00000062");--"00000019"
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F2     , X"00000060");--"00000001"
 
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NB_DATA_IN_BUFFER , X"00000007"); -- X"00000010"
-    -- 
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NBSNAPSHOT , X"00000010");
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_START_DATE , X"00000001");
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NB_WORD_IN_BUFFER , X"00000022");
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NB_DATA_IN_BUFFER , X"0000003f"); -- X"00000010"
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NBSNAPSHOT        , X"00000040");
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_START_DATE        , X"00000001");
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NB_WORD_IN_BUFFER , X"000000c2");
 
 
     WAIT UNTIL clk25MHz = '1';
@@ -405,23 +411,40 @@ BEGIN
     WAIT UNTIL clk25MHz = '1';
     WAIT FOR 1 us;
     coarse_time <= X"00000001";
+
+    WAIT UNTIL clk25MHz = '1';
+   
+    read_buffer <= '0';
+    while_loop: WHILE run_test_waveform_picker = '1' LOOP
+      WAIT UNTIL apbo(INDEX_WAVEFORM_PICKER).pirq(14) = '1';
+      APB_READ(clk25MHz,INDEX_WAVEFORM_PICKER,apbi,apbo(INDEX_WAVEFORM_PICKER),ADDR_WAVEFORM_PICKER_STATUS,status);
+      IF status(2 DOWNTO 0) = "111" THEN
+        APB_WRITE(clk25MHz,INDEX_WAVEFORM_PICKER,apbi,ADDR_WAVEFORM_PICKER_STATUS,X"00000000");
+        read_buffer <= '1';
+      END IF;
+      WAIT UNTIL clk25MHz = '1';   
+      read_buffer <= '0';
+    END LOOP while_loop;
+
+    
     ---------------------------------------------------------------------------
     -- RUN STEP
-    WAIT FOR 200 ms;
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_CONTROL, X"00000000");
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_START_DATE, X"00000010");
-    WAIT FOR 10 us;
-    WAIT UNTIL clk25MHz = '1';
-    WAIT UNTIL clk25MHz = '1';
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_CONTROL, X"000000FF");
-    WAIT UNTIL clk25MHz = '1';
-    coarse_time <= X"00000010";
-    WAIT FOR 100 ms;
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_CONTROL, X"00000000");
-    WAIT FOR 10 us;
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_CONTROL, X"000000AF");
-    WAIT FOR 200 ms;
+    WAIT FOR 20000 ms;
     REPORT "*** END simulation ***" SEVERITY failure;
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_CONTROL, X"00000000");
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_START_DATE, X"00000010");
+    --WAIT FOR 10 us;
+    --WAIT UNTIL clk25MHz = '1';
+    --WAIT UNTIL clk25MHz = '1';
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_CONTROL, X"000000FF");
+    --WAIT UNTIL clk25MHz = '1';
+    --coarse_time <= X"00000010";
+    --WAIT FOR 100 ms;
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_CONTROL, X"00000000");
+    --WAIT FOR 10 us;
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_CONTROL, X"000000AF");
+    --WAIT FOR 200 ms;
+    --REPORT "*** END simulation ***" SEVERITY failure;
 
 
     WAIT;
@@ -435,9 +458,37 @@ BEGIN
   PROCESS (clk25MHz, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
-
+      state_read_buffer_on_going <= '0';
     ELSIF clk25MHz'EVENT AND clk25MHz = '1' THEN  -- rising clock edge
+      IF read_buffer = '1' THEN
+        state_read_buffer_on_going <= '1';
+        
+        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40000000", time_mem_f0(31 DOWNTO 0));
+        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40020000", time_mem_f1(31 DOWNTO 0));
+        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40040000", time_mem_f2(31 DOWNTO 0));
+        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40060000", time_mem_f3(31 DOWNTO 0));
+        
+        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40000004", time_mem_f0(63 DOWNTO 32));
+        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40020004", time_mem_f1(63 DOWNTO 32));
+        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40040004", time_mem_f2(63 DOWNTO 32));
+        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40060004", time_mem_f3(63 DOWNTO 32));
+        
+        current_data <= 8;
+      ELSE
+        IF state_read_buffer_on_going = '1' THEN
+          -- READ ALL DATA in memory
+          AHB_READ(clk, hindex, ahbmi, ahbmo, X"40000000" + current_data, data_mem_f0);
+          AHB_READ(clk, hindex, ahbmi, ahbmo, X"40020000" + current_data, data_mem_f1);
+          AHB_READ(clk, hindex, ahbmi, ahbmo, X"40040000" + current_data, data_mem_f2);
+          AHB_READ(clk, hindex, ahbmi, ahbmo, X"40060000" + current_data, data_mem_f3);
+          IF current_data < LIMIT_DATA THEN
 
+            current_data <= current_data + 4;
+          ELSE
+            state_read_buffer_on_going <= '0';
+          END IF;          
+        END IF;
+      END IF;
     END IF;
   END PROCESS;
   -----------------------------------------------------------------------------

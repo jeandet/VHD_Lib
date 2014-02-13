@@ -169,24 +169,25 @@ PACKAGE lpp_waveform_pkg IS
       data_f3_data_out_ren         : IN  STD_LOGIC;
 
       --debug
-      debug_f0_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      debug_f0_data_valid : OUT STD_LOGIC;
-      debug_f1_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      debug_f1_data_valid : OUT STD_LOGIC;
-      debug_f2_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      debug_f2_data_valid : OUT STD_LOGIC;
-      debug_f3_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      debug_f3_data_valid : OUT STD_LOGIC;
+      observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+      --debug_f0_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+      --debug_f0_data_valid : OUT STD_LOGIC;
+      --debug_f1_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+      --debug_f1_data_valid : OUT STD_LOGIC;
+      --debug_f2_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+      --debug_f2_data_valid : OUT STD_LOGIC;
+      --debug_f3_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+      --debug_f3_data_valid : OUT STD_LOGIC;
 
-      --debug FIFO IN
-      debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
-      debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
-      debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
-      debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      debug_f3_data_fifo_in_valid : OUT STD_LOGIC
+      ----debug FIFO IN
+      --debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      --debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
+      --debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      --debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
+      --debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      --debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
+      --debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      --debug_f3_data_fifo_in_valid : OUT STD_LOGIC
       );
   END COMPONENT;
 

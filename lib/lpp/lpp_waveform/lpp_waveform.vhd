@@ -129,25 +129,30 @@ ENTITY lpp_waveform IS
     data_f3_data_out_valid_burst : OUT STD_LOGIC;
     data_f3_data_out_ren         : IN  STD_LOGIC;
 
-    --debug SNAPSHOT OUT
-    debug_f0_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    debug_f0_data_valid : OUT STD_LOGIC;
-    debug_f1_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    debug_f1_data_valid : OUT STD_LOGIC;
-    debug_f2_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    debug_f2_data_valid : OUT STD_LOGIC;
-    debug_f3_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    debug_f3_data_valid : OUT STD_LOGIC;
+    ---------------------------------------------------------------------------
+    --
+    observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+    
 
-    --debug FIFO IN
-    debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
-    debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
-    debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
-    debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    debug_f3_data_fifo_in_valid : OUT STD_LOGIC
+    ----debug SNAPSHOT OUT
+    --debug_f0_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    --debug_f0_data_valid : OUT STD_LOGIC;
+    --debug_f1_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    --debug_f1_data_valid : OUT STD_LOGIC;
+    --debug_f2_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    --debug_f2_data_valid : OUT STD_LOGIC;
+    --debug_f3_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    --debug_f3_data_valid : OUT STD_LOGIC;
+
+    ----debug FIFO IN
+    --debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
+    --debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
+    --debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
+    --debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --debug_f3_data_fifo_in_valid : OUT STD_LOGIC
 
     );
 
@@ -203,9 +208,33 @@ ARCHITECTURE beh OF lpp_waveform IS
   SIGNAL s_empty        : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL s_data_ren     : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL s_rdata        : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+  --
+
+  SIGNAL observation_reg_s : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL status_full_s       : STD_LOGIC_VECTOR(3 DOWNTO 0);
   
 BEGIN  -- beh
 
+  -----------------------------------------------------------------------------
+  -- DEBUG
+  -----------------------------------------------------------------------------
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS
+    IF rstn = '0' THEN                  -- asynchronous reset (active low)
+      observation_reg <= (OTHERS => '0');
+    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      observation_reg <= observation_reg_s;
+    END IF;
+  END PROCESS;
+  observation_reg_s( 2 DOWNTO  0) <= start_snapshot_f2 & start_snapshot_f1 & start_snapshot_f0;
+  observation_reg_s( 5 DOWNTO  3) <= data_f2_out_valid & data_f1_out_valid & data_f0_out_valid;
+  observation_reg_s( 8 DOWNTO  6) <= status_full_s(2 DOWNTO 0) ;
+  observation_reg_s(11 DOWNTO  9) <= status_full_ack(2 DOWNTO 0);
+  observation_reg_s(14 DOWNTO 12) <= data_wen(2 DOWNTO 0);
+  observation_reg_s(31 DOWNTO 15) <= (OTHERS => '0');
+  -----------------------------------------------------------------------------
+  
   lpp_waveform_snapshot_controler_1 : lpp_waveform_snapshot_controler
     GENERIC MAP (
       delta_vector_size      => delta_vector_size,
@@ -246,7 +275,7 @@ BEGIN  -- beh
       data_out          => data_f0_out,
       data_out_valid    => data_f0_out_valid);
 
-  nb_snapshot_param_more_one <= ('0' & nb_snapshot_param) + 1;
+  nb_snapshot_param_more_one <= ('0' & nb_snapshot_param) ;--+ 1;
 
   lpp_waveform_snapshot_f1 : lpp_waveform_snapshot
     GENERIC MAP (
@@ -297,14 +326,14 @@ BEGIN  -- beh
 
   -----------------------------------------------------------------------------
   -- DEBUG -- SNAPSHOT OUT
-  debug_f0_data_valid <= data_f0_out_valid;
-  debug_f0_data       <= data_f0_out;
-  debug_f1_data_valid <= data_f1_out_valid;
-  debug_f1_data       <= data_f1_out;
-  debug_f2_data_valid <= data_f2_out_valid;
-  debug_f2_data       <= data_f2_out;
-  debug_f3_data_valid <= data_f3_out_valid;
-  debug_f3_data       <= data_f3_out;
+  --debug_f0_data_valid <= data_f0_out_valid;
+  --debug_f0_data       <= data_f0_out;
+  --debug_f1_data_valid <= data_f1_out_valid;
+  --debug_f1_data       <= data_f1_out;
+  --debug_f2_data_valid <= data_f2_out_valid;
+  --debug_f2_data       <= data_f2_out;
+  --debug_f3_data_valid <= data_f3_out_valid;
+  --debug_f3_data       <= data_f3_out;
   -----------------------------------------------------------------------------
 
   PROCESS (clk, rstn)
@@ -382,14 +411,14 @@ BEGIN  -- beh
 
   -----------------------------------------------------------------------------
   -- DEBUG -- SNAPSHOT IN
-  debug_f0_data_fifo_in_valid <= NOT data_wen(0);
-  debug_f0_data_fifo_in       <= wdata;
-  debug_f1_data_fifo_in_valid <= NOT data_wen(1);
-  debug_f1_data_fifo_in       <= wdata;
-  debug_f2_data_fifo_in_valid <= NOT data_wen(2);
-  debug_f2_data_fifo_in       <= wdata;
-  debug_f3_data_fifo_in_valid <= NOT data_wen(3);
-  debug_f3_data_fifo_in       <= wdata;
+  --debug_f0_data_fifo_in_valid <= NOT data_wen(0);
+  --debug_f0_data_fifo_in       <= wdata;
+  --debug_f1_data_fifo_in_valid <= NOT data_wen(1);
+  --debug_f1_data_fifo_in       <= wdata;
+  --debug_f2_data_fifo_in_valid <= NOT data_wen(2);
+  --debug_f2_data_fifo_in       <= wdata;
+  --debug_f3_data_fifo_in_valid <= NOT data_wen(3);
+  --debug_f3_data_fifo_in       <= wdata;s
   -----------------------------------------------------------------------------
 
   lpp_waveform_fifo_1 : lpp_waveform_fifo
@@ -469,7 +498,7 @@ BEGIN  -- beh
       -------------------------------------------------------------------------
       -- STATUS
       -------------------------------------------------------------------------
-      status_full     => status_full,
+      status_full     => status_full_s,
       status_full_ack => status_full_ack,
       status_full_err => status_full_err,
 
@@ -491,5 +520,6 @@ BEGIN  -- beh
       data_f2_addr_out => data_f2_addr_out,
       data_f3_addr_out => data_f3_addr_out
       );
-
+  status_full <= status_full_s;
+  
 END beh;
