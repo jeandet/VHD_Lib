@@ -18,6 +18,6 @@ vsim work.testbench
 
 log -r *
 
-do tb_waveform.do
+do wave_waveform_longsim.do
 
-run -all
+run 500 ms

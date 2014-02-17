@@ -187,6 +187,48 @@ ARCHITECTURE behav OF testbench IS
   -----------------------------------------------------------------------------
   SIGNAL run_test_waveform_picker : STD_LOGIC := '1';
   SIGNAL state_read_buffer_on_going : STD_LOGIC;
+  CONSTANT hindex                  : INTEGER                       := 1;
+  SIGNAL time_mem_f0 : STD_LOGIC_VECTOR(63 DOWNTO 0);
+  SIGNAL time_mem_f1 : STD_LOGIC_VECTOR(63 DOWNTO 0);
+  SIGNAL time_mem_f2 : STD_LOGIC_VECTOR(63 DOWNTO 0);
+  SIGNAL time_mem_f3 : STD_LOGIC_VECTOR(63 DOWNTO 0);
+  
+  SIGNAL data_mem_f0 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL data_mem_f1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL data_mem_f2 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL data_mem_f3 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+  SIGNAL data_0_f1 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_0_f2 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_0_f0 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  
+  SIGNAL data_1_f1 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_1_f2 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_1_f0 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  
+  SIGNAL data_2_f1 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_2_f2 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_2_f0 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  
+  SIGNAL data_3_f1 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_3_f2 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_3_f0 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  
+  SIGNAL data_4_f1 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_4_f2 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_4_f0 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  
+  SIGNAL data_5_f1 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_5_f2 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_5_f0 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  -----------------------------------------------------------------------------
+
+  SIGNAL current_data : INTEGER;
+  SIGNAL LIMIT_DATA : INTEGER := 194;
+
+  SIGNAL read_buffer_temp   : STD_LOGIC;
+  SIGNAL read_buffer_temp_2 : STD_LOGIC;
+  
   
 BEGIN
 
@@ -392,7 +434,7 @@ BEGIN
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F0     , X"00000060");--"00000019"
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F0_2   , X"00000007");--"00000007"
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F1     , X"00000062");--"00000019"
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F2     , X"00000060");--"00000001"
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F2     , X"00000001");--"00000001"
 
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NB_DATA_IN_BUFFER , X"0000003f"); -- X"00000010"
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NBSNAPSHOT        , X"00000040");
@@ -414,16 +456,14 @@ BEGIN
 
     WAIT UNTIL clk25MHz = '1';
    
-    read_buffer <= '0';
     while_loop: WHILE run_test_waveform_picker = '1' LOOP
       WAIT UNTIL apbo(INDEX_WAVEFORM_PICKER).pirq(14) = '1';
       APB_READ(clk25MHz,INDEX_WAVEFORM_PICKER,apbi,apbo(INDEX_WAVEFORM_PICKER),ADDR_WAVEFORM_PICKER_STATUS,status);
+      
       IF status(2 DOWNTO 0) = "111" THEN
         APB_WRITE(clk25MHz,INDEX_WAVEFORM_PICKER,apbi,ADDR_WAVEFORM_PICKER_STATUS,X"00000000");
-        read_buffer <= '1';
       END IF;
-      WAIT UNTIL clk25MHz = '1';   
-      read_buffer <= '0';
+      WAIT UNTIL clk25MHz = '1';  
     END LOOP while_loop;
 
     
@@ -447,49 +487,104 @@ BEGIN
     --REPORT "*** END simulation ***" SEVERITY failure;
 
 
+
     WAIT;
 
   END PROCESS WaveGen_Proc;
   -----------------------------------------------------------------------------
 
-  -----------------------------------------------------------------------------
-  -- IRQ
-  -----------------------------------------------------------------------------
+  read_buffer_temp <= '1' WHEN status(2 DOWNTO 0) = "111" ELSE '0';
   PROCESS (clk25MHz, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      state_read_buffer_on_going <= '0';
-    ELSIF clk25MHz'EVENT AND clk25MHz = '1' THEN  -- rising clock edge
+      read_buffer <= '0';
+      read_buffer_temp_2 <= '0';
+    ELSIF clk25MHz'event AND clk25MHz = '1' THEN  -- rising clock edge
+      read_buffer_temp_2 <=  read_buffer_temp;
+      read_buffer        <= read_buffer_temp AND NOT read_buffer_temp_2;
+    END IF;
+  END PROCESS;
+
+  -----------------------------------------------------------------------------
+  -- IRQ
+  -----------------------------------------------------------------------------
+  PROCESS 
+  BEGIN  -- PROCESS
+    state_read_buffer_on_going <= '0';
+    current_data <= 0;
+    time_mem_f0 <= (OTHERS => '0');
+    time_mem_f1 <= (OTHERS => '0');
+    time_mem_f2 <= (OTHERS => '0');
+    time_mem_f3 <= (OTHERS => '0');
+    data_mem_f0 <= (OTHERS => '0');
+    data_mem_f1 <= (OTHERS => '0');
+    data_mem_f2 <= (OTHERS => '0');
+    data_mem_f3 <= (OTHERS => '0');
+    
+    while_loop2: WHILE run_test_waveform_picker = '1' LOOP
+      WAIT UNTIL clk25MHz = '1';
       IF read_buffer = '1' THEN
         state_read_buffer_on_going <= '1';
         
-        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40000000", time_mem_f0(31 DOWNTO 0));
-        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40020000", time_mem_f1(31 DOWNTO 0));
-        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40040000", time_mem_f2(31 DOWNTO 0));
-        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40060000", time_mem_f3(31 DOWNTO 0));
+        AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40000000", time_mem_f0(31 DOWNTO 0));
+        AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020000", time_mem_f1(31 DOWNTO 0));
+        AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40040000", time_mem_f2(31 DOWNTO 0));
         
-        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40000004", time_mem_f0(63 DOWNTO 32));
-        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40020004", time_mem_f1(63 DOWNTO 32));
-        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40040004", time_mem_f2(63 DOWNTO 32));
-        AHB_READ(clk, hindex, ahbmi, ahbmo, X"40060004", time_mem_f3(63 DOWNTO 32));
+        AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40000004", time_mem_f0(63 DOWNTO 32));
+        AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020004", time_mem_f1(63 DOWNTO 32));
+        AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40040004", time_mem_f2(63 DOWNTO 32));
         
         current_data <= 8;
       ELSE
         IF state_read_buffer_on_going = '1' THEN
           -- READ ALL DATA in memory
-          AHB_READ(clk, hindex, ahbmi, ahbmo, X"40000000" + current_data, data_mem_f0);
-          AHB_READ(clk, hindex, ahbmi, ahbmo, X"40020000" + current_data, data_mem_f1);
-          AHB_READ(clk, hindex, ahbmi, ahbmo, X"40040000" + current_data, data_mem_f2);
-          AHB_READ(clk, hindex, ahbmi, ahbmo, X"40060000" + current_data, data_mem_f3);
-          IF current_data < LIMIT_DATA THEN
-
-            current_data <= current_data + 4;
-          ELSE
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40000000" + current_data, data_mem_f0);
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020000" + current_data, data_mem_f1);
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40040000" + current_data, data_mem_f2); 
+          data_0_f0 <= data_mem_f0(15 DOWNTO  0);
+          data_1_f0 <= data_mem_f0(31 DOWNTO 16);                  
+          data_0_f1 <= data_mem_f1(15 DOWNTO  0);
+          data_1_f1 <= data_mem_f1(31 DOWNTO 16);
+          data_0_f2 <= data_mem_f2(15 DOWNTO  0);
+          data_1_f2 <= data_mem_f2(31 DOWNTO 16);
+          current_data <= current_data + 4;
+          
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40000000" + current_data, data_mem_f0);
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020000" + current_data, data_mem_f1);
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40040000" + current_data, data_mem_f2); 
+          data_2_f0 <= data_mem_f0(15 DOWNTO  0);
+          data_3_f0 <= data_mem_f0(31 DOWNTO 16);                  
+          data_2_f1 <= data_mem_f1(15 DOWNTO  0);
+          data_3_f1 <= data_mem_f1(31 DOWNTO 16);
+          data_2_f2 <= data_mem_f2(15 DOWNTO  0);
+          data_3_f2 <= data_mem_f2(31 DOWNTO 16);
+          current_data <= current_data + 4;
+          
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40000000" + current_data, data_mem_f0);
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020000" + current_data, data_mem_f1);
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40040000" + current_data, data_mem_f2); 
+          data_4_f0 <= data_mem_f0(15 DOWNTO  0);
+          data_5_f0 <= data_mem_f0(31 DOWNTO 16);                  
+          data_4_f1 <= data_mem_f1(15 DOWNTO  0);
+          data_5_f1 <= data_mem_f1(31 DOWNTO 16);
+          data_4_f2 <= data_mem_f2(15 DOWNTO  0);
+          data_5_f2 <= data_mem_f2(31 DOWNTO 16);
+          current_data <= current_data + 4;          
+          
+          IF current_data > LIMIT_DATA THEN
             state_read_buffer_on_going <= '0';
+            time_mem_f0 <= (OTHERS => '0');
+            time_mem_f1 <= (OTHERS => '0');
+            time_mem_f2 <= (OTHERS => '0');
+            time_mem_f3 <= (OTHERS => '0');
+            data_mem_f0 <= (OTHERS => '0');
+            data_mem_f1 <= (OTHERS => '0');
+            data_mem_f2 <= (OTHERS => '0');
+            data_mem_f3 <= (OTHERS => '0');
           END IF;          
         END IF;
       END IF;
-    END IF;
+    END LOOP while_loop2;
   END PROCESS;
   -----------------------------------------------------------------------------
 

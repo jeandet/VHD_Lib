@@ -32,10 +32,10 @@ PACKAGE testbench_package IS
     );
 
   PROCEDURE AHB_READ (
-    SIGNAL   clk    : IN STD_LOGIC;
-    CONSTANT hindex : IN INTEGER
-    SIGNAL   ahbmi : OUT ahb_slv_in_type;
-    SIGNAL   ahbmo : IN ahb_slv_out_type;
+    SIGNAL   clk    : IN  STD_LOGIC;
+    CONSTANT hindex : IN  INTEGER;
+    SIGNAL   ahbmi  : IN  ahb_mst_in_type;
+    SIGNAL   ahbmo  : OUT ahb_mst_out_type;
     CONSTANT haddr  : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL   hrdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
@@ -63,6 +63,7 @@ PACKAGE BODY testbench_package IS
     apbi.penable      <= '0';
     apbi.paddr        <= (OTHERS => '0');
     apbi.pwdata       <= (OTHERS => '0');
+    WAIT UNTIL clk = '1';
     
   END APB_WRITE;
 
@@ -89,17 +90,31 @@ PACKAGE BODY testbench_package IS
   END APB_READ;
 
   PROCEDURE AHB_READ (
-    SIGNAL   clk    : IN STD_LOGIC;
-    CONSTANT hindex : IN INTEGER
-    SIGNAL   ahbmi : OUT ahb_slv_in_type;
-    SIGNAL   ahbmo : IN ahb_slv_out_type;
+    SIGNAL   clk    : IN  STD_LOGIC;
+    CONSTANT hindex : IN  INTEGER;
+    SIGNAL   ahbmi  : IN  ahb_mst_in_type;
+    SIGNAL   ahbmo  : OUT ahb_mst_out_type;
     CONSTANT haddr  : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL   hrdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     ) IS
   BEGIN
-    
+    ahbmo.HADDR   <= haddr;
+    ahbmo.HPROT   <= "0011";
+    ahbmo.HIRQ    <= (OTHERS => '0');
+    ahbmo.HCONFIG <= (0      => (OTHERS => '0'), OTHERS => (OTHERS => '0'));
+    ahbmo.HINDEX  <= hindex;
+    ahbmo.HBUSREQ <= '1';
+    ahbmo.HLOCK   <= '1';
+    ahbmo.HSIZE   <= HSIZE_WORD;
+    ahbmo.HBURST  <= HBURST_SINGLE;
+    ahbmo.HTRANS  <= HTRANS_NONSEQ;
+    ahbmo.HWRITE  <= '0';
+    WAIT UNTIL clk = '1' AND ahbmi.HREADY = '1' AND ahbmi.HGRANT(hindex) = '1';
+    hrdata        <= ahbmi.HRDATA;
+    WAIT UNTIL clk = '1' AND ahbmi.HREADY = '1' AND ahbmi.HGRANT(hindex) = '1';
+    ahbmo.HTRANS  <= HTRANS_IDLE;
+    ahbmo.HBUSREQ <= '0';
+    ahbmo.HLOCK   <= '0';
   END AHB_READ;
-
-  
 
 END testbench_package;
