@@ -20,4 +20,4 @@ log -r *
 
 do wave_waveform_longsim.do
 
-run 500 ms
+run 40 ms

@@ -29,6 +29,8 @@ ENTITY CY7C1061DV33 IS
      DATA_BITS : INTEGER := 16;
      depth     : INTEGER := 1048576;
 
+     MEM_ARRAY_DEBUG : INTEGER := 32;
+     
      TimingInfo   : BOOLEAN   := true;
      TimingChecks : STD_LOGIC := '1'
      );
@@ -68,7 +70,7 @@ ARCHITECTURE behave_arch OF CY7C1061DV33 IS
   CONSTANT tskew        : TIME := 1 ns;
 
   -------------------------------------------------------------------------------JC\/
-  TYPE mem_array_type_t IS ARRAY (31 DOWNTO 0) OF STD_LOGIC_VECTOR(DATA_BITS-1 DOWNTO 0);
+  TYPE mem_array_type_t IS ARRAY (MEM_ARRAY_DEBUG-1 DOWNTO 0) OF STD_LOGIC_VECTOR(DATA_BITS-1 DOWNTO 0);
   SIGNAL mem_array_0 : mem_array_type_t;
   SIGNAL mem_array_1 : mem_array_type_t;
   SIGNAL mem_array_2 : mem_array_type_t;
@@ -236,7 +238,7 @@ BEGIN
 
         
         -------------------------------------------------------------------------------JC\/
-        all_mem_array_obs: FOR I IN 0 TO 31 LOOP
+        all_mem_array_obs: FOR I IN 0 TO MEM_ARRAY_DEBUG-1 LOOP
           IF I + ((2**15) *0) < depth THEN  mem_array_0(I) <= mem_array(I+((2**15) *0)); END IF;
           IF I + ((2**15) *1) < depth THEN  mem_array_1(I) <= mem_array(I+((2**15) *1)); END IF;
           IF I + ((2**15) *2) < depth THEN  mem_array_2(I) <= mem_array(I+((2**15) *2)); END IF;

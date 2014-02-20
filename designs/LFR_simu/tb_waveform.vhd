@@ -19,6 +19,7 @@ USE ieee.std_logic_1164.ALL;
 LIBRARY grlib;
 USE grlib.amba.ALL;
 USE grlib.stdlib.ALL;
+USE grlib.AMBA_TestPackage.ALL;
 LIBRARY gaisler;
 USE gaisler.memctrl.ALL;
 USE gaisler.leon3.ALL;
@@ -224,7 +225,7 @@ ARCHITECTURE behav OF testbench IS
   -----------------------------------------------------------------------------
 
   SIGNAL current_data : INTEGER;
-  SIGNAL LIMIT_DATA : INTEGER := 194;
+  SIGNAL LIMIT_DATA : INTEGER := 64;
 
   SIGNAL read_buffer_temp   : STD_LOGIC;
   SIGNAL read_buffer_temp_2 : STD_LOGIC;
@@ -367,6 +368,7 @@ BEGIN
       ADDR_BITS         => 20,
       DATA_BITS         => 16,
       depth 	        => 1048576,
+      MEM_ARRAY_DEBUG   => 194,
       TimingInfo        => TRUE,
       TimingChecks	=> '1')
     PORT MAP (
@@ -384,6 +386,7 @@ BEGIN
       ADDR_BITS         => 20,
       DATA_BITS         => 16,
       depth 	        => 1048576,
+      MEM_ARRAY_DEBUG   => 194,
       TimingInfo        => TRUE,
       TimingChecks	=> '1')
     PORT MAP (
@@ -430,16 +433,26 @@ BEGIN
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_ADDRESS_F2 , X"40040000");
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_ADDRESS_F3 , X"40060000");
 
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTASNAPSHOT, X"00000080");--"00000020"
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F0     , X"00000060");--"00000019"
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F0_2   , X"00000007");--"00000007"
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F1     , X"00000062");--"00000019"
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F2     , X"00000001");--"00000001"
-
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTASNAPSHOT     , X"00000080");--"00000020"
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F0          , X"00000060");--"00000019"
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F0_2        , X"00000007");--"00000007"
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F1          , X"00000062");--"00000019"
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F2          , X"00000001");--"00000001"
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NB_DATA_IN_BUFFER , X"0000003f"); -- X"00000010"
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NBSNAPSHOT        , X"00000040");
     APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_START_DATE        , X"00000001");
-    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NB_WORD_IN_BUFFER , X"000000c2");
+    APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NB_WORD_IN_BUFFER , X"000000C2");-- 0xC2 = 64 * 3 + 2
+
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTASNAPSHOT     , X"00000010");--"00000020"
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F0          , X"0000000C");--"00000019"
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F0_2        , X"00000007");--"00000007"
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F1          , X"0000000C");--"00000019"
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_DELTA_F2          , X"00000001");--"00000001"
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NB_DATA_IN_BUFFER , X"00000007"); -- X"00000010"
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NBSNAPSHOT        , X"00000008");
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_START_DATE        , X"00000001");
+    --APB_WRITE(clk25MHz, INDEX_WAVEFORM_PICKER, apbi, ADDR_WAVEFORM_PICKER_NB_WORD_IN_BUFFER , X"0000001A");-- 0xC2 = 8 * 3 + 2
+
 
 
     WAIT UNTIL clk25MHz = '1';
@@ -525,6 +538,20 @@ BEGIN
       WAIT UNTIL clk25MHz = '1';
       IF read_buffer = '1' THEN
         state_read_buffer_on_going <= '1';
+
+        --AHBRead(X"40000000",time_mem_f0(31 DOWNTO 0),clk25MHz,
+      --constant Address:       in    Std_Logic_Vector(31 downto 0);
+      --variable Data:          out   Std_Logic_Vector(31 downto 0);
+      --signal   HCLK:          in    Std_ULogic;
+                
+      --signal   AHBIn:         out   AHB_Slv_In_Type;
+      --signal   AHBOut:        in    AHB_Slv_Out_Type;
+      --variable TP:            inout Boolean;
+      --constant InstancePath:  in    String  := "AHBRead";
+      --constant ScreenOutput:  in    Boolean := False;
+      --constant cBack2Back:    in    Boolean := False;
+      --constant HINDEX:        in    Integer := 0;
+      --constant HMBINDEX:      in    Integer := 0);
         
         AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40000000", time_mem_f0(31 DOWNTO 0));
         AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020000", time_mem_f1(31 DOWNTO 0));
@@ -534,44 +561,42 @@ BEGIN
         AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020004", time_mem_f1(63 DOWNTO 32));
         AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40040004", time_mem_f2(63 DOWNTO 32));
         
-        current_data <= 8;
+        current_data <= 0;
       ELSE
         IF state_read_buffer_on_going = '1' THEN
           -- READ ALL DATA in memory
-          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40000000" + current_data, data_mem_f0);
-          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020000" + current_data, data_mem_f1);
-          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40040000" + current_data, data_mem_f2); 
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40000000" + (current_data * 12)    + 8, data_mem_f0);
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020000" + (current_data * 12)    + 8, data_mem_f1);
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40040000" + (current_data * 12)    + 8, data_mem_f2); 
           data_0_f0 <= data_mem_f0(15 DOWNTO  0);
           data_1_f0 <= data_mem_f0(31 DOWNTO 16);                  
           data_0_f1 <= data_mem_f1(15 DOWNTO  0);
           data_1_f1 <= data_mem_f1(31 DOWNTO 16);
           data_0_f2 <= data_mem_f2(15 DOWNTO  0);
           data_1_f2 <= data_mem_f2(31 DOWNTO 16);
-          current_data <= current_data + 4;
           
-          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40000000" + current_data, data_mem_f0);
-          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020000" + current_data, data_mem_f1);
-          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40040000" + current_data, data_mem_f2); 
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40000000" + (current_data * 12) + 4 + 8, data_mem_f0);
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020000" + (current_data * 12) + 4 + 8, data_mem_f1);
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40040000" + (current_data * 12) + 4 + 8, data_mem_f2); 
           data_2_f0 <= data_mem_f0(15 DOWNTO  0);
           data_3_f0 <= data_mem_f0(31 DOWNTO 16);                  
           data_2_f1 <= data_mem_f1(15 DOWNTO  0);
           data_3_f1 <= data_mem_f1(31 DOWNTO 16);
           data_2_f2 <= data_mem_f2(15 DOWNTO  0);
           data_3_f2 <= data_mem_f2(31 DOWNTO 16);
-          current_data <= current_data + 4;
           
-          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40000000" + current_data, data_mem_f0);
-          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020000" + current_data, data_mem_f1);
-          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40040000" + current_data, data_mem_f2); 
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40000000" + (current_data * 12) + 8 + 8, data_mem_f0);
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40020000" + (current_data * 12) + 8 + 8, data_mem_f1);
+          AHB_READ(clk25MHz, hindex, ahbmi, ahbmo(hindex), X"40040000" + (current_data * 12) + 8 + 8, data_mem_f2); 
           data_4_f0 <= data_mem_f0(15 DOWNTO  0);
           data_5_f0 <= data_mem_f0(31 DOWNTO 16);                  
           data_4_f1 <= data_mem_f1(15 DOWNTO  0);
           data_5_f1 <= data_mem_f1(31 DOWNTO 16);
           data_4_f2 <= data_mem_f2(15 DOWNTO  0);
           data_5_f2 <= data_mem_f2(31 DOWNTO 16);
-          current_data <= current_data + 4;          
+          current_data <= current_data + 1;
           
-          IF current_data > LIMIT_DATA THEN
+          IF current_data >= LIMIT_DATA THEN
             state_read_buffer_on_going <= '0';
             time_mem_f0 <= (OTHERS => '0');
             time_mem_f1 <= (OTHERS => '0');

@@ -57,12 +57,14 @@ PACKAGE BODY testbench_package IS
     apbi.penable      <= '1';
     apbi.paddr        <= paddr;
     apbi.pwdata       <= pwdata;
+    WAIT UNTIL clk = '0';
     WAIT UNTIL clk = '1';
     apbi.psel(pindex) <= '0';
     apbi.pwrite       <= '0';
     apbi.penable      <= '0';
     apbi.paddr        <= (OTHERS => '0');
     apbi.pwdata       <= (OTHERS => '0');
+    WAIT UNTIL clk = '0';
     WAIT UNTIL clk = '1';
     
   END APB_WRITE;
@@ -80,11 +82,13 @@ PACKAGE BODY testbench_package IS
     apbi.pwrite       <= '0';
     apbi.penable      <= '1';
     apbi.paddr        <= paddr;
+    WAIT UNTIL clk = '0';
     WAIT UNTIL clk = '1';
     apbi.psel(pindex) <= '0';
     apbi.pwrite       <= '0';
     apbi.penable      <= '0';
     apbi.paddr        <= (OTHERS => '0');
+    WAIT UNTIL clk = '0';
     WAIT UNTIL clk = '1';
     prdata            <= apbo.prdata;
   END APB_READ;
@@ -98,6 +102,7 @@ PACKAGE BODY testbench_package IS
     SIGNAL   hrdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     ) IS
   BEGIN
+    WAIT UNTIL clk = '1';
     ahbmo.HADDR   <= haddr;
     ahbmo.HPROT   <= "0011";
     ahbmo.HIRQ    <= (OTHERS => '0');
@@ -109,12 +114,23 @@ PACKAGE BODY testbench_package IS
     ahbmo.HBURST  <= HBURST_SINGLE;
     ahbmo.HTRANS  <= HTRANS_NONSEQ;
     ahbmo.HWRITE  <= '0';
-    WAIT UNTIL clk = '1' AND ahbmi.HREADY = '1' AND ahbmi.HGRANT(hindex) = '1';
-    hrdata        <= ahbmi.HRDATA;
-    WAIT UNTIL clk = '1' AND ahbmi.HREADY = '1' AND ahbmi.HGRANT(hindex) = '1';
-    ahbmo.HTRANS  <= HTRANS_IDLE;
+    WHILE ahbmi.HREADY = '0' LOOP
+      WAIT UNTIL clk = '1';
+    END LOOP;
+    WAIT UNTIL clk = '1';
+    --WAIT UNTIL clk = '1' AND ahbmi.HREADY = '1' AND ahbmi.HGRANT(hindex) = '1';
     ahbmo.HBUSREQ <= '0';
     ahbmo.HLOCK   <= '0';
+    ahbmo.HTRANS  <= HTRANS_IDLE;
+    WHILE ahbmi.HREADY = '0' LOOP
+      WAIT UNTIL clk = '1';
+    END LOOP;
+    WAIT UNTIL clk = '1';
+    hrdata        <= ahbmi.HRDATA;
+    --WAIT UNTIL clk = '1' AND ahbmi.HREADY = '1' AND ahbmi.HGRANT(hindex) = '1';
+    ahbmo.HLOCK   <= '0';
+    WAIT UNTIL clk = '1';
+    
   END AHB_READ;
 
 END testbench_package;

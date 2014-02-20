@@ -95,6 +95,13 @@ ARCHITECTURE Behavioral OF lpp_dma_singleOrBurst IS
   SIGNAL burst_ren             : STD_LOGIC;
   -----------------------------------------------------------------------------
   SIGNAL data_2_halfword      : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  -----------------------------------------------------------------------------
+  -- \/ -- 20/02/2014 -- JC Pellion
+  SIGNAL send_reg : STD_LOGIC;
+  SIGNAL send_s   : STD_LOGIC;
+  -- /\ --
+  
+  
 BEGIN
 
   debug_dmaout_okay <= DMAOut.OKAY;
@@ -121,14 +128,21 @@ BEGIN
   -----------------------------------------------------------------------------
 
   -----------------------------------------------------------------------------
-  -----------------------------------------------------------------------------
-  -- LE PROBLEME EST LA !!!!!
-  -----------------------------------------------------------------------------
-  -----------------------------------------------------------------------------
-  -- C'est le signal valid_burst qui n'est pas assez long.
-  -----------------------------------------------------------------------------
-  single_send   <= send             WHEN valid_burst = '0' ELSE '0';
-  burst_send    <= send             WHEN valid_burst = '1' ELSE '0';
+  -- \/ -- 20/02/2014 -- JC Pellion
+  PROCESS (HCLK, HRESETn)
+  BEGIN 
+    IF HRESETn = '0' THEN
+      send_reg <= '0';
+    ELSIF HCLK'event AND HCLK = '1' THEN 
+      send_reg <= send;      
+    END IF;
+  END PROCESS;
+  send_s <= send_reg;
+  
+  single_send   <= send_s  WHEN valid_burst = '0' ELSE '0';
+  burst_send    <= send_s  WHEN valid_burst = '1' ELSE '0';
+  -- /\ --
+
   DMAIn         <= single_dmai      WHEN valid_burst = '0' ELSE burst_dmai;
 
   -- TODO : verifier
