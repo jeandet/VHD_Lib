@@ -39,12 +39,14 @@ end Serialize;
 
 architecture ar_Serialize of Serialize is
 
-type etat is (attente,serialize);
+type etat is (chargemT,serialize);
 signal ect      : etat;
 
 signal vector_int   : std_logic_vector(16 downto 0);
-signal vectin_reg   : std_logic_vector(15 downto 0);
-signal load         : std_logic;
+--signal vectin_reg   : std_logic_vector(15 downto 0);
+--signal load         : std_logic;
+signal send_reg         : std_logic;
+
 signal N            : integer range 0 to 16;
 signal CPT_ended    : std_logic:='0';
 
@@ -52,45 +54,60 @@ begin
     process(clk,raz)
         begin
         if(raz='0')then           
-            ect         <= attente;
-            vectin_reg  <= (others=> '0');
-            load        <= '0';
+            ect         <= chargemT;
+--            vectin_reg  <= (others=> '0');
+--            load        <= '0';
             sended      <= '1';            
 
-        elsif(clk'event and clk='1')then
-            vectin_reg <= vectin;
+        elsif(clk'event and clk='1')then 
+            
+--            vectin_reg <= vectin;
           
             case ect is
-                when attente =>                     
+                when chargemT =>                     
                     if (send='1') then 
                         sended  <= '0'; 
-                        load    <= '1';                   
-                        ect     <= serialize;                        
-                    else
-                        ect <= attente;                       
+--                        load    <= '1';                   
+                        ect     <= serialize;                                               
                     end if;
                 
                 when serialize => 
-                    load <= '0';                    
-                    if(CPT_ended='1')then 
-                        ect     <= attente;
-                        sended  <= '1';                        
+--                    load <= '0';
+                    if(N=14)then
+                        sended <= '1';
                     end if;
+                                        
+                    if(CPT_ended='1')then 
+                        ect     <= chargemT;
+--                        sended  <= '1';                        
+                    end if;
+
+--                when attente =>
+--                    if(send='0')then
+--                        ect <= chargemT;
+--                    end if;
 
             end case;
         end if;
     end process;
 
-    process(sclk,load,raz)
+    process(sclk,raz)
         begin
         if (raz='0')then
             vector_int <= (others=> '0');
             N <= 16;
-        elsif(load='1')then
-            vector_int <= vectin & '0';
-            N <= 0;
-        elsif(sclk'event and sclk='1')then        
-            if (CPT_ended='0') then
+--        elsif(send='1')then
+--            vector_int <= vectin & '0';
+--            N <= 0;
+        elsif(sclk'event and sclk='1')then
+            send_reg <= send;
+            
+            
+            if(send_reg='1' and send='0')then
+                vector_int <= vectin & '0';
+            elsif(send='1')then
+                N <= 0;
+            elsif (CPT_ended='0') then
                 vector_int <= vector_int(15 downto 0) & '0'; 
                 N <= N+1;
             end if; 

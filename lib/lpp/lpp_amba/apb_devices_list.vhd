@@ -37,9 +37,10 @@ PACKAGE apb_devices_list IS
   CONSTANT LPP_DMA_TYPE        : amba_device_type := 16#17#;
   CONSTANT LPP_BOOTLOADER_TYPE : amba_device_type := 16#18#;
   CONSTANT LPP_LFR             : amba_device_type := 16#19#;
+  CONSTANT LPP_CLKSETTING      : amba_device_type := 16#20#;
   
   CONSTANT LPP_DEBUG_DMA       : amba_device_type := 16#A0#;
-  CONSTANT LPP_DEBUG_LFR       : amba_device_type := 16#A1#;
+  CONSTANT LPP_DEBUG_LFR_ID       : amba_device_type := 16#A1#;
 
   CONSTANT LPP_DEBUG_LFR_ID    : amba_device_type := 16#A2#;
   

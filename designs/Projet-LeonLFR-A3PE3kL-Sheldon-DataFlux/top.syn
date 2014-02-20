@@ -1,0 +1,7 @@
+JDF B
+PROJECT top
+DESIGN top Normal
+DEVKIT A3PE3000LStd""
+ENTRY EDIF
+MODULE ./synplify/top.edf
+MODSTYLE top Normal
