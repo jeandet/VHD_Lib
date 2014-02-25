@@ -424,7 +424,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000101")  -- aa.bb.cc version
+      top_lfr_version        => X"000102")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => reset,
@@ -444,7 +444,7 @@ BEGIN  -- beh
       ChannelCount    => 8,
       SampleNbBits    => 14,
       ncycle_cnv_high => 40,  -- at least 32 cycles at 25 MHz, 32 * 49.152 / 25 /2 = 31.5
-      ncycle_cnv      => 250) -- 49 152 000 / 98304 /2
+      ncycle_cnv      => 249) -- 49 152 000 / 98304 /2
     PORT MAP (
       -- CONV
       cnv_clk    => clk_24,
