@@ -37,6 +37,9 @@ ENTITY lpp_lfr_ms IS
     ---------------------------------------------------------------------------
     -- DATA INPUT
     ---------------------------------------------------------------------------
+    -- TIME
+    coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);  -- todo
+    fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
     --
     sample_f0_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
     sample_f0_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
@@ -135,7 +138,10 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   -----------------------------------------------------------------------------
   SIGNAL   DMA_Read  : STD_LOGIC;
   SIGNAL   DMA_ack   : STD_LOGIC;
-
+  
+  -----------------------------------------------------------------------------
+  SIGNAL data_time : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  
 BEGIN
 
   -----------------------------------------------------------------------------
@@ -305,12 +311,15 @@ BEGIN
       header_val   => Head_Val,
       header_ack   => DMA_ack );
   -----------------------------------------------------------------------------
-
+  data_time(31 DOWNTO  0) <= coarse_time;
+  data_time(47 DOWNTO 32) <= fine_time;
 
   lpp_lfr_ms_fsmdma_1: lpp_lfr_ms_fsmdma
     PORT MAP (
       HCLK                                   => clk,
       HRESETn                                => rstn,
+      
+      data_time                              => data_time,
       
       fifo_data                              => Head_Data,
       fifo_empty                             => Head_Empty,

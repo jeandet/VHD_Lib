@@ -17,6 +17,7 @@ SYNC_FF.vhd
 Shifter.vhd
 TwoComplementer.vhd
 Clock_Divider.vhd
+lpp_front_to_level.vhd
 lpp_front_detection.vhd
 lpp_front_positive_detection.vhd
 SYNC_VALID_BIT.vhd

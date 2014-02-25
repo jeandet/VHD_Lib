@@ -21,6 +21,10 @@ PACKAGE lpp_lfr_pkg IS
     PORT (
       clk                                    : IN  STD_LOGIC;
       rstn                                   : IN  STD_LOGIC;
+
+      coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);  -- todo
+      fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
+
       sample_f0_wen                          : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
       sample_f0_wdata                        : IN  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
       sample_f1_wen                          : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
@@ -60,6 +64,7 @@ PACKAGE lpp_lfr_pkg IS
     PORT (
       HCLK                                   : IN  STD_ULOGIC;
       HRESETn                                : IN  STD_ULOGIC;
+      data_time                              : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
       fifo_data                              : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       fifo_empty                             : IN  STD_LOGIC;
       fifo_ren                               : OUT STD_LOGIC;
@@ -144,7 +149,7 @@ PACKAGE lpp_lfr_pkg IS
       ahbo            : OUT AHB_Mst_Out_Type;
       coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-      data_shaping_BW : OUT STD_LOGIC
+      data_shaping_BW : OUT STD_LOGIC;
       observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
       );
   END COMPONENT;

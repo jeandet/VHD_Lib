@@ -8,6 +8,8 @@ vcom -quiet  -93  -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/..
 
 vcom -quiet  -93  -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_waveform/lpp_waveform_snapshot.vhd
 
+vcom -quiet -93 -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_top_lfr/lpp_lfr_pkg.vhd
+vcom -quiet -93 -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_top_lfr/lpp_lfr.vhd
 vcom -quiet -93 -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_top_lfr/lpp_lfr_ms_test.vhd
 vcom -quiet -93 -work lpp ../../../grlib-ft-fpga-grlfpu-spw-1.2.4-b4126/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_top_lfr/lpp_lfr_ms_fsmdma.vhd
 
@@ -21,6 +23,6 @@ vsim work.testbench
 
 log -r *
 
-do wave_waveform_longsim.do
+do wave_ms.do
 
-run 40 ms
+run 2 ms

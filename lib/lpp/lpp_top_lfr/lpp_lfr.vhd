@@ -59,7 +59,7 @@ ENTITY lpp_lfr IS
     coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);  -- todo
     fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
     -- 
-    data_shaping_BW : OUT STD_LOGIC--;
+    data_shaping_BW : OUT STD_LOGIC;
     --
     observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 
@@ -489,7 +489,7 @@ BEGIN
       data_f3_data_out             => data_f3_data_out,
       data_f3_data_out_valid       => data_f3_data_out_valid_s,
       data_f3_data_out_valid_burst => data_f3_data_out_valid_burst_s,
-      data_f3_data_out_ren         => data_f3_data_out_ren --,
+      data_f3_data_out_ren         => data_f3_data_out_ren ,
 
       -------------------------------------------------------------------------
       observation_reg => observation_reg
@@ -605,8 +605,10 @@ BEGIN
       dma_sel         <= (OTHERS => '0');
       dma_send        <= '0';
       dma_valid_burst <= '0';
+      data_ms_done    <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
       IF run = '1' THEN
+        data_ms_done <= '0';
         IF dma_sel = "00000" OR dma_done = '1' THEN
           dma_sel <= dma_rr_grant;
           IF dma_rr_grant(0) = '1' THEN
@@ -639,6 +641,7 @@ BEGIN
           dma_send <= '0';
         END IF;
       ELSE
+        data_ms_done    <= '0';
         dma_sel         <= (OTHERS => '0');
         dma_send        <= '0';
         dma_valid_burst <= '0';
@@ -717,6 +720,7 @@ BEGIN
   sample_f0_wdata <= sample_f0_data((3*16)-1 DOWNTO (1*16)) & sample_f0_data((6*16)-1 DOWNTO (3*16));  -- (MSB) E2 E1 B2 B1 B0 (LSB)
   sample_f1_wdata <= sample_f1_data((3*16)-1 DOWNTO (1*16)) & sample_f1_data((6*16)-1 DOWNTO (3*16));
   sample_f3_wdata <= sample_f3_data((3*16)-1 DOWNTO (1*16)) & sample_f3_data((6*16)-1 DOWNTO (3*16));
+  
   -------------------------------------------------------------------------------
   lpp_lfr_ms_1: lpp_lfr_ms
     GENERIC MAP (
@@ -724,7 +728,10 @@ BEGIN
     PORT MAP (
       clk                                    => clk,
       rstn                                   => rstn,
-      
+
+      coarse_time      => coarse_time,
+      fine_time        => fine_time,
+            
       sample_f0_wen                          => sample_f0_wen,
       sample_f0_wdata                        => sample_f0_wdata,
       sample_f1_wen                          => sample_f1_wen,

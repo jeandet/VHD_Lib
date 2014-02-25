@@ -314,24 +314,24 @@ BEGIN
   ahb0 : ahbctrl                        -- AHB arbiter/multiplexer
     GENERIC MAP (defmast => 0, split => 0,
                  rrobin  => 1, ioaddr => 16#FFF#,
-                 ioen    => 0, nahbm => 2, nahbs => 1)
+                 ioen    => 0, nahbm => 2, nahbs => 4)
     PORT MAP (rstn, clk25MHz, ahbmi, ahbmo, ahbsi, ahbso);
 
 
   
   ---  AHB RAM ----------------------------------------------------------
-  --ahbram0 : ahbram
-  --  GENERIC MAP (hindex => 0, haddr => AHB_RAM_ADDR_0, tech => inferred, kbytes => 1, pipe => 0)
-  --  PORT MAP (rstn, clk25MHz, ahbsi, ahbso(0));
-  --ahbram1 : ahbram
-  --  GENERIC MAP (hindex => 1, haddr => AHB_RAM_ADDR_1, tech => inferred, kbytes => 1, pipe => 0)
-  --  PORT MAP (rstn, clk25MHz, ahbsi, ahbso(1));
-  --ahbram2 : ahbram
-  --  GENERIC MAP (hindex => 2, haddr => AHB_RAM_ADDR_2, tech => inferred, kbytes => 1, pipe => 0)
-  --  PORT MAP (rstn, clk25MHz, ahbsi, ahbso(2));
-  --ahbram3 : ahbram
-  --  GENERIC MAP (hindex => 3, haddr => AHB_RAM_ADDR_3, tech => inferred, kbytes => 1, pipe => 0)
-  --  PORT MAP (rstn, clk25MHz, ahbsi, ahbso(3));
+  ahbram0 : ahbram
+    GENERIC MAP (hindex => 0, haddr => AHB_RAM_ADDR_0, tech => inferred, kbytes => 1, pipe => 0)
+    PORT MAP (rstn, clk25MHz, ahbsi, ahbso(0));
+  ahbram1 : ahbram
+    GENERIC MAP (hindex => 1, haddr => AHB_RAM_ADDR_1, tech => inferred, kbytes => 1, pipe => 0)
+    PORT MAP (rstn, clk25MHz, ahbsi, ahbso(1));
+  ahbram2 : ahbram
+    GENERIC MAP (hindex => 2, haddr => AHB_RAM_ADDR_2, tech => inferred, kbytes => 1, pipe => 0)
+    PORT MAP (rstn, clk25MHz, ahbsi, ahbso(2));
+  ahbram3 : ahbram
+    GENERIC MAP (hindex => 3, haddr => AHB_RAM_ADDR_3, tech => inferred, kbytes => 1, pipe => 0)
+    PORT MAP (rstn, clk25MHz, ahbsi, ahbso(3));
 
   -----------------------------------------------------------------------------
   ----------------------------------------------------------------------
@@ -501,7 +501,7 @@ BEGIN
   -----------------------------------------------------------------------------
   -- IRQ
   -----------------------------------------------------------------------------
-  PROCESS 
+  PROCESS (clk25MHz, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
 
