@@ -62,7 +62,7 @@ ENTITY lpp_lfr IS
     data_shaping_BW : OUT STD_LOGIC;
     --
     observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
-
+    
     --debug
     --debug_f0_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
     --debug_f0_data_valid : OUT STD_LOGIC;
@@ -492,7 +492,7 @@ BEGIN
       data_f3_data_out_ren         => data_f3_data_out_ren ,
 
       -------------------------------------------------------------------------
-      observation_reg => observation_reg
+      observation_reg => OPEN --observation_reg
       ---- debug SNAPSHOT_OUT
       --debug_f0_data       => debug_f0_data,
       --debug_f0_data_valid => debug_f0_data_valid ,
@@ -752,7 +752,7 @@ BEGIN
       ready_matrix_f2                        => ready_matrix_f2,
       error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
       error_bad_component_error              => error_bad_component_error,
-      debug_reg                              => debug_reg,
+      debug_reg                              => observation_reg,--debug_reg,
       status_ready_matrix_f0_0               => status_ready_matrix_f0_0,
       status_ready_matrix_f0_1               => status_ready_matrix_f0_1,
       status_ready_matrix_f1                 => status_ready_matrix_f1,
@@ -765,5 +765,5 @@ BEGIN
       addr_matrix_f0_1                       => addr_matrix_f0_1,
       addr_matrix_f1                         => addr_matrix_f1,
       addr_matrix_f2                         => addr_matrix_f2);
-
+  
 END beh;
