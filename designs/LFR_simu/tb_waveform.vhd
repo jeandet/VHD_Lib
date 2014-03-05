@@ -314,98 +314,100 @@ BEGIN
   ahb0 : ahbctrl                        -- AHB arbiter/multiplexer
     GENERIC MAP (defmast => 0, split => 0,
                  rrobin  => 1, ioaddr => 16#FFF#,
-                 ioen    => 0, nahbm => 2, nahbs => 4)
+                 ioen    => 0, nahbm => 2, nahbs => 1)
     PORT MAP (rstn, clk25MHz, ahbmi, ahbmo, ahbsi, ahbso);
 
 
   
   ---  AHB RAM ----------------------------------------------------------
-  ahbram0 : ahbram
-    GENERIC MAP (hindex => 0, haddr => AHB_RAM_ADDR_0, tech => inferred, kbytes => 1, pipe => 0)
-    PORT MAP (rstn, clk25MHz, ahbsi, ahbso(0));
-  ahbram1 : ahbram
-    GENERIC MAP (hindex => 1, haddr => AHB_RAM_ADDR_1, tech => inferred, kbytes => 1, pipe => 0)
-    PORT MAP (rstn, clk25MHz, ahbsi, ahbso(1));
-  ahbram2 : ahbram
-    GENERIC MAP (hindex => 2, haddr => AHB_RAM_ADDR_2, tech => inferred, kbytes => 1, pipe => 0)
-    PORT MAP (rstn, clk25MHz, ahbsi, ahbso(2));
-  ahbram3 : ahbram
-    GENERIC MAP (hindex => 3, haddr => AHB_RAM_ADDR_3, tech => inferred, kbytes => 1, pipe => 0)
-    PORT MAP (rstn, clk25MHz, ahbsi, ahbso(3));
+  --ahbram0 : ahbram
+  --  GENERIC MAP (hindex => 0, haddr => AHB_RAM_ADDR_0, tech => inferred, kbytes => 1, pipe => 0)
+  --  PORT MAP (rstn, clk25MHz, ahbsi, ahbso(0));
+  --ahbram1 : ahbram
+  --  GENERIC MAP (hindex => 1, haddr => AHB_RAM_ADDR_1, tech => inferred, kbytes => 1, pipe => 0)
+  --  PORT MAP (rstn, clk25MHz, ahbsi, ahbso(1));
+  --ahbram2 : ahbram
+  --  GENERIC MAP (hindex => 2, haddr => AHB_RAM_ADDR_2, tech => inferred, kbytes => 1, pipe => 0)
+  --  PORT MAP (rstn, clk25MHz, ahbsi, ahbso(2));
+  --ahbram3 : ahbram
+  --  GENERIC MAP (hindex => 3, haddr => AHB_RAM_ADDR_3, tech => inferred, kbytes => 1, pipe => 0)
+  --  PORT MAP (rstn, clk25MHz, ahbsi, ahbso(3));
 
   -----------------------------------------------------------------------------
   ----------------------------------------------------------------------
   ---  Memory controllers  ---------------------------------------------
   ----------------------------------------------------------------------
-  --memctrlr : mctrl GENERIC MAP (
-  --  hindex  => 0,
-  --  pindex  => 0,
-  --  paddr   => 0,
-  --  srbanks => 1
-  --  )
-  --  PORT MAP (rstn, clk25MHz, memi, memo, ahbsi, ahbso(0), apbi, apbo(0), wpo, sdo);
+  memctrlr : mctrl GENERIC MAP (
+    hindex  => 0,
+    pindex  => 0,
+    paddr   => 0,
+    srbanks => 1
+    )
+    PORT MAP (rstn, clk25MHz, memi, memo, ahbsi, ahbso(0), apbi, apbo(0), wpo, sdo);
 
-  --memi.brdyn  <= '1';
-  --memi.bexcn  <= '1';
-  --memi.writen <= '1';
-  --memi.wrn    <= "1111";
-  --memi.bwidth <= "10";
+  memi.brdyn  <= '1';
+  memi.bexcn  <= '1';
+  memi.writen <= '1';
+  memi.wrn    <= "1111";
+  memi.bwidth <= "10";
 
-  --bdr : FOR i IN 0 TO 3 GENERATE
-  --  data_pad : iopadv GENERIC MAP (tech => padtech, width => 8)
-  --    PORT MAP (
-  --      data(31-i*8 DOWNTO 24-i*8),
-  --      memo.data(31-i*8 DOWNTO 24-i*8),
-  --      memo.bdrive(i),
-  --      memi.data(31-i*8 DOWNTO 24-i*8));
-  --END GENERATE;
+  bdr : FOR i IN 0 TO 3 GENERATE
+    data_pad : iopadv GENERIC MAP (tech => padtech, width => 8)
+      PORT MAP (
+        data(31-i*8 DOWNTO 24-i*8),
+        memo.data(31-i*8 DOWNTO 24-i*8),
+        memo.bdrive(i),
+        memi.data(31-i*8 DOWNTO 24-i*8));
+  END GENERATE;
 
-  --addr_pad : outpadv GENERIC MAP (width => 20, tech => padtech)
-  --  PORT MAP (address, memo.address(21 DOWNTO 2));
+  addr_pad : outpadv GENERIC MAP (width => 20, tech => padtech)
+    PORT MAP (address, memo.address(21 DOWNTO 2));
 
-  --not_ramsn_0 <= NOT(memo.ramsn(0));
+  not_ramsn_0 <= NOT(memo.ramsn(0));
   
-  --rams_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_CE, not_ramsn_0);
-  --oen_pad  : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_OE, memo.ramoen(0));
-  --nBWE_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_WE, memo.writen);
-  --nBWa_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE0, memo.mben(3));
-  --nBWb_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE1, memo.mben(2));
-  --nBWc_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE2, memo.mben(1));
-  --nBWd_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE3, memo.mben(0));
+  rams_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_CE, not_ramsn_0);
+  oen_pad  : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_OE, memo.ramoen(0));
+  nBWE_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_WE, memo.writen);
+  nBWa_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE0, memo.mben(3));
+  nBWb_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE1, memo.mben(2));
+  nBWc_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE2, memo.mben(1));
+  nBWd_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE3, memo.mben(0));
   
-  --async_1Mx16_0: CY7C1061DV33
-  --  GENERIC MAP (
-  --    ADDR_BITS         => 20,
-  --    DATA_BITS         => 16,
-  --    depth 	        => 1048576,
-  --    TimingInfo        => TRUE,
-  --    TimingChecks	=> '1')
-  --  PORT MAP (
-  --    CE1_b => '0',
-  --    CE2   => nSRAM_CE,
-  --    WE_b  => nSRAM_WE,
-  --    OE_b  => nSRAM_OE,
-  --    BHE_b => nSRAM_BE1,
-  --    BLE_b => nSRAM_BE0,
-  --    A     => address,
-  --    DQ    => data(15 DOWNTO 0));
+  async_1Mx16_0: CY7C1061DV33
+    GENERIC MAP (
+      ADDR_BITS         => 20,
+      DATA_BITS         => 16,
+      depth 	        => 1048576,
+      MEM_ARRAY_DEBUG   => 32,
+      TimingInfo        => TRUE,
+      TimingChecks	=> '1')
+    PORT MAP (
+      CE1_b => '0',
+      CE2   => nSRAM_CE,
+      WE_b  => nSRAM_WE,
+      OE_b  => nSRAM_OE,
+      BHE_b => nSRAM_BE1,
+      BLE_b => nSRAM_BE0,
+      A     => address,
+      DQ    => data(15 DOWNTO 0));
   
-  --async_1Mx16_1: CY7C1061DV33
-  --  GENERIC MAP (
-  --    ADDR_BITS         => 20,
-  --    DATA_BITS         => 16,
-  --    depth 	        => 1048576,
-  --    TimingInfo        => TRUE,
-  --    TimingChecks	=> '1')
-  --  PORT MAP (
-  --    CE1_b => '0',
-  --    CE2   => nSRAM_CE,
-  --    WE_b  => nSRAM_WE,
-  --    OE_b  => nSRAM_OE,
-  --    BHE_b => nSRAM_BE3,
-  --    BLE_b => nSRAM_BE2,
-  --    A     => address,
-  --    DQ    => data(31 DOWNTO 16));
+  async_1Mx16_1: CY7C1061DV33
+    GENERIC MAP (
+      ADDR_BITS         => 20,
+      DATA_BITS         => 16,
+      depth 	        => 1048576,
+      MEM_ARRAY_DEBUG   => 32,
+      TimingInfo        => TRUE,
+      TimingChecks	=> '1')
+    PORT MAP (
+      CE1_b => '0',
+      CE2   => nSRAM_CE,
+      WE_b  => nSRAM_WE,
+      OE_b  => nSRAM_OE,
+      BHE_b => nSRAM_BE3,
+      BLE_b => nSRAM_BE2,
+      A     => address,
+      DQ    => data(31 DOWNTO 16));
   
   
   -----------------------------------------------------------------------------
@@ -465,7 +467,7 @@ BEGIN
     WAIT UNTIL clk25MHz = '1';
     
     
-    --APB_WRITE(clk25MHz, INDEX_LFR, apbi, ADDR_WAVEFORM_PICKER_CONTROL, X"00000087");
+    APB_WRITE(clk25MHz, INDEX_LFR, apbi, ADDR_WAVEFORM_PICKER_CONTROL, X"00000087");
     WAIT UNTIL clk25MHz = '1';
     WAIT UNTIL clk25MHz = '1';
     WAIT UNTIL clk25MHz = '1';

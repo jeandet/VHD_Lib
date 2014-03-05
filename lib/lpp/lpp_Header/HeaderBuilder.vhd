@@ -19,137 +19,137 @@
 --                    Author : Martin Morlot
 --                     Mail : martin.morlot@lpp.polytechnique.fr
 ------------------------------------------------------------------------------
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity HeaderBuilder is
-  generic(
-      Data_sz  : integer := 32);
-    port(
-        clkm            : in std_logic;
-        rstn            : in std_logic;
+ENTITY HeaderBuilder IS
+  GENERIC(
+    Data_sz : INTEGER := 32);
+  PORT(
+    clkm : IN STD_LOGIC;
+    rstn : IN STD_LOGIC;
 
-        Statu : in std_logic_vector(3 downto 0);
-        Matrix_Type : in std_logic_vector(1 downto 0);
-        Matrix_Write : in std_logic;
-        Valid : out std_logic;               
+    Statu        : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    Matrix_Type  : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+    Matrix_Write : IN  STD_LOGIC;
+    Valid        : OUT STD_LOGIC;
 
-        dataIN : in std_logic_vector((2*Data_sz)-1 downto 0);
-        emptyIN : in std_logic_vector(1 downto 0);
-        RenOUT : out std_logic_vector(1 downto 0);
+    dataIN  : IN  STD_LOGIC_VECTOR((2*Data_sz)-1 DOWNTO 0);
+    emptyIN : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+    RenOUT  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
 
-        dataOUT  : out std_logic_vector(Data_sz-1 downto 0);
-        emptyOUT : out std_logic;
-        RenIN : in std_logic;
+    dataOUT  : OUT STD_LOGIC_VECTOR(Data_sz-1 DOWNTO 0);
+    emptyOUT : OUT STD_LOGIC;
+    RenIN    : IN  STD_LOGIC;
 
-        header     : out  std_logic_vector(Data_sz-1 DOWNTO 0);
-        header_val : out  std_logic;
-        header_ack : in std_logic
-        );
-end entity;
+    header     : OUT STD_LOGIC_VECTOR(Data_sz-1 DOWNTO 0);
+    header_val : OUT STD_LOGIC;
+    header_ack : IN  STD_LOGIC
+    );
+END ENTITY;
 
 
-architecture ar_HeaderBuilder of HeaderBuilder is
+ARCHITECTURE ar_HeaderBuilder OF HeaderBuilder IS
 
-signal Matrix_Param     : std_logic_vector(3 downto 0);
-signal Write_reg : std_logic;
-signal Data_cpt : integer;
-signal MAX : integer;
+  SIGNAL Matrix_Param : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL Write_reg    : STD_LOGIC;
+  SIGNAL Data_cpt     : INTEGER;
+  SIGNAL MAX          : INTEGER;
 
-type etat is (idle0,idle1,pong0,pong1);
-signal ect : etat;
+  TYPE   etat IS (idle0, idle1, pong0, pong1);
+  SIGNAL ect : etat;
 
-begin
+BEGIN
 
- process (clkm,rstn)
-    begin
-        if(rstn='0')then
-            ect <= idle0;
-            Valid <= '0';
+  PROCESS (clkm, rstn)
+  BEGIN
+    IF(rstn = '0')then
+      ect                <= idle0;
+      Valid              <= '0';
+      header_val         <= '0';
+      header(5 DOWNTO 0) <= (OTHERS => '0');
+      Write_reg          <= '0';
+      Data_cpt           <= 0;
+      MAX                <= 128;
+
+      
+    ELSIF(clkm' event AND clkm = '1')then
+      Write_reg <= Matrix_Write;
+
+      IF(Statu = "0001" OR Statu="0011" OR Statu="0110" OR Statu="1010" OR Statu="1111")THEN
+        MAX <= 128;
+      ELSE
+        MAX <= 256;
+      END IF;
+
+      IF(Write_reg = '0' AND Matrix_Write = '1')THEN
+        Data_cpt <= Data_cpt + 1;
+        Valid    <= '0';
+      ELSIF(Data_cpt = MAX)THEN
+        Data_cpt   <= 0;
+        Valid      <= '1';
+        header_val <= '1';
+      ELSE
+        Valid <= '0';
+      END IF;
+
+
+      CASE ect IS
+
+        WHEN idle0 =>
+          IF(header_ack = '1')THEN
             header_val <= '0';
-            header(5 downto 0) <= (others => '0');
-            Write_reg    <= '0';
-            Data_cpt <= 0;
-            MAX <= 128;
+            ect        <= pong0;
+          END IF;
 
-            
-        elsif(clkm' event and clkm='1')then
-            Write_reg <= Matrix_Write;
+        WHEN pong0 =>
+          header(1 DOWNTO 0) <= Matrix_Type;
+          header(5 DOWNTO 2) <= Matrix_Param;
+          IF(emptyIN(0) = '1')THEN
+            ect <= idle1;
+          END IF;
 
-            if(Statu="0001" or Statu="0011" or Statu="0110" or Statu="1010" or Statu="1111")then
-                MAX <= 128;
-            else
-                MAX <= 256;
-            end if;
+        WHEN idle1 =>
+          IF(header_ack = '1')THEN
+            header_val <= '0';
+            ect        <= pong1;
+          END IF;
 
-            if(Write_reg = '0' and Matrix_Write = '1')then     
-                Data_cpt <= Data_cpt + 1;
-                Valid <= '0';
-            elsif(Data_cpt = MAX)then
-                Data_cpt <= 0;
-                Valid <= '1';
-                header_val <= '1';
-            else
-                Valid <= '0';
-            end if; 
+        WHEN pong1 =>
+          header(1 DOWNTO 0) <= Matrix_Type;
+          header(5 DOWNTO 2) <= Matrix_Param;
+          IF(emptyIN(1) = '1')THEN
+            ect <= idle0;
+          END IF;
 
+      END CASE;
+    END IF;
+  END PROCESS;
 
-            case ect is
+  Matrix_Param <= STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(Statu))-1, 4));
 
-                when idle0 =>
-                    if(header_ack = '1')then
-                        header_val <= '0';
-                        ect <= pong0;
-                    end if;
+  header(31 DOWNTO 6) <= (OTHERS => '0');
 
-                when pong0 =>
-                    header(1 downto 0) <= Matrix_Type;
-                    header(5 downto 2) <= Matrix_Param;
-                    if(emptyIN(0) = '1')then
-                        ect <= idle1;
-                    end if;                  
+  WITH ect SELECT
+    dataOUT <= dataIN(Data_sz-1 DOWNTO 0) WHEN pong0,
+    dataIN(Data_sz-1 DOWNTO 0)            WHEN idle0,
+    dataIN((2*Data_sz)-1 DOWNTO Data_sz)  WHEN pong1,
+    dataIN((2*Data_sz)-1 DOWNTO Data_sz)  WHEN idle1,
+    (OTHERS => '0')                       WHEN OTHERS;
 
-                when idle1 =>
-                     if(header_ack = '1')then
-                        header_val <= '0';
-                        ect <= pong1;
-                     end if;
+  WITH ect SELECT
+    emptyOUT <= emptyIN(0) WHEN pong0,
+    emptyIN(0)             WHEN idle0,
+    emptyIN(1)             WHEN pong1,
+    emptyIN(1)             WHEN idle1,
+    '1'                    WHEN OTHERS;
 
-                when pong1 =>
-                    header(1 downto 0) <= Matrix_Type;
-                    header(5 downto 2) <= Matrix_Param;
-                    if(emptyIN(1) = '1')then
-                        ect <= idle0;
-                    end if;
+  WITH ect SELECT
+    RenOUT <= '1' & RenIN WHEN pong0,
+    '1' & RenIN           WHEN idle0,
+    RenIN & '1'           WHEN pong1,
+    RenIN & '1'           WHEN idle1,
+    "11"                  WHEN OTHERS;
 
-            end case;
-        end if;
-    end process;
-
-Matrix_Param <= std_logic_vector(to_unsigned(to_integer(unsigned(Statu))-1,4));
-
-header(31 downto 6) <= (others => '0');
-
-with ect select
-    dataOUT <= dataIN(Data_sz-1 downto 0)           when pong0,
-               dataIN(Data_sz-1 downto 0)           when idle0,
-               dataIN((2*Data_sz)-1 downto Data_sz) when pong1,
-               dataIN((2*Data_sz)-1 downto Data_sz) when idle1,
-               (others => '0')                      when others;
-
-with ect select
-    emptyOUT    <= emptyIN(0)   when pong0,
-                   emptyIN(0)   when idle0,
-                   emptyIN(1)   when pong1,
-                   emptyIN(1)   when idle1,
-                   '1'          when others;
-
-with ect select 
-    RenOUT  <= '1' & RenIN  when pong0,
-               '1' & RenIN  when idle0,
-               RenIN & '1'  when pong1,
-               RenIN & '1'  when idle1,
-               "11"         when others;
-
-end architecture;
+END ARCHITECTURE;
