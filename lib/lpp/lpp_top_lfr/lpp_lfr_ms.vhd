@@ -82,7 +82,13 @@ ENTITY lpp_lfr_ms IS
     addr_matrix_f0_0                       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f0_1                       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f1                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f2                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0)    
+    addr_matrix_f2                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+    matrix_time_f0_0                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    matrix_time_f0_1                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    matrix_time_f1                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    matrix_time_f2                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
+    
     );
 END;
 
@@ -354,7 +360,13 @@ BEGIN
       addr_matrix_f0_0                       => addr_matrix_f0_0,
       addr_matrix_f0_1                       => addr_matrix_f0_1,
       addr_matrix_f1                         => addr_matrix_f1,
-      addr_matrix_f2                         => addr_matrix_f2);
+      addr_matrix_f2                         => addr_matrix_f2,
+
+      matrix_time_f0_0                       => matrix_time_f0_0,
+      matrix_time_f0_1                       => matrix_time_f0_1,
+      matrix_time_f1                         => matrix_time_f1,
+      matrix_time_f2                         => matrix_time_f2
+      );
 
   
 

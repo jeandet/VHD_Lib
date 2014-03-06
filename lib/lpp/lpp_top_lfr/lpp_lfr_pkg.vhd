@@ -57,7 +57,12 @@ PACKAGE lpp_lfr_pkg IS
       addr_matrix_f0_0                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f0_1                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f1                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-      addr_matrix_f2                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
+      addr_matrix_f2                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+      matrix_time_f0_0                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f0_1                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f1                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f2                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0));
   END COMPONENT;
 
   COMPONENT lpp_lfr_ms_fsmdma
@@ -95,7 +100,13 @@ PACKAGE lpp_lfr_pkg IS
       addr_matrix_f0_0                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f0_1                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f1                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-      addr_matrix_f2                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
+      addr_matrix_f2                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+      matrix_time_f0_0                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f0_1                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f1                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f2                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
+      );
   END COMPONENT;
   
 
@@ -172,6 +183,7 @@ PACKAGE lpp_lfr_pkg IS
       HRESETn                                : IN  STD_ULOGIC;
       apbi                                   : IN  apb_slv_in_type;
       apbo                                   : OUT apb_slv_out_type;
+      run_ms                                 : OUT STD_LOGIC;
       ready_matrix_f0_0                      : IN  STD_LOGIC;
       ready_matrix_f0_1                      : IN  STD_LOGIC;
       ready_matrix_f1                        : IN  STD_LOGIC;
@@ -191,6 +203,12 @@ PACKAGE lpp_lfr_pkg IS
       addr_matrix_f0_1                       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f1                         : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f2                         : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+      matrix_time_f0_0                       : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f0_1                       : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f1                         : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f2                         : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
+    
       status_full                            : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
       status_full_ack                        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       status_full_err                        : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -257,7 +275,13 @@ PACKAGE lpp_lfr_pkg IS
       apbo            : OUT apb_slv_out_type;
       ahbi_ms         : IN  AHB_Mst_In_Type;
       ahbo_ms         : OUT AHB_Mst_Out_Type;
-      data_shaping_BW : OUT STD_LOGIC);
+      data_shaping_BW : OUT STD_LOGIC;
+      matrix_time_f0_0                       : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f0_1                       : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f1                         : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f2                         : IN STD_LOGIC_VECTOR(47 DOWNTO 0)
+     
+      );
   END COMPONENT;
   
 END lpp_lfr_pkg;

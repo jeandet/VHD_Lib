@@ -89,7 +89,12 @@ ENTITY lpp_lfr_ms_fsmdma IS
     addr_matrix_f0_0                       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f0_1                       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f1                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f2                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
+    addr_matrix_f2                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+    matrix_time_f0_0                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    matrix_time_f0_1                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    matrix_time_f1                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    matrix_time_f2                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
 
     );                                      
 END;
@@ -228,10 +233,22 @@ BEGIN
             --
             IF component_type = "0000" THEN
               address       <= address_matrix;
-              state         <= WRITE_COARSE_TIME;
+              CASE matrix_type IS
+                WHEN "00" => matrix_time_f0_0 <= data_time;
+                WHEN "01" => matrix_time_f0_1 <= data_time;
+                WHEN "10" => matrix_time_f1 <= data_time;
+                WHEN "11" => matrix_time_f2 <= data_time ;
+                WHEN OTHERS => NULL;
+              END CASE;
+              
               header_data   <= data_time(31 DOWNTO 0);
               fine_time_reg <= data_time(47 DOWNTO 32);
-              header_send   <= '1';
+              --state         <= WRITE_COARSE_TIME;
+              --header_send   <= '1';
+              state          <= SEND_DATA;
+              header_send    <= '0';
+              component_send <= '1';
+              header_select  <= '0';
             ELSE
               state <= SEND_DATA;
             END IF;
@@ -274,7 +291,6 @@ BEGIN
           debug_reg_s(2 DOWNTO 0) <= "011";
           
           header_ack <= '0';
-          header_ack <= '0';
 
           IF dma_ren = '0' THEN
             header_send <= '0';
@@ -308,6 +324,7 @@ BEGIN
           END IF;
 
         WHEN SEND_DATA =>
+          header_ack <= '0';
           debug_reg_s(2 DOWNTO 0) <= "101";
           
           IF fifo_empty = '1' THEN
@@ -341,6 +358,7 @@ BEGIN
           END IF;
           
         WHEN CHECK_LENGTH =>
+          component_send <= '0';
           debug_reg_s(2 DOWNTO 0) <= "111";
           state <= IDLE;
           
