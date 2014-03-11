@@ -260,55 +260,55 @@ BEGIN
             state                     <= TRASH_FIFO;
           END IF;
 
-        WHEN WRITE_COARSE_TIME =>
-          debug_reg_s(2 DOWNTO 0) <= "010";
+        --WHEN WRITE_COARSE_TIME =>
+        --  debug_reg_s(2 DOWNTO 0) <= "010";
           
-          header_ack <= '0';
+        --  header_ack <= '0';
 
-          IF dma_ren = '0' THEN
-            header_send <= '0';
-          ELSE
-            header_send <= header_send;
-          END IF;
+        --  IF dma_ren = '0' THEN
+        --    header_send <= '0';
+        --  ELSE
+        --    header_send <= header_send;
+        --  END IF;
 
 
-          IF header_send_ko = '1' THEN
-            header_send                   <= '0';
-            state                         <= TRASH_FIFO;
-            error_anticipating_empty_fifo <= '1';
-            -- TODO : error sending header
-          ELSIF header_send_ok = '1' THEN
-            header_send               <= '1';
-            header_select             <= '1';
-            header_data(15 DOWNTO 0)  <= fine_time_reg;
-            header_data(31 DOWNTO 16) <= (OTHERS => '0');
-            state                     <= WRITE_FINE_TIME;
-            address                   <= address + 4;
-          END IF;
+        --  IF header_send_ko = '1' THEN
+        --    header_send                   <= '0';
+        --    state                         <= TRASH_FIFO;
+        --    error_anticipating_empty_fifo <= '1';
+        --    -- TODO : error sending header
+        --  ELSIF header_send_ok = '1' THEN
+        --    header_send               <= '1';
+        --    header_select             <= '1';
+        --    header_data(15 DOWNTO 0)  <= fine_time_reg;
+        --    header_data(31 DOWNTO 16) <= (OTHERS => '0');
+        --    state                     <= WRITE_FINE_TIME;
+        --    address                   <= address + 4;
+        --  END IF;
           
           
-        WHEN WRITE_FINE_TIME =>
-          debug_reg_s(2 DOWNTO 0) <= "011";
+        --WHEN WRITE_FINE_TIME =>
+        --  debug_reg_s(2 DOWNTO 0) <= "011";
           
-          header_ack <= '0';
+        --  header_ack <= '0';
 
-          IF dma_ren = '0' THEN
-            header_send <= '0';
-          ELSE
-            header_send <= header_send;
-          END IF;
+        --  IF dma_ren = '0' THEN
+        --    header_send <= '0';
+        --  ELSE
+        --    header_send <= header_send;
+        --  END IF;
 
-          IF header_send_ko = '1' THEN
-            header_send                   <= '0';
-            state                         <= TRASH_FIFO;
-            error_anticipating_empty_fifo <= '1';
-            -- TODO : error sending header
-          ELSIF header_send_ok = '1' THEN
-            header_send   <= '0';
-            header_select <= '0';
-            state         <= SEND_DATA;
-            address       <= address + 4;
-          END IF;
+        --  IF header_send_ko = '1' THEN
+        --    header_send                   <= '0';
+        --    state                         <= TRASH_FIFO;
+        --    error_anticipating_empty_fifo <= '1';
+        --    -- TODO : error sending header
+        --  ELSIF header_send_ok = '1' THEN
+        --    header_send   <= '0';
+        --    header_select <= '0';
+        --    state         <= SEND_DATA;
+        --    address       <= address + 4;
+        --  END IF;
           
         WHEN TRASH_FIFO =>
           debug_reg_s(2 DOWNTO 0) <= "100";

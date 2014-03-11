@@ -4,4 +4,5 @@ lpp_lfr_filter.vhd
 lpp_lfr_apbreg.vhd
 lpp_lfr_ms_fsmdma.vhd
 lpp_lfr_ms.vhd
+lpp_lfr_WFP_nMS.vhd
 lpp_lfr.vhd

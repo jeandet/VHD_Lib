@@ -173,10 +173,10 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
     coarse_time_f1                         : STD_LOGIC_VECTOR(31 DOWNTO 0);
     coarse_time_f2                         : STD_LOGIC_VECTOR(31 DOWNTO 0);
     
-    fine_time_f0_0                         : STD_LOGIC_VECTOR(15 DOWNTO 0);
-    fine_time_f0_1                         : STD_LOGIC_VECTOR(15 DOWNTO 0);
-    fine_time_f1                           : STD_LOGIC_VECTOR(15 DOWNTO 0);
-    fine_time_f2                           : STD_LOGIC_VECTOR(15 DOWNTO 0);
+--    fine_time_f0_0                         : STD_LOGIC_VECTOR(15 DOWNTO 0);
+--    fine_time_f0_1                         : STD_LOGIC_VECTOR(15 DOWNTO 0);
+--    fine_time_f1                           : STD_LOGIC_VECTOR(15 DOWNTO 0);
+--    fine_time_f2                           : STD_LOGIC_VECTOR(15 DOWNTO 0);
   END RECORD;
   SIGNAL reg_sp : lpp_SpectralMatrix_regs;
 
@@ -297,10 +297,10 @@ BEGIN  -- beh
       reg_sp.coarse_time_f0_1                       <= (OTHERS => '0');
       reg_sp.coarse_time_f1                         <= (OTHERS => '0');
       reg_sp.coarse_time_f2                         <= (OTHERS => '0');
-      reg_sp.fine_time_f0_0                         <= (OTHERS => '0');
-      reg_sp.fine_time_f0_1                         <= (OTHERS => '0');
-      reg_sp.fine_time_f1                           <= (OTHERS => '0');
-      reg_sp.fine_time_f2                           <= (OTHERS => '0');
+      --reg_sp.fine_time_f0_0                         <= (OTHERS => '0');
+      --reg_sp.fine_time_f0_1                         <= (OTHERS => '0');
+      --reg_sp.fine_time_f1                           <= (OTHERS => '0');
+      --reg_sp.fine_time_f2                           <= (OTHERS => '0');
       
       prdata                                        <= (OTHERS => '0');
 
@@ -344,10 +344,10 @@ BEGIN  -- beh
       reg_sp.coarse_time_f1                         <= matrix_time_f1  (31 DOWNTO 0);
       reg_sp.coarse_time_f2                         <= matrix_time_f2  (31 DOWNTO 0);
     
-      reg_sp.fine_time_f0_0                         <= matrix_time_f0_0(15 DOWNTO 0);
-      reg_sp.fine_time_f0_1                         <= matrix_time_f0_1(15 DOWNTO 0);
-      reg_sp.fine_time_f1                           <= matrix_time_f1  (15 DOWNTO 0);
-      reg_sp.fine_time_f2                           <= matrix_time_f2  (15 DOWNTO 0);
+      --reg_sp.fine_time_f0_0                         <= matrix_time_f0_0(15 DOWNTO 0);
+      --reg_sp.fine_time_f0_1                         <= matrix_time_f0_1(15 DOWNTO 0);
+      --reg_sp.fine_time_f1                           <= matrix_time_f1  (15 DOWNTO 0);
+      --reg_sp.fine_time_f2                           <= matrix_time_f2  (15 DOWNTO 0);
       
       status_full_ack <= (OTHERS => '0');
 
@@ -392,10 +392,10 @@ BEGIN  -- beh
           WHEN "000111" => prdata    <= reg_sp.coarse_time_f0_1;
           WHEN "001000" => prdata    <= reg_sp.coarse_time_f1;  
           WHEN "001001" => prdata    <= reg_sp.coarse_time_f2;  
-          WHEN "001010" => prdata(15 downto 0) <= reg_sp.fine_time_f0_0;  
-          WHEN "001011" => prdata(15 downto 0) <= reg_sp.fine_time_f0_1;  
-          WHEN "001100" => prdata(15 downto 0) <= reg_sp.fine_time_f1;    
-          WHEN "001101" => prdata(15 downto 0) <= reg_sp.fine_time_f2;
+          WHEN "001010" => prdata(15 downto 0) <= matrix_time_f0_0(15 DOWNTO 0);--reg_sp.fine_time_f0_0;  
+          WHEN "001011" => prdata(15 downto 0) <= matrix_time_f0_1(15 DOWNTO 0);--reg_sp.fine_time_f0_1;  
+          WHEN "001100" => prdata(15 downto 0) <= matrix_time_f1  (15 DOWNTO 0);--reg_sp.fine_time_f1;    
+          WHEN "001101" => prdata(15 downto 0) <= matrix_time_f2  (15 DOWNTO 0);--reg_sp.fine_time_f2;
                            
           WHEN "001111" => prdata    <= debug_reg;   
           ---------------------------------------------------------------------

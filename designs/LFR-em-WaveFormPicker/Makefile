@@ -2,7 +2,7 @@
 VHDLIB=../..
 SCRIPTSDIR=$(VHDLIB)/scripts/
 GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
-TOP=leon3mp
+TOP=LFR_em
 BOARD=em-LeonLPP-A3PE3kL-v3-core1
 include $(GRLIB)/boards/$(BOARD)/Makefile.inc
 DEVICE=$(PART)-$(PACKAGE)$(SPEED)
@@ -12,7 +12,8 @@ EFFORT=high
 XSTOPT=
 SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_constraint 0"
 #VHDLSYNFILES=config.vhd ahbrom.vhd leon3mp.vhd
-VHDLSYNFILES=config.vhd leon3mp.vhd
+#VHDLSYNFILES=config.vhd leon3mp.vhd
+VHDLSYNFILES=LFR-em.vhd
 #VHDLSIMFILES=testbench.vhd
 #SIMTOP=testbench
 #SDCFILE=$(GRLIB)/boards/$(BOARD)/synplify.sdc
@@ -37,8 +38,7 @@ DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	./lpp_uart \
 	./lpp_usb \
 
-FILESKIP = lpp_lfr_ms.vhd \
-	i2cmst.vhd \
+FILESKIP = i2cmst.vhd \
 	APB_MULTI_DIODE.vhd \
 	APB_MULTI_DIODE.vhd \
 	Top_MatrixSpec.vhd \

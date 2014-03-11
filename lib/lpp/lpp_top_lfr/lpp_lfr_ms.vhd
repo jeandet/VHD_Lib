@@ -307,12 +307,15 @@ BEGIN
       Matrix_Type  => DMUX_WorkFreq, 
       Matrix_Write => SM_Wen, 
       Valid        => Head_Valid,
+      
       dataIN       => FifoOUT_Data, 
       emptyIN      => FifoOUT_Empty, 
-      RenOUT       => Head_Read, 
+      RenOUT       => Head_Read,
+      
       dataOUT      => Head_Data, 
       emptyOUT     => Head_Empty, 
-      RenIN        => DMA_Read, 
+      RenIN        => DMA_Read,
+      
       header       => Head_Header,
       header_val   => Head_Val,
       header_ack   => DMA_ack );
@@ -367,48 +370,5 @@ BEGIN
       matrix_time_f1                         => matrix_time_f1,
       matrix_time_f2                         => matrix_time_f2
       );
-
-  
-
-  
-  -----------------------------------------------------------------------------
-  --lpp_dma_ip_1: lpp_dma_ip
-  --  GENERIC MAP (
-  --    tech   => 0,
-  --    hindex => hindex)
-  --  PORT MAP (
-  --    HCLK                                   => clk,
-  --    HRESETn                                => rstn,
-  --    AHB_Master_In                          => AHB_Master_In,
-  --    AHB_Master_Out                         => AHB_Master_Out,
-      
-  --    fifo_data                              => Head_Data,
-  --    fifo_empty                             => Head_Empty,
-  --    fifo_ren                               => DMA_Read,
-      
-  --    header                                 => Head_Header,
-  --    header_val                             => Head_Val,
-  --    header_ack                             => DMA_ack,     
-      
-  --    ready_matrix_f0_0                      => ready_matrix_f0_0,
-  --    ready_matrix_f0_1                      => ready_matrix_f0_1,
-  --    ready_matrix_f1                        => ready_matrix_f1,
-  --    ready_matrix_f2                        => ready_matrix_f2,
-  --    error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
-  --    error_bad_component_error              => error_bad_component_error,
-  --    debug_reg                              => debug_reg,
-  --    status_ready_matrix_f0_0               => status_ready_matrix_f0_0,
-  --    status_ready_matrix_f0_1               => status_ready_matrix_f0_1,
-  --    status_ready_matrix_f1                 => status_ready_matrix_f1,
-  --    status_ready_matrix_f2                 => status_ready_matrix_f2,
-  --    status_error_anticipating_empty_fifo   => status_error_anticipating_empty_fifo,
-  --    status_error_bad_component_error       => status_error_bad_component_error,
-  --    config_active_interruption_onNewMatrix => config_active_interruption_onNewMatrix,
-  --    config_active_interruption_onError     => config_active_interruption_onError,
-  --    addr_matrix_f0_0                       => addr_matrix_f0_0,
-  --    addr_matrix_f0_1                       => addr_matrix_f0_1,
-  --    addr_matrix_f1                         => addr_matrix_f1,
-  --    addr_matrix_f2                         => addr_matrix_f2);
-  -------------------------------------------------------------------------------
 
 END Behavioral;

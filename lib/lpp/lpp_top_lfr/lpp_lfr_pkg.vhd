@@ -165,6 +165,42 @@ PACKAGE lpp_lfr_pkg IS
       );
   END COMPONENT;
 
+  -----------------------------------------------------------------------------
+  -- LPP_LFR with only WaveForm Picker (and without Spectral Matrix Sub System)
+  -----------------------------------------------------------------------------
+  COMPONENT lpp_lfr_WFP_nMS
+    GENERIC (
+      Mem_use                : INTEGER;
+      nb_data_by_buffer_size : INTEGER;
+      nb_word_by_buffer_size : INTEGER;
+      nb_snapshot_param_size : INTEGER;
+      delta_vector_size      : INTEGER;
+      delta_vector_size_f0_2 : INTEGER;
+      pindex                 : INTEGER;
+      paddr                  : INTEGER;
+      pmask                  : INTEGER;
+      pirq_ms                : INTEGER;
+      pirq_wfp               : INTEGER;
+      hindex                 : INTEGER;
+      top_lfr_version        : STD_LOGIC_VECTOR(23 DOWNTO 0));
+    PORT (
+      clk             : IN  STD_LOGIC;
+      rstn            : IN  STD_LOGIC;
+      sample_B        : IN  Samples14v(2 DOWNTO 0);
+      sample_E        : IN  Samples14v(4 DOWNTO 0);
+      sample_val      : IN  STD_LOGIC;
+      apbi            : IN  apb_slv_in_type;
+      apbo            : OUT apb_slv_out_type;
+      ahbi            : IN  AHB_Mst_In_Type;
+      ahbo            : OUT AHB_Mst_Out_Type;
+      coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+      data_shaping_BW : OUT STD_LOGIC;
+      observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0));
+  END COMPONENT;
+  -----------------------------------------------------------------------------
+  
+  
   COMPONENT lpp_lfr_apbreg
     GENERIC (
       nb_data_by_buffer_size : INTEGER;

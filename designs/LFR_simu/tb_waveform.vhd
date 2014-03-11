@@ -48,25 +48,6 @@ USE lpp.CY7C1061DV33_pkg.ALL;
 ENTITY testbench IS
 END;
 
- 
- 
- 
- 
- 
- 
- 
-
-
-
-
-
-
-
-
-
-
-
-
 ARCHITECTURE behav OF testbench IS
   CONSTANT INDEX_LFR                              : INTEGER                       := 15;
   CONSTANT ADDR_LFR                               : INTEGER                       := 15;
