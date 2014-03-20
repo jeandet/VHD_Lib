@@ -47,7 +47,7 @@ ENTITY lpp_lfr_apbreg IS
     pmask    : INTEGER := 16#fff#;
     pirq_ms  : INTEGER := 0;
     pirq_wfp : INTEGER := 1;
-    top_lfr_version    : STD_LOGIC_VECTOR(23 DOWNTO 0));
+    top_lfr_version    : STD_LOGIC_VECTOR(23 DOWNTO 0) := X"000000");
   PORT (
     -- AMBA AHB system signals
     HCLK    : IN STD_ULOGIC;

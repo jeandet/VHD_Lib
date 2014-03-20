@@ -28,7 +28,7 @@ USE GRLIB.DMA2AHB_Package.ALL;
 
 ENTITY lpp_lfr_ms IS
   GENERIC (
-    Mem_use : INTEGER 
+    Mem_use : INTEGER := use_RAM
     );
   PORT (
     clk  : IN STD_LOGIC;
@@ -146,7 +146,11 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL   DMA_ack   : STD_LOGIC;
   
   -----------------------------------------------------------------------------
-  SIGNAL data_time : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL data_time   : STD_LOGIC_VECTOR(47 DOWNTO 0);
+
+  SIGNAL debug_reg_s : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL dma_valid_s       : STD_LOGIC;
+  SIGNAL dma_valid_burst_s : STD_LOGIC;
   
 BEGIN
 
@@ -340,8 +344,8 @@ BEGIN
       
       dma_addr                               => dma_addr,
       dma_data                               => dma_data,
-      dma_valid                              => dma_valid,
-      dma_valid_burst                        => dma_valid_burst,
+      dma_valid                              => dma_valid_s,
+      dma_valid_burst                        => dma_valid_burst_s,
       dma_ren                                => dma_ren,
       dma_done                               => dma_done,
       
@@ -351,7 +355,7 @@ BEGIN
       ready_matrix_f2                        => ready_matrix_f2,
       error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
       error_bad_component_error              => error_bad_component_error,
-      debug_reg                              => debug_reg,
+      debug_reg                              => debug_reg_s,
       status_ready_matrix_f0_0               => status_ready_matrix_f0_0,
       status_ready_matrix_f0_1               => status_ready_matrix_f0_1,
       status_ready_matrix_f1                 => status_ready_matrix_f1,
@@ -371,4 +375,20 @@ BEGIN
       matrix_time_f2                         => matrix_time_f2
       );
 
+  dma_valid       <= dma_valid_s;
+  dma_valid_burst <= dma_valid_burst_s;
+  
+  debug_reg(9 DOWNTO 0)   <= debug_reg_s(9 DOWNTO 0);
+  debug_reg(10)           <= Head_Empty;
+  debug_reg(11)           <= DMA_Read;
+  debug_reg(12)           <= Head_Val;
+  debug_reg(13)           <= DMA_ack;
+  debug_reg(14)           <= dma_ren;
+  debug_reg(15)           <= dma_done;
+  debug_reg(16)           <= dma_valid_s;
+  debug_reg(17)           <= dma_valid_burst_s;
+  debug_reg(31 DOWNTO 18) <= (OTHERS => '0');
+  
+  
+  
 END Behavioral;

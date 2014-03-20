@@ -84,7 +84,12 @@ Load <= FFT_Load;
         PTS         => gPTS,
         HALFPTS     => gHALFPTS,
         inBuf_RWDLY => gInBuf_RWDLY)        
-        port map(clkm,start,rstn,Drive_Write,Link_Read,Drive_DataIM,Drive_DataRE,FFT_Load,open,FFT_DataIM,FFT_DataRE,FFT_Valid,FFT_Ready); 
+        port map(clkm,start,rstn,
+                 Drive_Write,Link_Read,
+                 Drive_DataIM,Drive_DataRE,
+                 FFT_Load,open,
+                 FFT_DataIM,FFT_DataRE,
+                 FFT_Valid,FFT_Ready); 
 
 
     LINK : Linker_FFT

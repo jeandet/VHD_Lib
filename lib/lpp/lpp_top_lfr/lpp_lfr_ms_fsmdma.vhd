@@ -200,7 +200,8 @@ BEGIN
       debug_reg_s(31 DOWNTO 0) <= (OTHERS => '0');
 
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
-
+      debug_reg_s(31 DOWNTO 10) <= (OTHERS => '0');
+      
       CASE state IS
         WHEN IDLE =>
           debug_reg_s(2 DOWNTO 0) <= "000";
@@ -214,6 +215,9 @@ BEGIN
           ready_matrix_f2           <= '0';
           error_bad_component_error <= '0';
           header_select             <= '1';
+          IF header_val = '1' THEN
+            header_ack  <= '1';            
+          END IF;
           IF header_val = '1' AND fifo_empty = '0' AND send_matrix = '1' THEN
             debug_reg_s(5 DOWNTO 4) <= header(1 DOWNTO 0);
             debug_reg_s(9 DOWNTO 6) <= header(5 DOWNTO 2);
@@ -226,9 +230,9 @@ BEGIN
           
         WHEN CHECK_COMPONENT_TYPE =>
           debug_reg_s(2 DOWNTO 0) <= "001";
+          header_ack              <= '0';
           
           IF header_check_ok = '1' THEN
-            header_ack  <= '1';
             header_send <= '0';
             --
             IF component_type = "0000" THEN
@@ -256,7 +260,6 @@ BEGIN
           ELSE
             error_bad_component_error <= '1';
             component_type_pre        <= "0000";
-            header_ack                <= '1';
             state                     <= TRASH_FIFO;
           END IF;
 

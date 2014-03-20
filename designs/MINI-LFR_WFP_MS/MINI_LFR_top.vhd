@@ -425,7 +425,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000104")  -- aa.bb.cc version
+      top_lfr_version        => X"000105")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => reset,
