@@ -1,4 +1,5 @@
-apb_lfr_time_management.vhd
-lpp_counter.vhd
-lfr_time_management.vhd
 lpp_lfr_time_management.vhd
+apb_lfr_time_management.vhd
+lfr_time_management.vhd
+fine_time_counter.vhd
+coarse_time_counter.vhd

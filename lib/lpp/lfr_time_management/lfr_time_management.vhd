@@ -25,16 +25,16 @@ USE lpp.lpp_lfr_time_management.ALL;
 
 ENTITY lfr_time_management IS
   GENERIC (
-    nb_time_code_missing_limit : INTEGER := 60;
-    nb_wait_pediod             : INTEGER := 375
-    );
+    FIRST_DIVISION   : INTEGER := 374;
+    NB_SECOND_DESYNC : INTEGER := 60);
   PORT (
     clk  : IN STD_LOGIC;
     rstn : IN STD_LOGIC;
 
-    new_timecode   : IN STD_LOGIC;      -- transition signal information
+    tick           : IN STD_LOGIC;      -- transition signal information
+    
     new_coarsetime : IN STD_LOGIC;      -- transition signal information
-    coarsetime_reg : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    coarsetime_reg : IN STD_LOGIC_VECTOR(30 DOWNTO 0);
 
     fine_time       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
     fine_time_new   : OUT STD_LOGIC;
@@ -45,68 +45,129 @@ END lfr_time_management;
 
 ARCHITECTURE Behavioral OF lfr_time_management IS
 
-  SIGNAL counter_clear : STD_LOGIC;
-  SIGNAL counter_full  : STD_LOGIC;
+  SIGNAL FT_max : STD_LOGIC;
+  SIGNAL FT_half : STD_LOGIC;
+  SIGNAL FT_wait : STD_LOGIC;
 
-  SIGNAL nb_time_code_missing : INTEGER;
-  SIGNAL coarse_time_s        : INTEGER;
+  TYPE state_fsm_time_management IS (DESYNC, TRANSITION, SYNC);
+  SIGNAL state : state_fsm_time_management;
 
-  SIGNAL new_coarsetime_s : STD_LOGIC;
-  
+  SIGNAL fsm_desync   : STD_LOGIC;
+  SIGNAL fsm_transition : STD_LOGIC;
+
+  SIGNAL set_TCU : STD_LOGIC;
+  SIGNAL CT_add1 : STD_LOGIC;
+
+  SIGNAL new_coarsetime_reg : STD_LOGIC;
+    
 BEGIN
-  
-  lpp_counter_1 : lpp_counter
-    GENERIC MAP (
-      nb_wait_period => nb_wait_pediod,
-      nb_bit_of_data => 16)
-    PORT MAP (
-      clk   => clk,
-      rstn  => rstn,
-      clear => counter_clear,
-      full  => counter_full,
-      data  => fine_time,
-      new_data => fine_time_new);
 
+  -----------------------------------------------------------------------------
+  -- 
+  -----------------------------------------------------------------------------
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      nb_time_code_missing <= 0;
-      counter_clear        <= '0';
-      coarse_time_s <= 0;
-      coarse_time_new <= '0';
-    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
+      new_coarsetime_reg <= '0';
+    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
       IF new_coarsetime = '1' THEN
-        new_coarsetime_s <= '1';
-      ELSIF new_timecode = '1' THEN
-        new_coarsetime_s <= '0';        
-      END IF;
-      
-      IF new_timecode = '1' THEN
-        coarse_time_new <= '1';
-        IF new_coarsetime_s = '1' THEN
-          coarse_time_s <= to_integer(unsigned(coarsetime_reg));
-        ELSE
-          coarse_time_s <= coarse_time_s + 1;
-        END IF;
-        nb_time_code_missing <= 0;
-        counter_clear        <= '1';
-      ELSE
-        coarse_time_new <= '0';
-        counter_clear <= '0';
-        IF counter_full = '1' THEN
-          coarse_time_new <= '1';
-          coarse_time_s <= coarse_time_s + 1;
-          IF nb_time_code_missing = nb_time_code_missing_limit THEN
-            nb_time_code_missing <= nb_time_code_missing_limit;
-          ELSE
-            nb_time_code_missing <= nb_time_code_missing + 1;
+        new_coarsetime_reg <= '1';
+      ELSIF tick = '1' THEN
+        new_coarsetime_reg <= '0';
+      END IF;      
+    END IF;
+  END PROCESS;
+  
+  -----------------------------------------------------------------------------
+  -- FINE_TIME
+  -----------------------------------------------------------------------------
+  fine_time_counter_1: fine_time_counter
+    GENERIC MAP (
+      WAITING_TIME => X"0040",
+      FIRST_DIVISION => FIRST_DIVISION)
+    PORT MAP (
+      clk            => clk,
+      rstn           => rstn,
+      tick           => tick,
+      fsm_transition => fsm_transition,  -- todo
+      FT_max         => FT_max,  
+      FT_half        => FT_half, 
+      FT_wait        => FT_wait, 
+      fine_time      => fine_time, 
+      fine_time_new  => fine_time_new);
+
+  -----------------------------------------------------------------------------
+  -- COARSE_TIME
+  -----------------------------------------------------------------------------
+  coarse_time_counter_1: coarse_time_counter
+    GENERIC MAP(
+      NB_SECOND_DESYNC => NB_SECOND_DESYNC )
+    PORT MAP (
+      clk           => clk,
+      rstn          => rstn,
+      tick          => tick,
+      set_TCU       => set_TCU,         -- todo
+      set_TCU_value => coarsetime_reg,  -- todo
+      CT_add1       => CT_add1,         -- todo
+      fsm_desync    => fsm_desync,      -- todo
+      FT_max        => FT_max,
+      coarse_time   => coarse_time,
+      coarse_time_new   => coarse_time_new);
+
+  -----------------------------------------------------------------------------
+  -- FSM
+  -----------------------------------------------------------------------------
+  fsm_desync     <= '1' WHEN state = DESYNC     ELSE '0';
+  fsm_transition <= '1' WHEN state = TRANSITION ELSE '0';
+    
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS
+    IF rstn = '0' THEN                  -- asynchronous reset (active low)
+      state <= DESYNC;
+    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      --CT_add1 <= '0';
+      set_TCU <= '0';
+      CASE state IS
+        WHEN DESYNC =>
+          IF tick = '1' THEN
+            state <= SYNC;
+            set_TCU <= new_coarsetime_reg;
+            --IF new_coarsetime = '0' AND FT_half = '1' THEN
+            --  CT_add1 <= '1';
+            --END IF;
+          --ELSIF FT_max = '1' THEN
+          --  CT_add1 <= '1';
           END IF;
-        END IF;
-      END IF;
+        WHEN TRANSITION => 
+          IF tick = '1' THEN
+            state         <= SYNC;
+            set_TCU       <= new_coarsetime_reg;
+            --IF new_coarsetime = '0' THEN
+            --  CT_add1 <= '1';
+            --END IF;
+          ELSIF FT_wait = '1' THEN
+            --CT_add1 <= '1';
+            state         <= DESYNC;
+          END IF;
+        WHEN SYNC =>
+          IF tick = '1' THEN
+            set_TCU       <= new_coarsetime_reg;
+            --IF new_coarsetime = '0' THEN
+            --  CT_add1 <= '1';
+            --END IF;
+          ELSIF FT_max = '1' THEN
+            state         <= TRANSITION;
+          END IF;
+        WHEN OTHERS => NULL;
+      END CASE;
     END IF;
   END PROCESS;
 
-  coarse_time(30 DOWNTO 0) <= STD_LOGIC_VECTOR(to_unsigned(coarse_time_s,31));
-  coarse_time(31)          <= '1' WHEN nb_time_code_missing = nb_time_code_missing_limit ELSE '0';
-  
+
+  CT_add1 <= '1' WHEN state = SYNC   AND tick = '1' AND new_coarsetime_reg = '0' ELSE
+             '1' WHEN state = DESYNC AND tick = '1' AND new_coarsetime_reg = '0' AND FT_half = '1' ELSE
+             '1' WHEN state = DESYNC AND tick = '0' AND FT_max = '1' ELSE
+             '1' WHEN state = TRANSITION AND  tick = '1' AND new_coarsetime_reg = '0' ELSE
+             '1' WHEN state = TRANSITION AND  tick = '0' AND FT_wait = '1' ELSE             
+             '0';
 END Behavioral;

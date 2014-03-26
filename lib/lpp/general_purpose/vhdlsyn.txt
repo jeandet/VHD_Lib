@@ -22,3 +22,4 @@ lpp_front_detection.vhd
 lpp_front_positive_detection.vhd
 SYNC_VALID_BIT.vhd
 RR_Arbiter_4.vhd
+counter.vhd

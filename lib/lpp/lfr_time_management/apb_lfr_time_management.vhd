@@ -32,21 +32,23 @@ USE lpp.lpp_lfr_time_management.ALL;
 ENTITY apb_lfr_time_management IS
 
   GENERIC(
-    pindex : INTEGER := 0;              --! APB slave index
-    paddr  : INTEGER := 0;              --! ADDR field of the APB BAR
-    pmask  : INTEGER := 16#fff#;        --! MASK field of the APB BAR
-    pirq   : INTEGER := 0;              --! 2 consecutive IRQ lines are used
-    nb_wait_pediod             : INTEGER := 375
+    pindex         : INTEGER := 0;        --! APB slave index
+    paddr          : INTEGER := 0;        --! ADDR field of the APB BAR
+    pmask          : INTEGER := 16#fff#;   --! MASK field of the APB BAR
+    FIRST_DIVISION   : INTEGER := 374;
+    NB_SECOND_DESYNC : INTEGER := 60
     );
 
   PORT (
     clk25MHz     : IN STD_LOGIC;        --! Clock
-    clk49_152MHz : IN STD_LOGIC;        --! secondary clock
+    clk24_576MHz : IN STD_LOGIC;        --! secondary clock
     resetn       : IN STD_LOGIC;        --! Reset
 
-    grspw_tick  : IN  STD_LOGIC;  --! grspw signal asserted when a valid time-code is received
-    apbi        : IN  apb_slv_in_type;  --! APB slave input signals
-    apbo        : OUT apb_slv_out_type;  --! APB slave output signals
+    grspw_tick : IN STD_LOGIC;  --! grspw signal asserted when a valid time-code is received
+
+    apbi : IN  apb_slv_in_type;         --! APB slave input signals
+    apbo : OUT apb_slv_out_type;        --! APB slave output signals
+
     coarse_time : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --! coarse time
     fine_time   : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)   --! fine time
     );
@@ -57,63 +59,44 @@ ARCHITECTURE Behavioral OF apb_lfr_time_management IS
 
   CONSTANT REVISION : INTEGER := 1;
   CONSTANT pconfig : apb_config_type := (
-    0 => ahb_device_reg (VENDOR_LPP, 14, 0, REVISION, pirq),
+    0 => ahb_device_reg (VENDOR_LPP, 14, 0, REVISION, 0),
     1 => apb_iobar(paddr, pmask)
     );
 
   TYPE apb_lfr_time_management_Reg IS RECORD
-    ctrl             : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    ctrl             : STD_LOGIC;
     coarse_time_load : STD_LOGIC_VECTOR(31 DOWNTO 0);
     coarse_time      : STD_LOGIC_VECTOR(31 DOWNTO 0);
     fine_time        : STD_LOGIC_VECTOR(15 DOWNTO 0);
   END RECORD;
-
   SIGNAL r                   : apb_lfr_time_management_Reg;
+  
   SIGNAL Rdata               : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL force_tick          : STD_LOGIC;
   SIGNAL previous_force_tick : STD_LOGIC;
   SIGNAL soft_tick           : STD_LOGIC;
 
-  SIGNAL irq1 : STD_LOGIC;
-  SIGNAL irq2 : STD_LOGIC;
-
   SIGNAL coarsetime_reg_updated : STD_LOGIC;
   SIGNAL coarsetime_reg         : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-  SIGNAL coarse_time_new         : STD_LOGIC;
-  SIGNAL coarse_time_new_49      : STD_LOGIC;
-  SIGNAL coarse_time_49         : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL coarse_time_s         : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  --SIGNAL coarse_time_new    : STD_LOGIC;
+  SIGNAL coarse_time_new_49 : STD_LOGIC;
+  SIGNAL coarse_time_49     : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL coarse_time_s      : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+  --SIGNAL fine_time_new      : STD_LOGIC;
+  --SIGNAL fine_time_new_temp : STD_LOGIC;
+  SIGNAL fine_time_new_49   : STD_LOGIC;
+  SIGNAL fine_time_49       : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL fine_time_s        : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL tick               : STD_LOGIC;
+  SIGNAL new_timecode       : STD_LOGIC;
+  SIGNAL new_coarsetime     : STD_LOGIC;
   
-  SIGNAL fine_time_new         : STD_LOGIC;
-  SIGNAL fine_time_new_temp         : STD_LOGIC;
-  SIGNAL fine_time_new_49      : STD_LOGIC;
-  SIGNAL fine_time_49         : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL fine_time_s         : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL tick : STD_LOGIC;
-  SIGNAL new_timecode : STD_LOGIC;
-  SIGNAL new_coarsetime : STD_LOGIC;
+  SIGNAL time_new_49 : STD_LOGIC;
+  SIGNAL time_new    : STD_LOGIC;
   
 BEGIN
-  -----------------------------------------------------------------------------
-  -- TODO
-  -- IRQ 1 & 2
-  -----------------------------------------------------------------------------
-  irq2 <= '0';
-  irq1 <= '0';
-
-  
-  --all_irq_gen : FOR I IN 15 DOWNTO 0 GENERATE
-  --irq1_gen : IF I = pirq GENERATE
-  apbo.pirq(pirq) <= irq1;
-  --END GENERATE irq1_gen;
-  --irq2_gen : IF I = pirq+1 GENERATE
-  apbo.pirq(pirq+1) <= irq2;
-  --  END GENERATE irq2_gen;
-  --  others_irq : IF (I < pirq) OR (I > (pirq + 1)) GENERATE
-  --    apbo.pirq(I) <= '0';
-  --  END GENERATE others_irq;
-  --END GENERATE all_irq_gen;
 
   PROCESS(resetn, clk25MHz)
   BEGIN
@@ -121,7 +104,7 @@ BEGIN
     IF resetn = '0' THEN
       Rdata               <= (OTHERS => '0');
       r.coarse_time_load  <= x"80000000";
-      r.ctrl              <= x"00000000";
+      r.ctrl              <= '0';
       force_tick          <= '0';
       previous_force_tick <= '0';
       soft_tick           <= '0';
@@ -131,7 +114,7 @@ BEGIN
     ELSIF clk25MHz'EVENT AND clk25MHz = '1' THEN
       coarsetime_reg_updated <= '0';
 
-      force_tick          <= r.ctrl(0);
+      force_tick          <= r.ctrl;
       previous_force_tick <= force_tick;
       IF (previous_force_tick = '0') AND (force_tick = '1') THEN
         soft_tick <= '1';
@@ -143,28 +126,28 @@ BEGIN
       IF (apbi.psel(pindex) AND apbi.penable AND apbi.pwrite) = '1' THEN
         CASE apbi.paddr(7 DOWNTO 2) IS
           WHEN "000000" =>
-            r.ctrl <= apbi.pwdata(31 DOWNTO 0);
+            r.ctrl <= apbi.pwdata(0);
           WHEN "000001" =>
-            r.coarse_time_load <= apbi.pwdata(31 DOWNTO 0);
+            r.coarse_time_load     <= apbi.pwdata(31 DOWNTO 0);
             coarsetime_reg_updated <= '1';
           WHEN OTHERS =>
         END CASE;
-      ELSIF r.ctrl(0) = '1' THEN
-        r.ctrl(0) <= '0';
+      ELSIF r.ctrl = '1' THEN
+        r.ctrl <= '0';
       END IF;
 
 --APB READ OP
       IF (apbi.psel(pindex) AND (NOT apbi.pwrite)) = '1' THEN
         CASE apbi.paddr(7 DOWNTO 2) IS
           WHEN "000000" =>
-            Rdata(31 DOWNTO 0) <= r.ctrl(31 DOWNTO 0);
+            Rdata(0) <= r.ctrl;
           WHEN "000001" =>
             Rdata(31 DOWNTO 0) <= r.coarse_time_load(31 DOWNTO 0);
           WHEN "000010" =>
             Rdata(31 DOWNTO 0) <= r.coarse_time(31 DOWNTO 0);
           WHEN "000011" =>
             Rdata(31 DOWNTO 16) <= (OTHERS => '0');
-            Rdata(15 DOWNTO 0) <= r.fine_time(15 DOWNTO 0);
+            Rdata(15 DOWNTO 0)  <= r.fine_time(15 DOWNTO 0);
           WHEN OTHERS =>
             Rdata(31 DOWNTO 0) <= x"00000000";
         END CASE;
@@ -173,25 +156,24 @@ BEGIN
     END IF;
   END PROCESS;
 
-  apbo.prdata  <= Rdata; 
+  apbo.prdata  <= Rdata;
   apbo.pconfig <= pconfig;
   apbo.pindex  <= pindex;
-  
-  coarse_time  <= r.coarse_time;
-  fine_time    <= r.fine_time;
+
+  -----------------------------------------------------------------------------
+  -- IN
+  coarse_time    <= r.coarse_time;
+  fine_time      <= r.fine_time;
+  coarsetime_reg <= r.coarse_time_load;
   -----------------------------------------------------------------------------
 
-  coarsetime_reg <= r.coarse_time_load;
+  -----------------------------------------------------------------------------
+  -- OUT
   r.coarse_time  <= coarse_time_s;
   r.fine_time    <= fine_time_s;
   -----------------------------------------------------------------------------
-  -- IN coarsetime_reg_updated
-  -- IN coarsetime_reg
 
-  -- OUT coarse_time_s -- ok
-  -- OUT fine_time_s   -- ok
   -----------------------------------------------------------------------------
-
   tick <= grspw_tick OR soft_tick;
 
   SYNC_VALID_BIT_1 : SYNC_VALID_BIT
@@ -199,7 +181,7 @@ BEGIN
       NB_FF_OF_SYNC => 2)
     PORT MAP (
       clk_in  => clk25MHz,
-      clk_out => clk49_152MHz,
+      clk_out => clk24_576MHz,
       rstn    => resetn,
       sin     => tick,
       sout    => new_timecode);
@@ -209,57 +191,61 @@ BEGIN
       NB_FF_OF_SYNC => 2)
     PORT MAP (
       clk_in  => clk25MHz,
-      clk_out => clk49_152MHz,
+      clk_out => clk24_576MHz,
       rstn    => resetn,
       sin     => coarsetime_reg_updated,
       sout    => new_coarsetime);
+  ----------------------------------------------------------------------------
 
-  --SYNC_VALID_BIT_3 : SYNC_VALID_BIT
+  -----------------------------------------------------------------------------
+  --SYNC_FF_1 : SYNC_FF
   --  GENERIC MAP (
   --    NB_FF_OF_SYNC => 2)
   --  PORT MAP (
-  --    clk_in  => clk49_152MHz,
+  --    clk    => clk25MHz,
+  --    rstn   => resetn,
+  --    A      => fine_time_new_49,
+  --    A_sync => fine_time_new_temp);
+
+  --lpp_front_detection_1 : lpp_front_detection
+  --  PORT MAP (
+  --    clk  => clk25MHz,
+  --    rstn => resetn,
+  --    sin  => fine_time_new_temp,
+  --    sout => fine_time_new);
+
+  --SYNC_VALID_BIT_4 : SYNC_VALID_BIT
+  --  GENERIC MAP (
+  --    NB_FF_OF_SYNC => 2)
+  --  PORT MAP (
+  --    clk_in  => clk24_576MHz,
   --    clk_out => clk25MHz,
   --    rstn    => resetn,
-  --    sin     => 9,
-  --    sout    => );
-  
-  SYNC_FF_1:  SYNC_FF
-    GENERIC MAP (
-      NB_FF_OF_SYNC => 2)
-    PORT MAP (
-      clk    => clk25MHz,
-      rstn   => resetn,
-      A      => fine_time_new_49,
-      A_sync => fine_time_new_temp);
+  --    sin     => coarse_time_new_49,
+  --    sout    => coarse_time_new);
 
-  lpp_front_detection_1: lpp_front_detection
-    PORT MAP (
-      clk  => clk25MHz,
-      rstn => resetn,
-      sin  => fine_time_new_temp,
-      sout => fine_time_new);
+  time_new_49 <= coarse_time_new_49 OR fine_time_new_49;
 
   SYNC_VALID_BIT_4 : SYNC_VALID_BIT
-    GENERIC MAP (
-      NB_FF_OF_SYNC => 2)
-    PORT MAP (
-      clk_in  => clk49_152MHz,
-      clk_out => clk25MHz,
-      rstn    => resetn,
-      sin     => coarse_time_new_49,
-      sout    => coarse_time_new);
+   GENERIC MAP (
+     NB_FF_OF_SYNC => 2)
+   PORT MAP (
+     clk_in  => clk24_576MHz,
+     clk_out => clk25MHz,
+     rstn    => resetn,
+     sin     => time_new_49,
+     sout    => time_new);
+ 
 
+  
   PROCESS (clk25MHz, resetn)
   BEGIN  -- PROCESS
     IF resetn = '0' THEN                -- asynchronous reset (active low)
       fine_time_s   <= (OTHERS => '0');
       coarse_time_s <= (OTHERS => '0');
     ELSIF clk25MHz'EVENT AND clk25MHz = '1' THEN  -- rising clock edge
-      IF fine_time_new = '1' THEN
-        fine_time_s <= fine_time_49;
-      END IF;
-      IF coarse_time_new = '1' THEN
+      IF time_new = '1' THEN
+        fine_time_s   <= fine_time_49;
         coarse_time_s <= coarse_time_49;
       END IF;
     END IF;
@@ -270,15 +256,15 @@ BEGIN
   -----------------------------------------------------------------------------
   lfr_time_management_1 : lfr_time_management
     GENERIC MAP (
-      nb_time_code_missing_limit => 60,
-      nb_wait_pediod             => 375)
+      FIRST_DIVISION   => FIRST_DIVISION,
+      NB_SECOND_DESYNC => NB_SECOND_DESYNC)
     PORT MAP (
-      clk  => clk49_152MHz,
+      clk  => clk24_576MHz,
       rstn => resetn,
 
-      new_timecode   => new_timecode,
+      tick           => new_timecode,
       new_coarsetime => new_coarsetime,
-      coarsetime_reg => coarsetime_reg,
+      coarsetime_reg => coarsetime_reg(30 DOWNTO 0),
 
       fine_time       => fine_time_49,
       fine_time_new   => fine_time_new_49,
