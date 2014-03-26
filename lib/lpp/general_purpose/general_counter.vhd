@@ -3,7 +3,7 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.std_logic_arith.ALL;
 USE IEEE.std_logic_unsigned.ALL;
 
-ENTITY counter IS
+ENTITY general_counter IS
   
   GENERIC (
     CYCLIC          : STD_LOGIC := '1';
@@ -23,9 +23,9 @@ ENTITY counter IS
     counter   : OUT STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0)
     );
 
-END counter;
+END general_counter;
 
-ARCHITECTURE beh OF counter IS
+ARCHITECTURE beh OF general_counter IS
   SIGNAL counter_s : STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0);
 
 BEGIN  -- beh

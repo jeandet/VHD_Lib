@@ -38,7 +38,7 @@ ARCHITECTURE beh OF coarse_time_counter IS
   --CONSTANT NB_SECOND_DESYNC : INTEGER := 4; -- TODO : 60 
 BEGIN  -- beh
 
-  counter_1 : counter
+  counter_1 : general_counter
     GENERIC MAP (
       CYCLIC => '1',
       NB_BITS_COUNTER => 31)
@@ -55,7 +55,7 @@ BEGIN  -- beh
   
   add1_bit31 <= '1' WHEN fsm_desync = '1' AND FT_max = '1' ELSE '0';
   
-  counter_2 : counter
+  counter_2 : general_counter
     GENERIC MAP (
       CYCLIC          => '0',
       NB_BITS_COUNTER => 6)

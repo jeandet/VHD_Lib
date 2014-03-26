@@ -115,8 +115,7 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms_fsmdma IS
                                WRITE_FINE_TIME,
                                TRASH_FIFO,
                                SEND_DATA,
-                               WAIT_DATA_ACK,
-                               CHECK_LENGTH
+                               WAIT_DATA_ACK
                                );
   SIGNAL state : state_DMAWriteBurst;   -- := IDLE;
 
@@ -149,6 +148,9 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms_fsmdma IS
   -----------------------------------------------------------------------------
   SIGNAL debug_reg_s   : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL fine_time_reg : STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+  -----------------------------------------------------------------------------
+  SIGNAL log_empty_fifo : STD_LOGIC;
   
 BEGIN
   
@@ -199,6 +201,8 @@ BEGIN
 
       debug_reg_s(31 DOWNTO 0) <= (OTHERS => '0');
 
+      log_empty_fifo <= '0';
+
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
       debug_reg_s(31 DOWNTO 10) <= (OTHERS => '0');
       
@@ -227,6 +231,7 @@ BEGIN
             component_type_pre <= component_type;
             state              <= CHECK_COMPONENT_TYPE;
           END IF;
+          log_empty_fifo <= '0';
           
         WHEN CHECK_COMPONENT_TYPE =>
           debug_reg_s(2 DOWNTO 0) <= "001";
@@ -330,7 +335,7 @@ BEGIN
           header_ack <= '0';
           debug_reg_s(2 DOWNTO 0) <= "101";
           
-          IF fifo_empty = '1' THEN
+          IF fifo_empty = '1' OR log_empty_fifo = '1' THEN
             state <= IDLE;
             IF component_type = "1110" THEN  --"1110" -- JC
               CASE matrix_type IS
@@ -349,6 +354,8 @@ BEGIN
           END IF;
 
         WHEN WAIT_DATA_ACK =>
+          log_empty_fifo <= fifo_empty OR log_empty_fifo;
+          
           debug_reg_s(2 DOWNTO 0) <= "110";
           
           component_send <= '0';
@@ -357,13 +364,14 @@ BEGIN
             state   <= SEND_DATA;
           ELSIF component_send_ko = '1' THEN
             error_anticipating_empty_fifo <= '0';
-            state                         <= TRASH_FIFO;
+            state   <= TRASH_FIFO;
           END IF;
           
-        WHEN CHECK_LENGTH =>
-          component_send <= '0';
-          debug_reg_s(2 DOWNTO 0) <= "111";
-          state <= IDLE;
+          
+        --WHEN CHECK_LENGTH =>
+        --  component_send <= '0';
+        --  debug_reg_s(2 DOWNTO 0) <= "111";
+        --  state <= IDLE;
           
         WHEN OTHERS => NULL;
       END CASE;

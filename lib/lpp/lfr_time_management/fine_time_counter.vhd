@@ -40,7 +40,7 @@ BEGIN  -- beh
 
 
   
-  counter_1 : counter
+  counter_1 : general_counter
     GENERIC MAP (
       CYCLIC          => '1',
       NB_BITS_COUNTER => 9)
@@ -56,7 +56,7 @@ BEGIN  -- beh
 
   new_ft <= '1' WHEN new_ft_counter = STD_LOGIC_VECTOR(to_unsigned(FIRST_DIVISION, 9)) ELSE '0';
 
-  counter_2 : counter
+  counter_2 : general_counter
     GENERIC MAP (
       CYCLIC          => '1',
       NB_BITS_COUNTER => 16)

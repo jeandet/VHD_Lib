@@ -310,11 +310,11 @@ BEGIN  -- beh
       pindex => 6,
       paddr  => 6,
       pmask  => 16#fff#,
-      pirq   => 12,
-      nb_wait_pediod => 375)            -- (49.152/2) /2^16 = 375
+      FIRST_DIVISION   => 374, -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
+      NB_SECOND_DESYNC => 60)  -- 60 secondes of desynchronization before CoarseTime's MSB is Set
     PORT MAP (
       clk25MHz     => clk_25,
-      clk49_152MHz => clk_24,           -- 49.152MHz/2
+      clk24_576MHz => clk_24,           -- 49.152MHz/2
       resetn       => reset,
       grspw_tick   => swno.tickout,
       apbi         => apbi_ext,
@@ -425,7 +425,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000105")  -- aa.bb.cc version
+      top_lfr_version        => X"000106")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => reset,

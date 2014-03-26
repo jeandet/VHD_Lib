@@ -142,7 +142,7 @@ vcom_lpp:
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/lpp_front_positive_detection.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/SYNC_VALID_BIT.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/RR_Arbiter_4.vhd
-	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/counter.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/general_counter.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lfr_time_management/lpp_lfr_time_management.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lfr_time_management/apb_lfr_time_management.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lfr_time_management/lfr_time_management.vhd

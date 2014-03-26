@@ -33,7 +33,7 @@ USE IEEE.NUMERIC_STD.ALL;
 
 PACKAGE general_purpose IS
 
-  COMPONENT counter
+  COMPONENT general_counter
     GENERIC (
       CYCLIC          : STD_LOGIC;
       NB_BITS_COUNTER : INTEGER);
