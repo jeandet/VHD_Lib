@@ -131,6 +131,7 @@ BEGIN
             r.coarse_time_load     <= apbi.pwdata(31 DOWNTO 0);
             coarsetime_reg_updated <= '1';
           WHEN OTHERS =>
+            NULL;
         END CASE;
       ELSIF r.ctrl = '1' THEN
         r.ctrl <= '0';
@@ -140,16 +141,17 @@ BEGIN
       IF (apbi.psel(pindex) AND (NOT apbi.pwrite)) = '1' THEN
         CASE apbi.paddr(7 DOWNTO 2) IS
           WHEN "000000" =>
-            Rdata(0) <= r.ctrl;
+            Rdata(0)            <= r.ctrl;
+            Rdata(31 DOWNTO 1)  <= (others => '0');
           WHEN "000001" =>
-            Rdata(31 DOWNTO 0) <= r.coarse_time_load(31 DOWNTO 0);
+            Rdata(31 DOWNTO 0)  <= r.coarse_time_load(31 DOWNTO 0);
           WHEN "000010" =>
-            Rdata(31 DOWNTO 0) <= r.coarse_time(31 DOWNTO 0);
+            Rdata(31 DOWNTO 0)  <= r.coarse_time(31 DOWNTO 0);
           WHEN "000011" =>
             Rdata(31 DOWNTO 16) <= (OTHERS => '0');
             Rdata(15 DOWNTO 0)  <= r.fine_time(15 DOWNTO 0);
           WHEN OTHERS =>
-            Rdata(31 DOWNTO 0) <= x"00000000";
+            Rdata(31 DOWNTO 0)  <= (others => '0');
         END CASE;
       END IF;
 

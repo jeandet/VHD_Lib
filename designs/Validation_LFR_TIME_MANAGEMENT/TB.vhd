@@ -150,16 +150,54 @@ BEGIN  -- beh
     WAIT UNTIL clk25MHz = '1';
     grspw_tick   <= '0';
     
-    
-    
-    
-    WAIT FOR 750 ms;
+    WAIT FOR 250 ms;
+    TB_string <= "READ 1  ";
+    apbi.psel(0)      <= '1';
+    apbi.pwrite       <= '0';
+    apbi.penable      <= '1';
+    apbi.paddr        <= X"00000008";
+    WAIT UNTIL clk25MHz = '1';
+    apbi.psel(0)      <= '0';
+    apbi.pwrite       <= '0';
+    apbi.penable      <= '0';
+    apbi.paddr        <= (OTHERS => '0');
+    WAIT UNTIL clk25MHz = '1';
+    WAIT FOR 250 ms;
+    TB_string <= "READ 2  ";
+    apbi.psel(0)      <= '1';
+    apbi.pwrite       <= '0';
+    apbi.penable      <= '1';
+    apbi.paddr        <= X"00000008";
+    WAIT UNTIL clk25MHz = '1';
+    apbi.psel(0)      <= '0';
+    apbi.pwrite       <= '0';
+    apbi.penable      <= '0';
+    apbi.paddr        <= (OTHERS => '0');
+    WAIT UNTIL clk25MHz = '1';
+    WAIT FOR 250 ms;
+    TB_string <= "READ 3  ";
+    apbi.psel(0)      <= '1';
+    apbi.pwrite       <= '0';
+    apbi.penable      <= '1';
+    apbi.paddr        <= X"00000008";
+    WAIT UNTIL clk25MHz = '1';
+    apbi.psel(0)      <= '0';
+    apbi.pwrite       <= '0';
+    apbi.penable      <= '0';
+    apbi.paddr        <= (OTHERS => '0');
+    WAIT UNTIL clk25MHz = '1';
+
+
         
     REPORT "*** END simulation ***" SEVERITY failure;
     WAIT;   
     
   END PROCESS;
 
+
+  -----------------------------------------------------------------------------
+  -- 
+  -----------------------------------------------------------------------------
 
   global_time <= coarse_time & fine_time;
   

@@ -151,6 +151,11 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms_fsmdma IS
 
   -----------------------------------------------------------------------------
   SIGNAL log_empty_fifo : STD_LOGIC;
+  -----------------------------------------------------------------------------
+  SIGNAL header_reg     : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL header_reg_val : STD_LOGIC;
+  SIGNAL header_reg_ack : STD_LOGIC;
+  SIGNAL header_error   : STD_LOGIC;
   
 BEGIN
   
@@ -183,7 +188,7 @@ BEGIN
       matrix_type                   <= (OTHERS => '0');
       component_type                <= (OTHERS => '0');
       state                         <= IDLE;
-      header_ack                    <= '0';
+--      header_ack                    <= '0';
       ready_matrix_f0_0             <= '0';
       ready_matrix_f0_1             <= '0';
       ready_matrix_f1               <= '0';
@@ -199,12 +204,14 @@ BEGIN
       header_data                   <= (OTHERS => '0');
       fine_time_reg                 <= (OTHERS => '0');
 
-      debug_reg_s(31 DOWNTO 0) <= (OTHERS => '0');
+      debug_reg_s( 2 DOWNTO 0) <= (OTHERS => '0');
+      debug_reg_s(31 DOWNTO 4) <= (OTHERS => '0');
 
       log_empty_fifo <= '0';
 
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
       debug_reg_s(31 DOWNTO 10) <= (OTHERS => '0');
+      header_reg_ack            <= '0';
       
       CASE state IS
         WHEN IDLE =>
@@ -219,15 +226,14 @@ BEGIN
           ready_matrix_f2           <= '0';
           error_bad_component_error <= '0';
           header_select             <= '1';
-          IF header_val = '1' THEN
-            header_ack  <= '1';            
-          END IF;
-          IF header_val = '1' AND fifo_empty = '0' AND send_matrix = '1' THEN
-            debug_reg_s(5 DOWNTO 4) <= header(1 DOWNTO 0);
-            debug_reg_s(9 DOWNTO 6) <= header(5 DOWNTO 2);
+          
+          IF header_reg_val = '1' AND fifo_empty = '0' AND send_matrix = '1' THEN
+            header_reg_ack <= '1';
+            debug_reg_s(5 DOWNTO 4) <= header_reg(1 DOWNTO 0);
+            debug_reg_s(9 DOWNTO 6) <= header_reg(5 DOWNTO 2);
             
-            matrix_type        <= header(1 DOWNTO 0);
-            component_type     <= header(5 DOWNTO 2);
+            matrix_type        <= header_reg(1 DOWNTO 0);
+            component_type     <= header_reg(5 DOWNTO 2);
             component_type_pre <= component_type;
             state              <= CHECK_COMPONENT_TYPE;
           END IF;
@@ -235,7 +241,7 @@ BEGIN
           
         WHEN CHECK_COMPONENT_TYPE =>
           debug_reg_s(2 DOWNTO 0) <= "001";
-          header_ack              <= '0';
+          --header_ack              <= '0';
           
           IF header_check_ok = '1' THEN
             header_send <= '0';
@@ -321,7 +327,7 @@ BEGIN
         WHEN TRASH_FIFO =>
           debug_reg_s(2 DOWNTO 0) <= "100";
           
-          header_ack                    <= '0';
+--          header_ack                    <= '0';
           error_bad_component_error     <= '0';
           error_anticipating_empty_fifo <= '0';
           IF fifo_empty = '1' THEN
@@ -332,7 +338,7 @@ BEGIN
           END IF;
 
         WHEN SEND_DATA =>
-          header_ack <= '0';
+--          header_ack <= '0';
           debug_reg_s(2 DOWNTO 0) <= "101";
           
           IF fifo_empty = '1' OR log_empty_fifo = '1' THEN
@@ -391,4 +397,35 @@ BEGIN
   header_send_ok <= '0' WHEN header_select = '0' ELSE dma_done;
   header_send_ko <= '0';
 
+
+  -----------------------------------------------------------------------------
+  -- FSM HEADER ACK
+  -----------------------------------------------------------------------------
+  PROCESS (HCLK, HRESETn)
+  BEGIN  -- PROCESS
+    IF HRESETn = '0' THEN                  -- asynchronous reset (active low)
+      header_ack     <= '0';
+      header_reg     <= (OTHERS => '0');
+      header_reg_val <= '0';
+    ELSIF HCLK'event AND HCLK = '1' THEN  -- rising clock edge
+      header_ack <= '0';
+      
+      IF header_val = '1' THEN
+        header_ack <= '1';
+        header_reg <= header;
+      END IF;
+
+      IF header_val = '1' THEN
+        header_reg_val <= '1';
+      ELSIF header_reg_ack = '1' THEN
+        header_reg_val <= '0';
+      END IF;
+
+      header_error <= header_val AND header_reg_val AND (NOT Header_reg_ack);
+      
+    END IF;
+  END PROCESS;
+
+  debug_reg_s(3) <= header_error;
+  
 END Behavioral;
