@@ -266,7 +266,7 @@ BEGIN
 
       tick           => new_timecode,
       new_coarsetime => new_coarsetime,
-      coarsetime_reg => coarsetime_reg(30 DOWNTO 0),
+      coarsetime_reg => coarsetime_reg(31 DOWNTO 0),
 
       fine_time       => fine_time_49,
       fine_time_new   => fine_time_new_49,

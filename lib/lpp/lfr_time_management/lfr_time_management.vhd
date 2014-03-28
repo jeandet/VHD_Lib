@@ -34,7 +34,7 @@ ENTITY lfr_time_management IS
     tick           : IN STD_LOGIC;      -- transition signal information
     
     new_coarsetime : IN STD_LOGIC;      -- transition signal information
-    coarsetime_reg : IN STD_LOGIC_VECTOR(30 DOWNTO 0);
+    coarsetime_reg : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     fine_time       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
     fine_time_new   : OUT STD_LOGIC;
