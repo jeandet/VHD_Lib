@@ -57,7 +57,7 @@ PACKAGE lpp_lfr_time_management IS
       rstn            : IN  STD_LOGIC;
       tick            : IN  STD_LOGIC;
       new_coarsetime  : IN  STD_LOGIC;
-      coarsetime_reg  : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      coarsetime_reg  : IN  STD_LOGIC_VECTOR(30 DOWNTO 0);
       fine_time       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       fine_time_new   : OUT STD_LOGIC;
       coarse_time     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -72,7 +72,8 @@ PACKAGE lpp_lfr_time_management IS
       rstn            : IN  STD_LOGIC;
       tick            : IN  STD_LOGIC;
       set_TCU         : IN  STD_LOGIC;
-      set_TCU_value   : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      new_TCU         : IN  STD_LOGIC;
+      set_TCU_value   : IN  STD_LOGIC_VECTOR(30 DOWNTO 0);
       CT_add1         : IN  STD_LOGIC;
       fsm_desync      : IN  STD_LOGIC;
       FT_max          : IN  STD_LOGIC;

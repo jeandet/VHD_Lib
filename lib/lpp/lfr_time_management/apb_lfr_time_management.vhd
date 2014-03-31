@@ -65,7 +65,8 @@ ARCHITECTURE Behavioral OF apb_lfr_time_management IS
 
   TYPE apb_lfr_time_management_Reg IS RECORD
     ctrl             : STD_LOGIC;
-    coarse_time_load : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    soft_reset       : STD_LOGIC;
+    coarse_time_load : STD_LOGIC_VECTOR(30 DOWNTO 0);
     coarse_time      : STD_LOGIC_VECTOR(31 DOWNTO 0);
     fine_time        : STD_LOGIC_VECTOR(15 DOWNTO 0);
   END RECORD;
@@ -77,7 +78,7 @@ ARCHITECTURE Behavioral OF apb_lfr_time_management IS
   SIGNAL soft_tick           : STD_LOGIC;
 
   SIGNAL coarsetime_reg_updated : STD_LOGIC;
-  SIGNAL coarsetime_reg         : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL coarsetime_reg         : STD_LOGIC_VECTOR(30 DOWNTO 0);
 
   --SIGNAL coarse_time_new    : STD_LOGIC;
   SIGNAL coarse_time_new_49 : STD_LOGIC;
@@ -95,6 +96,15 @@ ARCHITECTURE Behavioral OF apb_lfr_time_management IS
   
   SIGNAL time_new_49 : STD_LOGIC;
   SIGNAL time_new    : STD_LOGIC;
+
+  -----------------------------------------------------------------------------
+  SIGNAL force_reset          : STD_LOGIC;
+  SIGNAL previous_force_reset : STD_LOGIC;
+  SIGNAL soft_reset           : STD_LOGIC;  
+  SIGNAL soft_reset_sync      : STD_LOGIC;  
+  -----------------------------------------------------------------------------
+
+  SIGNAL rstn_LFR_TM : STD_LOGIC;
   
 BEGIN
 
@@ -103,7 +113,8 @@ BEGIN
 
     IF resetn = '0' THEN
       Rdata               <= (OTHERS => '0');
-      r.coarse_time_load  <= x"80000000";
+      r.coarse_time_load  <= (OTHERS => '0');
+      r.soft_reset              <= '0';
       r.ctrl              <= '0';
       force_tick          <= '0';
       previous_force_tick <= '0';
@@ -121,20 +132,34 @@ BEGIN
       ELSE
         soft_tick <= '0';
       END IF;
+      
+      force_reset          <= r.soft_reset;
+      previous_force_reset <= force_reset;
+      IF (previous_force_reset = '0') AND (force_reset = '1') THEN
+        soft_reset <= '1';
+      ELSE
+        soft_reset <= '0';
+      END IF;
 
 --APB Write OP
       IF (apbi.psel(pindex) AND apbi.penable AND apbi.pwrite) = '1' THEN
         CASE apbi.paddr(7 DOWNTO 2) IS
           WHEN "000000" =>
-            r.ctrl <= apbi.pwdata(0);
+            r.ctrl       <= apbi.pwdata(0);
+            r.soft_reset <= apbi.pwdata(1);
           WHEN "000001" =>
-            r.coarse_time_load     <= apbi.pwdata(31 DOWNTO 0);
+            r.coarse_time_load     <= apbi.pwdata(30 DOWNTO 0);
             coarsetime_reg_updated <= '1';
           WHEN OTHERS =>
             NULL;
         END CASE;
-      ELSIF r.ctrl = '1' THEN
-        r.ctrl <= '0';
+      ELSE
+        IF r.ctrl = '1' THEN
+          r.ctrl <= '0';
+        END if;
+        IF r.soft_reset = '1' THEN
+          r.soft_reset <= '0';
+        END if;
       END IF;
 
 --APB READ OP
@@ -142,9 +167,10 @@ BEGIN
         CASE apbi.paddr(7 DOWNTO 2) IS
           WHEN "000000" =>
             Rdata(0)            <= r.ctrl;
+            Rdata(1)            <= r.soft_reset;
             Rdata(31 DOWNTO 1)  <= (others => '0');
           WHEN "000001" =>
-            Rdata(31 DOWNTO 0)  <= r.coarse_time_load(31 DOWNTO 0);
+            Rdata(30 DOWNTO 0)  <= r.coarse_time_load(30 DOWNTO 0);
           WHEN "000010" =>
             Rdata(31 DOWNTO 0)  <= r.coarse_time(31 DOWNTO 0);
           WHEN "000011" =>
@@ -197,7 +223,16 @@ BEGIN
       rstn    => resetn,
       sin     => coarsetime_reg_updated,
       sout    => new_coarsetime);
-  ----------------------------------------------------------------------------
+  
+  SYNC_VALID_BIT_3 : SYNC_VALID_BIT
+    GENERIC MAP (
+      NB_FF_OF_SYNC => 2)
+    PORT MAP (
+      clk_in  => clk25MHz,
+      clk_out => clk24_576MHz,
+      rstn    => resetn,
+      sin     => soft_reset,
+      sout    => soft_reset_sync);
 
   -----------------------------------------------------------------------------
   --SYNC_FF_1 : SYNC_FF
@@ -253,6 +288,12 @@ BEGIN
     END IF;
   END PROCESS;
 
+
+  rstn_LFR_TM <= '0' WHEN resetn = '0' ELSE
+                 '0' WHEN soft_reset_sync = '1' ELSE
+                 '1';
+                 
+  
   -----------------------------------------------------------------------------
   -- LFR_TIME_MANAGMENT
   -----------------------------------------------------------------------------
@@ -262,11 +303,11 @@ BEGIN
       NB_SECOND_DESYNC => NB_SECOND_DESYNC)
     PORT MAP (
       clk  => clk24_576MHz,
-      rstn => resetn,
+      rstn => rstn_LFR_TM,
 
       tick           => new_timecode,
       new_coarsetime => new_coarsetime,
-      coarsetime_reg => coarsetime_reg(31 DOWNTO 0),
+      coarsetime_reg => coarsetime_reg(30 DOWNTO 0),
 
       fine_time       => fine_time_49,
       fine_time_new   => fine_time_new_49,

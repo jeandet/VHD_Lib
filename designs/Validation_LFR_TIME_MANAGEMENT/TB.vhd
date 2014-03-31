@@ -149,6 +149,66 @@ BEGIN  -- beh
     grspw_tick   <= '1';------------------------------------------------------3
     WAIT UNTIL clk25MHz = '1';
     grspw_tick   <= '0';
+
+    
+    WAIT FOR 250 ms;
+    WAIT UNTIL clk25MHz = '1';
+    TB_string <= "CT new  ";
+    -- WRITE NEW COARSE_TIME
+    apbi.psel(0)      <= '1';
+    apbi.pwrite       <= '1';
+    apbi.penable      <= '1';
+    apbi.paddr        <= X"00000004";
+    apbi.pwdata       <= X"80005678";
+    WAIT UNTIL clk25MHz = '1';
+    apbi.psel(0)      <= '0';
+    apbi.pwrite       <= '0';
+    apbi.penable      <= '0';
+    apbi.paddr        <= (OTHERS => '0');
+    apbi.pwdata       <= (OTHERS => '0');
+    WAIT UNTIL clk25MHz = '1';
+    
+    WAIT FOR 10 ms;
+    WAIT UNTIL clk25MHz = '1';
+    TB_string <= "TICK 5  ";
+    grspw_tick   <= '1';------------------------------------------------------3
+    WAIT UNTIL clk25MHz = '1';
+    grspw_tick   <= '0';
+
+    
+    WAIT FOR 20 ms;
+    WAIT UNTIL clk25MHz = '1';
+    TB_string <= "CT new  ";
+    -- WRITE NEW COARSE_TIME
+    apbi.psel(0)      <= '1';
+    apbi.pwrite       <= '1';
+    apbi.penable      <= '1';
+    apbi.paddr        <= X"00000004";
+    apbi.pwdata       <= X"00005678";
+    WAIT UNTIL clk25MHz = '1';
+    apbi.psel(0)      <= '0';
+    apbi.pwrite       <= '0';
+    apbi.penable      <= '0';
+    apbi.paddr        <= (OTHERS => '0');
+    apbi.pwdata       <= (OTHERS => '0');
+    WAIT UNTIL clk25MHz = '1';
+    
+    WAIT FOR 25 ms;
+    WAIT UNTIL clk25MHz = '1';
+    TB_string <= "Soft RST";
+    -- WRITE SOFT RESET
+    apbi.psel(0)      <= '1';
+    apbi.pwrite       <= '1';
+    apbi.penable      <= '1';
+    apbi.paddr        <= X"00000000";
+    apbi.pwdata       <= X"00000002";
+    WAIT UNTIL clk25MHz = '1';
+    apbi.psel(0)      <= '0';
+    apbi.pwrite       <= '0';
+    apbi.penable      <= '0';
+    apbi.paddr        <= (OTHERS => '0');
+    apbi.pwdata       <= (OTHERS => '0');
+    WAIT UNTIL clk25MHz = '1';
     
     WAIT FOR 250 ms;
     TB_string <= "READ 1  ";

@@ -34,7 +34,7 @@ ENTITY lfr_time_management IS
     tick           : IN STD_LOGIC;      -- transition signal information
     
     new_coarsetime : IN STD_LOGIC;      -- transition signal information
-    coarsetime_reg : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    coarsetime_reg : IN STD_LOGIC_VECTOR(30 DOWNTO 0);
 
     fine_time       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
     fine_time_new   : OUT STD_LOGIC;
@@ -107,6 +107,7 @@ BEGIN
       rstn          => rstn,
       tick          => tick,
       set_TCU       => set_TCU,         -- todo
+      new_TCU       => new_coarsetime_reg,
       set_TCU_value => coarsetime_reg,  -- todo
       CT_add1       => CT_add1,         -- todo
       fsm_desync    => fsm_desync,      -- todo

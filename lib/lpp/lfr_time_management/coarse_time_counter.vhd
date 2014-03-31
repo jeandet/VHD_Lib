@@ -15,7 +15,8 @@ ENTITY coarse_time_counter IS
     
     tick          : IN STD_LOGIC;
     set_TCU       : IN STD_LOGIC;
-    set_TCU_value : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    new_TCU       : IN STD_LOGIC;
+    set_TCU_value : IN STD_LOGIC_VECTOR(30 DOWNTO 0);
     CT_add1       : IN STD_LOGIC;
     fsm_desync    : IN STD_LOGIC;
     FT_max        : IN STD_LOGIC;
@@ -41,6 +42,9 @@ ARCHITECTURE beh OF coarse_time_counter IS
   --CONSTANT NB_SECOND_DESYNC : INTEGER := 4; -- TODO : 60 
 BEGIN  -- beh
 
+  -----------------------------------------------------------------------------
+  -- COARSE_TIME( 30 DOWNTO 0)
+  -----------------------------------------------------------------------------
   counter_1 : general_counter
     GENERIC MAP (
       CYCLIC => '1',
@@ -58,10 +62,15 @@ BEGIN  -- beh
   
   add1_bit31 <= '1' WHEN fsm_desync = '1' AND FT_max = '1' ELSE '0';
 
+  -----------------------------------------------------------------------------
+  -- COARSE_TIME(31)
+  -----------------------------------------------------------------------------
   
-  set_synchronized       <= (tick AND (NOT coarse_time_31)) OR (coarse_time_31 AND set_TCU);
-  set_synchronized_value <= STD_LOGIC_VECTOR(to_unsigned(NB_SECOND_DESYNC, 6)) WHEN (set_TCU AND set_TCU_value(31)) =  '1' ELSE
-                            (OTHERS => '0');
+  --set_synchronized       <= (tick AND (NOT coarse_time_31)) OR (coarse_time_31 AND set_TCU);
+  --set_synchronized_value <= STD_LOGIC_VECTOR(to_unsigned(NB_SECOND_DESYNC, 6)) WHEN (set_TCU AND set_TCU_value(31)) =  '1' ELSE
+  --                          (OTHERS => '0');
+  set_synchronized       <= tick AND ((NOT coarse_time_31) OR (coarse_time_31 AND new_TCU));
+  set_synchronized_value <= (OTHERS => '0');
   
   counter_2 : general_counter
     GENERIC MAP (
