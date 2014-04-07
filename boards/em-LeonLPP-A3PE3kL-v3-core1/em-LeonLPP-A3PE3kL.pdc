@@ -78,14 +78,14 @@ set_io	{led[0]}	-pinname	K17	-fixed	yes	-DIRECTION	Inout
 set_io	{led[1]}	-pinname	L18	-fixed	yes	-DIRECTION	Inout
 set_io	{led[2]}	-pinname	M17	-fixed	yes	-DIRECTION	Inout
 
-set_io	ahbtxd	-pinname	J12	-fixed	yes	-DIRECTION	Inout
-#set_io	TAG2	-pinname	K13	-fixed	yes	-DIRECTION	Inout
-set_io	ahbrxd	-pinname	L16	-fixed	yes	-DIRECTION	Inout
-#set_io	TAG4	-pinname	L15	-fixed	yes	-DIRECTION	Inout
-set_io	urxd1	-pinname	M16	-fixed	yes	-DIRECTION	Inout
-set_io	utxd1	-pinname	L13	-fixed	yes	-DIRECTION	Inout
-set_io	errorn	-pinname	P6	-fixed	yes	-DIRECTION	Inout
-#set_io	TAG8	-pinname	R6	-fixed	yes	-DIRECTION	Inout
+set_io	TAG1    -pinname	J12	-fixed	yes	-DIRECTION	Inout
+set_io	TAG2	-pinname	K13	-fixed	yes	-DIRECTION	Inout
+set_io	TAG3	-pinname	L16	-fixed	yes	-DIRECTION	Inout
+set_io	TAG4	-pinname	L15	-fixed	yes	-DIRECTION	Inout
+#set_io	TAG5	-pinname	M16	-fixed	yes	-DIRECTION	Inout
+#set_io	TAG6	-pinname	L13	-fixed	yes	-DIRECTION	Inout
+#set_io  TAG7	-pinname	P6	-fixed	yes	-DIRECTION	Inout
+set_io	TAG8	-pinname	R6	-fixed	yes	-DIRECTION	Inout
 #set_io	TAG9	-pinname	T4	-fixed	yes	-DIRECTION	Inout
 
 set_io bias_fail_sw -pinname A3 -fixed	yes	-DIRECTION	Inout
