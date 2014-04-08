@@ -53,11 +53,11 @@ ENTITY LFR_em IS
     reset        : IN STD_ULOGIC;
                       
     -- TAG --------------------------------------------------------------------
-    TAG3 : IN  STD_ULOGIC;            -- DSU rx data   
-    TAG1 : OUT STD_ULOGIC;            -- DSU tx data  
+    TAG1 : IN  STD_ULOGIC;            -- DSU rx data   
+    TAG3 : OUT STD_ULOGIC;            -- DSU tx data  
     -- UART APB ---------------------------------------------------------------
-    TAG4 : IN  STD_ULOGIC;            -- UART1 rx data 
-    TAG2 : OUT STD_ULOGIC;            -- UART1 tx data   
+    TAG2 : IN  STD_ULOGIC;            -- UART1 rx data 
+    TAG4 : OUT STD_ULOGIC;            -- UART1 tx data   
     -- RAM --------------------------------------------------------------------
     address   : OUT   STD_LOGIC_VECTOR(19 DOWNTO 0);    
     data      : INOUT STD_LOGIC_VECTOR(31 DOWNTO 0);    
@@ -207,10 +207,10 @@ BEGIN  -- beh
       reset     => rstn,
       errorn    => OPEN,
 
-      ahbrxd    => TAG3,
-      ahbtxd    => TAG1,
-      urxd1     => TAG4,
-      utxd1     => TAG2,
+      ahbrxd    => TAG1,
+      ahbtxd    => TAG3,
+      urxd1     => TAG2,
+      utxd1     => TAG4,
       
       address   => address,
       data      => data,
