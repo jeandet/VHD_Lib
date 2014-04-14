@@ -262,19 +262,19 @@ BEGIN
     PORT MAP (
       clkm        => clk,
       rstn        => rstn,
-      FifoIN_Full => FifoINT_Full,
-      SetReUse    => FFT_ReUse,
-      Valid       => Head_Valid,
-      Data_IN     => FifoINT_Data, 
-      ACK         => DMA_ack,      
-      SM_Write    => SM_Wen,       
-      FlagError   => SM_FlagError, 
+      FifoIN_Full => FifoINT_Full,      --
+      SetReUse    => FFT_ReUse,         --
+      Valid       => Head_Valid,        -- HeaderBuilder
+      Data_IN     => FifoINT_Data,      --
+      ACK         => DMA_ack,           -- HeaderBuilder
+      SM_Write    => SM_Wen,            -- HeaderBuilder
+      FlagError   => SM_FlagError,      -- UNUSED
 --      Pong        => SM_Pong,      
-      Statu       => SM_Param,     
-      Write       => SM_Write,
-      Read        => SM_Read,
-      ReUse       => SM_ReUse,
-      Data_OUT    => SM_Data);
+      Statu       => SM_Param,          -- HeaderBuilder
+      Write       => SM_Write,          -- FIFO MemOut
+      Read        => SM_Read,           --
+      ReUse       => SM_ReUse,          --
+      Data_OUT    => SM_Data);          -- FIFO MemOut
   -----------------------------------------------------------------------------
 
   -----------------------------------------------------------------------------

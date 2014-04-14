@@ -16,138 +16,141 @@
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
 ------------------------------------------------------------------------------
---                    Author : Martin Morlot
---                     Mail : martin.morlot@lpp.polytechnique.fr
+-- Author : Martin Morlot
+-- Mail   : martin.morlot@lpp.polytechnique.fr
+-------------------------------------------------------------------------------
+-- Update : Jean-christophe Pellion
+-- Mail   : jean-christophe.pellion@lpp.polytechnique.fr
 ------------------------------------------------------------------------------
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity DEMUX is
-generic(
-    Data_sz        :   integer range 1 to 32 := 16);
-port(
-    clk    :   in std_logic;
-    rstn   :   in std_logic;
+ENTITY DEMUX IS
+  GENERIC(
+    Data_sz : INTEGER RANGE 1 TO 32 := 16);
+  PORT(
+    clk  : IN STD_LOGIC;
+    rstn : IN STD_LOGIC;
 
-    Read : in std_logic_vector(4 downto 0);
-    Load : in std_logic;
+    Read : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+    Load : IN STD_LOGIC;
 
-    EmptyF0    :   in std_logic_vector(4 downto 0);
-    EmptyF1     :   in std_logic_vector(4 downto 0);
-    EmptyF2     :   in std_logic_vector(4 downto 0);
+    EmptyF0 : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+    EmptyF1 : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+    EmptyF2 : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
 
-    DataF0     :   in std_logic_vector((5*Data_sz)-1 downto 0);
-    DataF1      :   in std_logic_vector((5*Data_sz)-1 downto 0);
-    DataF2      :   in std_logic_vector((5*Data_sz)-1 downto 0);
+    DataF0 : IN STD_LOGIC_VECTOR((5*Data_sz)-1 DOWNTO 0);
+    DataF1 : IN STD_LOGIC_VECTOR((5*Data_sz)-1 DOWNTO 0);
+    DataF2 : IN STD_LOGIC_VECTOR((5*Data_sz)-1 DOWNTO 0);
 
-    WorkFreq : out std_logic_vector(1 downto 0);
-    Read_DEMUX : out std_logic_vector(14 downto 0);
-    Empty   :   out std_logic_vector(4 downto 0);
-    Data    :   out std_logic_vector((5*Data_sz)-1 downto 0)
-);
-end entity;
-
-
-architecture ar_DEMUX of DEMUX is
-
-type etat is (eX,e0,e1,e2,e3);
-signal ect : etat;
+    WorkFreq   : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+    Read_DEMUX : OUT STD_LOGIC_VECTOR(14 DOWNTO 0);
+    Empty      : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+    Data       : OUT STD_LOGIC_VECTOR((5*Data_sz)-1 DOWNTO 0)
+    );
+END ENTITY;
 
 
-signal load_reg : std_logic;
-constant Dummy_Read : std_logic_vector(4 downto 0) := (others => '1');
+ARCHITECTURE ar_DEMUX OF DEMUX IS
 
-signal Countf0 : integer;
-signal Countf1 : integer;
-signal i : integer;
+  TYPE   etat IS (eX, e0, e1, e2, e3);
+  SIGNAL ect : etat;
 
-begin
-    process(clk,rstn)
-    begin
-        if(rstn='0')then
-            ect <= e0;
-            load_reg <= '0';
-            Countf0 <= 0;
-            Countf1 <= 0;
-            i <= 0;
 
-        elsif(clk'event and clk='1')then
-            load_reg <= Load;
+  SIGNAL   load_reg   : STD_LOGIC;
+  CONSTANT Dummy_Read : STD_LOGIC_VECTOR(4 DOWNTO 0) := (OTHERS => '1');
 
-            case ect is
+  SIGNAL Countf0 : INTEGER;
+  SIGNAL Countf1 : INTEGER;
+  SIGNAL i       : INTEGER;
 
-                when e0 =>
-                    if(load_reg = '1' and Load = '0')then
-                        if(Countf0 = 24)then
-                            Countf0 <= 0;
-                            ect <= e1;
-                        else
-                            Countf0 <= Countf0 + 1;
-                            ect <= e0;
-                        end if;
-                    end if;                        
+BEGIN
+  PROCESS(clk, rstn)
+  BEGIN
+    IF(rstn = '0')then
+      ect      <= e0;
+      load_reg <= '0';
+      Countf0  <= 0;
+      Countf1  <= 0;
+      i        <= 0;
 
-                when e1 =>
-                    if(load_reg = '1' and Load = '0')then
-                        if(Countf1 = 74)then
-                            Countf1 <= 0;
-                            ect <= e2;
-                        else
-                            Countf1 <= Countf1 + 1;
-                            if(i=4)then
-                                i <= 0;
-                                ect <= e0;
-                            else
-                                i <= i+1;
-                                ect <= e1;
-                            end if;
-                        end if;
-                    end if;  
+    ELSIF(clk'EVENT AND clk = '1')then
+      load_reg <= Load;
 
-                when e2 =>
-                    if(load_reg = '1' and Load = '0')then
-                        if(i=4)then
-                            i <= 0;
-                            ect <= e0;
-                        else
-                            i <= i+1;
-                            ect <= e2;
-                        end if;
-                    end if;                
-                
-                when others =>
-                    null;
+      CASE ect IS
 
-            end case;
-        end if;
-    end process;
+        WHEN e0 =>
+          IF(load_reg = '1' AND Load = '0')THEN
+            IF(Countf0 = 24)THEN
+              Countf0 <= 0;
+              ect     <= e1;
+            ELSE
+              Countf0 <= Countf0 + 1;
+              ect     <= e0;
+            END IF;
+          END IF;
 
-with ect select
-    Empty      <=   EmptyF0 when e0,
-                    EmptyF1 when e1,
-                    EmptyF2 when e2,
-                    (others => '1') when others;
+        WHEN e1 =>
+          IF(load_reg = '1' AND Load = '0')THEN
+            IF(Countf1 = 74)THEN
+              Countf1 <= 0;
+              ect     <= e2;
+            ELSE
+              Countf1 <= Countf1 + 1;
+              IF(i = 4)THEN
+                i   <= 0;
+                ect <= e0;
+              ELSE
+                i   <= i+1;
+                ect <= e1;
+              END IF;
+            END IF;
+          END IF;
 
-with ect select
-    Data      <=    DataF0 when e0,
-                    DataF1 when e1,
-                    DataF2 when e2,
-                    (others => '0') when others;
+        WHEN e2 =>
+          IF(load_reg = '1' AND Load = '0')THEN
+            IF(i = 4)THEN
+              i   <= 0;
+              ect <= e0;
+            ELSE
+              i   <= i+1;
+              ect <= e2;
+            END IF;
+          END IF;
+          
+        WHEN OTHERS =>
+          NULL;
 
-with ect select
-    Read_DEMUX  <=  Dummy_Read & Dummy_Read & Read when e0,
-                    Dummy_Read & Read & Dummy_Read when e1,
-                    Read & Dummy_Read & Dummy_Read when e2,
-                    (others => '1') when others;
+      END CASE;
+    END IF;
+  END PROCESS;
 
-with ect select
-    WorkFreq    <=  "01" when e0,
-                    "10" when e1,
-                    "11" when e2,
-                    "00" when others;
+  WITH ect SELECT
+    Empty <= EmptyF0 WHEN e0,
+    EmptyF1          WHEN e1,
+    EmptyF2          WHEN e2,
+    (OTHERS => '1')  WHEN OTHERS;
 
-end architecture;
+  WITH ect SELECT
+    Data <= DataF0  WHEN e0,
+    DataF1          WHEN e1,
+    DataF2          WHEN e2,
+    (OTHERS => '0') WHEN OTHERS;
+
+  WITH ect SELECT
+    Read_DEMUX <= Dummy_Read & Dummy_Read & Read WHEN e0,
+    Dummy_Read & Read & Dummy_Read               WHEN e1,
+    Read & Dummy_Read & Dummy_Read               WHEN e2,
+    (OTHERS => '1')                              WHEN OTHERS;
+
+  WITH ect SELECT
+    WorkFreq <= "01" WHEN e0,
+    "10"             WHEN e1,
+    "11"             WHEN e2,
+    "00"             WHEN OTHERS;
+
+END ARCHITECTURE;
 
 
 

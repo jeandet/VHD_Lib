@@ -19,94 +19,95 @@
 --                    Author : Martin Morlot
 --                     Mail : martin.morlot@lpp.polytechnique.fr
 ------------------------------------------------------------------------------
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity Linker_FFT is
-generic(
-    Data_sz  : integer range 1 to 32 := 16;
-    NbData : integer range 1 to 512 := 256
+ENTITY Linker_FFT IS
+  GENERIC(
+    Data_sz : INTEGER RANGE 1 TO 32  := 16;
+    NbData  : INTEGER RANGE 1 TO 512 := 256
     );
-port(
-    clk         : in std_logic;
-    rstn        : in std_logic;
-    Ready       : in std_logic;
-    Valid       : in std_logic;
-    Full        : in std_logic_vector(4 downto 0);
-    Data_re     : in std_logic_vector(Data_sz-1 downto 0);
-    Data_im     : in std_logic_vector(Data_sz-1 downto 0);
-    Read        : out std_logic;
-    Write       : out std_logic_vector(4 downto 0);
-    ReUse       : out std_logic_vector(4 downto 0);
-    DATA        : out std_logic_vector((5*Data_sz)-1 downto 0)
-);
-end entity;
+  PORT(
+    clk     : IN STD_LOGIC;
+    rstn    : IN STD_LOGIC;
+    Ready   : IN STD_LOGIC;                             --
+    Valid   : IN STD_LOGIC;                             --
+    Full    : IN STD_LOGIC_VECTOR(4 DOWNTO 0);          --
+    Data_re : IN STD_LOGIC_VECTOR(Data_sz-1 DOWNTO 0);  --
+    Data_im : IN STD_LOGIC_VECTOR(Data_sz-1 DOWNTO 0);  --
+
+    Read  : OUT STD_LOGIC;                     -- Link_Read
+    Write : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);  --
+    ReUse : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+    DATA  : OUT STD_LOGIC_VECTOR((5*Data_sz)-1 DOWNTO 0)
+    );
+END ENTITY;
 
 
-architecture ar_Linker of Linker_FFT is
+ARCHITECTURE ar_Linker OF Linker_FFT IS
 
-type etat is (eX,e0,e1,e2);
-signal ect : etat;
+  TYPE   etat IS (eX, e0, e1, e2);
+  SIGNAL ect : etat;
 
-signal DataTmp  : std_logic_vector(Data_sz-1 downto 0);
+  SIGNAL DataTmp : STD_LOGIC_VECTOR(Data_sz-1 DOWNTO 0);
 
-signal sRead   : std_logic;
-signal sReady : std_logic;
+  SIGNAL sRead  : STD_LOGIC;
+  SIGNAL sReady : STD_LOGIC;
 
-signal FifoCpt  : integer range 0 to 4 := 0;
+  SIGNAL FifoCpt : INTEGER RANGE 0 TO 4 := 0;
 
-begin
+BEGIN
 
-    process(clk,rstn)
-    begin
-        if(rstn='0')then 
-            ect <= e0;
-            sRead <= '0';
-            sReady <= '0';
-            Write <= (others => '1');
-            Reuse <= (others => '0');
-            FifoCpt <= 0;
-            
-        elsif(clk'event and clk='1')then
-            sReady <= Ready;
+  PROCESS(clk, rstn)
+  BEGIN
+    IF(rstn = '0')then
+      ect     <= e0;
+      sRead   <= '0';
+      sReady  <= '0';
+      Write   <= (OTHERS => '1');
+      Reuse   <= (OTHERS => '0');
+      FifoCpt <= 0;
+      
+    ELSIF(clk'EVENT AND clk = '1')then
+      sReady <= Ready;
 
-            if(sReady='1' and Ready='0')then
-                if(FifoCpt=4)then
-                    FifoCpt <= 0;
-                else
-                    FifoCpt <= FifoCpt + 1;
-                end if;
-            elsif(Ready='1')then
-                sRead <= not sRead;               
-            else
-                sRead <= '0';
-            end if;           
+      IF(sReady = '1' and Ready = '0')THEN
+        IF(FifoCpt = 4)THEN
+          FifoCpt <= 0;
+        ELSE
+          FifoCpt <= FifoCpt + 1;
+        END IF;
+      ELSIF(Ready = '1')then
+        sRead <= NOT sRead;
+      ELSE
+        sRead <= '0';
+      END IF;
 
-            case ect is
+      CASE ect IS
 
-                when e0 =>
-                    Write(FifoCpt) <= '1';
-                    if(Valid='1' and Full(FifoCpt)='0')then
-                        DataTmp <= Data_im;
-                        DATA(((FifoCpt+1)*Data_sz)-1 downto (FifoCpt*Data_sz)) <= Data_re;
-                        Write(FifoCpt) <= '0';
-                        ect <= e1;
-                    elsif(Full(FifoCpt)='1')then
-                        ReUse(FifoCpt) <= '1';                        
-                    end if;                    
+        WHEN e0 =>
+          Write(FifoCpt) <= '1';
+          IF(Valid = '1' and Full(FifoCpt) = '0')THEN
+            DataTmp                                                <= Data_im;
+            DATA(((FifoCpt+1)*Data_sz)-1 DOWNTO (FifoCpt*Data_sz)) <= Data_re;
+            Write(FifoCpt)                                         <= '0';
+            ect                                                    <= e1;
+          ELSIF(Full(FifoCpt) = '1')then
+            ReUse(FifoCpt) <= '1';
+          END IF;
 
-                 when e1 =>
-                    DATA(((FifoCpt+1)*Data_sz)-1 downto (FifoCpt*Data_sz)) <= DataTmp;
-                    ect <= e0;
-                               
-                when others =>
-                    null;
+        WHEN e1 =>
+          DATA(((FifoCpt+1)*Data_sz)-1 DOWNTO (FifoCpt*Data_sz)) <= DataTmp;
+          ect                                                    <= e0;
+          
+        WHEN OTHERS =>
+          NULL;
 
-            end case;
-        end if;
-    end process;
+      END CASE;
+    END IF;
+  END PROCESS;
 
-Read <= sRead;
+  Read <= sRead;
 
-end architecture;
+END ARCHITECTURE;

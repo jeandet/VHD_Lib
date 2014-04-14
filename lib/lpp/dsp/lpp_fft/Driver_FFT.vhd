@@ -19,103 +19,104 @@
 --                    Author : Martin Morlot
 --                     Mail : martin.morlot@lpp.polytechnique.fr
 ------------------------------------------------------------------------------
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity Driver_FFT is
-generic(
-    Data_sz  : integer range 1 to 32 := 16;
-    NbData : integer range 1 to 512 := 256
+ENTITY Driver_FFT IS
+  GENERIC(
+    Data_sz : INTEGER RANGE 1 TO 32  := 16;
+    NbData  : INTEGER RANGE 1 TO 512 := 256
     );
-port(
-    clk         : in std_logic;
-    rstn        : in std_logic;
-    Load        : in std_logic;
-    Empty       : in std_logic_vector(4 downto 0);
-    DATA        : in std_logic_vector((5*Data_sz)-1 downto 0);
-    Valid       : out std_logic;
-    Read        : out std_logic_vector(4 downto 0);
-    Data_re     : out std_logic_vector(Data_sz-1 downto 0);
-    Data_im     : out std_logic_vector(Data_sz-1 downto 0)
-);
-end entity;
+  PORT(
+    clk     : IN  STD_LOGIC;
+    rstn    : IN  STD_LOGIC;
+    Load    : IN  STD_LOGIC;                                    -- (CoreFFT) FFT_Load
+                                                                -- Load
+    Empty   : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);                 -- FifoIN_Empty
+    DATA    : IN  STD_LOGIC_VECTOR((5*Data_sz)-1 DOWNTO 0);     -- FifoIN_Data
+    Valid   : OUT STD_LOGIC;                                    --(CoreFFT) Drive_write 
+    Read    : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);                 -- Read
+    Data_re : OUT STD_LOGIC_VECTOR(Data_sz-1 DOWNTO 0);         --(CoreFFT) Drive_DataRE
+    Data_im : OUT STD_LOGIC_VECTOR(Data_sz-1 DOWNTO 0)          --(CoreFFT) Drive_DataIM
+    );
+END ENTITY;
 
 
-architecture ar_Driver of Driver_FFT is
+ARCHITECTURE ar_Driver OF Driver_FFT IS
 
-type etat is (eX,e0,e1,e2);
-signal ect : etat;
+  TYPE   etat IS (eX, e0, e1, e2);
+  SIGNAL ect : etat;
 
-signal DataCount : integer range 0 to 255 := 0;
-signal FifoCpt  : integer range 0 to 4 := 0;
+  SIGNAL DataCount : INTEGER RANGE 0 TO 255 := 0;
+  SIGNAL FifoCpt   : INTEGER RANGE 0 TO 4   := 0;
 
-signal sLoad : std_logic;
+  SIGNAL sLoad : STD_LOGIC;
 
-begin
+BEGIN
 
-    process(clk,rstn)
-    begin
-        if(rstn='0')then 
-            ect <= e0;
-            Read <= (others => '1');
-            Valid <= '0';
-            Data_re <= (others => '0');
-            Data_im <= (others => '0');
+  PROCESS(clk, rstn)
+  BEGIN
+    IF(rstn = '0')then
+      ect       <= e0;
+      Read      <= (OTHERS => '1');
+      Valid     <= '0';
+      Data_re   <= (OTHERS => '0');
+      Data_im   <= (OTHERS => '0');
+      DataCount <= 0;
+      FifoCpt   <= 0;
+      sLoad     <= '0';
+      
+    ELSIF(clk'EVENT AND clk = '1')then
+      sLoad <= Load;
+
+      IF(sLoad = '1' and Load = '0')THEN
+        IF(FifoCpt = 4)THEN
+          FifoCpt <= 0;
+        ELSE
+          FifoCpt <= FifoCpt + 1;
+        END IF;
+      END IF;
+
+      CASE ect IS
+
+        WHEN e0 =>
+          IF(Load = '1' and Empty(FifoCpt) = '0')THEN
+            Read(FifoCpt) <= '0';
+            ect           <= e1;
+          END IF;
+
+        WHEN e1 =>
+          Valid         <= '0';
+          Read(FifoCpt) <= '1';
+          ect           <= e2;
+          
+        WHEN e2 =>
+          Data_re <= DATA(((FifoCpt+1)*Data_sz)-1 DOWNTO (FifoCpt*Data_sz));
+          Data_im <= (OTHERS => '0');
+          Valid   <= '1';
+          IF(DataCount = NbData-1)THEN
             DataCount <= 0;
-            FifoCpt <= 0;
-            sLoad <= '0';
-            
-        elsif(clk'event and clk='1')then
-            sLoad <= Load;
+            ect       <= eX;
+          ELSE
+            DataCount <= DataCount + 1;
+            IF(Load = '1' and Empty(FifoCpt) = '0')THEN
+              Read(FifoCpt) <= '0';
+              ect           <= e1;
+            ELSE
+              ect <= eX;
+            END IF;
+          END IF;
 
-            if(sLoad='1' and Load='0')then
-                if(FifoCpt=4)then
-                    FifoCpt <= 0;
-                else
-                    FifoCpt <= FifoCpt + 1;
-                end if;
-            end if;
-                
-            case ect is
+        WHEN eX =>
+          Valid <= '0';
+          ect   <= e0;
 
-                when e0 =>
-                    if(Load='1' and Empty(FifoCpt)='0')then
-                        Read(FifoCpt) <= '0';
-                        ect <= e1;                       
-                    end if;
+        WHEN OTHERS =>
+          NULL;
 
-                when e1 =>
-                    Valid <= '0';
-                    Read(FifoCpt) <= '1';
-                    ect <= e2;
-                    
-                when e2 =>
-                    Data_re <= DATA(((FifoCpt+1)*Data_sz)-1 downto (FifoCpt*Data_sz));
-                    Data_im <= (others => '0');
-                    Valid <= '1';
-                    if(DataCount=NbData-1)then
-                        DataCount <= 0;
-                        ect <= eX;
-                    else
-                        DataCount <= DataCount + 1;
-                        if(Load='1' and Empty(FifoCpt)='0')then
-                            Read(FifoCpt) <= '0';
-                            ect <= e1;
-                        else
-                            ect <= eX;
-                        end if;                        
-                    end if;
+      END CASE;
+    END IF;
+  END PROCESS;
 
-                when eX =>
-                    Valid <= '0';
-                    ect <= e0;
-
-                when others =>
-                    null; 
-
-            end case;
-        end if;
-    end process;
-
-end architecture;
+END ARCHITECTURE;

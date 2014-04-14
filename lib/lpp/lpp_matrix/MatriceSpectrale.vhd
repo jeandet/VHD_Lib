@@ -33,17 +33,17 @@ entity MatriceSpectrale is
         clkm            : in std_logic;
         rstn            : in std_logic;
 
-        FifoIN_Full     : in std_logic_vector(4 downto 0);
-        SetReUse        : in std_logic_vector(4 downto 0);
+        FifoIN_Full     : in std_logic_vector(4 downto 0);      --
+        SetReUse        : in std_logic_vector(4 downto 0);      --
         Valid           : in std_logic;
-        Data_IN         : in std_logic_vector((5*Input_SZ)-1 downto 0);
+        Data_IN         : in std_logic_vector((5*Input_SZ)-1 downto 0); --
         ACK             : in std_logic;
         SM_Write        : out std_logic;
         FlagError       : out std_logic;
         Statu           : out std_logic_vector(3 downto 0);
         Write           : out std_logic_vector(1 downto 0);
-        Read            : out std_logic_vector(4 downto 0);
-        ReUse           : out std_logic_vector(4 downto 0);
+        Read            : out std_logic_vector(4 downto 0);     --
+        ReUse           : out std_logic_vector(4 downto 0);     --
         Data_OUT        : out std_logic_vector((2*Result_SZ)-1 downto 0)
         );
 end entity;

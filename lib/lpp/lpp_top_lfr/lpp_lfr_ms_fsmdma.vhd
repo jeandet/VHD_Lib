@@ -91,10 +91,10 @@ ENTITY lpp_lfr_ms_fsmdma IS
     addr_matrix_f1                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f2                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-    matrix_time_f0_0                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
-    matrix_time_f0_1                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
-    matrix_time_f1                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
-    matrix_time_f2                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
+    matrix_time_f0_0 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    matrix_time_f0_1 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    matrix_time_f1   : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    matrix_time_f2   : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
 
     );                                      
 END;
@@ -169,7 +169,7 @@ BEGIN
                  '0';
   
   header_check_ok <= '0' WHEN component_type = "1111" ELSE  -- ?? component_type_pre = "1111"
-                     '1' WHEN component_type = "0000" AND component_type_pre = "0000" ELSE
+                     '1' WHEN component_type = "0000" ELSE  --AND component_type_pre = "0000" ELSE
                      '1' WHEN component_type = component_type_pre + "0001"            ELSE
                      '0';
 
@@ -204,7 +204,7 @@ BEGIN
       header_data                   <= (OTHERS => '0');
       fine_time_reg                 <= (OTHERS => '0');
 
-      debug_reg_s( 2 DOWNTO 0) <= (OTHERS => '0');
+      debug_reg_s(2 DOWNTO 0)  <= (OTHERS => '0');
       debug_reg_s(31 DOWNTO 4) <= (OTHERS => '0');
 
       log_empty_fifo <= '0';
@@ -212,12 +212,12 @@ BEGIN
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
       debug_reg_s(31 DOWNTO 10) <= (OTHERS => '0');
       header_reg_ack            <= '0';
-      
+
       CASE state IS
         WHEN IDLE =>
           debug_reg_s(2 DOWNTO 0) <= "000";
-          
-          matrix_type <= header(1 DOWNTO 0);
+
+          --matrix_type <= header(1 DOWNTO 0);
           --component_type <= header(5 DOWNTO 2);
 
           ready_matrix_f0_0         <= '0';
@@ -225,13 +225,13 @@ BEGIN
           ready_matrix_f1           <= '0';
           ready_matrix_f2           <= '0';
           error_bad_component_error <= '0';
-          header_select             <= '1';
-          
+          --header_select             <= '1';
+
           IF header_reg_val = '1' AND fifo_empty = '0' AND send_matrix = '1' THEN
-            header_reg_ack <= '1';
+            header_reg_ack          <= '1';
             debug_reg_s(5 DOWNTO 4) <= header_reg(1 DOWNTO 0);
             debug_reg_s(9 DOWNTO 6) <= header_reg(5 DOWNTO 2);
-            
+
             matrix_type        <= header_reg(1 DOWNTO 0);
             component_type     <= header_reg(5 DOWNTO 2);
             component_type_pre <= component_type;
@@ -242,22 +242,22 @@ BEGIN
         WHEN CHECK_COMPONENT_TYPE =>
           debug_reg_s(2 DOWNTO 0) <= "001";
           --header_ack              <= '0';
-          
+
           IF header_check_ok = '1' THEN
             header_send <= '0';
             --
             IF component_type = "0000" THEN
-              address       <= address_matrix;
+              address <= address_matrix;
               CASE matrix_type IS
-                WHEN "00" => matrix_time_f0_0 <= data_time;
-                WHEN "01" => matrix_time_f0_1 <= data_time;
-                WHEN "10" => matrix_time_f1 <= data_time;
-                WHEN "11" => matrix_time_f2 <= data_time ;
+                WHEN "00"   => matrix_time_f0_0 <= data_time;
+                WHEN "01"   => matrix_time_f0_1 <= data_time;
+                WHEN "10"   => matrix_time_f1   <= data_time;
+                WHEN "11"   => matrix_time_f2   <= data_time;
                 WHEN OTHERS => NULL;
               END CASE;
-              
-              header_data   <= data_time(31 DOWNTO 0);
-              fine_time_reg <= data_time(47 DOWNTO 32);
+
+              header_data    <= data_time(31 DOWNTO 0);
+              fine_time_reg  <= data_time(47 DOWNTO 32);
               --state         <= WRITE_COARSE_TIME;
               --header_send   <= '1';
               state          <= SEND_DATA;
@@ -274,59 +274,59 @@ BEGIN
             state                     <= TRASH_FIFO;
           END IF;
 
-        --WHEN WRITE_COARSE_TIME =>
-        --  debug_reg_s(2 DOWNTO 0) <= "010";
-          
-        --  header_ack <= '0';
+          --WHEN WRITE_COARSE_TIME =>
+          --  debug_reg_s(2 DOWNTO 0) <= "010";
 
-        --  IF dma_ren = '0' THEN
-        --    header_send <= '0';
-        --  ELSE
-        --    header_send <= header_send;
-        --  END IF;
+          --  header_ack <= '0';
+
+          --  IF dma_ren = '0' THEN
+          --    header_send <= '0';
+          --  ELSE
+          --    header_send <= header_send;
+          --  END IF;
 
 
-        --  IF header_send_ko = '1' THEN
-        --    header_send                   <= '0';
-        --    state                         <= TRASH_FIFO;
-        --    error_anticipating_empty_fifo <= '1';
-        --    -- TODO : error sending header
-        --  ELSIF header_send_ok = '1' THEN
-        --    header_send               <= '1';
-        --    header_select             <= '1';
-        --    header_data(15 DOWNTO 0)  <= fine_time_reg;
-        --    header_data(31 DOWNTO 16) <= (OTHERS => '0');
-        --    state                     <= WRITE_FINE_TIME;
-        --    address                   <= address + 4;
-        --  END IF;
-          
-          
-        --WHEN WRITE_FINE_TIME =>
-        --  debug_reg_s(2 DOWNTO 0) <= "011";
-          
-        --  header_ack <= '0';
+          --  IF header_send_ko = '1' THEN
+          --    header_send                   <= '0';
+          --    state                         <= TRASH_FIFO;
+          --    error_anticipating_empty_fifo <= '1';
+          --    -- TODO : error sending header
+          --  ELSIF header_send_ok = '1' THEN
+          --    header_send               <= '1';
+          --    header_select             <= '1';
+          --    header_data(15 DOWNTO 0)  <= fine_time_reg;
+          --    header_data(31 DOWNTO 16) <= (OTHERS => '0');
+          --    state                     <= WRITE_FINE_TIME;
+          --    address                   <= address + 4;
+          --  END IF;
 
-        --  IF dma_ren = '0' THEN
-        --    header_send <= '0';
-        --  ELSE
-        --    header_send <= header_send;
-        --  END IF;
 
-        --  IF header_send_ko = '1' THEN
-        --    header_send                   <= '0';
-        --    state                         <= TRASH_FIFO;
-        --    error_anticipating_empty_fifo <= '1';
-        --    -- TODO : error sending header
-        --  ELSIF header_send_ok = '1' THEN
-        --    header_send   <= '0';
-        --    header_select <= '0';
-        --    state         <= SEND_DATA;
-        --    address       <= address + 4;
-        --  END IF;
+          --WHEN WRITE_FINE_TIME =>
+          --  debug_reg_s(2 DOWNTO 0) <= "011";
+
+          --  header_ack <= '0';
+
+          --  IF dma_ren = '0' THEN
+          --    header_send <= '0';
+          --  ELSE
+          --    header_send <= header_send;
+          --  END IF;
+
+          --  IF header_send_ko = '1' THEN
+          --    header_send                   <= '0';
+          --    state                         <= TRASH_FIFO;
+          --    error_anticipating_empty_fifo <= '1';
+          --    -- TODO : error sending header
+          --  ELSIF header_send_ok = '1' THEN
+          --    header_send   <= '0';
+          --    header_select <= '0';
+          --    state         <= SEND_DATA;
+          --    address       <= address + 4;
+          --  END IF;
           
         WHEN TRASH_FIFO =>
           debug_reg_s(2 DOWNTO 0) <= "100";
-          
+
 --          header_ack                    <= '0';
           error_bad_component_error     <= '0';
           error_anticipating_empty_fifo <= '0';
@@ -340,7 +340,7 @@ BEGIN
         WHEN SEND_DATA =>
 --          header_ack <= '0';
           debug_reg_s(2 DOWNTO 0) <= "101";
-          
+
           IF fifo_empty = '1' OR log_empty_fifo = '1' THEN
             state <= IDLE;
             IF component_type = "1110" THEN  --"1110" -- JC
@@ -361,30 +361,30 @@ BEGIN
 
         WHEN WAIT_DATA_ACK =>
           log_empty_fifo <= fifo_empty OR log_empty_fifo;
-          
+
           debug_reg_s(2 DOWNTO 0) <= "110";
-          
+
           component_send <= '0';
           IF component_send_ok = '1' THEN
             address <= address + 64;
             state   <= SEND_DATA;
           ELSIF component_send_ko = '1' THEN
             error_anticipating_empty_fifo <= '0';
-            state   <= TRASH_FIFO;
+            state                         <= TRASH_FIFO;
           END IF;
-          
-          
-        --WHEN CHECK_LENGTH =>
-        --  component_send <= '0';
-        --  debug_reg_s(2 DOWNTO 0) <= "111";
-        --  state <= IDLE;
+
+
+          --WHEN CHECK_LENGTH =>
+          --  component_send <= '0';
+          --  debug_reg_s(2 DOWNTO 0) <= "111";
+          --  state <= IDLE;
           
         WHEN OTHERS => NULL;
       END CASE;
       
     END IF;
   END PROCESS DMAWriteFSM_p;
-  
+
   dma_valid_burst <= '0'            WHEN header_select = '1' ELSE component_send;
   dma_valid       <= header_send    WHEN header_select = '1' ELSE '0';
   dma_data        <= header_data    WHEN header_select = '1' ELSE fifo_data;
@@ -403,13 +403,13 @@ BEGIN
   -----------------------------------------------------------------------------
   PROCESS (HCLK, HRESETn)
   BEGIN  -- PROCESS
-    IF HRESETn = '0' THEN                  -- asynchronous reset (active low)
+    IF HRESETn = '0' THEN                 -- asynchronous reset (active low)
       header_ack     <= '0';
       header_reg     <= (OTHERS => '0');
       header_reg_val <= '0';
-    ELSIF HCLK'event AND HCLK = '1' THEN  -- rising clock edge
+    ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
       header_ack <= '0';
-      
+
       IF header_val = '1' THEN
         header_ack <= '1';
         header_reg <= header;
