@@ -46,8 +46,8 @@ ENTITY lpp_lfr IS
     clk             : IN  STD_LOGIC;
     rstn            : IN  STD_LOGIC;
     -- SAMPLE
-    sample_B        : IN  Samples14v(2 DOWNTO 0);
-    sample_E        : IN  Samples14v(4 DOWNTO 0);
+    sample_B        : IN  Samples(2 DOWNTO 0);
+    sample_E        : IN  Samples(4 DOWNTO 0);
     sample_val      : IN  STD_LOGIC;
     -- APB
     apbi            : IN  apb_slv_in_type;
@@ -106,7 +106,7 @@ ENTITY lpp_lfr IS
 END lpp_lfr;
 
 ARCHITECTURE beh OF lpp_lfr IS
-  SIGNAL sample           : Samples14v(7 DOWNTO 0);
+  --SIGNAL sample           : Samples14v(7 DOWNTO 0);
   SIGNAL sample_s         : Samples(7 DOWNTO 0);
   --
   SIGNAL data_shaping_SP0 : STD_LOGIC;
@@ -299,12 +299,12 @@ ARCHITECTURE beh OF lpp_lfr IS
   
 BEGIN
   
-  sample(4 DOWNTO 0) <= sample_E(4 DOWNTO 0);
-  sample(7 DOWNTO 5) <= sample_B(2 DOWNTO 0);
+  sample_s(4 DOWNTO 0) <= sample_E(4 DOWNTO 0);
+  sample_s(7 DOWNTO 5) <= sample_B(2 DOWNTO 0);
 
-  all_channel : FOR i IN 7 DOWNTO 0 GENERATE
-    sample_s(i) <= sample(i)(13) & sample(i)(13) & sample(i);
-  END GENERATE all_channel;
+  --all_channel : FOR i IN 7 DOWNTO 0 GENERATE
+  --  sample_s(i) <= sample(i)(13) & sample(i)(13) & sample(i);
+  --END GENERATE all_channel;
 
   -----------------------------------------------------------------------------
   lpp_lfr_filter_1 : lpp_lfr_filter

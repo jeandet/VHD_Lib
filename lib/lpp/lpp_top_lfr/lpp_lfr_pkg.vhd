@@ -151,8 +151,8 @@ PACKAGE lpp_lfr_pkg IS
     PORT (
       clk             : IN  STD_LOGIC;
       rstn            : IN  STD_LOGIC;
-      sample_B        : IN  Samples14v(2 DOWNTO 0);
-      sample_E        : IN  Samples14v(4 DOWNTO 0);
+      sample_B        : IN  Samples(2 DOWNTO 0);
+      sample_E        : IN  Samples(4 DOWNTO 0);
       sample_val      : IN  STD_LOGIC;
       apbi            : IN  apb_slv_in_type;
       apbo            : OUT apb_slv_out_type;
@@ -186,8 +186,8 @@ PACKAGE lpp_lfr_pkg IS
     PORT (
       clk             : IN  STD_LOGIC;
       rstn            : IN  STD_LOGIC;
-      sample_B        : IN  Samples14v(2 DOWNTO 0);
-      sample_E        : IN  Samples14v(4 DOWNTO 0);
+      sample_B        : IN  Samples(2 DOWNTO 0);
+      sample_E        : IN  Samples(4 DOWNTO 0);
       sample_val      : IN  STD_LOGIC;
       apbi            : IN  apb_slv_in_type;
       apbo            : OUT apb_slv_out_type;

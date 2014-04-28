@@ -127,6 +127,7 @@ ARCHITECTURE beh OF LFR_em IS
 
 -- AD Converter ADS7886
   SIGNAL sample      : Samples14v(7 DOWNTO 0);
+  SIGNAL sample_s    : Samples(7 DOWNTO 0);
   SIGNAL sample_val  : STD_LOGIC;
   SIGNAL ADC_nCS_sig : STD_LOGIC;
   SIGNAL ADC_CLK_sig : STD_LOGIC;
@@ -353,15 +354,15 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"00010A")  -- aa.bb.cc version
+      top_lfr_version        => X"00010B")  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             -- 0 => MINI_LFR
                                             -- 1 => EM
     PORT MAP (
       clk             => clk_25,
       rstn            => rstn,
-      sample_B        => sample(2 DOWNTO 0),
-      sample_E        => sample(7 DOWNTO 3),
+      sample_B        => sample_s(2 DOWNTO 0),
+      sample_E        => sample_s(7 DOWNTO 3),
       sample_val      => sample_val,
       apbi            => apbi_ext,
       apbo            => apbo_ext(15),
@@ -372,6 +373,11 @@ BEGIN  -- beh
       data_shaping_BW => bias_fail_sw,
       observation_reg => observation_reg);
 
+
+  all_sample: FOR I IN 7 DOWNTO 0 GENERATE
+    sample_s(I) <= sample(I) & '0' & '0';
+  END GENERATE all_sample;
+  
   -----------------------------------------------------------------------------
   -- 
   -----------------------------------------------------------------------------

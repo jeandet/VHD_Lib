@@ -163,6 +163,7 @@ ARCHITECTURE beh OF MINI_LFR_top IS
 
 -- AD Converter ADS7886
   SIGNAL sample      : Samples14v(7 DOWNTO 0);
+  SIGNAL sample_s    : Samples(7 DOWNTO 0);
   SIGNAL sample_val  : STD_LOGIC;
   SIGNAL ADC_nCS_sig : STD_LOGIC;
   SIGNAL ADC_CLK_sig : STD_LOGIC;
@@ -429,8 +430,8 @@ BEGIN  -- beh
     PORT MAP (
       clk             => clk_25,
       rstn            => reset,
-      sample_B        => sample(2 DOWNTO 0),
-      sample_E        => sample(7 DOWNTO 3),
+      sample_B        => sample_s(2 DOWNTO 0),
+      sample_E        => sample_s(7 DOWNTO 3),
       sample_val      => sample_val,
       apbi            => apbi_ext,
       apbo            => apbo_ext(15),
@@ -440,6 +441,12 @@ BEGIN  -- beh
       fine_time       => fine_time,
       data_shaping_BW => bias_fail_sw_sig,
       observation_reg => observation_reg);
+
+  all_sample: FOR I IN 7 DOWNTO 0 GENERATE
+    sample_s(I) <= sample(I) & '0' & '0';
+  END GENERATE all_sample;
+
+  
 
   top_ad_conv_ADS7886_v2_1 : top_ad_conv_ADS7886_v2
     GENERIC MAP(
