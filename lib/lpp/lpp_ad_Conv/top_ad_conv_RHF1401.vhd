@@ -44,7 +44,7 @@ BEGIN
       cnv_s             <= '0';
     ELSIF cnv_clk'EVENT AND cnv_clk = '1' THEN  -- rising clock edge
 --      IF cnv_run = '1' THEN
-      IF cnv_cycle_counter < ncycle_cnv THEN
+      IF cnv_cycle_counter < ncycle_cnv-1 THEN
         cnv_cycle_counter <= cnv_cycle_counter +1;
         IF cnv_cycle_counter < ncycle_cnv_high THEN
           cnv_s <= '1';
