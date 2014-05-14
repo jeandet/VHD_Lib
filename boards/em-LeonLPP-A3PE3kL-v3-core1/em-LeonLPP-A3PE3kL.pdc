@@ -21,7 +21,7 @@ set_io	{address[15]}	-pinname	N1	-fixed	yes	-DIRECTION	Inout
 set_io	{address[16]}	-pinname	R3	-fixed	yes	-DIRECTION	Inout
 set_io	{address[17]}	-pinname	P4	-fixed	yes	-DIRECTION	Inout
 set_io	{address[18]}	-pinname	N3	-fixed	yes	-DIRECTION	Inout
-set_io	{address[19]}	-pinname	M7	-fixed	yes	-DIRECTION	Inout
+set_io	{address[19]}	-pinname	M7 	-fixed	yes	-DIRECTION	Inout
 
 set_io	{data[0]}	-pinname	P17	-fixed	yes	-DIRECTION	Inout
 set_io	{data[1]}	-pinname	R18	-fixed	yes	-DIRECTION	Inout

@@ -426,7 +426,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"00010A")  -- aa.bb.cc version
+      top_lfr_version        => X"00010B")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => reset,
@@ -443,7 +443,7 @@ BEGIN  -- beh
       observation_reg => observation_reg);
 
   all_sample: FOR I IN 7 DOWNTO 0 GENERATE
-    sample_s(I) <= sample(I) & '0' & '0';
+    sample_s(I) <= sample(I)(11 DOWNTO 0) & '0' & '0' & '0' & '0';
   END GENERATE all_sample;
 
   
