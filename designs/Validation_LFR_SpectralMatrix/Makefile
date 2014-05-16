@@ -58,6 +58,7 @@ vcom_tb:
 	$(CMD_VCOM) lpp  lpp_FIFO.vhd
 	$(CMD_VCOM) lpp  spectral_matrix_package.vhd
 	$(CMD_VCOM) lpp  spectral_matrix_switch_f0.vhd
+	$(CMD_VCOM) lpp  spectral_matrix_time_managment.vhd
 	$(CMD_VCOM) lpp  lpp_lfr_ms.vhd
 	$(CMD_VCOM) work TB.vhd
 	@echo "vcom done"
@@ -344,7 +345,52 @@ vcom_lpp:
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./dsp/iir_filter/RAM_CEL.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./dsp/lpp_fft/fft_components.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./dsp/lpp_fft/lpp_fft.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./dsp/lpp_fft/Linker_FFT.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/general_purpose.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/ADDRcntr.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/ALU.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/Adder.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/Clk_Divider2.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/Clk_divider.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/MAC.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/MAC_CONTROLER.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/MAC_MUX.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/MAC_MUX2.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/MAC_REG.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/MUX2.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/MUXN.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/Multiplier.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/REG.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/SYNC_FF.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/Shifter.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/TwoComplementer.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/Clock_Divider.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/lpp_front_to_level.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/lpp_front_detection.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/lpp_front_positive_detection.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/SYNC_VALID_BIT.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/RR_Arbiter_4.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/general_purpose/general_counter.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_ad_Conv/lpp_ad_Conv.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/dsp/iir_filter/FILTERcfg.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_amba/apb_devices_list.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_dma/lpp_dma_pkg.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/lpp_matrix.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/MatriceSpectrale.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/ALU_Driver.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/ReUse_CTRLR.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/Dispatch.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/DriveInputs.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/GetResult.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/MatriceSpectrale.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/Matrix.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/TopSpecMatrix.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/SpectralMatrix.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_Header/lpp_Header.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_Header/HeaderBuilder.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./dsp/lpp_fft/CoreFFT_simu.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_pkg.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_ms_fsmdma.vhd
 	@echo "vcom lpp done"
 
 # 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_amba/apb_devices_list.vhd
