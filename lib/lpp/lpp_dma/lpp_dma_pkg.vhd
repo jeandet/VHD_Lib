@@ -31,10 +31,10 @@ USE grlib.stdlib.ALL;
 USE GRLIB.DMA2AHB_Package.ALL;
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
-LIBRARY lpp;
-USE lpp.lpp_amba.ALL;
-USE lpp.apb_devices_list.ALL;
-USE lpp.lpp_memory.ALL;
+--LIBRARY lpp;
+--USE lpp.lpp_amba.ALL;
+--USE lpp.apb_devices_list.ALL;
+--USE lpp.lpp_memory.ALL;
 
 PACKAGE lpp_dma_pkg IS
 

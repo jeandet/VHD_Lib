@@ -388,6 +388,7 @@ vcom_lpp:
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/SpectralMatrix.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_Header/lpp_Header.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_Header/HeaderBuilder.vhd
+	$(CMD_VCOM) lpp  lpp_memory.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./dsp/lpp_fft/CoreFFT_simu.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_pkg.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_ms_fsmdma.vhd
