@@ -51,8 +51,7 @@ ENTITY lpp_fifo IS
 
     empty       : OUT STD_LOGIC;
     full        : OUT STD_LOGIC;
-    almost_full : OUT STD_LOGIC;
-    more_16Data : OUT STD_LOGIC
+    almost_full : OUT STD_LOGIC
     );
 END ENTITY;
 
@@ -161,13 +160,6 @@ BEGIN
   full        <= sFull_s;
   empty       <= sEmpty_s;
 
-
-  more_16Data <= '1' WHEN ReUse = '1' ELSE
-                 '1' WHEN sFull = '1' ELSE
-                 '1' WHEN UNSIGNED(Waddr_vect) > UNSIGNED(Raddr_vect) AND UNSIGNED(Waddr_vect) > UNSIGNED(Raddr_vect) + 15  ELSE
-                 '1' WHEN  UNSIGNED(Waddr_vect) < UNSIGNED(Raddr_vect) AND 2**AddrSz - UNSIGNED(Raddr_vect) + UNSIGNED(Waddr_vect) > 15  ELSE
-                 '0';
-                 
 
   
 END ARCHITECTURE;

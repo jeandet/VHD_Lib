@@ -53,8 +53,7 @@ PACKAGE lpp_memory IS
       wdata       : IN  STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
       empty       : OUT STD_LOGIC;
       full        : OUT STD_LOGIC;
-      almost_full : OUT STD_LOGIC;
-      more_16Data : OUT STD_LOGIC);
+      almost_full : OUT STD_LOGIC);
   END COMPONENT;
 
   COMPONENT lppFIFOxN
@@ -74,8 +73,7 @@ PACKAGE lpp_memory IS
       rdata       : OUT STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);
       empty       : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
       full        : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
-      almost_full : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
-      more_16Data : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0));
+      almost_full : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0));
   END COMPONENT;
 
 
