@@ -27,10 +27,12 @@ PACKAGE lpp_lfr_pkg IS
 
       sample_f0_wen                          : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
       sample_f0_wdata                        : IN  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+
       sample_f1_wen                          : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
       sample_f1_wdata                        : IN  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
-      sample_f3_wen                          : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
-      sample_f3_wdata                        : IN  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+
+      sample_f2_wen                          : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
+      sample_f2_wdata                        : IN  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
 
       dma_addr        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       dma_data        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -39,28 +41,30 @@ PACKAGE lpp_lfr_pkg IS
       dma_ren         : IN STD_LOGIC;
       dma_done        : IN STD_LOGIC;
       
-      ready_matrix_f0_0                      : OUT STD_LOGIC;
-      ready_matrix_f0_1                      : OUT STD_LOGIC;
+      ready_matrix_f0                      : OUT STD_LOGIC;
+--      ready_matrix_f0_1                      : OUT STD_LOGIC;
       ready_matrix_f1                        : OUT STD_LOGIC;
       ready_matrix_f2                        : OUT STD_LOGIC;
-      error_anticipating_empty_fifo          : OUT STD_LOGIC;
+--      error_anticipating_empty_fifo          : OUT STD_LOGIC;
       error_bad_component_error              : OUT STD_LOGIC;
+      error_buffer_full                      : OUT STD_LOGIC;
+      error_input_fifo_write                 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
       debug_reg                              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      status_ready_matrix_f0_0               : IN  STD_LOGIC;
-      status_ready_matrix_f0_1               : IN  STD_LOGIC;
+      status_ready_matrix_f0               : IN  STD_LOGIC;
+--      status_ready_matrix_f0_1               : IN  STD_LOGIC;
       status_ready_matrix_f1                 : IN  STD_LOGIC;
       status_ready_matrix_f2                 : IN  STD_LOGIC;
-      status_error_anticipating_empty_fifo   : IN  STD_LOGIC;
-      status_error_bad_component_error       : IN  STD_LOGIC;
+--      status_error_anticipating_empty_fifo   : IN  STD_LOGIC;
+--      status_error_bad_component_error       : IN  STD_LOGIC;
       config_active_interruption_onNewMatrix : IN  STD_LOGIC;
       config_active_interruption_onError     : IN  STD_LOGIC;
-      addr_matrix_f0_0                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-      addr_matrix_f0_1                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      addr_matrix_f0                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+--      addr_matrix_f0_1                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f1                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f2                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-      matrix_time_f0_0                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
-      matrix_time_f0_1                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f0                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+--      matrix_time_f0_1                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
       matrix_time_f1                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
       matrix_time_f2                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0));
   END COMPONENT;
@@ -69,41 +73,48 @@ PACKAGE lpp_lfr_pkg IS
     PORT (
       HCLK                                   : IN  STD_ULOGIC;
       HRESETn                                : IN  STD_ULOGIC;
-      data_time                              : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-      fifo_data                              : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-      fifo_empty                             : IN  STD_LOGIC;
-      fifo_ren                               : OUT STD_LOGIC;
-      header                                 : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-      header_val                             : IN  STD_LOGIC;
-      header_ack                             : OUT STD_LOGIC;
+      fifo_matrix_type      : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+      fifo_matrix_component : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+      fifo_matrix_time      : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
+      fifo_data  : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      fifo_empty : IN  STD_LOGIC;
+      fifo_ren   : OUT STD_LOGIC;
+      --data_time                              : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
+      --fifo_data                              : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      --fifo_empty                             : IN  STD_LOGIC;
+      --fifo_ren                               : OUT STD_LOGIC;
+      --header                                 : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      --header_val                             : IN  STD_LOGIC;
+      --header_ack                             : OUT STD_LOGIC;
       dma_addr                               : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       dma_data                               : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       dma_valid                              : OUT STD_LOGIC;
       dma_valid_burst                        : OUT STD_LOGIC;
       dma_ren                                : IN  STD_LOGIC;
       dma_done                               : IN  STD_LOGIC;
-      ready_matrix_f0_0                      : OUT STD_LOGIC;
-      ready_matrix_f0_1                      : OUT STD_LOGIC;
+      ready_matrix_f0                      : OUT STD_LOGIC;
+--      ready_matrix_f0_1                      : OUT STD_LOGIC;
       ready_matrix_f1                        : OUT STD_LOGIC;
       ready_matrix_f2                        : OUT STD_LOGIC;
-      error_anticipating_empty_fifo          : OUT STD_LOGIC;
+--      error_anticipating_empty_fifo          : OUT STD_LOGIC;
       error_bad_component_error              : OUT STD_LOGIC;
+      error_buffer_full                      : OUT STD_LOGIC;
       debug_reg                              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      status_ready_matrix_f0_0               : IN  STD_LOGIC;
-      status_ready_matrix_f0_1               : IN  STD_LOGIC;
+      status_ready_matrix_f0               : IN  STD_LOGIC;
+--      status_ready_matrix_f0_1               : IN  STD_LOGIC;
       status_ready_matrix_f1                 : IN  STD_LOGIC;
       status_ready_matrix_f2                 : IN  STD_LOGIC;
-      status_error_anticipating_empty_fifo   : IN  STD_LOGIC;
-      status_error_bad_component_error       : IN  STD_LOGIC;
+--      status_error_anticipating_empty_fifo   : IN  STD_LOGIC;
+--      status_error_bad_component_error       : IN  STD_LOGIC;
       config_active_interruption_onNewMatrix : IN  STD_LOGIC;
       config_active_interruption_onError     : IN  STD_LOGIC;
-      addr_matrix_f0_0                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-      addr_matrix_f0_1                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      addr_matrix_f0                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+--      addr_matrix_f0_1                       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f1                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f2                         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-      matrix_time_f0_0                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
-      matrix_time_f0_1                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f0                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+--      matrix_time_f0_1                       : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
       matrix_time_f1                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
       matrix_time_f2                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
       );

@@ -49,31 +49,35 @@ ENTITY lpp_lfr_ms IS
     dma_done        : IN  STD_LOGIC;
 
     -- Reg out
-    ready_matrix_f0_0             : OUT STD_LOGIC;
-    ready_matrix_f0_1             : OUT STD_LOGIC;
+    ready_matrix_f0               : OUT STD_LOGIC;
+--    ready_matrix_f0             : OUT STD_LOGIC;
     ready_matrix_f1               : OUT STD_LOGIC;
     ready_matrix_f2               : OUT STD_LOGIC;
-    error_anticipating_empty_fifo : OUT STD_LOGIC;
+    --error_anticipating_empty_fifo : OUT STD_LOGIC;
     error_bad_component_error     : OUT STD_LOGIC;
+    error_buffer_full             : OUT STD_LOGIC;
+    error_input_fifo_write        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    
     debug_reg                     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     -- Reg In
-    status_ready_matrix_f0_0             : IN STD_LOGIC;
-    status_ready_matrix_f0_1             : IN STD_LOGIC;
+    status_ready_matrix_f0             : IN STD_LOGIC;
+--    status_ready_matrix_f0_1             : IN STD_LOGIC;
     status_ready_matrix_f1               : IN STD_LOGIC;
     status_ready_matrix_f2               : IN STD_LOGIC;
-    status_error_anticipating_empty_fifo : IN STD_LOGIC;
-    status_error_bad_component_error     : IN STD_LOGIC;
+--    status_error_anticipating_empty_fifo : IN STD_LOGIC;
+--    status_error_bad_component_error     : IN STD_LOGIC;
+--    status_error_buffer_full             : IN STD_LOGIC;
 
     config_active_interruption_onNewMatrix : IN STD_LOGIC;
     config_active_interruption_onError     : IN STD_LOGIC;
-    addr_matrix_f0_0                       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f0_1                       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+--    addr_matrix_f0_0                       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    addr_matrix_f0                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f1                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f2                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-    matrix_time_f0_0 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
-    matrix_time_f0_1 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    matrix_time_f0 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+--    matrix_time_f0_1 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
     matrix_time_f1   : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
     matrix_time_f2   : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
 
@@ -171,6 +175,40 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL MEM_IN_SM_Full      : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL MEM_IN_SM_Empty      : STD_LOGIC_VECTOR(4 DOWNTO 0);
   -----------------------------------------------------------------------------
+  SIGNAL SM_in_data : STD_LOGIC_VECTOR(32*2-1 DOWNTO 0);
+  SIGNAL SM_in_ren : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL SM_in_empty : STD_LOGIC_VECTOR(1 DOWNTO 0);
+
+  SIGNAL SM_correlation_start : STD_LOGIC;
+  SIGNAL SM_correlation_auto : STD_LOGIC;
+  SIGNAL SM_correlation_done : STD_LOGIC;
+  SIGNAL SM_correlation_done_reg1 : STD_LOGIC;
+  SIGNAL SM_correlation_done_reg2 : STD_LOGIC;
+  SIGNAL SM_correlation_begin : STD_LOGIC;
+  
+  SIGNAL temp_ongoing : STD_LOGIC;
+  SIGNAL temp_auto : STD_LOGIC;
+
+  SIGNAL MEM_OUT_SM_Full_s     : STD_LOGIC;
+  SIGNAL MEM_OUT_SM_Data_in_s  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL MEM_OUT_SM_Write_s    : STD_LOGIC;
+
+  SIGNAL   current_matrix_write       : STD_LOGIC;
+  SIGNAL   current_matrix_wait_empty  : STD_LOGIC;
+
+  --SIGNAL MEM_OUT_SM_BURST_available : STD_LOGIC_VECTOR(1 DOWNTO 0);
+
+  -----------------------------------------------------------------------------
+  SIGNAL   fifo_0_ready : STD_LOGIC;
+  SIGNAL   fifo_1_ready : STD_LOGIC;
+  SIGNAL   fifo_ongoing : STD_LOGIC;
+
+  SIGNAL FSM_DMA_fifo_ren  : STD_LOGIC;
+  SIGNAL FSM_DMA_fifo_empty : STD_LOGIC;
+  SIGNAL FSM_DMA_fifo_data : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL FSM_DMA_fifo_status : STD_LOGIC_VECTOR(53 DOWNTO 0);
+  
+  -----------------------------------------------------------------------------
   SIGNAL HEAD_SM_Param       : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL HEAD_WorkFreq       : STD_LOGIC_VECTOR(1 DOWNTO 0);
   SIGNAL HEAD_SM_Wen         : STD_LOGIC;
@@ -185,7 +223,7 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL MEM_OUT_SM_Data_in  : STD_LOGIC_VECTOR(63 DOWNTO 0);
   SIGNAL MEM_OUT_SM_Data_out : STD_LOGIC_VECTOR(63 DOWNTO 0);
   SIGNAL MEM_OUT_SM_Full     : STD_LOGIC_VECTOR(1 DOWNTO 0);
-  SIGNAL MEM_OUT_SM_Empty     : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL MEM_OUT_SM_Empty    : STD_LOGIC_VECTOR(1 DOWNTO 0);
   -----------------------------------------------------------------------------
   SIGNAL DMA_Header          : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL DMA_Header_Val      : STD_LOGIC;
@@ -207,12 +245,25 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL time_update_f2   : STD_LOGIC;
   --
   SIGNAL status_channel   : STD_LOGIC_VECTOR(49 DOWNTO 0);
+  SIGNAL status_MS_input  : STD_LOGIC_VECTOR(49 DOWNTO 0);
+  SIGNAL status_component : STD_LOGIC_VECTOR(53 DOWNTO 0);
+  
+  SIGNAL status_component_fifo_0 : STD_LOGIC_VECTOR(53 DOWNTO 0);
+  SIGNAL status_component_fifo_1 : STD_LOGIC_VECTOR(53 DOWNTO 0);
+  SIGNAL status_component_fifo_0_new : STD_LOGIC;
+  SIGNAL status_component_fifo_1_new : STD_LOGIC;
+  SIGNAL status_component_fifo_0_end : STD_LOGIC;
+  SIGNAL status_component_fifo_1_end : STD_LOGIC;
   
   SIGNAL dma_time : STD_LOGIC_VECTOR(47 DOWNTO 0);
   -----------------------------------------------------------------------------
 
 BEGIN
 
+  
+  error_input_fifo_write <=  error_wen_f2 & error_wen_f1 & error_wen_f0;
+
+  
   switch_f0_inst : spectral_matrix_switch_f0
     PORT MAP (
       clk  => clk,
@@ -453,6 +504,7 @@ BEGIN
     IF rstn = '0' THEN
       sample_ren_s       <= (OTHERS => '1');
       state_fsm_load_FFT <= IDLE;
+      status_MS_input <= (OTHERS => '0');
       --next_state_fsm_load_FFT <= IDLE;
       --sample_valid              <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN
@@ -462,6 +514,7 @@ BEGIN
           sample_ren_s <= (OTHERS => '1');
           IF sample_full = "11111" AND sample_load = '1' THEN
             state_fsm_load_FFT <= FIFO_1;
+            status_MS_input <= status_channel;
           END IF;
           
         WHEN FIFO_1 =>
@@ -686,47 +739,131 @@ BEGIN
       empty => MEM_IN_SM_Empty);
 
 
-  all_lock: FOR I IN 4 DOWNTO 0 GENERATE
-    PROCESS (clk, rstn)
-    BEGIN
-      IF rstn = '0' THEN
-        MEM_IN_SM_locked(I) <= '0';
-      ELSIF clk'event AND clk = '1' THEN 
-        MEM_IN_SM_locked(I) <=   MEM_IN_SM_Full(I) OR  MEM_IN_SM_locked(I);  -- TODO
-      END IF;
-    END PROCESS;    
-  END GENERATE all_lock;
+  --all_lock: FOR I IN 4 DOWNTO 0 GENERATE
+  --  PROCESS (clk, rstn)
+  --  BEGIN
+  --    IF rstn = '0' THEN
+  --      MEM_IN_SM_locked(I) <= '0';
+  --    ELSIF clk'event AND clk = '1' THEN 
+  --      MEM_IN_SM_locked(I) <=   MEM_IN_SM_Full(I) OR  MEM_IN_SM_locked(I);  -- TODO
+  --    END IF;
+  --  END PROCESS;    
+  --END GENERATE all_lock;
   
   -----------------------------------------------------------------------------
-  
-
-
-  
-  
-  -----------------------------------------------------------------------------
-  SM0 : MatriceSpectrale
-    GENERIC MAP (
-      Input_SZ  => 16,
-      Result_SZ => 32)
+  MS_control_1: MS_control
     PORT MAP (
-      clkm => clk,
-      rstn => rstn,
+      clk               => clk,
+      rstn              => rstn,
 
-      FifoIN_Full => MEM_IN_SM_Full,
-      Data_IN     => MEM_IN_SM_rData(79 DOWNTO 0),
-      Read        => MEM_IN_SM_ren,
-      ReUse       => MEM_IN_SM_ReUse,
+      current_status_ms => status_MS_input,
+      
+      fifo_in_lock      => MEM_IN_SM_locked,
+      fifo_in_data      => MEM_IN_SM_rdata,
+      fifo_in_full      => MEM_IN_SM_Full,
+      fifo_in_empty     => MEM_IN_SM_Empty,
+      fifo_in_ren       => MEM_IN_SM_ren,
+      fifo_in_reuse     => MEM_IN_SM_ReUse,
+      
+      fifo_out_data     => SM_in_data,
+      fifo_out_ren      => SM_in_ren,
+      fifo_out_empty    => SM_in_empty,
 
-      SetReUse => fft_linker_ReUse,
+      current_status_component => status_component,
 
-      Valid     => HEAD_Valid,
-      ACK       => DMA_Header_Ack,
-      SM_Write  => HEAD_SM_Wen,
-      FlagError => OPEN,
-      Statu     => HEAD_SM_Param,
-      Write     => MEM_OUT_SM_Write,
-      Data_OUT  => MEM_OUT_SM_Data_in);
+      correlation_start => SM_correlation_start,
+      correlation_auto  => SM_correlation_auto,
+      correlation_done  => SM_correlation_done);
+
+
+  MS_calculation_1: MS_calculation
+    PORT MAP (
+      clk               => clk,
+      rstn              => rstn,
+      
+      fifo_in_data      => SM_in_data,
+      fifo_in_ren       => SM_in_ren,
+      fifo_in_empty     => SM_in_empty,
+      
+      fifo_out_data     => MEM_OUT_SM_Data_in_s,  --    TODO
+      fifo_out_wen      => MEM_OUT_SM_Write_s,  --      TODO
+      fifo_out_full     => MEM_OUT_SM_Full_s,  --       TODO
+      
+      correlation_start => SM_correlation_start,
+      correlation_auto  => SM_correlation_auto,
+      correlation_begin => SM_correlation_begin,
+      correlation_done  => SM_correlation_done);
+  
   -----------------------------------------------------------------------------
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS
+    IF rstn = '0' THEN                  -- asynchronous reset (active low)
+      current_matrix_write      <= '0';
+      current_matrix_wait_empty <= '1';
+      status_component_fifo_0 <= (OTHERS => '0');
+      status_component_fifo_1 <= (OTHERS => '0');
+      status_component_fifo_0_new <= '0';
+      status_component_fifo_1_new <= '0';
+      status_component_fifo_0_end <= '0';
+      status_component_fifo_1_end <= '0';
+      SM_correlation_done_reg1 <= '0';
+      SM_correlation_done_reg2 <= '0';
+      
+    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      SM_correlation_done_reg1 <= SM_correlation_done;
+      SM_correlation_done_reg2 <= SM_correlation_done_reg1;
+      
+      status_component_fifo_0_new <= '0';
+      status_component_fifo_1_new <= '0';
+      status_component_fifo_0_end <= '0';
+      status_component_fifo_1_end <= '0';
+
+
+      
+      IF SM_correlation_begin = '1' THEN
+        IF current_matrix_write = '0' THEN
+          status_component_fifo_0_new   <= '1';
+          status_component_fifo_0       <= status_component;
+        ELSE
+          status_component_fifo_1_new   <= '1';
+          status_component_fifo_1       <= status_component;
+        END IF;
+      END IF;
+      
+      IF SM_correlation_done_reg2 = '1' THEN
+        IF current_matrix_write = '0' THEN
+          status_component_fifo_0_end   <= '1';
+        ELSE
+          status_component_fifo_1_end   <= '1';
+        END IF;
+        current_matrix_wait_empty <= '1';
+        current_matrix_write      <= NOT current_matrix_write;
+      END IF;
+      
+      IF current_matrix_wait_empty <= '1' THEN
+        IF current_matrix_write = '0' THEN
+          current_matrix_wait_empty <= NOT MEM_OUT_SM_Empty(0);
+        ELSE
+          current_matrix_wait_empty <= NOT MEM_OUT_SM_Empty(1);
+        END IF;
+      END IF;
+      
+    END IF;
+  END PROCESS;
+
+  MEM_OUT_SM_Full_s <= '1'                WHEN SM_correlation_done      = '1' ELSE
+                       '1'                WHEN SM_correlation_done_reg1 = '1' ELSE
+                       '1'                WHEN SM_correlation_done_reg2 = '1' ELSE
+                       '1'                WHEN current_matrix_wait_empty = '1' ELSE
+                       MEM_OUT_SM_Full(0) WHEN current_matrix_write = '0' ELSE
+                       MEM_OUT_SM_Full(1);
+
+  MEM_OUT_SM_Write(0) <= MEM_OUT_SM_Write_s WHEN current_matrix_write = '0' ELSE '1';
+  MEM_OUT_SM_Write(1) <= MEM_OUT_SM_Write_s WHEN current_matrix_write = '1' ELSE '1';
+
+  MEM_OUT_SM_Data_in  <= MEM_OUT_SM_Data_in_s & MEM_OUT_SM_Data_in_s;
+  -----------------------------------------------------------------------------
+  
   Mem_Out_SpectralMatrix : lppFIFOxN
     GENERIC MAP (
       tech         => 0,
@@ -742,51 +879,81 @@ BEGIN
 
       wen   => MEM_OUT_SM_Write,
       wdata => MEM_OUT_SM_Data_in,
+      
       ren   => MEM_OUT_SM_Read,
       rdata => MEM_OUT_SM_Data_out,
 
       full  => MEM_OUT_SM_Full,
-      empty => MEM_OUT_SM_Empty);       
+      empty => MEM_OUT_SM_Empty,
+      almost_full => OPEN);
+  
   -----------------------------------------------------------------------------
-  Head0 : HeaderBuilder
-    GENERIC MAP (
-      Data_sz => 32)
-    PORT MAP (
-      clkm => clk,
-      rstn => rstn,
+--  MEM_OUT_SM_Read <= "00";
+  PROCESS (clk, rstn)
+  BEGIN 
+    IF rstn = '0' THEN 
+      fifo_0_ready <= '0';
+      fifo_1_ready <= '0';
+      fifo_ongoing <= '0';
+    ELSIF clk'event AND clk = '1' THEN
+      IF fifo_0_ready = '1' AND MEM_OUT_SM_Empty(0) = '1' THEN
+        fifo_ongoing <= '1'; 
+        fifo_0_ready <= '0';
+      ELSIF status_component_fifo_0_end = '1' THEN
+        fifo_0_ready <= '1';        
+      END IF;
+      
+      IF fifo_1_ready = '1' AND MEM_OUT_SM_Empty(1) = '1' THEN
+        fifo_ongoing <= '0';
+        fifo_1_ready <= '0';
+      ELSIF status_component_fifo_1_end = '1' THEN
+        fifo_1_ready <= '1';        
+      END IF;
+      
+    END IF;
+  END PROCESS;
+  
+  MEM_OUT_SM_Read(0) <= '1' WHEN fifo_ongoing = '1' ELSE
+                        '1' WHEN fifo_0_ready = '0' ELSE
+                        FSM_DMA_fifo_ren;
 
-      Statu        => HEAD_SM_Param,
-      Matrix_Type  => HEAD_WorkFreq,    -- TODO IN
-      Matrix_Write => HEAD_SM_Wen,
-      Valid        => HEAD_Valid,
+  MEM_OUT_SM_Read(1) <= '1' WHEN fifo_ongoing = '0' ELSE
+                        '1' WHEN fifo_1_ready = '0' ELSE
+                        FSM_DMA_fifo_ren;
 
-      dataIN  => MEM_OUT_SM_Data_out,
-      emptyIN => MEM_OUT_SM_Empty,
-      RenOUT  => MEM_OUT_SM_Read,
+  FSM_DMA_fifo_empty <= MEM_OUT_SM_Empty(0)    WHEN fifo_ongoing = '0' AND fifo_0_ready = '1' ELSE
+                        MEM_OUT_SM_Empty(1)    WHEN fifo_ongoing = '1' AND fifo_1_ready = '1' ELSE
+                        '1';
+  
+  FSM_DMA_fifo_status <=  status_component_fifo_0 WHEN fifo_ongoing = '0' ELSE
+                          status_component_fifo_1;
 
-      dataOUT  => HEAD_Data,
-      emptyOUT => HEAD_Empty,
-      RenIN    => HEAD_Read,
+  FSM_DMA_fifo_data   <= MEM_OUT_SM_Data_out(31 DOWNTO  0) WHEN fifo_ongoing = '0' ELSE
+                         MEM_OUT_SM_Data_out(63 DOWNTO 32);
 
-      header     => DMA_Header,
-      header_val => DMA_Header_Val,
-      header_ack => DMA_Header_Ack);         
-  -----------------------------------------------------------------------------
   -----------------------------------------------------------------------------
   lpp_lfr_ms_fsmdma_1 : lpp_lfr_ms_fsmdma
     PORT MAP (
       HCLK    => clk,
       HRESETn => rstn,
 
-      data_time => dma_time,           
+      fifo_matrix_type      => FSM_DMA_fifo_status( 5 DOWNTO 4),
+      fifo_matrix_component => FSM_DMA_fifo_status( 3 DOWNTO 0),
+      fifo_matrix_time      => FSM_DMA_fifo_status(53 DOWNTO 6),
+      fifo_data             => FSM_DMA_fifo_data,
+      fifo_empty            => FSM_DMA_fifo_empty,
+      fifo_ren              => FSM_DMA_fifo_ren,
+      
+      ---- FIFO IN
+      --data_time => dma_time,           
 
-      fifo_data  => HEAD_Data,
-      fifo_empty => HEAD_Empty,
-      fifo_ren   => HEAD_Read,
+      --fifo_data  => HEAD_Data,
+      --fifo_empty => HEAD_Empty,
+      --fifo_ren   => HEAD_Read,
 
-      header     => DMA_Header,
-      header_val => DMA_Header_Val,
-      header_ack => DMA_Header_Ack,
+      --header     => DMA_Header,
+      --header_val => DMA_Header_Val,
+      --header_ack => DMA_Header_Ack,
 
       dma_addr        => dma_addr,
       dma_data        => dma_data,
@@ -795,33 +962,45 @@ BEGIN
       dma_ren         => dma_ren,
       dma_done        => dma_done,
 
-      ready_matrix_f0_0                      => ready_matrix_f0_0,
-      ready_matrix_f0_1                      => ready_matrix_f0_1,
+      ready_matrix_f0                      => ready_matrix_f0,
+--      ready_matrix_f0_1                      => ready_matrix_f0_1,
       ready_matrix_f1                        => ready_matrix_f1,
       ready_matrix_f2                        => ready_matrix_f2,
-      error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
+--      error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
       error_bad_component_error              => error_bad_component_error,
+      error_buffer_full                      => error_buffer_full,
       debug_reg                              => debug_reg,
-      status_ready_matrix_f0_0               => status_ready_matrix_f0_0,
-      status_ready_matrix_f0_1               => status_ready_matrix_f0_1,
+      status_ready_matrix_f0               => status_ready_matrix_f0,
+--      status_ready_matrix_f0_1               => status_ready_matrix_f0_1,
       status_ready_matrix_f1                 => status_ready_matrix_f1,
       status_ready_matrix_f2                 => status_ready_matrix_f2,
-      status_error_anticipating_empty_fifo   => status_error_anticipating_empty_fifo,
-      status_error_bad_component_error       => status_error_bad_component_error,
+--      status_error_anticipating_empty_fifo   => status_error_anticipating_empty_fifo,
+--      status_error_bad_component_error       => status_error_bad_component_error,
+--      status_error_buffer_full               => status_error_buffer_full,
       config_active_interruption_onNewMatrix => config_active_interruption_onNewMatrix,
       config_active_interruption_onError     => config_active_interruption_onError,
-      addr_matrix_f0_0                       => addr_matrix_f0_0,
-      addr_matrix_f0_1                       => addr_matrix_f0_1,
+      addr_matrix_f0                       => addr_matrix_f0,
+--      addr_matrix_f0_1                       => addr_matrix_f0_1,
       addr_matrix_f1                         => addr_matrix_f1,
       addr_matrix_f2                         => addr_matrix_f2,
 
-      matrix_time_f0_0 => matrix_time_f0_0,
-      matrix_time_f0_1 => matrix_time_f0_1,
+      matrix_time_f0 => matrix_time_f0,
+--      matrix_time_f0_1 => matrix_time_f0_1,
       matrix_time_f1   => matrix_time_f1,
       matrix_time_f2   => matrix_time_f2
       );
   -----------------------------------------------------------------------------
 
+
+
+
+
+
+
+
+
+
+  
   -----------------------------------------------------------------------------
   -----------------------------------------------------------------------------
   -----------------------------------------------------------------------------

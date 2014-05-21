@@ -50,7 +50,8 @@ ENTITY lppFIFOxN IS
 
     empty       : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
     full        : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
-    almost_full : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0)
+    almost_full : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+    more_16Data : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0)
     );
 END ENTITY;
 
@@ -76,7 +77,8 @@ BEGIN
         wdata       => wdata(((I+1)*Data_sz)-1 DOWNTO (I*Data_sz)),
         empty       => empty(I),
         full        => full(I),
-        almost_full => almost_full(I));
+        almost_full => almost_full(I),
+        more_16Data => more_16Data(I));
   END GENERATE;
 
 END ARCHITECTURE;

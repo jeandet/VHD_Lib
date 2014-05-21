@@ -6,7 +6,9 @@ ENTITY MS_control IS
   PORT (
     clk           : IN  STD_LOGIC;
     rstn          : IN  STD_LOGIC;
-        
+    -- IN
+    current_status_ms : IN STD_LOGIC_VECTOR(49 DOWNTO 0); -- TIME(47 .. 0) & Matrix_type(1..0)
+    
     -- IN
     fifo_in_lock   : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
     fifo_in_data  : IN  STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);
@@ -19,6 +21,9 @@ ENTITY MS_control IS
     fifo_out_ren   : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
     fifo_out_empty : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
     -- OUT
+    current_status_component : OUT STD_LOGIC_VECTOR(53 DOWNTO 0);  -- TIME(47 .. 0) &
+                                                                   -- Matrix_type (1..0)
+                                                                   -- ComponentType (3..0)
     correlation_start : OUT STD_LOGIC;
     correlation_auto  : OUT STD_LOGIC;   -- 1 => auto correlation / 0 => inter correlation
     correlation_done  : IN  STD_LOGIC
@@ -30,7 +35,7 @@ ARCHITECTURE beh OF MS_control IS
   TYPE fsm_control_MS IS (WAIT_DATA, CORRELATION_ONGOING);
   SIGNAL state : fsm_control_MS;
 
-  SUBTYPE fifo_pointer IS RANGE 0 TO 4;
+  SUBTYPE fifo_pointer IS INTEGER RANGE 0 TO 4;
   SIGNAL fifo_1 : fifo_pointer;
   SIGNAL fifo_2 : fifo_pointer;
 
@@ -52,11 +57,13 @@ BEGIN  -- beh
       fifo_in_reuse_s <= (OTHERS => '0');
       correlation_start <= '0';
       correlation_auto  <= '0';
+      current_status_component <= (OTHERS => '0');
     ELSIF clk'event AND clk = '1' THEN
       CASE state IS
+        
         WHEN WAIT_DATA =>
           fifo_in_reuse_s <= (OTHERS => '0');
-          IF fifo_in_full[fifo_1] = '1' AND fifo_in_full[fifo_2] = '1' THEN
+          IF fifo_in_full(fifo_1) = '1' AND fifo_in_full(fifo_2) = '1' THEN
             fifo_in_lock_s(fifo_1) <= '1';
             fifo_in_lock_s(fifo_2) <= '1';
             correlation_start <= '1';
@@ -64,6 +71,18 @@ BEGIN  -- beh
               correlation_auto <= '1';
             END IF;
             state <= CORRELATION_ONGOING;
+            IF fifo_1 = 0 AND fifo_2 = 0 THEN
+              current_status_component(53 DOWNTO 4) <= current_status_ms;
+            END IF;
+            CASE fifo_1 IS
+              WHEN 0 => current_status_component(3 DOWNTO 0) <= STD_LOGIC_VECTOR(to_unsigned(  fifo_2,4));
+              WHEN 1 => current_status_component(3 DOWNTO 0) <= STD_LOGIC_VECTOR(to_unsigned(4+fifo_2,4));
+              WHEN 2 => current_status_component(3 DOWNTO 0) <= STD_LOGIC_VECTOR(to_unsigned(7+fifo_2,4));
+              WHEN 3 => current_status_component(3 DOWNTO 0) <= STD_LOGIC_VECTOR(to_unsigned(9+fifo_2,4));
+              WHEN 4 => current_status_component(3 DOWNTO 0) <= STD_LOGIC_VECTOR(to_unsigned(14      ,4));
+              WHEN OTHERS => NULL;
+            END CASE;
+            --current_status_component(3 DOWNTO 0)    <= STD_LOGIC_VECTOR(to_unsigned(fifo_1*5+fifo_2,4));
           END IF;
 
         WHEN CORRELATION_ONGOING =>
@@ -94,14 +113,14 @@ BEGIN  -- beh
   END PROCESS;
 
 
-  fifo_out_data(31 DOWNTO 0) <= fifo_in_data(31*1-1 DOWNTO 32*0) WHEN fifo_1 = 0 ELSE
+  fifo_out_data(31 DOWNTO 0) <= fifo_in_data(32*1-1 DOWNTO 32*0) WHEN fifo_1 = 0 ELSE
                                 fifo_in_data(32*2-1 DOWNTO 32*1) WHEN fifo_1 = 1 ELSE
                                 fifo_in_data(32*3-1 DOWNTO 32*2) WHEN fifo_1 = 2 ELSE
                                 fifo_in_data(32*4-1 DOWNTO 32*3) WHEN fifo_1 = 3 ELSE
                                 fifo_in_data(32*5-1 DOWNTO 32*4);-- WHEN fifo_1 = 4
                                 
 
-  fifo_out_data(63 DOWNTO 32) <= fifo_in_data(31*1-1 DOWNTO 32*0) WHEN fifo_2 = 0 ELSE
+  fifo_out_data(63 DOWNTO 32) <= fifo_in_data(32*1-1 DOWNTO 32*0) WHEN fifo_2 = 0 ELSE
                                  fifo_in_data(32*2-1 DOWNTO 32*1) WHEN fifo_2 = 1 ELSE
                                  fifo_in_data(32*3-1 DOWNTO 32*2) WHEN fifo_2 = 2 ELSE
                                  fifo_in_data(32*4-1 DOWNTO 32*3) WHEN fifo_2 = 3 ELSE
@@ -121,8 +140,8 @@ BEGIN  -- beh
 
 
   all_fifo: FOR I IN 0 TO 4 GENERATE
-    fifo_in_ren(I) <= fifo_out_ren(I) WHEN fifo_1 = I ELSE
-                      fifo_out_ren(I) WHEN fifo_2 = I ELSE
+    fifo_in_ren(I) <= fifo_out_ren(0) WHEN fifo_1 = I ELSE
+                      fifo_out_ren(1) WHEN fifo_2 = I ELSE
                       '1';
   END GENERATE all_fifo;  
 
