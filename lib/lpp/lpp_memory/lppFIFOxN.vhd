@@ -19,47 +19,64 @@
 --                    Author : Martin Morlot
 --                     Mail : martin.morlot@lpp.polytechnique.fr
 ------------------------------------------------------------------------------
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-library lpp;
-use lpp.lpp_memory.all;
-use lpp.iir_filter.all;
-library techmap;
-use techmap.gencomp.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
+LIBRARY lpp;
+USE lpp.lpp_memory.ALL;
+USE lpp.iir_filter.ALL;
+LIBRARY techmap;
+USE techmap.gencomp.ALL;
 
-entity lppFIFOxN is
-generic(
-    tech          :   integer := 0;
-    Mem_use       :   integer := use_RAM;
-    Data_sz       :   integer range 1 to 32 := 8;
-    Addr_sz       :   integer range 2 to 12 := 8;
-    FifoCnt       :   integer := 1;
-    Enable_ReUse  :   std_logic := '0'
+ENTITY lppFIFOxN IS
+  GENERIC(
+    tech         : INTEGER               := 0;
+    Mem_use      : INTEGER               := use_RAM;
+    Data_sz      : INTEGER RANGE 1 TO 32 := 8;
+    Addr_sz      : INTEGER RANGE 2 TO 12 := 8;
+    FifoCnt      : INTEGER               := 1
     );
-port(
-    rstn     :   in std_logic;
-    wclk    :   in std_logic;    
-    rclk    :   in std_logic;
-    ReUse   :   in std_logic_vector(FifoCnt-1 downto 0);
-    wen     :   in std_logic_vector(FifoCnt-1 downto 0);
-    ren     :   in std_logic_vector(FifoCnt-1 downto 0);
-    wdata   :   in std_logic_vector((FifoCnt*Data_sz)-1 downto 0);
-    rdata   :   out std_logic_vector((FifoCnt*Data_sz)-1 downto 0);
-    full    :   out std_logic_vector(FifoCnt-1 downto 0);
-    empty   :   out std_logic_vector(FifoCnt-1 downto 0)
-);
-end entity;
+  PORT(
+    clk  : IN STD_LOGIC;
+    rstn : IN STD_LOGIC;
+
+    ReUse : IN STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+
+    wen   : IN STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+    wdata : IN STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);
+
+    ren   : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+    rdata : OUT STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);
+
+    empty       : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+    full        : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+    almost_full : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0)
+    );
+END ENTITY;
 
 
-architecture ar_lppFIFOxN of lppFIFOxN is
+ARCHITECTURE ar_lppFIFOxN OF lppFIFOxN IS
 
-begin
+BEGIN
 
-fifos: for i in 0 to FifoCnt-1 generate
-    FIFO0 : lpp_fifo
-        generic map (tech,Mem_use,Enable_ReUse,Data_sz,Addr_sz)
-        port map(rstn,ReUse(i),rclk,ren(i),rdata((i+1)*Data_sz-1 downto i*Data_sz),empty(i),open,wclk,wen(i),wdata((i+1)*Data_sz-1 downto i*Data_sz),full(i),open);
-end generate;
+  fifos : FOR i IN 0 TO FifoCnt-1 GENERATE
+    lpp_fifo_1: lpp_fifo
+      GENERIC MAP (
+        tech         => tech,
+        Mem_use      => Mem_use,
+        DataSz       => Data_sz,
+        AddrSz       => Addr_sz)
+      PORT MAP (
+        clk         => clk,
+        rstn        => rstn,
+        reUse       => reUse(I),
+        ren         => ren(I),
+        rdata       => rdata( ((I+1)*Data_sz)-1 DOWNTO (I*Data_sz) ),
+        wen         => wen(I),
+        wdata       => wdata(((I+1)*Data_sz)-1 DOWNTO (I*Data_sz)),
+        empty       => empty(I),
+        full        => full(I),
+        almost_full => almost_full(I));
+  END GENERATE;
 
-end architecture;
+END ARCHITECTURE;

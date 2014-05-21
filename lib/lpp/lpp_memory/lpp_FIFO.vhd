@@ -19,139 +19,150 @@
 --                    Author : Martin Morlot
 --                     Mail : martin.morlot@lpp.polytechnique.fr
 ------------------------------------------------------------------------------
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-library lpp;
-use lpp.lpp_memory.all;
-use lpp.iir_filter.all;
-library techmap;
-use techmap.gencomp.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
+LIBRARY lpp;
+USE lpp.lpp_memory.ALL;
+USE lpp.iir_filter.ALL;
+LIBRARY techmap;
+USE techmap.gencomp.ALL;
 
-entity lpp_fifo is
-generic(
-    tech          :   integer := 0;
-    Mem_use       :   integer := use_RAM;
-    Enable_ReUse  :   std_logic := '0';
-    DataSz        :   integer range 1 to 32 := 8;
-    AddrSz        :   integer range 2 to 12 := 8
+ENTITY lpp_fifo IS
+  GENERIC(
+    tech         : INTEGER               := 0;
+    Mem_use      : INTEGER               := use_RAM;
+    DataSz       : INTEGER RANGE 1 TO 32 := 8;
+    AddrSz       : INTEGER RANGE 2 TO 12 := 8
     );
-port(
-    rstn    :   in std_logic;
-    ReUse   :   in std_logic;
-    rclk    :   in std_logic;
-    ren     :   in std_logic;
-    rdata   :   out std_logic_vector(DataSz-1 downto 0);
-    empty   :   out std_logic;
-    raddr   :   out std_logic_vector(AddrSz-1 downto 0);
-    wclk    :   in std_logic;
-    wen     :   in std_logic;
-    wdata   :   in std_logic_vector(DataSz-1 downto 0);
-    full    :   out std_logic;
-    waddr   :   out std_logic_vector(AddrSz-1 downto 0)
-);
-end entity;
+  PORT(
+    clk         : IN  STD_LOGIC;
+    rstn        : IN  STD_LOGIC;
+    --
+    reUse       : IN STD_LOGIC;
+    
+    --IN
+    ren         : IN  STD_LOGIC;
+    rdata       : OUT STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+    
+    --OUT
+    wen         : IN  STD_LOGIC;
+    wdata       : IN  STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+
+    empty       : OUT STD_LOGIC;
+    full        : OUT STD_LOGIC;
+    almost_full : OUT STD_LOGIC
+    );
+END ENTITY;
 
 
-architecture ar_lpp_fifo of lpp_fifo is
+ARCHITECTURE ar_lpp_fifo OF lpp_fifo IS
 
-signal sFull        : std_logic;
-signal sFull_s      : std_logic;
-signal sEmpty_s     : std_logic;
+  SIGNAL sFull    : STD_LOGIC;
+  SIGNAL sFull_s  : STD_LOGIC;
+  SIGNAL sEmpty_s : STD_LOGIC;
 
-signal sEmpty       : std_logic;
-signal sREN         : std_logic;
-signal sWEN         : std_logic;
-signal sRE          : std_logic;
-signal sWE          : std_logic;
+  SIGNAL sEmpty : STD_LOGIC;
+  SIGNAL sREN   : STD_LOGIC;
+  SIGNAL sWEN   : STD_LOGIC;
+  SIGNAL sRE    : STD_LOGIC;
+  SIGNAL sWE    : STD_LOGIC;
 
-signal Waddr_vect   : std_logic_vector(AddrSz-1 downto 0):=(others =>'0');
-signal Raddr_vect   : std_logic_vector(AddrSz-1 downto 0):=(others =>'0');
-signal Waddr_vect_s : std_logic_vector(AddrSz-1 downto 0):=(others =>'0');
-signal Raddr_vect_s : std_logic_vector(AddrSz-1 downto 0):=(others =>'0');
+  SIGNAL Waddr_vect   : STD_LOGIC_VECTOR(AddrSz-1 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL Raddr_vect   : STD_LOGIC_VECTOR(AddrSz-1 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL Waddr_vect_s : STD_LOGIC_VECTOR(AddrSz-1 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL Raddr_vect_s : STD_LOGIC_VECTOR(AddrSz-1 DOWNTO 0) := (OTHERS => '0');
 
-begin
+  SIGNAL almost_full_s : STD_LOGIC;
+  SIGNAL almost_full_r   : STD_LOGIC;
+BEGIN
 
 --==================================================================================
 -- /!\ syncram_2p Write et Read actif a l'état haut /!\
 -- A l'inverse de RAM_CEL !!!
 --==================================================================================
-memRAM : IF Mem_use = use_RAM GENERATE
-  SRAM : syncram_2p
-      generic map(tech,AddrSz,DataSz)
-      port map(RCLK,sRE,Raddr_vect,rdata,WCLK,sWE,Waddr_vect,wdata);
-END GENERATE;
+  memRAM : IF Mem_use = use_RAM GENERATE
+    SRAM : syncram_2p
+      GENERIC MAP(tech, AddrSz, DataSz)
+      PORT MAP(CLK, sRE, Raddr_vect, rdata, CLK, sWE, Waddr_vect, wdata);
+  END GENERATE;
 --================================================================================== 
-memCEL : IF Mem_use = use_CEL GENERATE
-  CRAM : RAM_CEL
-      generic map(DataSz,AddrSz)
-      port map(wdata, rdata, sWEN, sREN, Waddr_vect, Raddr_vect, WCLK, rstn);
-END GENERATE;
+  memCEL : IF Mem_use = use_CEL GENERATE
+    CRAM : RAM_CEL
+      GENERIC MAP(DataSz, AddrSz)
+      PORT MAP(wdata, rdata, sWEN, sREN, Waddr_vect, Raddr_vect, CLK, rstn);
+  END GENERATE;
 --================================================================================== 
 
 --=============================
 --     Read section
 --=============================
-sREN    <= REN or sEmpty;
-sRE     <= not sREN;
+  sREN <= REN OR sEmpty;
+  sRE  <= NOT sREN;
 
-sEmpty_s <= '0' when ReUse = '1' and Enable_ReUse='1' else
-            '1' when sEmpty = '1' and Wen = '1' else
-            '1' when sEmpty = '0' and (Wen = '1' and Ren = '0' and Raddr_vect_s = Waddr_vect) else
-            '0';
+  sEmpty_s <= '0' WHEN ReUse = '1'  else
+              '1' WHEN sEmpty = '1' AND Wen = '1'                                               ELSE
+              '1' WHEN sEmpty = '0' AND (Wen = '1' AND Ren = '0' AND Raddr_vect_s = Waddr_vect) ELSE
+              '0';
 
-Raddr_vect_s   <= std_logic_vector(unsigned(Raddr_vect) +1);
+  Raddr_vect_s <= STD_LOGIC_VECTOR(UNSIGNED(Raddr_vect) +1);
 
-process (rclk,rstn)
-begin
-    if(rstn='0')then
-        Raddr_vect   <=  (others =>'0');
-        sempty  <= '1';
-    elsif(rclk'event and rclk='1')then 
-        sEmpty <= sempty_s;
-        
-        if(sREN='0' and sempty = '0')then
-            Raddr_vect  <= Raddr_vect_s;
-        end if;
+  PROCESS (clk, rstn)
+  BEGIN
+    IF(rstn = '0')then
+      Raddr_vect <= (OTHERS => '0');
+      sempty     <= '1';
+    ELSIF(clk'EVENT AND clk = '1')then
+      sEmpty <= sempty_s;
 
-    end if;
-end process;
+      IF(sREN = '0' and sempty = '0')then
+        Raddr_vect <= Raddr_vect_s;
+      END IF;
+
+    END IF;
+  END PROCESS;
 
 --=============================
 --     Write section
 --=============================
-sWEN    <= WEN or sFull;
-sWE     <= not sWEN;
+  sWEN <= WEN OR sFull;
+  sWE  <= NOT sWEN;
 
-sFull_s <= '1' when ReUse = '1' and Enable_ReUse='1' else
-           '1' when Waddr_vect_s = Raddr_vect and REN = '1' and WEN = '0' else
-           '1' when sFull = '1' and REN = '1' else
-           '0';
-           
-Waddr_vect_s   <= std_logic_vector(unsigned(Waddr_vect) +1);
+  sFull_s <= '1' WHEN ReUse = '1' else
+             '1' WHEN Waddr_vect_s = Raddr_vect AND REN = '1' AND WEN = '0' ELSE
+             '1' WHEN sFull = '1' AND REN = '1'                             ELSE
+             '0';
 
-process (wclk,rstn)
-begin
-    if(rstn='0')then
-        Waddr_vect   <=  (others =>'0');
-        sfull        <=   '0';
-    elsif(wclk'event and wclk='1')then
-        sfull <= sfull_s;
+  almost_full_s <= '1' WHEN STD_LOGIC_VECTOR(UNSIGNED(Waddr_vect) +2) = Raddr_vect AND REN = '1' AND WEN = '0' ELSE
+                   '1' WHEN almost_full_r = '1' AND WEN = REN ELSE
+                   '0';
+  
+  Waddr_vect_s <= STD_LOGIC_VECTOR(UNSIGNED(Waddr_vect) +1);
 
-        if(sWEN='0' and sfull='0')then
-            Waddr_vect <= Waddr_vect_s;
-        end if;
-        
-    end if;
-end process;
+  PROCESS (clk, rstn)
+  BEGIN
+    IF(rstn = '0')then
+      Waddr_vect <= (OTHERS => '0');
+      sfull      <= '0';
+      almost_full_r <= '0';
+    ELSIF(clk'EVENT AND clk = '1')then
+      sfull <= sfull_s;
+      almost_full_r      <= almost_full_s;
+
+      IF(sWEN = '0' and sfull = '0')THEN
+        Waddr_vect <= Waddr_vect_s;
+      END IF;
+      
+    END IF;
+  END PROCESS;
+
+  almost_full <= almost_full_s;
+  full        <= sFull_s;
+  empty       <= sEmpty_s;
 
 
-full    <= sFull_s;
-empty   <= sEmpty_s;
-waddr   <= Waddr_vect;
-raddr   <= Raddr_vect;
-
-end architecture;
+  
+END ARCHITECTURE;
 
 
 

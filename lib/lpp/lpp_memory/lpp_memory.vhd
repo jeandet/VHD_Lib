@@ -19,179 +19,223 @@
 --                    Author : Martin Morlot
 --                     Mail : martin.morlot@lpp.polytechnique.fr
 ------------------------------------------------------------------------------
-library ieee;
-use ieee.std_logic_1164.all;
-library grlib;
-use grlib.amba.all;
-use std.textio.all;
-library lpp;
-use lpp.lpp_amba.all;
-use lpp.iir_filter.all;
-library gaisler;
-use gaisler.misc.all;
-use gaisler.memctrl.all;
-library techmap;
-use techmap.gencomp.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+LIBRARY grlib;
+USE grlib.amba.ALL;
+USE std.textio.ALL;
+LIBRARY lpp;
+USE lpp.lpp_amba.ALL;
+USE lpp.iir_filter.ALL;
+LIBRARY gaisler;
+USE gaisler.misc.ALL;
+USE gaisler.memctrl.ALL;
+LIBRARY techmap;
+USE techmap.gencomp.ALL;
 
 --! Package contenant tous les programmes qui forment le composant intégré dans le léon 
 
-package lpp_memory is
+PACKAGE lpp_memory IS
 
-component APB_FIFO is
-generic (
-    tech         : integer := apa3;
-    pindex       : integer := 0;
-    paddr        : integer := 0;
-    pmask        : integer := 16#fff#;
-    pirq         : integer := 0;
-    abits        : integer := 8;
-    FifoCnt      : integer := 2;
-    Data_sz      : integer := 16;
-    Addr_sz        : integer := 9;
-    Enable_ReUse   : std_logic := '0';
-    Mem_use        : integer := use_RAM;
-    R            : integer := 1;
-    W            : integer := 1
-    );
-  port (
-    clk          : in  std_logic;                              --! Horloge du composant
-    rst          : in  std_logic;                              --! Reset general du composant
-    rclk         : in  std_logic; 
-    wclk         : in  std_logic;
-    ReUse        : in  std_logic_vector(FifoCnt-1 downto 0);
-    REN          : in std_logic_vector(FifoCnt-1 downto 0);   --! Instruction de lecture en mémoire
-    WEN          : in std_logic_vector(FifoCnt-1 downto 0);   --! Instruction d'écriture en mémoire
-    Empty        : out std_logic_vector(FifoCnt-1 downto 0);    --! Flag, Mémoire vide
-    Full         : out std_logic_vector(FifoCnt-1 downto 0);    --! Flag, Mémoire pleine
-    RDATA        : out std_logic_vector((FifoCnt*Data_sz)-1 downto 0);   --! Registre de données en entrée
-    WDATA        : in std_logic_vector((FifoCnt*Data_sz)-1 downto 0);    --! Registre de données en sortie
-    WADDR        : out std_logic_vector((FifoCnt*Addr_sz)-1 downto 0);    --! Registre d'addresse (écriture)
-    RADDR        : out std_logic_vector((FifoCnt*Addr_sz)-1 downto 0);    --! Registre d'addresse (lecture)
-    apbi         : in  apb_slv_in_type;                        --! Registre de gestion des entrées du bus
-    apbo         : out apb_slv_out_type                        --! Registre de gestion des sorties du bus
-    );
-end component;
+  COMPONENT lpp_fifo
+    GENERIC (
+      tech    : INTEGER;
+      Mem_use : INTEGER;
+      DataSz  : INTEGER RANGE 1 TO 32;
+      AddrSz  : INTEGER RANGE 2 TO 12);
+    PORT (
+      clk         : IN  STD_LOGIC;
+      rstn        : IN  STD_LOGIC;
+      reUse       : IN  STD_LOGIC;
+      ren         : IN  STD_LOGIC;
+      rdata       : OUT STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+      wen         : IN  STD_LOGIC;
+      wdata       : IN  STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+      empty       : OUT STD_LOGIC;
+      full        : OUT STD_LOGIC;
+      almost_full : OUT STD_LOGIC);
+  END COMPONENT;
 
-component FIFO_pipeline is
-generic(
-    tech          :   integer := 0;
-    Mem_use       :   integer := use_RAM;
-    fifoCount     :   integer range 2 to 32 := 8;
-    DataSz        :   integer range 1 to 32 := 8;
-    abits         :   integer range 2 to 12 := 8
-    );
-port(
-    rstn    :   in std_logic;
-    ReUse   :   in std_logic;
-    rclk    :   in std_logic;
-    ren     :   in std_logic;
-    rdata   :   out std_logic_vector(DataSz-1 downto 0);
-    empty   :   out std_logic;
-    raddr   :   out std_logic_vector(abits-1 downto 0);
-    wclk    :   in std_logic;
-    wen     :   in std_logic;
-    wdata   :   in std_logic_vector(DataSz-1 downto 0);
-    full    :   out std_logic;
-    waddr   :   out std_logic_vector(abits-1 downto 0)
-);
-end component;
-
-component lpp_fifo is
-generic(
-    tech          :   integer := 0;
-    Mem_use       :   integer := use_RAM;
-    Enable_ReUse  :   std_logic := '0';
-    DataSz        :   integer range 1 to 32 := 8;
-    AddrSz        :   integer range 2 to 12 := 8
-    );
-port(
-    rstn    :   in std_logic;
-    ReUse   :   in std_logic;   --27/01/12
-    rclk    :   in std_logic;
-    ren     :   in std_logic;
-    rdata   :   out std_logic_vector(DataSz-1 downto 0);
-    empty   :   out std_logic;
-    raddr   :   out std_logic_vector(AddrSz-1 downto 0);
-    wclk    :   in std_logic;
-    wen     :   in std_logic;
-    wdata   :   in std_logic_vector(DataSz-1 downto 0);
-    full    :   out std_logic;
-    waddr   :   out std_logic_vector(AddrSz-1 downto 0)
-);
-end component;
+  COMPONENT lppFIFOxN
+    GENERIC (
+      tech    : INTEGER;
+      Mem_use : INTEGER;
+      Data_sz : INTEGER RANGE 1 TO 32;
+      Addr_sz : INTEGER RANGE 2 TO 12;
+      FifoCnt : INTEGER);
+    PORT (
+      clk         : IN  STD_LOGIC;
+      rstn        : IN  STD_LOGIC;
+      ReUse       : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+      wen         : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+      wdata       : IN  STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);
+      ren         : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+      rdata       : OUT STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);
+      empty       : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+      full        : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+      almost_full : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0));
+  END COMPONENT;
 
 
-component lppFIFOxN is
-generic(
-    tech          :   integer := 0;
-    Mem_use       :   integer := use_RAM;
-    Data_sz       :   integer range 1 to 32 := 8;
-    Addr_sz       :   integer range 1 to 32 := 8;
-    FifoCnt : integer := 1;
-    Enable_ReUse  :   std_logic := '0'
-    );
-port(
-    rstn     :   in std_logic;
-    wclk    :   in std_logic;    
-    rclk    :   in std_logic;
-    ReUse   :   in std_logic_vector(FifoCnt-1 downto 0);
-    wen     :   in std_logic_vector(FifoCnt-1 downto 0);
-    ren     :   in std_logic_vector(FifoCnt-1 downto 0);
-    wdata   :   in std_logic_vector((FifoCnt*Data_sz)-1 downto 0);
-    rdata   :   out std_logic_vector((FifoCnt*Data_sz)-1 downto 0);
-    full    :   out std_logic_vector(FifoCnt-1 downto 0);
-    empty   :   out std_logic_vector(FifoCnt-1 downto 0)
-);
-end component;
+  
 
-component FillFifo is
-generic(
-    Data_sz  : integer range 1 to 32 := 16;
-    Fifo_cnt : integer range 1 to 8 := 5
-    );
-port(
-    clk         : in std_logic;
-    raz        : in std_logic;
-    write : out std_logic_vector(Fifo_cnt-1 downto 0);
-    reuse : out std_logic_vector(Fifo_cnt-1 downto 0);
-    data : out std_logic_vector(Fifo_cnt*Data_sz-1 downto 0)
-);
-end component;
+  COMPONENT APB_FIFO IS
+    GENERIC (
+      tech         : INTEGER   := apa3;
+      pindex       : INTEGER   := 0;
+      paddr        : INTEGER   := 0;
+      pmask        : INTEGER   := 16#fff#;
+      pirq         : INTEGER   := 0;
+      abits        : INTEGER   := 8;
+      FifoCnt      : INTEGER   := 2;
+      Data_sz      : INTEGER   := 16;
+      Addr_sz      : INTEGER   := 9;
+      Enable_ReUse : STD_LOGIC := '0';
+      Mem_use      : INTEGER   := use_RAM;
+      R            : INTEGER   := 1;
+      W            : INTEGER   := 1
+      );
+    PORT (
+      clk   : IN  STD_LOGIC;            --! Horloge du composant
+      rst   : IN  STD_LOGIC;            --! Reset general du composant
+      rclk  : IN  STD_LOGIC;
+      wclk  : IN  STD_LOGIC;
+      ReUse : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+      REN   : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);  --! Instruction de lecture en mémoire
+      WEN   : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);  --! Instruction d'écriture en mémoire
+      Empty : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);  --! Flag, Mémoire vide
+      Full  : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);  --! Flag, Mémoire pleine
+      RDATA : OUT STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);  --! Registre de données en entrée
+      WDATA : IN  STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);  --! Registre de données en sortie
+      WADDR : OUT STD_LOGIC_VECTOR((FifoCnt*Addr_sz)-1 DOWNTO 0);  --! Registre d'addresse (écriture)
+      RADDR : OUT STD_LOGIC_VECTOR((FifoCnt*Addr_sz)-1 DOWNTO 0);  --! Registre d'addresse (lecture)
+      apbi  : IN  apb_slv_in_type;  --! Registre de gestion des entrées du bus
+      apbo  : OUT apb_slv_out_type  --! Registre de gestion des sorties du bus
+      );
+  END COMPONENT;
 
-component Bridge is
-    port(
-        clk         : in std_logic;
-        raz        : in std_logic;
-        EmptyUp : in std_logic;
-        FullDwn : in std_logic;
-        WriteDwn : out std_logic;
-        ReadUp : out std_logic
+  COMPONENT FIFO_pipeline IS
+    GENERIC(
+      tech      : INTEGER               := 0;
+      Mem_use   : INTEGER               := use_RAM;
+      fifoCount : INTEGER RANGE 2 TO 32 := 8;
+      DataSz    : INTEGER RANGE 1 TO 32 := 8;
+      abits     : INTEGER RANGE 2 TO 12 := 8
+      );
+    PORT(
+      rstn  : IN  STD_LOGIC;
+      ReUse : IN  STD_LOGIC;
+      rclk  : IN  STD_LOGIC;
+      ren   : IN  STD_LOGIC;
+      rdata : OUT STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+      empty : OUT STD_LOGIC;
+      raddr : OUT STD_LOGIC_VECTOR(abits-1 DOWNTO 0);
+      wclk  : IN  STD_LOGIC;
+      wen   : IN  STD_LOGIC;
+      wdata : IN  STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+      full  : OUT STD_LOGIC;
+      waddr : OUT STD_LOGIC_VECTOR(abits-1 DOWNTO 0)
+      );
+  END COMPONENT;
+
+  --COMPONENT lpp_fifo IS
+  --  GENERIC(
+  --    tech         : INTEGER               := 0;
+  --    Mem_use      : INTEGER               := use_RAM;
+  --    Enable_ReUse : STD_LOGIC             := '0';
+  --    DataSz       : INTEGER RANGE 1 TO 32 := 8;
+  --    AddrSz       : INTEGER RANGE 2 TO 12 := 8
+  --    );
+  --  PORT(
+  --    rstn        : IN  STD_LOGIC;
+  --    ReUse       : IN  STD_LOGIC;      --27/01/12
+  --    rclk        : IN  STD_LOGIC;
+  --    ren         : IN  STD_LOGIC;
+  --    rdata       : OUT STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+  --    empty       : OUT STD_LOGIC;
+  --    raddr       : OUT STD_LOGIC_VECTOR(AddrSz-1 DOWNTO 0);
+  --    wclk        : IN  STD_LOGIC;
+  --    wen         : IN  STD_LOGIC;
+  --    wdata       : IN  STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+  --    full        : OUT STD_LOGIC;
+  --    almost_full : OUT STD_LOGIC;
+  --    waddr       : OUT STD_LOGIC_VECTOR(AddrSz-1 DOWNTO 0)
+  --    );
+  --END COMPONENT;
+
+
+  --COMPONENT lppFIFOxN IS
+  --  GENERIC(
+  --    tech         : INTEGER               := 0;
+  --    Mem_use      : INTEGER               := use_RAM;
+  --    Data_sz      : INTEGER RANGE 1 TO 32 := 8;
+  --    Addr_sz      : INTEGER RANGE 1 TO 32 := 8;
+  --    FifoCnt      : INTEGER               := 1;
+  --    Enable_ReUse : STD_LOGIC             := '0'
+  --    );
+  --  PORT(
+  --    rstn        : IN  STD_LOGIC;
+  --    wclk        : IN  STD_LOGIC;
+  --    rclk        : IN  STD_LOGIC;
+  --    ReUse       : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+  --    wen         : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+  --    ren         : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+  --    wdata       : IN  STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);
+  --    rdata       : OUT STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);
+  --    full        : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+  --    almost_full : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+  --    empty       : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0)
+  --    );
+  --END COMPONENT;
+
+  COMPONENT FillFifo IS
+    GENERIC(
+      Data_sz  : INTEGER RANGE 1 TO 32 := 16;
+      Fifo_cnt : INTEGER RANGE 1 TO 8  := 5
+      );
+    PORT(
+      clk   : IN  STD_LOGIC;
+      raz   : IN  STD_LOGIC;
+      write : OUT STD_LOGIC_VECTOR(Fifo_cnt-1 DOWNTO 0);
+      reuse : OUT STD_LOGIC_VECTOR(Fifo_cnt-1 DOWNTO 0);
+      data  : OUT STD_LOGIC_VECTOR(Fifo_cnt*Data_sz-1 DOWNTO 0)
+      );
+  END COMPONENT;
+
+  COMPONENT Bridge IS
+    PORT(
+      clk      : IN  STD_LOGIC;
+      raz      : IN  STD_LOGIC;
+      EmptyUp  : IN  STD_LOGIC;
+      FullDwn  : IN  STD_LOGIC;
+      WriteDwn : OUT STD_LOGIC;
+      ReadUp   : OUT STD_LOGIC
+      );
+  END COMPONENT;
+
+  COMPONENT ssram_plugin IS
+    GENERIC (tech : INTEGER := 0);
+    PORT
+      (
+        clk         : IN  STD_LOGIC;
+        mem_ctrlr_o : IN  memory_out_type;
+        SSRAM_CLK   : OUT STD_LOGIC;
+        nBWa        : OUT STD_LOGIC;
+        nBWb        : OUT STD_LOGIC;
+        nBWc        : OUT STD_LOGIC;
+        nBWd        : OUT STD_LOGIC;
+        nBWE        : OUT STD_LOGIC;
+        nADSC       : OUT STD_LOGIC;
+        nADSP       : OUT STD_LOGIC;
+        nADV        : OUT STD_LOGIC;
+        nGW         : OUT STD_LOGIC;
+        nCE1        : OUT STD_LOGIC;
+        CE2         : OUT STD_LOGIC;
+        nCE3        : OUT STD_LOGIC;
+        nOE         : OUT STD_LOGIC;
+        MODE        : OUT STD_LOGIC;
+        ZZ          : OUT STD_LOGIC
         );
-end component;
+  END COMPONENT;
 
-component ssram_plugin is
-generic (tech : integer := 0);
-port
-(
-    clk             : in  std_logic;
-    mem_ctrlr_o     : in  memory_out_type;
-    SSRAM_CLK       : out std_logic;
-    nBWa            : out std_logic;
-    nBWb            : out std_logic;
-    nBWc            : out std_logic;
-    nBWd            : out std_logic;
-    nBWE            : out std_logic;
-    nADSC           : out std_logic;
-    nADSP           : out std_logic;
-    nADV            : out std_logic;
-    nGW             : out std_logic;
-    nCE1            : out std_logic;
-    CE2             : out std_logic;
-    nCE3            : out std_logic;
-    nOE             : out std_logic;
-    MODE            : out std_logic;
-    ZZ              : out std_logic
-);
-end component;
-
-end;
+END;

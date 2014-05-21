@@ -53,15 +53,10 @@ vcom: vcom_grlib vcom_techmap vcom_gaisler vcom_lpp vcom_tb
 
 
 vcom_tb:
-	$(CMD_VCOM) lpp  lpp_memory.vhd
-	$(CMD_VCOM) lpp  lppFIFOxN.vhd
-	$(CMD_VCOM) lpp  lpp_FIFO.vhd
-	$(CMD_VCOM) lpp  spectral_matrix_package.vhd
-	$(CMD_VCOM) lpp  spectral_matrix_switch_f0.vhd
-	$(CMD_VCOM) lpp  spectral_matrix_time_managment.vhd
-	$(CMD_VCOM) lpp  MS_control.vhd
-	$(CMD_VCOM) lpp  MS_calculation.vhd
-	$(CMD_VCOM) lpp  lpp_lfr_ms.vhd
+##	$(CMD_VCOM) lpp  lpp_memory.vhd
+##	$(CMD_VCOM) lpp  lppFIFOxN.vhd
+##	$(CMD_VCOM) lpp  lpp_FIFO.vhd
+##	$(CMD_VCOM) lpp  lpp_lfr_ms.vhd
 	$(CMD_VCOM) work TB.vhd
 	@echo "vcom done"
 
@@ -390,10 +385,18 @@ vcom_lpp:
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_matrix/SpectralMatrix.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_Header/lpp_Header.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_Header/HeaderBuilder.vhd
-	$(CMD_VCOM) lpp  lpp_memory.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_memory/lpp_memory.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_memory/lppFIFOxN.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_memory/lpp_FIFO.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./dsp/lpp_fft/CoreFFT_simu.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_spectral_matrix/spectral_matrix_package.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_spectral_matrix/spectral_matrix_switch_f0.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_spectral_matrix/spectral_matrix_time_managment.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_spectral_matrix/MS_control.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_spectral_matrix/MS_calculation.vhd	
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_pkg.vhd
-	$(CMD_VCOM) lpp lpp_lfr_ms_fsmdma.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_ms.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_ms_fsmdma.vhd
 	@echo "vcom lpp done"
 
 # 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_amba/apb_devices_list.vhd

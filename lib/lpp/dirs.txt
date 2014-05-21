@@ -11,6 +11,7 @@
 ./lpp_ad_Conv
 ./lpp_bootloader
 ./lpp_cna
+./lpp_spectral_matrix
 ./lpp_demux
 ./lpp_Header
 ./lpp_matrix
