@@ -114,7 +114,7 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms_fsmdma IS
   SIGNAL component_type_pre : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL header_check_ok    : STD_LOGIC;
   SIGNAL address_matrix     : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL send_matrix        : STD_LOGIC;
+--  SIGNAL send_matrix        : STD_LOGIC;
   SIGNAL Address            : STD_LOGIC_VECTOR(31 DOWNTO 0);
   -----------------------------------------------------------------------------
   -----------------------------------------------------------------------------
@@ -124,17 +124,17 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms_fsmdma IS
 --  SIGNAL component_send_ko  : STD_LOGIC;
   -----------------------------------------------------------------------------
   SIGNAL fifo_ren_trash     : STD_LOGIC;
-  SIGNAL component_fifo_ren : STD_LOGIC;
+--  SIGNAL component_fifo_ren : STD_LOGIC;
 
   -----------------------------------------------------------------------------
   SIGNAL debug_reg_s   : STD_LOGIC_VECTOR(31 DOWNTO 0);
   -----------------------------------------------------------------------------
   SIGNAL log_empty_fifo : STD_LOGIC;
   -----------------------------------------------------------------------------
-  SIGNAL header_reg     : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL header_reg_val : STD_LOGIC;
-  SIGNAL header_reg_ack : STD_LOGIC;
-  SIGNAL header_error   : STD_LOGIC;
+  --SIGNAL header_reg     : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  --SIGNAL header_reg_val : STD_LOGIC;
+  --SIGNAL header_reg_ack : STD_LOGIC;
+--  SIGNAL header_error   : STD_LOGIC;
 
   SIGNAL matrix_buffer_ready : STD_LOGIC;  
 BEGIN
@@ -159,6 +159,7 @@ BEGIN
                     addr_matrix_f2   WHEN matrix_type = "10" ELSE
                     (OTHERS => '0');
 
+  debug_reg_s(31 DOWNTO 3) <= (OTHERS => '0');
   -----------------------------------------------------------------------------
   -- DMA control
   -----------------------------------------------------------------------------
@@ -181,12 +182,14 @@ BEGIN
       address                       <= (OTHERS => '0');
 
       debug_reg_s(2 DOWNTO 0)  <= (OTHERS => '0');
-      debug_reg_s(31 DOWNTO 4) <= (OTHERS => '0');
 
       log_empty_fifo <= '0';
 
+      matrix_time_f0 <= (OTHERS => '0');
+      matrix_time_f1 <= (OTHERS => '0');
+      matrix_time_f2 <= (OTHERS => '0');
+
     ELSIF HCLK'EVENT AND HCLK = '1' THEN 
-      debug_reg_s(31 DOWNTO 10) <= (OTHERS => '0');
 
       ready_matrix_f0         <= '0';
 --      ready_matrix_f0_1         <= '0';

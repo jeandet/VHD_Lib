@@ -726,8 +726,8 @@ BEGIN
       sample_f0_wdata => sample_f0_wdata,
       sample_f1_wen   => sample_f1_wen,
       sample_f1_wdata => sample_f1_wdata,
-      sample_f3_wen   => sample_f3_wen,
-      sample_f3_wdata => sample_f3_wdata,
+      sample_f2_wen   => sample_f3_wen,  -- TODO verify that it's the good data
+      sample_f2_wdata => sample_f3_wdata,-- TODO verify that it's the good data
 
       dma_addr        => data_ms_addr,         --
       dma_data        => data_ms_data,         --
@@ -736,28 +736,26 @@ BEGIN
       dma_ren         => data_ms_ren,          --
       dma_done        => data_ms_done,         --
 
-      ready_matrix_f0_0                      => ready_matrix_f0_0,
-      ready_matrix_f0_1                      => ready_matrix_f0_1,
+      ready_matrix_f0                        => ready_matrix_f0_0,-- TODO rename
       ready_matrix_f1                        => ready_matrix_f1,
       ready_matrix_f2                        => ready_matrix_f2,
-      error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
+      --error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
       error_bad_component_error              => error_bad_component_error,
-      debug_reg                              => observation_reg,  --debug_reg,
-      status_ready_matrix_f0_0               => status_ready_matrix_f0_0,
-      status_ready_matrix_f0_1               => status_ready_matrix_f0_1,
+      error_buffer_full             => OPEN,  -- TODO
+      error_input_fifo_write        => OPEN,  -- TODO
+      debug_reg                              => observation_reg,  
+      status_ready_matrix_f0                 => status_ready_matrix_f0_0,-- TODO rename
       status_ready_matrix_f1                 => status_ready_matrix_f1,
       status_ready_matrix_f2                 => status_ready_matrix_f2,
-      status_error_anticipating_empty_fifo   => status_error_anticipating_empty_fifo,
-      status_error_bad_component_error       => status_error_bad_component_error,
+--      status_error_anticipating_empty_fifo   => status_error_anticipating_empty_fifo,-- TODO
+--      status_error_bad_component_error       => status_error_bad_component_error,-- TODO
       config_active_interruption_onNewMatrix => config_active_interruption_onNewMatrix,
       config_active_interruption_onError     => config_active_interruption_onError,
-      addr_matrix_f0_0                       => addr_matrix_f0_0,
-      addr_matrix_f0_1                       => addr_matrix_f0_1,
+      addr_matrix_f0                         => addr_matrix_f0_0,-- TODO rename
       addr_matrix_f1                         => addr_matrix_f1,
       addr_matrix_f2                         => addr_matrix_f2,
 
-      matrix_time_f0_0                       => matrix_time_f0_0,
-      matrix_time_f0_1                       => matrix_time_f0_1,
+      matrix_time_f0                         => matrix_time_f0_0,-- TODO rename
       matrix_time_f1                         => matrix_time_f1,
       matrix_time_f2                         => matrix_time_f2);
 

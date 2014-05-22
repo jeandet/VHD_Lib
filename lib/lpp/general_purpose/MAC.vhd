@@ -53,6 +53,10 @@ END MAC;
 
 ARCHITECTURE ar_MAC OF MAC IS
 
+  
+  SIGNAL clr_MAC_s     : STD_LOGIC;
+  SIGNAL MAC_MUL_ADD_s : STD_LOGIC_VECTOR(1 DOWNTO 0);
+
   SIGNAL add, mult : STD_LOGIC;
   SIGNAL MULTout   : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
 
@@ -77,8 +81,8 @@ ARCHITECTURE ar_MAC OF MAC IS
   SIGNAL MACMUX2sel_D     : STD_LOGIC;
   SIGNAL MACMUX2sel_D_D   : STD_LOGIC;
   SIGNAL clr_MAC_D        : STD_LOGIC;
-  SIGNAL clr_MAC_D_D      : STD_LOGIC;
-  SIGNAL MAC_MUL_ADD_2C_D : STD_LOGIC_VECTOR(1 DOWNTO 0);
+--  SIGNAL clr_MAC_D_D      : STD_LOGIC;
+--  SIGNAL MAC_MUL_ADD_2C_D : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
   SIGNAL load_mult_result   : STD_LOGIC;
   SIGNAL load_mult_result_D : STD_LOGIC;
@@ -93,7 +97,7 @@ BEGIN
 --==============================================================
   MAC_CONTROLER1 : MAC_CONTROLER
     PORT MAP(
-      ctrl        => MAC_MUL_ADD,
+      ctrl        => MAC_MUL_ADD_s,
       MULT        => mult,
       ADD         => add,
       LOAD_ADDER  => load_mult_result,
@@ -163,7 +167,7 @@ BEGIN
       PORT MAP(
         clk     => clk,
         reset   => reset,
-        clr     => clr_MAC,
+        clr     => '0',--clr_MAC,
         TwoComp => Comp_2C(0),
         OP      => OP1,
         RES     => OP1_2C
@@ -176,16 +180,39 @@ BEGIN
       PORT MAP(
         clk     => clk,
         reset   => reset,
-        clr     => clr_MAC,
+        clr     => '0',--clr_MAC,
         TwoComp => Comp_2C(1),
         OP      => OP2,
         RES     => OP2_2C
         );
+    
+    
+    clr_MACREG_comp : MAC_REG
+      GENERIC MAP(size => 1)
+      PORT MAP(
+        reset => reset,
+        clk   => clk,
+        D(0)  => clr_MAC,
+        Q(0)  => clr_MAC_s
+        );
+    
+    MAC_MUL_ADD_REG : MAC_REG
+    GENERIC MAP(size => 2)
+    PORT MAP(
+      reset => reset,
+      clk   => clk,
+      D     => MAC_MUL_ADD,
+      Q     => MAC_MUL_ADD_s
+      );
+    
   END GENERATE gen_comp;
   
   no_gen_comp : IF COMP_EN = 1 GENERATE
     OP2_2C <= OP2;
     OP1_2C <= OP1;
+
+    clr_MAC_s     <= clr_MAC;
+    MAC_MUL_ADD_s <= MAC_MUL_ADD;
   END GENERATE no_gen_comp;
 --==============================================================
 
@@ -194,7 +221,7 @@ BEGIN
     PORT MAP(
       reset => reset,
       clk   => clk,
-      D(0)  => clr_MAC,
+      D(0)  => clr_MAC_s,
       Q(0)  => clr_MAC_D
       );
 

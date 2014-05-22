@@ -31,6 +31,6 @@ BEGIN  -- beh
     END IF;
   END PROCESS;
 
-  time_out <= time_in;
+  time_out <= time_reg;
   
 END beh;

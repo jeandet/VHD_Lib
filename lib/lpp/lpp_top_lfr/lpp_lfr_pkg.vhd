@@ -13,7 +13,60 @@ LIBRARY techmap;
 USE techmap.gencomp.ALL;
 
 PACKAGE lpp_lfr_pkg IS
+  -----------------------------------------------------------------------------
+  -- TEMP
+  -----------------------------------------------------------------------------
+  COMPONENT lpp_lfr_ms_test
+    GENERIC (
+      Mem_use : INTEGER);
+    PORT (
+      clk              : IN  STD_LOGIC;
+      rstn             : IN  STD_LOGIC;
+    
+    -- TIME
+    coarse_time     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);  -- todo
+    fine_time       : IN STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
+    --
+    sample_f0_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+    sample_f0_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+    --
+    sample_f1_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+    sample_f1_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+    --
+    sample_f2_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+    sample_f2_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
 
+
+
+    ---------------------------------------------------------------------------
+    error_input_fifo_write        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    
+    --
+    --sample_ren   : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+    --sample_full  : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+    --sample_empty : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
+    --sample_rdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+
+    --status_channel : IN STD_LOGIC_VECTOR(49 DOWNTO 0);
+    
+    -- IN
+    MEM_IN_SM_locked      : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+  
+    -----------------------------------------------------------------------------
+    
+    status_component : OUT STD_LOGIC_VECTOR(53 DOWNTO 0);
+    SM_in_data : OUT STD_LOGIC_VECTOR(32*2-1 DOWNTO 0);
+    SM_in_ren : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+    SM_in_empty : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+
+    SM_correlation_start : OUT STD_LOGIC;
+    SM_correlation_auto : OUT STD_LOGIC;
+    SM_correlation_done : IN STD_LOGIC
+    );
+  END COMPONENT;
+
+  
+  -----------------------------------------------------------------------------
   COMPONENT lpp_lfr_ms
     GENERIC (
       Mem_use : INTEGER 
@@ -119,7 +172,21 @@ PACKAGE lpp_lfr_pkg IS
       matrix_time_f2                         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
       );
   END COMPONENT;
-  
+
+  COMPONENT lpp_lfr_ms_FFT
+    PORT (
+      clk            : IN  STD_LOGIC;
+      rstn           : IN  STD_LOGIC;
+      sample_valid   : IN  STD_LOGIC;
+      fft_read       : IN  STD_LOGIC;
+      sample_data    : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+      sample_load    : OUT STD_LOGIC;
+      fft_pong       : OUT STD_LOGIC;
+      fft_data_im    : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      fft_data_re    : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      fft_data_valid : OUT STD_LOGIC;
+      fft_ready      : OUT STD_LOGIC);
+  END COMPONENT;  
 
   COMPONENT lpp_lfr_filter
     GENERIC (

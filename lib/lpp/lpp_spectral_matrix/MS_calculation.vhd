@@ -54,7 +54,7 @@ ARCHITECTURE beh OF MS_calculation IS
 
   SIGNAL res_wen      : STD_LOGIC;
   SIGNAL res_wen_reg1 : STD_LOGIC;
---  SIGNAL res_wen_reg2 : STD_LOGIC;
+  SIGNAL res_wen_reg2 : STD_LOGIC;
   --SIGNAL res_wen_reg3 : STD_LOGIC;
   
 BEGIN
@@ -75,6 +75,7 @@ BEGIN
       res_wen <= '1';
       
     ELSIF clk'EVENT AND clk = '1' THEN
+      ALU_CTRL    <= ALU_CTRL_NOP;
       correlation_begin <= '0';
       fifo_in_ren <= "11";
       res_wen <= '1';
@@ -189,7 +190,7 @@ BEGIN
       Logic_en   => 0,
       Input_SZ_1 => 16,
       Input_SZ_2 => 16,
-      COMP_EN    => 1)
+      COMP_EN    => 0)                  -- 0> Enable  and 1> Disable
     PORT MAP (
       clk   => clk,
       reset => rstn,
@@ -209,14 +210,14 @@ BEGIN
   BEGIN
     IF rstn = '0' THEN
       res_wen_reg1 <= '1';
-      --res_wen_reg2 <= '1';
+      res_wen_reg2 <= '1';
       --res_wen_reg3 <= '1';
       fifo_out_wen <= '1';
     ELSIF clk'event AND clk = '1' THEN
       res_wen_reg1 <= res_wen;
-      --res_wen_reg2 <= res_wen_reg1;
+      res_wen_reg2 <= res_wen_reg1;
       --res_wen_reg3 <= res_wen_reg2;
-      fifo_out_wen <= res_wen_reg1;
+      fifo_out_wen <= res_wen_reg2;
     END IF;
   END PROCESS;
 
