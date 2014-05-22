@@ -277,8 +277,6 @@ PACKAGE lpp_lfr_pkg IS
       observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0));
   END COMPONENT;
   -----------------------------------------------------------------------------
-  
-  
   COMPONENT lpp_lfr_apbreg
     GENERIC (
       nb_data_by_buffer_size : INTEGER;
@@ -299,30 +297,25 @@ PACKAGE lpp_lfr_pkg IS
       apbo                                   : OUT apb_slv_out_type;
       run_ms                                 : OUT STD_LOGIC;
       ready_matrix_f0_0                      : IN  STD_LOGIC;
-      ready_matrix_f0_1                      : IN  STD_LOGIC;
       ready_matrix_f1                        : IN  STD_LOGIC;
       ready_matrix_f2                        : IN  STD_LOGIC;
-      error_anticipating_empty_fifo          : IN  STD_LOGIC;
       error_bad_component_error              : IN  STD_LOGIC;
+      error_buffer_full                      : in  STD_LOGIC;
+      error_input_fifo_write                 : in  STD_LOGIC_VECTOR(2 DOWNTO 0);
       debug_reg                              : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       status_ready_matrix_f0_0               : OUT STD_LOGIC;
-      status_ready_matrix_f0_1               : OUT STD_LOGIC;
       status_ready_matrix_f1                 : OUT STD_LOGIC;
       status_ready_matrix_f2                 : OUT STD_LOGIC;
-      status_error_anticipating_empty_fifo   : OUT STD_LOGIC;
-      status_error_bad_component_error       : OUT STD_LOGIC;
       config_active_interruption_onNewMatrix : OUT STD_LOGIC;
       config_active_interruption_onError     : OUT STD_LOGIC;
       addr_matrix_f0_0                       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      addr_matrix_f0_1                       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+--      addr_matrix_f0_1                       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f1                         : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_matrix_f2                         : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-
-      matrix_time_f0_0                       : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-      matrix_time_f0_1                       : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-      matrix_time_f1                         : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-      matrix_time_f2                         : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-    
+      matrix_time_f0_0                       : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
+--      matrix_time_f0_1                       : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f1                         : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f2                         : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
       status_full                            : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
       status_full_ack                        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       status_full_err                        : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -353,7 +346,6 @@ PACKAGE lpp_lfr_pkg IS
       addr_data_f2                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_data_f3                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       start_date                             : OUT STD_LOGIC_VECTOR(30 DOWNTO 0);
-      ---------------------------------------------------------------------------
       debug_reg0                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       debug_reg1                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       debug_reg2                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -363,6 +355,8 @@ PACKAGE lpp_lfr_pkg IS
       debug_reg6                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       debug_reg7                             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
   END COMPONENT;
+  
+  
 
   COMPONENT lpp_top_ms
     GENERIC (

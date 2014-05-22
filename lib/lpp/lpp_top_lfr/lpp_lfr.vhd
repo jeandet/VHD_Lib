@@ -137,19 +137,19 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL ready_matrix_f0_1                      : STD_LOGIC;
   SIGNAL ready_matrix_f1                        : STD_LOGIC;
   SIGNAL ready_matrix_f2                        : STD_LOGIC;
-  SIGNAL error_anticipating_empty_fifo          : STD_LOGIC;
+--  SIGNAL error_anticipating_empty_fifo          : STD_LOGIC;
   SIGNAL error_bad_component_error              : STD_LOGIC;
   SIGNAL debug_reg                              : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL status_ready_matrix_f0_0               : STD_LOGIC;
   SIGNAL status_ready_matrix_f0_1               : STD_LOGIC;
   SIGNAL status_ready_matrix_f1                 : STD_LOGIC;
   SIGNAL status_ready_matrix_f2                 : STD_LOGIC;
-  SIGNAL status_error_anticipating_empty_fifo   : STD_LOGIC;
-  SIGNAL status_error_bad_component_error       : STD_LOGIC;
+--  SIGNAL status_error_anticipating_empty_fifo   : STD_LOGIC;
+--  SIGNAL status_error_bad_component_error       : STD_LOGIC;
   SIGNAL config_active_interruption_onNewMatrix : STD_LOGIC;
   SIGNAL config_active_interruption_onError     : STD_LOGIC;
   SIGNAL addr_matrix_f0_0                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL addr_matrix_f0_1                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL addr_matrix_f0_1                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL addr_matrix_f1                         : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL addr_matrix_f2                         : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
@@ -292,10 +292,13 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL ms_softandhard_rstn : STD_LOGIC;
   
   SIGNAL matrix_time_f0_0    : STD_LOGIC_VECTOR(47 DOWNTO 0);
-  SIGNAL matrix_time_f0_1    : STD_LOGIC_VECTOR(47 DOWNTO 0);
+--  SIGNAL matrix_time_f0_1    : STD_LOGIC_VECTOR(47 DOWNTO 0);
   SIGNAL matrix_time_f1      : STD_LOGIC_VECTOR(47 DOWNTO 0);
   SIGNAL matrix_time_f2      : STD_LOGIC_VECTOR(47 DOWNTO 0);
   
+  
+  SIGNAL error_buffer_full         :  STD_LOGIC;
+  SIGNAL error_input_fifo_write    :  STD_LOGIC_VECTOR(2 DOWNTO 0);
   
 BEGIN
   
@@ -351,30 +354,33 @@ BEGIN
       run_ms => run_ms,
 
       ready_matrix_f0_0                      => ready_matrix_f0_0,
-      ready_matrix_f0_1                      => ready_matrix_f0_1,
+--      ready_matrix_f0_1                      => ready_matrix_f0_1,
       ready_matrix_f1                        => ready_matrix_f1,
       ready_matrix_f2                        => ready_matrix_f2,
-      error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
+--      error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
       error_bad_component_error              => error_bad_component_error,
+      error_buffer_full                      => error_buffer_full,      -- TODO
+      error_input_fifo_write                 => error_input_fifo_write, -- TODO
       debug_reg                              => debug_reg,
       status_ready_matrix_f0_0               => status_ready_matrix_f0_0,
-      status_ready_matrix_f0_1               => status_ready_matrix_f0_1,
+--      status_ready_matrix_f0_1               => status_ready_matrix_f0_1,
       status_ready_matrix_f1                 => status_ready_matrix_f1,
       status_ready_matrix_f2                 => status_ready_matrix_f2,
-      status_error_anticipating_empty_fifo   => status_error_anticipating_empty_fifo,
-      status_error_bad_component_error       => status_error_bad_component_error,
+--      status_error_anticipating_empty_fifo   => status_error_anticipating_empty_fifo,
+--      status_error_bad_component_error       => status_error_bad_component_error,
       config_active_interruption_onNewMatrix => config_active_interruption_onNewMatrix,
       config_active_interruption_onError     => config_active_interruption_onError,
 
       matrix_time_f0_0 => matrix_time_f0_0,
-      matrix_time_f0_1 => matrix_time_f0_1,
+--      matrix_time_f0_1 => matrix_time_f0_1,
       matrix_time_f1   => matrix_time_f1,
       matrix_time_f2   => matrix_time_f2,
 
       addr_matrix_f0_0  => addr_matrix_f0_0,
-      addr_matrix_f0_1  => addr_matrix_f0_1,
+--      addr_matrix_f0_1  => addr_matrix_f0_1,
       addr_matrix_f1    => addr_matrix_f1,
       addr_matrix_f2    => addr_matrix_f2,
+      -------------------------------------------------------------------------
       status_full       => status_full,
       status_full_ack   => status_full_ack,
       status_full_err   => status_full_err,
@@ -741,9 +747,11 @@ BEGIN
       ready_matrix_f2                        => ready_matrix_f2,
       --error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
       error_bad_component_error              => error_bad_component_error,
-      error_buffer_full             => OPEN,  -- TODO
-      error_input_fifo_write        => OPEN,  -- TODO
-      debug_reg                              => observation_reg,  
+      error_buffer_full                      => error_buffer_full,      -- TODO
+      error_input_fifo_write                 => error_input_fifo_write, -- TODO
+      
+      debug_reg                              => observation_reg,
+      
       status_ready_matrix_f0                 => status_ready_matrix_f0_0,-- TODO rename
       status_ready_matrix_f1                 => status_ready_matrix_f1,
       status_ready_matrix_f2                 => status_ready_matrix_f2,

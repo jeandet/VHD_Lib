@@ -62,31 +62,30 @@ ENTITY lpp_lfr_apbreg IS
     run_ms                              : OUT STD_LOGIC;
     -- IN
     ready_matrix_f0_0                   : IN STD_LOGIC;
-    ready_matrix_f0_1                   : IN STD_LOGIC;
     ready_matrix_f1                     : IN STD_LOGIC;
     ready_matrix_f2                     : IN STD_LOGIC;
-    error_anticipating_empty_fifo       : IN STD_LOGIC;
+
     error_bad_component_error           : IN STD_LOGIC;
+    error_buffer_full                   : in STD_LOGIC;                         --  TODO
+    error_input_fifo_write              : in STD_LOGIC_VECTOR(2 DOWNTO 0);      --  TODO
+
     debug_reg                           : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     -- OUT
     status_ready_matrix_f0_0             : OUT STD_LOGIC;
-    status_ready_matrix_f0_1             : OUT STD_LOGIC;
     status_ready_matrix_f1               : OUT STD_LOGIC;
     status_ready_matrix_f2               : OUT STD_LOGIC;
-    status_error_anticipating_empty_fifo : OUT STD_LOGIC;
-    status_error_bad_component_error     : OUT STD_LOGIC;
 
     config_active_interruption_onNewMatrix : OUT STD_LOGIC;
     config_active_interruption_onError     : OUT STD_LOGIC;
     
     addr_matrix_f0_0                       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f0_1                       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+--    addr_matrix_f0_1                       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f1                         : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f2                         : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     
     matrix_time_f0_0                       : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-    matrix_time_f0_1                       : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
+--    matrix_time_f0_1                       : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
     matrix_time_f1                         : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
     matrix_time_f2                         : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
     
@@ -158,18 +157,20 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
     config_active_interruption_onError     : STD_LOGIC;
     config_ms_run                          : STD_LOGIC;
     status_ready_matrix_f0_0               : STD_LOGIC;
-    status_ready_matrix_f0_1               : STD_LOGIC;
+--    status_ready_matrix_f0_1               : STD_LOGIC;
     status_ready_matrix_f1                 : STD_LOGIC;
     status_ready_matrix_f2                 : STD_LOGIC;
-    status_error_anticipating_empty_fifo   : STD_LOGIC;
+--    status_error_anticipating_empty_fifo   : STD_LOGIC;
     status_error_bad_component_error       : STD_LOGIC;
+    status_error_buffer_full               : STD_LOGIC;                         --  TODO
+    status_error_input_fifo_write          : STD_LOGIC_VECTOR(2 DOWNTO 0);      --  TODO
     addr_matrix_f0_0                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f0_1                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--    addr_matrix_f0_1                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f1                         : STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f2                         : STD_LOGIC_VECTOR(31 DOWNTO 0);
     
     coarse_time_f0_0                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    coarse_time_f0_1                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--    coarse_time_f0_1                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
     coarse_time_f1                         : STD_LOGIC_VECTOR(31 DOWNTO 0);
     coarse_time_f2                         : STD_LOGIC_VECTOR(31 DOWNTO 0);
     
@@ -228,16 +229,16 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
 BEGIN  -- beh
 
   status_ready_matrix_f0_0             <= reg_sp.status_ready_matrix_f0_0;
-  status_ready_matrix_f0_1             <= reg_sp.status_ready_matrix_f0_1;
+--  status_ready_matrix_f0_1             <= reg_sp.status_ready_matrix_f0_1;
   status_ready_matrix_f1               <= reg_sp.status_ready_matrix_f1;
   status_ready_matrix_f2               <= reg_sp.status_ready_matrix_f2;
-  status_error_anticipating_empty_fifo <= reg_sp.status_error_anticipating_empty_fifo;
-  status_error_bad_component_error     <= reg_sp.status_error_bad_component_error;
+--  status_error_anticipating_empty_fifo <= reg_sp.status_error_anticipating_empty_fifo;
+--  status_error_bad_component_error     <= reg_sp.status_error_bad_component_error;
 
   config_active_interruption_onNewMatrix <= reg_sp.config_active_interruption_onNewMatrix;
   config_active_interruption_onError     <= reg_sp.config_active_interruption_onError;
   addr_matrix_f0_0                       <= reg_sp.addr_matrix_f0_0;
-  addr_matrix_f0_1                       <= reg_sp.addr_matrix_f0_1;
+--  addr_matrix_f0_1                       <= reg_sp.addr_matrix_f0_1;
   addr_matrix_f1                         <= reg_sp.addr_matrix_f1;
   addr_matrix_f2                         <= reg_sp.addr_matrix_f2;
 
@@ -283,18 +284,21 @@ BEGIN  -- beh
       reg_sp.config_active_interruption_onError     <= '0';
       reg_sp.config_ms_run                          <= '1';
       reg_sp.status_ready_matrix_f0_0               <= '0';
-      reg_sp.status_ready_matrix_f0_1               <= '0';
+--      reg_sp.status_ready_matrix_f0_1               <= '0';
       reg_sp.status_ready_matrix_f1                 <= '0';
       reg_sp.status_ready_matrix_f2                 <= '0';
-      reg_sp.status_error_anticipating_empty_fifo   <= '0';
+--      reg_sp.status_error_anticipating_empty_fifo   <= '0';
       reg_sp.status_error_bad_component_error       <= '0';
+      reg_sp.status_error_buffer_full               <= '0';
+      reg_sp.status_error_input_fifo_write          <= (OTHERS => '0');
+      
       reg_sp.addr_matrix_f0_0                       <= (OTHERS => '0');
-      reg_sp.addr_matrix_f0_1                       <= (OTHERS => '0');
+--      reg_sp.addr_matrix_f0_1                       <= (OTHERS => '0');
       reg_sp.addr_matrix_f1                         <= (OTHERS => '0');
       reg_sp.addr_matrix_f2                         <= (OTHERS => '0');
       
       reg_sp.coarse_time_f0_0                       <= (OTHERS => '0');
-      reg_sp.coarse_time_f0_1                       <= (OTHERS => '0');
+--      reg_sp.coarse_time_f0_1                       <= (OTHERS => '0');
       reg_sp.coarse_time_f1                         <= (OTHERS => '0');
       reg_sp.coarse_time_f2                         <= (OTHERS => '0');
       --reg_sp.fine_time_f0_0                         <= (OTHERS => '0');
@@ -340,7 +344,7 @@ BEGIN  -- beh
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
       
       reg_sp.coarse_time_f0_0                       <= matrix_time_f0_0(31 DOWNTO 0);
-      reg_sp.coarse_time_f0_1                       <= matrix_time_f0_1(31 DOWNTO 0);
+--      reg_sp.coarse_time_f0_1                       <= matrix_time_f0_1(31 DOWNTO 0);
       reg_sp.coarse_time_f1                         <= matrix_time_f1  (31 DOWNTO 0);
       reg_sp.coarse_time_f2                         <= matrix_time_f2  (31 DOWNTO 0);
     
@@ -352,12 +356,20 @@ BEGIN  -- beh
       status_full_ack <= (OTHERS => '0');
 
       reg_sp.status_ready_matrix_f0_0 <= reg_sp.status_ready_matrix_f0_0 OR ready_matrix_f0_0;
-      reg_sp.status_ready_matrix_f0_1 <= reg_sp.status_ready_matrix_f0_1 OR ready_matrix_f0_1;
+--      reg_sp.status_ready_matrix_f0_1 <= reg_sp.status_ready_matrix_f0_1 OR ready_matrix_f0_1;
       reg_sp.status_ready_matrix_f1   <= reg_sp.status_ready_matrix_f1 OR ready_matrix_f1;
       reg_sp.status_ready_matrix_f2   <= reg_sp.status_ready_matrix_f2 OR ready_matrix_f2;
 
-      reg_sp.status_error_anticipating_empty_fifo <= reg_sp.status_error_anticipating_empty_fifo OR error_anticipating_empty_fifo;
+--      reg_sp.status_error_anticipating_empty_fifo <= reg_sp.status_error_anticipating_empty_fifo OR error_anticipating_empty_fifo;
       reg_sp.status_error_bad_component_error     <= reg_sp.status_error_bad_component_error OR error_bad_component_error;
+      
+      reg_sp.status_error_buffer_full    <= reg_sp.status_error_buffer_full OR error_buffer_full;
+      reg_sp.status_error_input_fifo_write(0)    <= reg_sp.status_error_input_fifo_write(0) OR error_input_fifo_write(0);
+      reg_sp.status_error_input_fifo_write(1)    <= reg_sp.status_error_input_fifo_write(1) OR error_input_fifo_write(1);
+      reg_sp.status_error_input_fifo_write(2)    <= reg_sp.status_error_input_fifo_write(2) OR error_input_fifo_write(2);
+
+
+      
       all_status: FOR I IN 3 DOWNTO 0 LOOP
         --reg_wp.status_full(I)     <= (reg_wp.status_full(I) OR status_full(I)) AND reg_wp.run;
         --reg_wp.status_full_err(I) <= (reg_wp.status_full_err(I) OR status_full_err(I))  AND reg_wp.run;
@@ -378,22 +390,26 @@ BEGIN  -- beh
                            prdata(1) <= reg_sp.config_active_interruption_onError;
                            prdata(2) <= reg_sp.config_ms_run;
           WHEN "000001" => prdata(0) <= reg_sp.status_ready_matrix_f0_0;
-                           prdata(1) <= reg_sp.status_ready_matrix_f0_1;
+--                           prdata(1) <= reg_sp.status_ready_matrix_f0_1;
                            prdata(2) <= reg_sp.status_ready_matrix_f1;
                            prdata(3) <= reg_sp.status_ready_matrix_f2;
-                           prdata(4) <= reg_sp.status_error_anticipating_empty_fifo;
+--                           prdata(4) <= reg_sp.status_error_anticipating_empty_fifo;
                            prdata(5) <= reg_sp.status_error_bad_component_error;
+                           prdata(6) <= reg_sp.status_error_buffer_full;            
+                           prdata(7) <= reg_sp.status_error_input_fifo_write(0);    
+                           prdata(8) <= reg_sp.status_error_input_fifo_write(1);    
+                           prdata(9) <= reg_sp.status_error_input_fifo_write(2);    
           WHEN "000010" => prdata    <= reg_sp.addr_matrix_f0_0;
-          WHEN "000011" => prdata    <= reg_sp.addr_matrix_f0_1;
+--          WHEN "000011" => prdata    <= reg_sp.addr_matrix_f0_1;
           WHEN "000100" => prdata    <= reg_sp.addr_matrix_f1;
           WHEN "000101" => prdata    <= reg_sp.addr_matrix_f2;
       
           WHEN "000110" => prdata    <= reg_sp.coarse_time_f0_0;
-          WHEN "000111" => prdata    <= reg_sp.coarse_time_f0_1;
+--          WHEN "000111" => prdata    <= reg_sp.coarse_time_f0_1;
           WHEN "001000" => prdata    <= reg_sp.coarse_time_f1;  
           WHEN "001001" => prdata    <= reg_sp.coarse_time_f2;  
           WHEN "001010" => prdata(15 downto 0) <= matrix_time_f0_0(15 DOWNTO 0);--reg_sp.fine_time_f0_0;  
-          WHEN "001011" => prdata(15 downto 0) <= matrix_time_f0_1(15 DOWNTO 0);--reg_sp.fine_time_f0_1;  
+--          WHEN "001011" => prdata(15 downto 0) <= matrix_time_f0_1(15 DOWNTO 0);--reg_sp.fine_time_f0_1;  
           WHEN "001100" => prdata(15 downto 0) <= matrix_time_f1  (15 DOWNTO 0);--reg_sp.fine_time_f1;    
           WHEN "001101" => prdata(15 downto 0) <= matrix_time_f2  (15 DOWNTO 0);--reg_sp.fine_time_f2;
                            
@@ -450,13 +466,17 @@ BEGIN  -- beh
                              reg_sp.config_active_interruption_onError     <= apbi.pwdata(1);
                              reg_sp.config_ms_run                          <= apbi.pwdata(2);
             WHEN "000001" => reg_sp.status_ready_matrix_f0_0 <= apbi.pwdata(0);
-                             reg_sp.status_ready_matrix_f0_1             <= apbi.pwdata(1);
+--                             reg_sp.status_ready_matrix_f0_1             <= apbi.pwdata(1);
                              reg_sp.status_ready_matrix_f1               <= apbi.pwdata(2);
                              reg_sp.status_ready_matrix_f2               <= apbi.pwdata(3);
-                             reg_sp.status_error_anticipating_empty_fifo <= apbi.pwdata(4);
+--                             reg_sp.status_error_anticipating_empty_fifo <= apbi.pwdata(4);
                              reg_sp.status_error_bad_component_error     <= apbi.pwdata(5);
+                           reg_sp.status_error_buffer_full              <= apbi.pwdata(6);            
+                           reg_sp.status_error_input_fifo_write(0)      <= apbi.pwdata(7);    
+                           reg_sp.status_error_input_fifo_write(1)      <= apbi.pwdata(8);    
+                           reg_sp.status_error_input_fifo_write(2)      <= apbi.pwdata(9);    
             WHEN "000010" => reg_sp.addr_matrix_f0_0 <= apbi.pwdata;
-            WHEN "000011" => reg_sp.addr_matrix_f0_1 <= apbi.pwdata;
+--            WHEN "000011" => reg_sp.addr_matrix_f0_1 <= apbi.pwdata;
             WHEN "000100" => reg_sp.addr_matrix_f1   <= apbi.pwdata;
             WHEN "000101" => reg_sp.addr_matrix_f2   <= apbi.pwdata;
                              --
@@ -500,13 +520,18 @@ BEGIN  -- beh
       END IF;
 
       apbo.pirq(pirq_ms) <= ((reg_sp.config_active_interruption_onNewMatrix AND (ready_matrix_f0_0 OR
-                                                                                 ready_matrix_f0_1 OR
+--                                                                                 ready_matrix_f0_1 OR
                                                                                  ready_matrix_f1 OR
                                                                                  ready_matrix_f2)
                              )
                             OR
-                            (reg_sp.config_active_interruption_onError AND (error_anticipating_empty_fifo OR
-                                                                            error_bad_component_error)
+                            (reg_sp.config_active_interruption_onError AND (
+                              --error_anticipating_empty_fifo OR
+                                                                            error_bad_component_error
+                                                                            OR error_buffer_full
+                                                                            OR error_input_fifo_write(0)
+                                                                            OR error_input_fifo_write(1)
+                                                                            OR error_input_fifo_write(2))
                              ));
       
       apbo.pirq(pirq_wfp) <= ored_irq_wfp;
