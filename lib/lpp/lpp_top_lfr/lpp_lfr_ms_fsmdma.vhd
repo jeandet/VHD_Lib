@@ -178,8 +178,8 @@ BEGIN
     ELSIF HCLK'EVENT AND HCLK = '1' THEN
       --
       debug_reg_s(3)  <= status_ready_matrix_f0;
-      debug_reg_s(4)  <= status_ready_matrix_f0;
-      debug_reg_s(5)  <= status_ready_matrix_f0;
+      debug_reg_s(4)  <= status_ready_matrix_f1;
+      debug_reg_s(5)  <= status_ready_matrix_f2;
       debug_reg_s(6)  <= '0';
       debug_reg_s(7)  <= '0';
       debug_reg_s(8)  <= '0';

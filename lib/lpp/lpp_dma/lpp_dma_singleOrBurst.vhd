@@ -185,7 +185,8 @@ BEGIN
   -----------------------------------------------------------------------------
   -- SEND 16 word by DMA (in burst mode)
   -----------------------------------------------------------------------------
-  data_2_halfword(31 DOWNTO 0) <= data(15 DOWNTO 0) & data (31 DOWNTO 16);
+  --data_2_halfword(31 DOWNTO 0) <= data(15 DOWNTO 0) & data (31 DOWNTO 16);
+  data_2_halfword(31 DOWNTO 0) <= data(31 DOWNTO 0);
   
   lpp_dma_send_16word_1 : lpp_dma_send_16word
     PORT MAP (

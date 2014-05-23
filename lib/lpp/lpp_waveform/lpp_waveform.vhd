@@ -168,6 +168,11 @@ ARCHITECTURE beh OF lpp_waveform IS
   SIGNAL data_f2_out : STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
   SIGNAL data_f3_out : STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
 
+  SIGNAL data_f0_out_swap : STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+  SIGNAL data_f1_out_swap : STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+  SIGNAL data_f2_out_swap : STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+  SIGNAL data_f3_out_swap : STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+
   SIGNAL data_f0_out_valid          : STD_LOGIC;
   SIGNAL data_f1_out_valid          : STD_LOGIC;
   SIGNAL data_f2_out_valid          : STD_LOGIC;
@@ -362,13 +367,41 @@ BEGIN  -- beh
         error     => status_new_err(I));
   END GENERATE all_input_valid;
 
-  all_bit_of_data_out : FOR I IN 95 DOWNTO 0 GENERATE
-    data_out(0, I) <= data_f0_out(I);
-    data_out(1, I) <= data_f1_out(I);
-    data_out(2, I) <= data_f2_out(I);
-    data_out(3, I) <= data_f3_out(I);
-  END GENERATE all_bit_of_data_out;
+  data_f0_out_swap <= data_f0_out((16*5)-1 DOWNTO 16*4) &  
+                      data_f0_out((16*6)-1 DOWNTO 16*5) &
+                      data_f0_out((16*3)-1 DOWNTO 16*2) &
+                      data_f0_out((16*4)-1 DOWNTO 16*3) &
+                      data_f0_out((16*1)-1 DOWNTO 16*0) &
+                      data_f0_out((16*2)-1 DOWNTO 16*1) ;  
 
+  data_f1_out_swap <= data_f1_out((16*5)-1 DOWNTO 16*4) &  
+                      data_f1_out((16*6)-1 DOWNTO 16*5) &
+                      data_f1_out((16*3)-1 DOWNTO 16*2) &
+                      data_f1_out((16*4)-1 DOWNTO 16*3) &
+                      data_f1_out((16*1)-1 DOWNTO 16*0) &
+                      data_f1_out((16*2)-1 DOWNTO 16*1) ;   
+
+  data_f2_out_swap <= data_f2_out((16*5)-1 DOWNTO 16*4) &  
+                      data_f2_out((16*6)-1 DOWNTO 16*5) &
+                      data_f2_out((16*3)-1 DOWNTO 16*2) &
+                      data_f2_out((16*4)-1 DOWNTO 16*3) &
+                      data_f2_out((16*1)-1 DOWNTO 16*0) &
+                      data_f2_out((16*2)-1 DOWNTO 16*1) ;   
+
+  data_f3_out_swap <= data_f3_out((16*5)-1 DOWNTO 16*4) &  
+                      data_f3_out((16*6)-1 DOWNTO 16*5) &
+                      data_f3_out((16*3)-1 DOWNTO 16*2) &
+                      data_f3_out((16*4)-1 DOWNTO 16*3) &
+                      data_f3_out((16*1)-1 DOWNTO 16*0) &
+                      data_f3_out((16*2)-1 DOWNTO 16*1) ;  
+  
+  all_bit_of_data_out : FOR I IN 95 DOWNTO 0 GENERATE
+    data_out(0, I) <= data_f0_out_swap(I);
+    data_out(1, I) <= data_f1_out_swap(I);
+    data_out(2, I) <= data_f2_out_swap(I);
+    data_out(3, I) <= data_f3_out_swap(I);
+  END GENERATE all_bit_of_data_out;
+  
   -----------------------------------------------------------------------------
   -- TODO : debug
   -----------------------------------------------------------------------------
