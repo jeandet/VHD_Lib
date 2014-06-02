@@ -281,7 +281,9 @@ ARCHITECTURE beh OF lpp_lfr IS
   
   SIGNAL error_buffer_full         :  STD_LOGIC;
   SIGNAL error_input_fifo_write    :  STD_LOGIC_VECTOR(2 DOWNTO 0);
-  
+
+  SIGNAL debug_ms : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    
 BEGIN
   
   sample_s(4 DOWNTO 0) <= sample_E(4 DOWNTO 0);
@@ -698,7 +700,7 @@ BEGIN
       error_buffer_full                      => error_buffer_full,      
       error_input_fifo_write                 => error_input_fifo_write, 
       
-      debug_reg                              => observation_reg,
+      debug_reg                              => debug_ms,--observation_reg,
       
       status_ready_matrix_f0                 => status_ready_matrix_f0,
       status_ready_matrix_f1                 => status_ready_matrix_f1,
@@ -713,4 +715,8 @@ BEGIN
       matrix_time_f1                         => matrix_time_f1,
       matrix_time_f2                         => matrix_time_f2);
 
+  -----------------------------------------------------------------------------
+  observation_reg(31 DOWNTO 0) <= debug_ms(30 DOWNTO 0) & ms_softandhard_rstn;
+
+  
 END beh;

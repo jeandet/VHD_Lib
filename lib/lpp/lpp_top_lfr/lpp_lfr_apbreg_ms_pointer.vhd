@@ -61,11 +61,20 @@ BEGIN  -- beh
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
       current_reg <= '0';
+      reg0_matrix_time <= (OTHERS => '0');
+      reg1_matrix_time <= (OTHERS => '0');
       
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
       IF ready_matrix = '1' THEN
         current_reg <= NOT current_reg;
       END IF;
+      IF current_reg = '0' THEN
+        reg0_matrix_time <= matrix_time;
+      END IF;
+      IF current_reg = '1' THEN
+        reg1_matrix_time <= matrix_time;
+      END IF;
+      
     END IF;
   END PROCESS;
 
@@ -77,5 +86,8 @@ BEGIN  -- beh
 
   reg0_ready_matrix <= ready_matrix WHEN current_reg = '0' ELSE '0';
   reg1_ready_matrix <= ready_matrix WHEN current_reg = '1' ELSE '0';
+
+  
+  
 
 END beh;

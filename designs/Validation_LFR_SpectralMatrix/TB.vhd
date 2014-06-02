@@ -32,6 +32,12 @@ USE lpp.spectral_matrix_package.ALL;
 use lpp.lpp_fft.all;
 use lpp.fft_components.all;
 
+LIBRARY grlib;
+USE grlib.amba.ALL;
+USE grlib.stdlib.ALL;
+USE grlib.devices.ALL;
+USE GRLIB.DMA2AHB_Package.ALL;
+
 ENTITY TB IS
   
 
@@ -102,6 +108,15 @@ ARCHITECTURE beh OF TB IS
 
   -----------------------------------------------------------------------------
   SIGNAL ren_counter : INTEGER;
+  
+  SIGNAL error_buffer_full         :  STD_LOGIC;
+  SIGNAL error_input_fifo_write    :  STD_LOGIC_VECTOR(2 DOWNTO 0);
+  -----------------------------------------------------------------------------
+  SIGNAL apbi :  apb_slv_in_type;
+  SIGNAL status_full     : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL status_full_ack : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL status_full_err : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL status_new_err  : STD_LOGIC_VECTOR(3 DOWNTO 0);
   
 BEGIN  -- beh
   
@@ -234,8 +249,8 @@ BEGIN  -- beh
       ready_matrix_f2                        => ready_matrix_f2,
 --      error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
       error_bad_component_error              => error_bad_component_error,
-      error_buffer_full                      => OPEN,
-      error_input_fifo_write                 => OPEN,
+      error_buffer_full                      => error_buffer_full,
+      error_input_fifo_write                 => error_input_fifo_write,
       
       debug_reg                              => debug_reg,
       status_ready_matrix_f0               => status_ready_matrix_f0,
@@ -255,37 +270,123 @@ BEGIN  -- beh
       matrix_time_f1                         => matrix_time_f1,
       matrix_time_f2                         => matrix_time_f2);
 
+
+
+  
+  lpp_lfr_apbreg_1 : lpp_lfr_apbreg
+    GENERIC MAP (
+      nb_data_by_buffer_size => 11,
+      nb_word_by_buffer_size => 11,
+      nb_snapshot_param_size => 11,
+      delta_vector_size      => 20,
+      delta_vector_size_f0_2 => 7,
+      pindex                 => 4,
+      paddr                  => 4,
+      pmask                  => 16#fff#,
+      pirq_ms                => 0,
+      pirq_wfp               => 1,
+      top_lfr_version        => (OTHERS => '0')
+      )
+    PORT MAP (
+      HCLK    => clk25MHz,
+      HRESETn => rstn,
+      apbi    => apbi,
+      apbo    => OPEN,
+
+      run_ms => OPEN,
+
+      ready_matrix_f0                        => ready_matrix_f0,
+      ready_matrix_f1                        => ready_matrix_f1,
+      ready_matrix_f2                        => ready_matrix_f2,
+      error_bad_component_error              => error_bad_component_error,
+      error_buffer_full                      => error_buffer_full,      -- TODO
+      error_input_fifo_write                 => error_input_fifo_write, -- TODO
+      status_ready_matrix_f0                 => status_ready_matrix_f0,
+      status_ready_matrix_f1                 => status_ready_matrix_f1,
+      status_ready_matrix_f2                 => status_ready_matrix_f2,
+      config_active_interruption_onNewMatrix => config_active_interruption_onNewMatrix,
+      config_active_interruption_onError     => config_active_interruption_onError,
+
+      matrix_time_f0    => matrix_time_f0,
+      matrix_time_f1    => matrix_time_f1,
+      matrix_time_f2     => matrix_time_f2,
+
+      addr_matrix_f0    => addr_matrix_f0,
+      addr_matrix_f1    => addr_matrix_f1,
+      addr_matrix_f2    => addr_matrix_f2,
+      -------------------------------------------------------------------------
+      status_full       => status_full,
+      status_full_ack   => status_full_ack,
+      status_full_err   => status_full_err,
+      status_new_err    => status_new_err,
+      data_shaping_BW   => OPEN,
+      data_shaping_SP0  => OPEN,
+      data_shaping_SP1  => OPEN,
+      data_shaping_R0   => OPEN,
+      data_shaping_R1   => OPEN,
+      delta_snapshot    => OPEN,
+      delta_f0          => OPEN,
+      delta_f0_2        => OPEN,
+      delta_f1          => OPEN,
+      delta_f2          => OPEN,
+      nb_data_by_buffer => OPEN,
+      nb_word_by_buffer => OPEN,
+      nb_snapshot_param => OPEN,
+      enable_f0         => OPEN,
+      enable_f1         => OPEN,
+      enable_f2         => OPEN,
+      enable_f3         => OPEN,
+      burst_f0          => OPEN,
+      burst_f1          => OPEN,
+      burst_f2          => OPEN,
+      run               => OPEN,
+      addr_data_f0      => OPEN,
+      addr_data_f1      => OPEN,
+      addr_data_f2      => OPEN,
+      addr_data_f3      => OPEN,
+      start_date        => OPEN);
+
+
+
+
+
+
+
+
+
+
+  
+
   
 
   
 
-  PROCESS (clk25MHz, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      status_ready_matrix_f0             <= '0';
---      status_ready_matrix_f0_1             <= '0';
-      status_ready_matrix_f1               <= '0';
-      status_ready_matrix_f2               <= '0';
-    ELSIF clk25MHz'event AND clk25MHz = '1' THEN  -- rising clock edge
-      status_ready_matrix_f0             <= status_ready_matrix_f0 OR ready_matrix_f0;
---      status_ready_matrix_f0_1             <= status_ready_matrix_f0_1 OR ready_matrix_f0_1;
-      status_ready_matrix_f1               <= status_ready_matrix_f1 OR ready_matrix_f1;
-      status_ready_matrix_f2               <= status_ready_matrix_f2 OR ready_matrix_f2;
-    END IF;
-  END PROCESS;
-      
+--  PROCESS (clk25MHz, rstn)
+--  BEGIN  -- PROCESS
+--    IF rstn = '0' THEN                  -- asynchronous reset (active low)
+--      status_ready_matrix_f0             <= '0';
+----      status_ready_matrix_f0_1             <= '0';
+--      status_ready_matrix_f1               <= '0';
+--      status_ready_matrix_f2               <= '0';
+--    ELSIF clk25MHz'event AND clk25MHz = '1' THEN  -- rising clock edge
+--      status_ready_matrix_f0             <= status_ready_matrix_f0 OR ready_matrix_f0;
+----      status_ready_matrix_f0_1             <= status_ready_matrix_f0_1 OR ready_matrix_f0_1;
+--      status_ready_matrix_f1               <= status_ready_matrix_f1 OR ready_matrix_f1;
+--      status_ready_matrix_f2               <= status_ready_matrix_f2 OR ready_matrix_f2;
+--    END IF;
+--  END PROCESS;      
 
 
   
 --  status_error_anticipating_empty_fifo <= '0';
 --  status_error_bad_component_error     <= '0';
 
-  config_active_interruption_onNewMatrix <= '0';
-  config_active_interruption_onError     <= '0';
-  addr_matrix_f0                         <= (OTHERS => '0');
+--  config_active_interruption_onNewMatrix <= '0';
+--  config_active_interruption_onError     <= '0';
+--  addr_matrix_f0                         <= (OTHERS => '0');
 --  addr_matrix_f0_1                       <= (OTHERS => '0');
-  addr_matrix_f1                         <= (OTHERS => '0');
-  addr_matrix_f2                         <= (OTHERS => '0');
+--  addr_matrix_f1                         <= (OTHERS => '0');
+--  addr_matrix_f2                         <= (OTHERS => '0');
 
 
   PROCESS (clk25MHz, rstn)

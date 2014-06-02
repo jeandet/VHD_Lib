@@ -29,7 +29,7 @@ USE grlib.stdlib.ALL;
 USE grlib.devices.ALL;
 LIBRARY lpp;
 USE lpp.lpp_lfr_pkg.ALL;
-USE lpp.lpp_amba.ALL;
+--USE lpp.lpp_amba.ALL;
 USE lpp.apb_devices_list.ALL;
 USE lpp.lpp_memory.ALL;
 LIBRARY techmap;
@@ -136,11 +136,11 @@ END lpp_lfr_apbreg;
 ARCHITECTURE beh OF lpp_lfr_apbreg IS
   
   CONSTANT REVISION : INTEGER := 1;
-  
+
   CONSTANT pconfig : apb_config_type := (
     0 => ahb_device_reg (VENDOR_LPP, LPP_LFR, 0, REVISION, pirq_wfp),
     1 => apb_iobar(paddr, pmask));
-
+  
   TYPE lpp_SpectralMatrix_regs IS RECORD
     config_active_interruption_onNewMatrix : STD_LOGIC;
     config_active_interruption_onError     : STD_LOGIC;
@@ -316,13 +316,13 @@ BEGIN  -- beh
       reg_sp.addr_matrix_f1_1 <= (OTHERS => '0');
       reg_sp.addr_matrix_f2_1 <= (OTHERS => '0');
       
-      reg_sp.time_matrix_f0_0 <= (OTHERS => '0');  -- ok
-      reg_sp.time_matrix_f1_0 <= (OTHERS => '0');  -- ok
-      reg_sp.time_matrix_f2_0 <= (OTHERS => '0');  -- ok
+--      reg_sp.time_matrix_f0_0 <= (OTHERS => '0');  -- ok
+--      reg_sp.time_matrix_f1_0 <= (OTHERS => '0');  -- ok
+--      reg_sp.time_matrix_f2_0 <= (OTHERS => '0');  -- ok
                          
-      reg_sp.time_matrix_f0_1 <= (OTHERS => '0');  -- ok
-      reg_sp.time_matrix_f1_1 <= (OTHERS => '0');  -- ok
-      reg_sp.time_matrix_f2_1 <= (OTHERS => '0');  -- ok
+--      reg_sp.time_matrix_f0_1 <= (OTHERS => '0');  -- ok
+      --reg_sp.time_matrix_f1_1 <= (OTHERS => '0');  -- ok
+--      reg_sp.time_matrix_f2_1 <= (OTHERS => '0');  -- ok
 
       prdata <= (OTHERS => '0');
 
@@ -360,14 +360,6 @@ BEGIN  -- beh
       reg_wp.start_date        <= (OTHERS => '0');
       
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
-      
-      reg_sp.time_matrix_f0_0 <= reg0_matrix_time_f0;  -- ok
-      reg_sp.time_matrix_f1_0 <= reg0_matrix_time_f1;  -- ok
-      reg_sp.time_matrix_f2_0 <= reg0_matrix_time_f2;  -- ok
-                         
-      reg_sp.time_matrix_f0_1 <= reg1_matrix_time_f0;  -- ok
-      reg_sp.time_matrix_f1_1 <= reg1_matrix_time_f1;  -- ok
-      reg_sp.time_matrix_f2_1 <= reg1_matrix_time_f2;  -- ok
 
       status_full_ack <= (OTHERS => '0');
 
@@ -626,13 +618,13 @@ BEGIN  -- beh
 
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f0_0,
       reg0_ready_matrix        => reg0_ready_matrix_f0,
-      reg0_addr_matrix         => reg0_addr_matrix_f0,          
-      reg0_matrix_time         => reg0_matrix_time_f0,          
+      reg0_addr_matrix         => reg_sp.addr_matrix_f0_0,--reg0_addr_matrix_f0,            
+      reg0_matrix_time         => reg_sp.time_matrix_f0_0,--reg0_matrix_time_f0,          
 
       reg1_status_ready_matrix => reg_sp.status_ready_matrix_f0_1,
       reg1_ready_matrix        => reg1_ready_matrix_f0,         
-      reg1_addr_matrix         => reg1_addr_matrix_f0,          
-      reg1_matrix_time         => reg1_matrix_time_f0,          
+      reg1_addr_matrix         => reg_sp.addr_matrix_f0_1,--reg1_addr_matrix_f0,          
+      reg1_matrix_time         => reg_sp.time_matrix_f0_1,--reg1_matrix_time_f0,          
 
       ready_matrix              => ready_matrix_f0,
       status_ready_matrix       => status_ready_matrix_f0,      
@@ -646,13 +638,13 @@ BEGIN  -- beh
 
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f1_0,
       reg0_ready_matrix        => reg0_ready_matrix_f1,
-      reg0_addr_matrix         => reg0_addr_matrix_f1,
-      reg0_matrix_time         => reg0_matrix_time_f1,
+      reg0_addr_matrix         => reg_sp.addr_matrix_f1_0,--reg0_addr_matrix_f1,
+      reg0_matrix_time         => reg_sp.time_matrix_f1_0,--reg0_matrix_time_f1,
 
       reg1_status_ready_matrix => reg_sp.status_ready_matrix_f1_1,
       reg1_ready_matrix        => reg1_ready_matrix_f1,
-      reg1_addr_matrix         => reg1_addr_matrix_f1,
-      reg1_matrix_time         => reg1_matrix_time_f1,
+      reg1_addr_matrix         => reg_sp.addr_matrix_f1_1,--reg1_addr_matrix_f1,
+      reg1_matrix_time         => reg_sp.time_matrix_f1_1,--reg1_matrix_time_f1,
 
       ready_matrix              => ready_matrix_f1,
       status_ready_matrix       => status_ready_matrix_f1,
@@ -666,13 +658,13 @@ BEGIN  -- beh
 
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f2_0,
       reg0_ready_matrix        => reg0_ready_matrix_f2,
-      reg0_addr_matrix         => reg0_addr_matrix_f2,
-      reg0_matrix_time         => reg0_matrix_time_f2,
+      reg0_addr_matrix         => reg_sp.addr_matrix_f2_0,--reg0_addr_matrix_f2,
+      reg0_matrix_time         => reg_sp.time_matrix_f2_0,--reg0_matrix_time_f2,
 
       reg1_status_ready_matrix => reg_sp.status_ready_matrix_f2_1,
       reg1_ready_matrix        => reg1_ready_matrix_f2,
-      reg1_addr_matrix         => reg1_addr_matrix_f2,
-      reg1_matrix_time         => reg1_matrix_time_f2,
+      reg1_addr_matrix         => reg_sp.addr_matrix_f2_1,--reg1_addr_matrix_f2,
+      reg1_matrix_time         => reg_sp.time_matrix_f2_1,--reg1_matrix_time_f2,
 
       ready_matrix              => ready_matrix_f2,
       status_ready_matrix       => status_ready_matrix_f2,

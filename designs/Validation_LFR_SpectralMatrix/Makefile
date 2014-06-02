@@ -393,8 +393,11 @@ vcom_lpp:
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_spectral_matrix/spectral_matrix_switch_f0.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_spectral_matrix/spectral_matrix_time_managment.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_spectral_matrix/MS_control.vhd
-	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_spectral_matrix/MS_calculation.vhd	
-	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_pkg.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_spectral_matrix/MS_calculation.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_amba/apb_devices_list.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_pkg.vhd	
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_apbreg_simu.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_apbreg_ms_pointer.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_ms.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_ms_fsmdma.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_ms_FFT.vhd
