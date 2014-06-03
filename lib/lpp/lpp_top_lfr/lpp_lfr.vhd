@@ -269,6 +269,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL data_ms_valid_burst : STD_LOGIC;
   SIGNAL data_ms_ren         : STD_LOGIC;
   SIGNAL data_ms_done        : STD_LOGIC;
+  SIGNAL dma_ms_ongoing      : STD_LOGIC;
 
   SIGNAL run_ms              : STD_LOGIC;
   SIGNAL ms_softandhard_rstn : STD_LOGIC;
@@ -564,34 +565,42 @@ BEGIN
       dma_send        <= '0';
       dma_valid_burst <= '0';
       data_ms_done    <= '0';
+      dma_ms_ongoing  <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
       IF run = '1' THEN
         data_ms_done <= '0';
         IF dma_sel = "00000" OR dma_done = '1' THEN
           dma_sel <= dma_rr_grant;
           IF dma_rr_grant(0) = '1' THEN
+            dma_ms_ongoing  <= '0';
             dma_send        <= '1';
             dma_valid_burst <= data_f0_data_out_valid_burst;
             dma_sel_valid   <= data_f0_data_out_valid;
           ELSIF dma_rr_grant(1) = '1' THEN
+            dma_ms_ongoing  <= '0';
             dma_send        <= '1';
             dma_valid_burst <= data_f1_data_out_valid_burst;
             dma_sel_valid   <= data_f1_data_out_valid;
           ELSIF dma_rr_grant(2) = '1' THEN
+            dma_ms_ongoing  <= '0';
             dma_send        <= '1';
             dma_valid_burst <= data_f2_data_out_valid_burst;
             dma_sel_valid   <= data_f2_data_out_valid;
           ELSIF dma_rr_grant(3) = '1' THEN
+            dma_ms_ongoing  <= '0';
             dma_send        <= '1';
             dma_valid_burst <= data_f3_data_out_valid_burst;
             dma_sel_valid   <= data_f3_data_out_valid;
           ELSIF dma_rr_grant(4) = '1' THEN
+            dma_ms_ongoing  <= '1';
             dma_send        <= '1';
             dma_valid_burst <= data_ms_valid_burst;
             dma_sel_valid   <= data_ms_valid;
+          ELSE
+            dma_ms_ongoing  <= '0';            
           END IF;
 
-          IF dma_sel(4) = '1' THEN
+          IF dma_ms_ongoing = '1' THEN
             data_ms_done <= '1';
           END IF;
         ELSE
