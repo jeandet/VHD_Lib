@@ -207,8 +207,17 @@ BEGIN  -- beh
 
 
   -----------------------------------------------------------------------------
-  coarse_time <= (OTHERS => '0');
-  fine_time   <= (OTHERS => '0');
+  coarse_time <= (OTHERS => '1');
+
+  PROCESS (clk25MHz, rstn)
+  BEGIN
+    IF rstn = '0' THEN
+      fine_time <= (OTHERS => '0');
+    ELSIF clk25MHz'event AND clk25MHz = '1' THEN
+      fine_time <= fine_time + 1;
+    END IF;
+  END PROCESS;
+  
   
   sample_f0_wdata <= X"A000" & X"A111" & X"A222" & X"A333" & X"A444";
   sample_f1_wdata <= X"B000" & X"B111" & X"B222" & X"B333" & X"B444";
@@ -272,6 +281,7 @@ BEGIN  -- beh
 
 
 
+  apbi.psel(4) <= '0';
   
   lpp_lfr_apbreg_1 : lpp_lfr_apbreg
     GENERIC MAP (
@@ -309,7 +319,7 @@ BEGIN  -- beh
 
       matrix_time_f0    => matrix_time_f0,
       matrix_time_f1    => matrix_time_f1,
-      matrix_time_f2     => matrix_time_f2,
+      matrix_time_f2    => matrix_time_f2,
 
       addr_matrix_f0    => addr_matrix_f0,
       addr_matrix_f1    => addr_matrix_f1,

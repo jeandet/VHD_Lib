@@ -596,11 +596,11 @@ BEGIN
             dma_send        <= '1';
             dma_valid_burst <= data_ms_valid_burst;
             dma_sel_valid   <= data_ms_valid;
-          ELSE
-            dma_ms_ongoing  <= '0';            
+          --ELSE
+          --dma_ms_ongoing  <= '0';            
           END IF;
 
-          IF dma_ms_ongoing = '1' THEN
+          IF dma_ms_ongoing = '1' AND dma_done = '1' THEN
             data_ms_done <= '1';
           END IF;
         ELSE
@@ -725,7 +725,11 @@ BEGIN
       matrix_time_f2                         => matrix_time_f2);
 
   -----------------------------------------------------------------------------
-  observation_reg(31 DOWNTO 0) <= debug_ms(30 DOWNTO 0) & ms_softandhard_rstn;
-
+  observation_reg(31 DOWNTO 0) <= debug_ms(31-9 DOWNTO 0) &
+                                  dma_ms_ongoing &      -- 8
+                                  data_ms_done &        -- 7
+                                  dma_done &            -- 6
+                                  dma_sel &             -- 5 .. 1
+                                  ms_softandhard_rstn;  -- 0
   
 END beh;

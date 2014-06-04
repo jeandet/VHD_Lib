@@ -207,15 +207,20 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   -----------------------------------------------------------------------------
   SIGNAL all_time : STD_LOGIC_VECTOR(47 DOWNTO 0);
 
+  SIGNAL f_empty       : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL f_empty_reg   : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL time_update_f : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL time_reg_f    : STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
+  
   SIGNAL time_reg_f0_A : STD_LOGIC_VECTOR(47 DOWNTO 0);
   SIGNAL time_reg_f0_B : STD_LOGIC_VECTOR(47 DOWNTO 0);
   SIGNAL time_reg_f1   : STD_LOGIC_VECTOR(47 DOWNTO 0);
   SIGNAL time_reg_f2   : STD_LOGIC_VECTOR(47 DOWNTO 0);
 
-  SIGNAL time_update_f0_A : STD_LOGIC;
-  SIGNAL time_update_f0_B : STD_LOGIC;
-  SIGNAL time_update_f1   : STD_LOGIC;
-  SIGNAL time_update_f2   : STD_LOGIC;
+  --SIGNAL time_update_f0_A : STD_LOGIC;
+  --SIGNAL time_update_f0_B : STD_LOGIC;
+  --SIGNAL time_update_f1   : STD_LOGIC;
+  --SIGNAL time_update_f2   : STD_LOGIC;
   --
   SIGNAL status_channel   : STD_LOGIC_VECTOR(49 DOWNTO 0);
   SIGNAL status_MS_input  : STD_LOGIC_VECTOR(49 DOWNTO 0);
@@ -885,59 +890,40 @@ BEGIN
   -----------------------------------------------------------------------------
   all_time         <= coarse_time & fine_time;
   --
-  time_update_f0_A <= '0' WHEN sample_f0_A_wen = "11111" ELSE
-                      '1' WHEN sample_f0_A_empty = "11111" ELSE
-                      '0';
+  f_empty(0) <= '1' WHEN sample_f0_A_empty = "11111" ELSE '0';
+  f_empty(1) <= '1' WHEN sample_f0_B_empty = "11111" ELSE '0';
+  f_empty(2) <= '1' WHEN sample_f1_empty   = "11111" ELSE '0';
+  f_empty(3) <= '1' WHEN sample_f2_empty   = "11111" ELSE '0';
   
-  s_m_t_m_f0_A : spectral_matrix_time_managment
-    PORT MAP (
-      clk      => clk,
-      rstn     => rstn,
-      time_in  => all_time,
-      update_1 => time_update_f0_A,
-      time_out => time_reg_f0_A);
+  all_time_reg: FOR I IN 0 TO 3 GENERATE
 
-  --  
-  time_update_f0_B <= '0' WHEN sample_f0_B_wen = "11111" ELSE
-                      '1' WHEN sample_f0_B_empty = "11111" ELSE
-                      '0';
-  
-  s_m_t_m_f0_B : spectral_matrix_time_managment
-    PORT MAP (
-      clk      => clk,
-      rstn     => rstn,
-      time_in  => all_time,
-      update_1 => time_update_f0_B,
-      time_out => time_reg_f0_B);
+    PROCESS (clk, rstn)
+    BEGIN
+      IF rstn = '0' THEN
+        f_empty_reg(I) <= '1';
+      ELSIF clk'event AND clk = '1' THEN
+        f_empty_reg(I) <= f_empty(I);
+      END IF;
+    END PROCESS;    
 
-  --  
-  time_update_f1 <= '0' WHEN sample_f1_wen = "11111" ELSE
-                    '1' WHEN sample_f1_empty = "11111" ELSE
-                    '0';
-  
-  s_m_t_m_f1 : spectral_matrix_time_managment
-    PORT MAP (
-      clk      => clk,
-      rstn     => rstn,
-      time_in  => all_time,
-      update_1 => time_update_f1,
-      time_out => time_reg_f1);
+    time_update_f(I) <= '1' WHEN f_empty(I) = '0' AND f_empty_reg(I) = '1' ELSE '0';
 
-  --  
-  time_update_f2 <= '0' WHEN sample_f2_wen = "11111" ELSE
-                    '1' WHEN sample_f2_empty = "11111" ELSE
-                    '0';
-  
-  s_m_t_m_f2 : spectral_matrix_time_managment
-    PORT MAP (
-      clk      => clk,
-      rstn     => rstn,
-      time_in  => all_time,
-      update_1 => time_update_f2,
-      time_out => time_reg_f2);
+    s_m_t_m_f0_A : spectral_matrix_time_managment
+      PORT MAP (
+        clk      => clk,
+        rstn     => rstn,
+        time_in  => all_time,
+        update_1 => time_update_f(I),
+        time_out => time_reg_f((I+1)*48-1 DOWNTO I*48)
+        );
+
+  END GENERATE all_time_reg;
+
+  time_reg_f0_A <= time_reg_f((0+1)*48-1 DOWNTO 0*48);
+  time_reg_f0_B <= time_reg_f((1+1)*48-1 DOWNTO 1*48);
+  time_reg_f1   <= time_reg_f((2+1)*48-1 DOWNTO 2*48);
+  time_reg_f2   <= time_reg_f((3+1)*48-1 DOWNTO 3*48);
 
   -----------------------------------------------------------------------------
-
-
 
 END Behavioral;

@@ -272,7 +272,10 @@ BEGIN
 
           debug_reg_s(2 DOWNTO 0) <= "011";
 
-          component_send <= '0';
+          IF dma_ren = '0' THEN
+            component_send <= '0';
+          END IF;
+
           IF component_send_ok = '1' THEN
             address <= address + 64;
             state   <= SEND_DATA;
