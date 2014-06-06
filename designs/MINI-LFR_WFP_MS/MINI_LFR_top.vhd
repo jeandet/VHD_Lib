@@ -172,6 +172,8 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   SIGNAL bias_fail_sw_sig : STD_LOGIC;
 
   SIGNAL observation_reg : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL observation_vector_0: STD_LOGIC_VECTOR(11 DOWNTO 0);
+  SIGNAL observation_vector_1: STD_LOGIC_VECTOR(11 DOWNTO 0);
   -----------------------------------------------------------------------------
   
 BEGIN  -- beh
@@ -440,6 +442,8 @@ BEGIN  -- beh
       coarse_time     => coarse_time,
       fine_time       => fine_time,
       data_shaping_BW => bias_fail_sw_sig,
+      observation_vector_0=> observation_vector_0,
+      observation_vector_1 => observation_vector_1,
       observation_reg => observation_reg);
 
   all_sample: FOR I IN 7 DOWNTO 0 GENERATE
@@ -525,8 +529,8 @@ BEGIN  -- beh
       IO10 <= '0';
       IO11 <= '0';
     ELSIF clk_25'event AND clk_25 = '1' THEN  -- rising clock edge
-      CASE gpioo.dout(1 DOWNTO 0) IS
-        WHEN "00" => 
+      CASE gpioo.dout(2 DOWNTO 0) IS
+        WHEN "000" => 
           IO0  <= observation_reg(0 );
           IO1  <= observation_reg(1 );
           IO2  <= observation_reg(2 );  
@@ -539,7 +543,7 @@ BEGIN  -- beh
           IO9  <= observation_reg(9 );
           IO10 <= observation_reg(10);
           IO11 <= observation_reg(11);
-        WHEN "01" => 
+        WHEN "001" => 
           IO0  <= observation_reg(0  + 12);
           IO1  <= observation_reg(1  + 12);
           IO2  <= observation_reg(2  + 12);  
@@ -552,7 +556,7 @@ BEGIN  -- beh
           IO9  <= observation_reg(9  + 12);
           IO10 <= observation_reg(10 + 12);
           IO11 <= observation_reg(11 + 12);
-        WHEN "10" => 
+        WHEN "010" => 
           IO0  <= observation_reg(0  + 12 + 12);
           IO1  <= observation_reg(1  + 12 + 12);
           IO2  <= observation_reg(2  + 12 + 12);  
@@ -565,19 +569,32 @@ BEGIN  -- beh
           IO9  <= '0';
           IO10 <= '0';
           IO11 <= '0';
-        WHEN "11" => 
-          IO0  <= '0';
-          IO1  <= '0';
-          IO2  <= '0';  
-          IO3  <= '0';
-          IO4  <= '0';
-          IO5  <= '0';
-          IO6  <= '0';
-          IO7  <= '0';
-          IO8  <= '0';
-          IO9  <= '0';
-          IO10 <= '0';
-          IO11 <= '0';
+        WHEN "011" => 
+          IO0  <= observation_vector_0(0 );
+          IO1  <= observation_vector_0(1 );
+          IO2  <= observation_vector_0(2 );  
+          IO3  <= observation_vector_0(3 );
+          IO4  <= observation_vector_0(4 );
+          IO5  <= observation_vector_0(5 );
+          IO6  <= observation_vector_0(6 );
+          IO7  <= observation_vector_0(7 );
+          IO8  <= observation_vector_0(8 );
+          IO9  <= observation_vector_0(9 );
+          IO10 <= observation_vector_0(10);
+          IO11 <= observation_vector_0(11);
+        WHEN "100" => 
+          IO0  <= observation_vector_1(0 );
+          IO1  <= observation_vector_1(1 );
+          IO2  <= observation_vector_1(2 );  
+          IO3  <= observation_vector_1(3 );
+          IO4  <= observation_vector_1(4 );
+          IO5  <= observation_vector_1(5 );
+          IO6  <= observation_vector_1(6 );
+          IO7  <= observation_vector_1(7 );
+          IO8  <= observation_vector_1(8 );
+          IO9  <= observation_vector_1(9 );
+          IO10 <= observation_vector_1(10);
+          IO11 <= observation_vector_1(11);
         WHEN OTHERS => NULL;
       END CASE;
       

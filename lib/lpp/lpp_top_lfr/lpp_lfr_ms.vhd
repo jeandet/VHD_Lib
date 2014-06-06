@@ -676,6 +676,18 @@ BEGIN
       almost_full => OPEN);
 
   -----------------------------------------------------------------------------
+
+  observation_vector_1(11 DOWNTO 0) <= "0000" &
+                                       SM_correlation_start &            --7
+                                       status_MS_input(1 DOWNTO 0)&     --6..5
+                                       MEM_IN_SM_locked(4 DOWNTO 0);    --4..0
+
+  observation_vector_0(11 DOWNTO 6) <= MEM_IN_SM_locked(0) &
+                                       SM_correlation_done      &               --4
+                                       SM_correlation_auto   &                --3
+                                       SM_correlation_start  &                 --2
+                                       status_component(5 DOWNTO 4);                   --1..0
+  -----------------------------------------------------------------------------
   MS_control_1 : MS_control
     PORT MAP (
       clk  => clk,
