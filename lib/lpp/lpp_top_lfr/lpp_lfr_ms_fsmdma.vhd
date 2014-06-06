@@ -46,12 +46,12 @@ ENTITY lpp_lfr_ms_fsmdma IS
 
     ---------------------------------------------------------------------------
     -- FIFO - IN
-    fifo_matrix_type      : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-    fifo_matrix_component : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-    fifo_matrix_time      : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-    fifo_data  : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-    fifo_empty : IN  STD_LOGIC;
-    fifo_ren   : OUT STD_LOGIC;
+    fifo_matrix_type      : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+    fifo_matrix_component : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    fifo_matrix_time      : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
+    fifo_data             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+    fifo_empty            : IN  STD_LOGIC;
+    fifo_ren              : OUT STD_LOGIC;
 
     ---------------------------------------------------------------------------
     -- DMA - OUT
@@ -64,7 +64,7 @@ ENTITY lpp_lfr_ms_fsmdma IS
 
     ---------------------------------------------------------------------------
     -- Reg out
-    ready_matrix_f0             : OUT STD_LOGIC;
+    ready_matrix_f0               : OUT STD_LOGIC;
     ready_matrix_f1               : OUT STD_LOGIC;
     ready_matrix_f2               : OUT STD_LOGIC;
     
@@ -73,13 +73,13 @@ ENTITY lpp_lfr_ms_fsmdma IS
     debug_reg                     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     -- Reg In
-    status_ready_matrix_f0             : IN STD_LOGIC;
+    status_ready_matrix_f0               : IN STD_LOGIC;
     status_ready_matrix_f1               : IN STD_LOGIC;
     status_ready_matrix_f2               : IN STD_LOGIC;
 
     config_active_interruption_onNewMatrix : IN STD_LOGIC;
     config_active_interruption_onError     : IN STD_LOGIC;
-    addr_matrix_f0                       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    addr_matrix_f0                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f1                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f2                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
@@ -190,7 +190,7 @@ BEGIN
 
       
 
-      ready_matrix_f0         <= '0';
+      ready_matrix_f0           <= '0';
       ready_matrix_f1           <= '0';
       ready_matrix_f2           <= '0';
       error_bad_component_error <= '0';
@@ -215,7 +215,7 @@ BEGIN
             IF component_type = "0000" THEN
               address <= address_matrix;
               CASE matrix_type IS
-                WHEN "00"   => matrix_time_f0 <= fifo_matrix_time;
+                WHEN "00"   => matrix_time_f0   <= fifo_matrix_time;
                 WHEN "01"   => matrix_time_f1   <= fifo_matrix_time;
                 WHEN "10"   => matrix_time_f2   <= fifo_matrix_time;
                 WHEN OTHERS => NULL;
@@ -233,7 +233,8 @@ BEGIN
           
         WHEN TRASH_FIFO =>
           debug_reg_s(2 DOWNTO 0) <= "100";
-
+          
+          error_buffer_full             <= '0';
           error_bad_component_error     <= '0';
           IF fifo_empty = '1' THEN
             state          <= IDLE;

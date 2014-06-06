@@ -113,11 +113,22 @@ ARCHITECTURE beh OF TB IS
   SIGNAL error_input_fifo_write    :  STD_LOGIC_VECTOR(2 DOWNTO 0);
   -----------------------------------------------------------------------------
   SIGNAL apbi :  apb_slv_in_type;
+  SIGNAL apbo :  apb_slv_out_type;
   SIGNAL status_full     : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL status_full_ack : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL status_full_err : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL status_new_err  : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  
+  --
+  SIGNAL ready_reg  : STD_LOGIC_VECTOR(5 DOWNTO 0);
+  SIGNAL irq_ongoing  : STD_LOGIC;
+  --
+  SIGNAL read_status : STD_LOGIC;
+  SIGNAL read_status_t : STD_LOGIC;
+
+
+  SIGNAL  observation_vector_0: STD_LOGIC_VECTOR(11 DOWNTO 0);
+  SIGNAL  observation_vector_1: STD_LOGIC_VECTOR(11 DOWNTO 0);
+
 BEGIN  -- beh
   
   clk25MHz      <= NOT clk25MHz     AFTER 20 ns;  
@@ -262,6 +273,11 @@ BEGIN  -- beh
       error_input_fifo_write                 => error_input_fifo_write,
       
       debug_reg                              => debug_reg,
+      
+      --
+      observation_vector_0 => observation_vector_0,
+      observation_vector_1 => observation_vector_1,
+      --
       status_ready_matrix_f0               => status_ready_matrix_f0,
 --      status_ready_matrix_f0               => status_ready_matrix_f0_1,
       status_ready_matrix_f1                 => status_ready_matrix_f1,
@@ -281,7 +297,7 @@ BEGIN  -- beh
 
 
 
-  apbi.psel(4) <= '0';
+  
   
   lpp_lfr_apbreg_1 : lpp_lfr_apbreg
     GENERIC MAP (
@@ -301,7 +317,7 @@ BEGIN  -- beh
       HCLK    => clk25MHz,
       HRESETn => rstn,
       apbi    => apbi,
-      apbo    => OPEN,
+      apbo    => apbo,
 
       run_ms => OPEN,
 
@@ -359,8 +375,40 @@ BEGIN  -- beh
 
 
 
+  read_status_t <= TRANSPORT apbo.pirq(0) AFTER 200 us;
 
+  PROCESS (clk25MHz, rstn)
+  BEGIN 
+    IF rstn = '0' THEN
+      ready_reg                 <= (OTHERS => '0');
+      --read_status <= '0';
+      apbi.psel(4)              <= '0';
+      apbi.pwrite               <= '0';
+      apbi.penable              <= '0';
+      apbi.paddr(7 DOWNTO 2)    <= (OTHERS => '0');
+    ELSIF clk25MHz'event AND clk25MHz = '1' THEN
+      apbi.psel(4)              <= '1';
+      apbi.paddr(7 DOWNTO 2)    <= "000001";
+      apbi.penable              <= '1';
+      read_status <= apbo.pirq(0);
 
+      IF read_status = '1' AND irq_ongoing = '0' THEN
+        ready_reg   <= apbo.prdata(5 DOWNTO 0);
+        irq_ongoing <= '1';
+      END IF;
+
+      IF read_status_t = '0' THEN
+        apbi.pwrite <= '0';
+      ELSE
+        irq_ongoing <= '0';
+        apbi.pwrite <= '1';
+        apbi.pwdata(31 DOWNTO 6) <= (OTHERS => '0');
+        apbi.pwdata(5 DOWNTO 0) <= ready_reg;
+        ready_reg                <= (OTHERS => '0');
+      END IF;
+      
+    END IF;
+  END PROCESS;
 
 
 

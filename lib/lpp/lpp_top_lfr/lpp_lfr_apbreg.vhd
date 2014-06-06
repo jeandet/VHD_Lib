@@ -127,7 +127,9 @@ ENTITY lpp_lfr_apbreg IS
     addr_data_f1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_data_f2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_data_f3 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    start_date   : OUT STD_LOGIC_VECTOR(30 DOWNTO 0)
+    start_date   : OUT STD_LOGIC_VECTOR(30 DOWNTO 0);
+    ---------------------------------------------------------------------------
+    debug_signal : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
     ---------------------------------------------------------------------------
     );
 
@@ -140,7 +142,7 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
   CONSTANT pconfig : apb_config_type := (
     0 => ahb_device_reg (VENDOR_LPP, LPP_LFR, 0, REVISION, pirq_wfp),
     1 => apb_iobar(paddr, pmask));
-  
+
   TYPE lpp_SpectralMatrix_regs IS RECORD
     config_active_interruption_onNewMatrix : STD_LOGIC;
     config_active_interruption_onError     : STD_LOGIC;
@@ -154,20 +156,20 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
     status_error_bad_component_error       : STD_LOGIC;
     status_error_buffer_full               : STD_LOGIC;
     status_error_input_fifo_write          : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    
-    addr_matrix_f0_0                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f0_1                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f1_0                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f1_1                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f2_0                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f2_1                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    
-    time_matrix_f0_0                       : STD_LOGIC_VECTOR(47 DOWNTO 0);
-    time_matrix_f0_1                       : STD_LOGIC_VECTOR(47 DOWNTO 0);
-    time_matrix_f1_0                       : STD_LOGIC_VECTOR(47 DOWNTO 0);
-    time_matrix_f1_1                       : STD_LOGIC_VECTOR(47 DOWNTO 0);
-    time_matrix_f2_0                       : STD_LOGIC_VECTOR(47 DOWNTO 0);
-    time_matrix_f2_1                       : STD_LOGIC_VECTOR(47 DOWNTO 0);
+
+    addr_matrix_f0_0 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    addr_matrix_f0_1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    addr_matrix_f1_0 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    addr_matrix_f1_1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    addr_matrix_f2_0 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    addr_matrix_f2_1 : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+    time_matrix_f0_0 : STD_LOGIC_VECTOR(47 DOWNTO 0);
+    time_matrix_f0_1 : STD_LOGIC_VECTOR(47 DOWNTO 0);
+    time_matrix_f1_0 : STD_LOGIC_VECTOR(47 DOWNTO 0);
+    time_matrix_f1_1 : STD_LOGIC_VECTOR(47 DOWNTO 0);
+    time_matrix_f2_0 : STD_LOGIC_VECTOR(47 DOWNTO 0);
+    time_matrix_f2_1 : STD_LOGIC_VECTOR(47 DOWNTO 0);
   END RECORD;
   SIGNAL reg_sp : lpp_SpectralMatrix_regs;
 
@@ -222,26 +224,28 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
   SIGNAL reg0_ready_matrix_f0 : STD_LOGIC;
   SIGNAL reg0_addr_matrix_f0  : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL reg0_matrix_time_f0  : STD_LOGIC_VECTOR(47 DOWNTO 0);
-  
+
   SIGNAL reg1_ready_matrix_f0 : STD_LOGIC;
   SIGNAL reg1_addr_matrix_f0  : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL reg1_matrix_time_f0  : STD_LOGIC_VECTOR(47 DOWNTO 0);
-  
+
   SIGNAL reg0_ready_matrix_f1 : STD_LOGIC;
   SIGNAL reg0_addr_matrix_f1  : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL reg0_matrix_time_f1  : STD_LOGIC_VECTOR(47 DOWNTO 0);
-  
+
   SIGNAL reg1_ready_matrix_f1 : STD_LOGIC;
   SIGNAL reg1_addr_matrix_f1  : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL reg1_matrix_time_f1  : STD_LOGIC_VECTOR(47 DOWNTO 0);    
-  
+  SIGNAL reg1_matrix_time_f1  : STD_LOGIC_VECTOR(47 DOWNTO 0);
+
   SIGNAL reg0_ready_matrix_f2 : STD_LOGIC;
   SIGNAL reg0_addr_matrix_f2  : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL reg0_matrix_time_f2  : STD_LOGIC_VECTOR(47 DOWNTO 0);
-  
+
   SIGNAL reg1_ready_matrix_f2 : STD_LOGIC;
   SIGNAL reg1_addr_matrix_f2  : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL reg1_matrix_time_f2  : STD_LOGIC_VECTOR(47 DOWNTO 0);          
+  SIGNAL reg1_matrix_time_f2  : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL apbo_irq_ms : STD_LOGIC;
+  SIGNAL apbo_irq_wfp : STD_LOGIC;
   
 BEGIN  -- beh
 
@@ -251,8 +255,8 @@ BEGIN  -- beh
 
   config_active_interruption_onNewMatrix <= reg_sp.config_active_interruption_onNewMatrix;
   config_active_interruption_onError     <= reg_sp.config_active_interruption_onError;
-    
-    
+
+
 --  addr_matrix_f0                         <= reg_sp.addr_matrix_f0;
 --  addr_matrix_f1                         <= reg_sp.addr_matrix_f1;
 --  addr_matrix_f2                         <= reg_sp.addr_matrix_f2;
@@ -315,18 +319,21 @@ BEGIN  -- beh
       reg_sp.addr_matrix_f0_1 <= (OTHERS => '0');
       reg_sp.addr_matrix_f1_1 <= (OTHERS => '0');
       reg_sp.addr_matrix_f2_1 <= (OTHERS => '0');
-      
+
 --      reg_sp.time_matrix_f0_0 <= (OTHERS => '0');  -- ok
 --      reg_sp.time_matrix_f1_0 <= (OTHERS => '0');  -- ok
 --      reg_sp.time_matrix_f2_0 <= (OTHERS => '0');  -- ok
-                         
+
 --      reg_sp.time_matrix_f0_1 <= (OTHERS => '0');  -- ok
       --reg_sp.time_matrix_f1_1 <= (OTHERS => '0');  -- ok
 --      reg_sp.time_matrix_f2_1 <= (OTHERS => '0');  -- ok
 
       prdata <= (OTHERS => '0');
 
-      apbo.pirq <= (OTHERS => '0');
+      
+      apbo_irq_ms <= '0';
+      apbo_irq_wfp <= '0';
+      
 
       status_full_ack <= (OTHERS => '0');
 
@@ -392,21 +399,21 @@ BEGIN  -- beh
       IF apbi.psel(pindex) = '1' THEN
         -- APB DMA READ  --
         CASE paddr(7 DOWNTO 2) IS
-                           --0
+          --0
           WHEN "000000" => prdata(0) <= reg_sp.config_active_interruption_onNewMatrix;
                            prdata(1) <= reg_sp.config_active_interruption_onError;
                            prdata(2) <= reg_sp.config_ms_run;
                            --1
           WHEN "000001" => prdata(0) <= reg_sp.status_ready_matrix_f0_0;
-                           prdata(1) <= reg_sp.status_ready_matrix_f0_1;
-                           prdata(2) <= reg_sp.status_ready_matrix_f1_0;
-                           prdata(3) <= reg_sp.status_ready_matrix_f1_1;
-                           prdata(4) <= reg_sp.status_ready_matrix_f2_0;
-                           prdata(5) <= reg_sp.status_ready_matrix_f2_1;
-                           prdata(6) <= reg_sp.status_error_bad_component_error;
-                           prdata(7) <= reg_sp.status_error_buffer_full;
-                           prdata(8) <= reg_sp.status_error_input_fifo_write(0);
-                           prdata(9) <= reg_sp.status_error_input_fifo_write(1);
+                           prdata(1)  <= reg_sp.status_ready_matrix_f0_1;
+                           prdata(2)  <= reg_sp.status_ready_matrix_f1_0;
+                           prdata(3)  <= reg_sp.status_ready_matrix_f1_1;
+                           prdata(4)  <= reg_sp.status_ready_matrix_f2_0;
+                           prdata(5)  <= reg_sp.status_ready_matrix_f2_1;
+                           prdata(6)  <= reg_sp.status_error_bad_component_error;
+                           prdata(7)  <= reg_sp.status_error_buffer_full;
+                           prdata(8)  <= reg_sp.status_error_input_fifo_write(0);
+                           prdata(9)  <= reg_sp.status_error_input_fifo_write(1);
                            prdata(10) <= reg_sp.status_error_input_fifo_write(2);
                            --2
           WHEN "000010" => prdata              <= reg_sp.addr_matrix_f0_0;
@@ -423,30 +430,30 @@ BEGIN  -- beh
                            --8
           WHEN "001000" => prdata              <= reg_sp.time_matrix_f0_0(47 DOWNTO 16);
                            --9
-          WHEN "001001" => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f0_0(15 DOWNTO  0);
+          WHEN "001001" => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f0_0(15 DOWNTO 0);
                            --10
           WHEN "001010" => prdata              <= reg_sp.time_matrix_f0_1(47 DOWNTO 16);
                            --11
-          WHEN "001011" => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f0_1(15 DOWNTO  0);
+          WHEN "001011" => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f0_1(15 DOWNTO 0);
                            --12
           WHEN "001100" => prdata              <= reg_sp.time_matrix_f1_0(47 DOWNTO 16);
                            --13
-          WHEN "001101" => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f1_0(15 DOWNTO  0);
+          WHEN "001101" => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f1_0(15 DOWNTO 0);
                            --14
           WHEN "001110" => prdata              <= reg_sp.time_matrix_f1_1(47 DOWNTO 16);
                            --15
-          WHEN "001111" => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f1_1(15 DOWNTO  0);
+          WHEN "001111" => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f1_1(15 DOWNTO 0);
                            --16
           WHEN "010000" => prdata              <= reg_sp.time_matrix_f2_0(47 DOWNTO 16);
                            --17
-          WHEN "010001" => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f2_0(15 DOWNTO  0);
+          WHEN "010001" => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f2_0(15 DOWNTO 0);
                            --18
           WHEN "010010" => prdata              <= reg_sp.time_matrix_f2_1(47 DOWNTO 16);
                            --19
-          WHEN "010011" => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f2_1(15 DOWNTO  0);
+          WHEN "010011" => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f2_1(15 DOWNTO 0);
                            ---------------------------------------------------------------------
                            --20
-          WHEN "010100" => prdata(0) <= reg_wp.data_shaping_BW;
+          WHEN "010100" => prdata(0)           <= reg_wp.data_shaping_BW;
                            prdata(1) <= reg_wp.data_shaping_SP0;
                            prdata(2) <= reg_wp.data_shaping_SP1;
                            prdata(3) <= reg_wp.data_shaping_R0;
@@ -500,26 +507,28 @@ BEGIN  -- beh
           CASE paddr(7 DOWNTO 2) IS
             --
             WHEN "000000" => reg_sp.config_active_interruption_onNewMatrix <= apbi.pwdata(0);
-                             reg_sp.config_active_interruption_onError     <= apbi.pwdata(1);
-                             reg_sp.config_ms_run                          <= apbi.pwdata(2);
-            WHEN "000001" => reg_sp.status_ready_matrix_f0_0               <= apbi.pwdata(0);
-                             reg_sp.status_ready_matrix_f0_1               <= apbi.pwdata(1);
-                             reg_sp.status_ready_matrix_f1_0               <= apbi.pwdata(2);
-                             reg_sp.status_ready_matrix_f1_1               <= apbi.pwdata(3);
-                             reg_sp.status_ready_matrix_f2_0               <= apbi.pwdata(4);
-                             reg_sp.status_ready_matrix_f2_1           <= apbi.pwdata(5);
-                             reg_sp.status_error_bad_component_error   <= apbi.pwdata(6);
-                             reg_sp.status_error_buffer_full           <= apbi.pwdata(7);
-                             reg_sp.status_error_input_fifo_write(0)   <= apbi.pwdata(8);
-                             reg_sp.status_error_input_fifo_write(1)   <= apbi.pwdata(9);
-                             reg_sp.status_error_input_fifo_write(2)   <= apbi.pwdata(10);
-                             --2
-            WHEN "000010" => reg_sp.addr_matrix_f0_0  <= apbi.pwdata;
-            WHEN "000011" => reg_sp.addr_matrix_f0_1  <= apbi.pwdata;
-            WHEN "000100" => reg_sp.addr_matrix_f1_0  <= apbi.pwdata;
-            WHEN "000101" => reg_sp.addr_matrix_f1_1  <= apbi.pwdata;
-            WHEN "000110" => reg_sp.addr_matrix_f2_0  <= apbi.pwdata;
-            WHEN "000111" => reg_sp.addr_matrix_f2_1  <= apbi.pwdata;
+                             reg_sp.config_active_interruption_onError <= apbi.pwdata(1);
+                             reg_sp.config_ms_run                      <= apbi.pwdata(2);
+                             
+            WHEN "000001" =>
+              reg_sp.status_ready_matrix_f0_0         <= ((NOT apbi.pwdata(0) ) AND reg_sp.status_ready_matrix_f0_0        ) OR reg0_ready_matrix_f0;
+              reg_sp.status_ready_matrix_f0_1         <= ((NOT apbi.pwdata(1) ) AND reg_sp.status_ready_matrix_f0_1        ) OR reg1_ready_matrix_f0;
+              reg_sp.status_ready_matrix_f1_0         <= ((NOT apbi.pwdata(2) ) AND reg_sp.status_ready_matrix_f1_0        ) OR reg0_ready_matrix_f1;
+              reg_sp.status_ready_matrix_f1_1         <= ((NOT apbi.pwdata(3) ) AND reg_sp.status_ready_matrix_f1_1        ) OR reg1_ready_matrix_f1;
+              reg_sp.status_ready_matrix_f2_0         <= ((NOT apbi.pwdata(4) ) AND reg_sp.status_ready_matrix_f2_0        ) OR reg0_ready_matrix_f2;
+              reg_sp.status_ready_matrix_f2_1         <= ((NOT apbi.pwdata(5) ) AND reg_sp.status_ready_matrix_f2_1        ) OR reg1_ready_matrix_f2;
+              reg_sp.status_error_bad_component_error <= ((NOT apbi.pwdata(6) ) AND reg_sp.status_error_bad_component_error) OR error_bad_component_error;
+              reg_sp.status_error_buffer_full         <= ((NOT apbi.pwdata(7) ) AND reg_sp.status_error_buffer_full        ) OR error_buffer_full;
+              reg_sp.status_error_input_fifo_write(0) <= ((NOT apbi.pwdata(8) ) AND reg_sp.status_error_input_fifo_write(0)) OR error_input_fifo_write(0);
+              reg_sp.status_error_input_fifo_write(1) <= ((NOT apbi.pwdata(9) ) AND reg_sp.status_error_input_fifo_write(1)) OR error_input_fifo_write(1);
+              reg_sp.status_error_input_fifo_write(2) <= ((NOT apbi.pwdata(10)) AND reg_sp.status_error_input_fifo_write(2)) OR error_input_fifo_write(2);
+              --2
+            WHEN "000010" => reg_sp.addr_matrix_f0_0 <= apbi.pwdata;
+            WHEN "000011" => reg_sp.addr_matrix_f0_1 <= apbi.pwdata;
+            WHEN "000100" => reg_sp.addr_matrix_f1_0 <= apbi.pwdata;
+            WHEN "000101" => reg_sp.addr_matrix_f1_1 <= apbi.pwdata;
+            WHEN "000110" => reg_sp.addr_matrix_f2_0 <= apbi.pwdata;
+            WHEN "000111" => reg_sp.addr_matrix_f2_1 <= apbi.pwdata;
                              --8 to 19
                              --20
             WHEN "010100" => reg_wp.data_shaping_BW  <= apbi.pwdata(0);
@@ -562,8 +571,8 @@ BEGIN  -- beh
           END CASE;
         END IF;
       END IF;
-
-      apbo.pirq(pirq_ms) <= ((reg_sp.config_active_interruption_onNewMatrix AND (ready_matrix_f0 OR
+      --apbo.pirq(pirq_ms) <=
+      apbo_irq_ms <= ((reg_sp.config_active_interruption_onNewMatrix AND (ready_matrix_f0 OR
                                                                                  ready_matrix_f1 OR
                                                                                  ready_matrix_f2)
                               )
@@ -575,12 +584,15 @@ BEGIN  -- beh
                                OR error_input_fifo_write(1)
                                OR error_input_fifo_write(2))
                               ));
-      
-      apbo.pirq(pirq_wfp) <= ored_irq_wfp;
+      -- apbo.pirq(pirq_wfp)
+      apbo_irq_wfp<= ored_irq_wfp;
       
     END IF;
   END PROCESS lpp_lfr_apbreg;
-
+  
+  apbo.pirq(pirq_ms)  <= apbo_irq_ms;
+  apbo.pirq(pirq_wfp) <= apbo_irq_wfp;
+  
   apbo.pindex  <= pindex;
   apbo.pconfig <= pconfig;
   apbo.prdata  <= prdata;
@@ -618,18 +630,18 @@ BEGIN  -- beh
 
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f0_0,
       reg0_ready_matrix        => reg0_ready_matrix_f0,
-      reg0_addr_matrix         => reg_sp.addr_matrix_f0_0,--reg0_addr_matrix_f0,            
-      reg0_matrix_time         => reg_sp.time_matrix_f0_0,--reg0_matrix_time_f0,          
+      reg0_addr_matrix         => reg_sp.addr_matrix_f0_0,  --reg0_addr_matrix_f0,            
+      reg0_matrix_time         => reg_sp.time_matrix_f0_0,  --reg0_matrix_time_f0,          
 
       reg1_status_ready_matrix => reg_sp.status_ready_matrix_f0_1,
-      reg1_ready_matrix        => reg1_ready_matrix_f0,         
-      reg1_addr_matrix         => reg_sp.addr_matrix_f0_1,--reg1_addr_matrix_f0,          
-      reg1_matrix_time         => reg_sp.time_matrix_f0_1,--reg1_matrix_time_f0,          
+      reg1_ready_matrix        => reg1_ready_matrix_f0,
+      reg1_addr_matrix         => reg_sp.addr_matrix_f0_1,  --reg1_addr_matrix_f0,          
+      reg1_matrix_time         => reg_sp.time_matrix_f0_1,  --reg1_matrix_time_f0,          
 
-      ready_matrix              => ready_matrix_f0,
-      status_ready_matrix       => status_ready_matrix_f0,      
-      addr_matrix               => addr_matrix_f0,              
-      matrix_time               => matrix_time_f0);             
+      ready_matrix        => ready_matrix_f0,
+      status_ready_matrix => status_ready_matrix_f0,
+      addr_matrix         => addr_matrix_f0,
+      matrix_time         => matrix_time_f0);             
 
   lpp_apbreg_ms_pointer_f1 : lpp_apbreg_ms_pointer
     PORT MAP (
@@ -638,19 +650,19 @@ BEGIN  -- beh
 
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f1_0,
       reg0_ready_matrix        => reg0_ready_matrix_f1,
-      reg0_addr_matrix         => reg_sp.addr_matrix_f1_0,--reg0_addr_matrix_f1,
-      reg0_matrix_time         => reg_sp.time_matrix_f1_0,--reg0_matrix_time_f1,
+      reg0_addr_matrix         => reg_sp.addr_matrix_f1_0,  --reg0_addr_matrix_f1,
+      reg0_matrix_time         => reg_sp.time_matrix_f1_0,  --reg0_matrix_time_f1,
 
       reg1_status_ready_matrix => reg_sp.status_ready_matrix_f1_1,
       reg1_ready_matrix        => reg1_ready_matrix_f1,
-      reg1_addr_matrix         => reg_sp.addr_matrix_f1_1,--reg1_addr_matrix_f1,
-      reg1_matrix_time         => reg_sp.time_matrix_f1_1,--reg1_matrix_time_f1,
+      reg1_addr_matrix         => reg_sp.addr_matrix_f1_1,  --reg1_addr_matrix_f1,
+      reg1_matrix_time         => reg_sp.time_matrix_f1_1,  --reg1_matrix_time_f1,
 
-      ready_matrix              => ready_matrix_f1,
-      status_ready_matrix       => status_ready_matrix_f1,
-      addr_matrix               => addr_matrix_f1,
-      matrix_time               => matrix_time_f1);
-  
+      ready_matrix        => ready_matrix_f1,
+      status_ready_matrix => status_ready_matrix_f1,
+      addr_matrix         => addr_matrix_f1,
+      matrix_time         => matrix_time_f1);
+
   lpp_apbreg_ms_pointer_f2 : lpp_apbreg_ms_pointer
     PORT MAP (
       clk  => HCLK,
@@ -658,18 +670,28 @@ BEGIN  -- beh
 
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f2_0,
       reg0_ready_matrix        => reg0_ready_matrix_f2,
-      reg0_addr_matrix         => reg_sp.addr_matrix_f2_0,--reg0_addr_matrix_f2,
-      reg0_matrix_time         => reg_sp.time_matrix_f2_0,--reg0_matrix_time_f2,
+      reg0_addr_matrix         => reg_sp.addr_matrix_f2_0,  --reg0_addr_matrix_f2,
+      reg0_matrix_time         => reg_sp.time_matrix_f2_0,  --reg0_matrix_time_f2,
 
       reg1_status_ready_matrix => reg_sp.status_ready_matrix_f2_1,
       reg1_ready_matrix        => reg1_ready_matrix_f2,
-      reg1_addr_matrix         => reg_sp.addr_matrix_f2_1,--reg1_addr_matrix_f2,
-      reg1_matrix_time         => reg_sp.time_matrix_f2_1,--reg1_matrix_time_f2,
+      reg1_addr_matrix         => reg_sp.addr_matrix_f2_1,  --reg1_addr_matrix_f2,
+      reg1_matrix_time         => reg_sp.time_matrix_f2_1,  --reg1_matrix_time_f2,
 
-      ready_matrix              => ready_matrix_f2,
-      status_ready_matrix       => status_ready_matrix_f2,
-      addr_matrix               => addr_matrix_f2,
-      matrix_time               => matrix_time_f2);
+      ready_matrix        => ready_matrix_f2,
+      status_ready_matrix => status_ready_matrix_f2,
+      addr_matrix         => addr_matrix_f2,
+      matrix_time         => matrix_time_f2);
 
-
+  -----------------------------------------------------------------------------
+  debug_signal(31 DOWNTO 12) <= (OTHERS => '0');
+  debug_signal(11 DOWNTO  0) <= apbo_irq_ms &  --11
+                               reg_sp.status_error_input_fifo_write(2) &--10
+                               reg_sp.status_error_input_fifo_write(1) &--9
+                               reg_sp.status_error_input_fifo_write(0) &--8
+                               reg_sp.status_error_buffer_full         & reg_sp.status_error_bad_component_error & --7 6
+                               reg_sp.status_ready_matrix_f2_1         & reg_sp.status_ready_matrix_f2_0 &--5 4
+                               reg_sp.status_ready_matrix_f1_1         & reg_sp.status_ready_matrix_f1_0 &--3 2
+                               reg_sp.status_ready_matrix_f0_1         & reg_sp.status_ready_matrix_f0_0; --1 0
+        
 END beh;

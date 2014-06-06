@@ -1,5 +1,23 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
+add wave -noupdate -expand -group debug -expand -group FSM_MS_DMA_state /tb/lpp_lfr_ms_1/debug_reg(0)
+add wave -noupdate -expand -group debug -expand -group FSM_MS_DMA_state /tb/lpp_lfr_ms_1/debug_reg(1)
+add wave -noupdate -expand -group debug -expand -group FSM_MS_DMA_state /tb/lpp_lfr_ms_1/debug_reg(2)
+add wave -noupdate -expand -group debug -expand -group status_ready_matrix /tb/lpp_lfr_ms_1/debug_reg(5)
+add wave -noupdate -expand -group debug -expand -group status_ready_matrix /tb/lpp_lfr_ms_1/debug_reg(4)
+add wave -noupdate -expand -group debug -expand -group status_ready_matrix /tb/lpp_lfr_ms_1/debug_reg(3)
+add wave -noupdate -expand -group debug -expand -group matrix_ready /tb/lpp_lfr_ms_1/debug_reg(8)
+add wave -noupdate -expand -group debug -expand -group matrix_ready /tb/lpp_lfr_ms_1/debug_reg(7)
+add wave -noupdate -expand -group debug -expand -group matrix_ready /tb/lpp_lfr_ms_1/debug_reg(6)
+add wave -noupdate -expand -group debug -expand /tb/lpp_lfr_ms_1/debug_reg
+add wave -noupdate -expand -group debug /tb/lpp_lfr_apbreg_1/apbi
+add wave -noupdate -expand -group debug -subitemconfig {/tb/lpp_lfr_apbreg_1/apbo.pirq {-height 15 -radix hexadecimal}} /tb/lpp_lfr_apbreg_1/apbo
+add wave -noupdate -expand -group debug /tb/ready_reg
+add wave -noupdate -expand -group Logic /tb/lpp_lfr_ms_1/debug_reg(0)
+add wave -noupdate -expand -group Logic /tb/lpp_lfr_ms_1/debug_reg(1)
+add wave -noupdate -expand -group Logic /tb/lpp_lfr_ms_1/debug_reg(2)
+add wave -noupdate -expand /tb/lpp_lfr_apbreg_1/debug_signal
+add wave -noupdate -divider {New Divider}
 add wave -noupdate /tb/lpp_lfr_ms_1/sample_f0_wen
 add wave -noupdate -radix hexadecimal /tb/lpp_lfr_ms_1/sample_f0_wdata
 add wave -noupdate /tb/lpp_lfr_ms_1/sample_f1_wen
@@ -192,7 +210,7 @@ add wave -noupdate /tb/lpp_lfr_apbreg_1/lpp_apbreg_ms_pointer_f0/addr_matrix
 add wave -noupdate /tb/lpp_lfr_apbreg_1/lpp_apbreg_ms_pointer_f0/matrix_time
 add wave -noupdate /tb/lpp_lfr_apbreg_1/lpp_apbreg_ms_pointer_f0/current_reg
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {189796403054 ps} 0} {{Cursor 2} {30152624373 ps} 0} {{Cursor 3} {10666401890 ps} 0} {{Cursor 4} {69917366400 ps} 0} {{Cursor 5} {87243365384 ps} 0}
+WaveRestoreCursors {{Cursor 1} {123239471127 ps} 0}
 configure wave -namecolwidth 486
 configure wave -valuecolwidth 112
 configure wave -justifyvalue left
@@ -207,6 +225,6 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {105000147 ns}
+WaveRestoreZoom {124629370639 ps} {125891337681 ps}
 bookmark add wave bookmark0 {{61745287067 ps} {63754655343 ps}} 0
 bookmark add wave bookmark1 {{61745287067 ps} {63754655343 ps}} 0

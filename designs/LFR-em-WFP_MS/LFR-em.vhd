@@ -340,7 +340,7 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
 -- LFR ------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-  lpp_lfr_1 : lpp_lfr_WFP_nMS
+  lpp_lfr_1 : lpp_lfr
     GENERIC MAP (
       Mem_use                => use_RAM,
       nb_data_by_buffer_size => 32,
@@ -354,7 +354,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"00010B")  -- aa.bb.cc version
+      top_lfr_version        => X"010110")  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             -- 0 => MINI_LFR
                                             -- 1 => EM

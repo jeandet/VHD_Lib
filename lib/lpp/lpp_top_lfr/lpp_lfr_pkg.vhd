@@ -103,6 +103,10 @@ PACKAGE lpp_lfr_pkg IS
       error_buffer_full                      : OUT STD_LOGIC;
       error_input_fifo_write                 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
       debug_reg                              : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      --
+      observation_vector_0: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+      observation_vector_1: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+      -------------------------------------------------------------------------
       status_ready_matrix_f0               : IN  STD_LOGIC;
 --      status_ready_matrix_f0_1               : IN  STD_LOGIC;
       status_ready_matrix_f1                 : IN  STD_LOGIC;
@@ -239,6 +243,9 @@ PACKAGE lpp_lfr_pkg IS
       coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
       data_shaping_BW : OUT STD_LOGIC;
+      --
+      observation_vector_0: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+      observation_vector_1: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
       observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
       );
   END COMPONENT;
@@ -345,7 +352,10 @@ PACKAGE lpp_lfr_pkg IS
       addr_data_f1                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_data_f2                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       addr_data_f3                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      start_date                             : OUT STD_LOGIC_VECTOR(30 DOWNTO 0)
+      start_date                             : OUT STD_LOGIC_VECTOR(30 DOWNTO 0);
+      
+      debug_signal                           : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+      
       );
   END COMPONENT;
   

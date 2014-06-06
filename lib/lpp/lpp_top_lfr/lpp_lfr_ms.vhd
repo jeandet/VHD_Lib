@@ -57,6 +57,9 @@ ENTITY lpp_lfr_ms IS
     error_input_fifo_write    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 
     debug_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --
+    observation_vector_0: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    observation_vector_1: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
 
     -- Reg In
     status_ready_matrix_f0 : IN STD_LOGIC;
@@ -570,6 +573,14 @@ BEGIN
       fft_data_valid => fft_data_valid,
       fft_ready      => fft_ready);
 
+  observation_vector_0(5 DOWNTO 0) <= fft_ready &                         --5
+                                      fft_data_valid &                    --4
+                                      fft_pong &                          --3
+                                      sample_load &                       --2
+                                      fft_read &                          --1
+                                      sample_valid;                       --0
+
+  
   -----------------------------------------------------------------------------
   PROCESS (clk, rstn)
   BEGIN
@@ -638,6 +649,8 @@ BEGIN
                      (fft_data_im & fft_data_re) &
                      (fft_data_im & fft_data_re) &
                      (fft_data_im & fft_data_re);
+  -----------------------------------------------------------------------------
+  
 
   -----------------------------------------------------------------------------
   Mem_In_SpectralMatrix : lppFIFOxN

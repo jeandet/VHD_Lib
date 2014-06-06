@@ -61,6 +61,10 @@ ENTITY lpp_lfr IS
     -- 
     data_shaping_BW : OUT STD_LOGIC;
     --
+    --
+    observation_vector_0: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    observation_vector_1: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    
     observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 
     --debug
@@ -284,6 +288,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL error_input_fifo_write    :  STD_LOGIC_VECTOR(2 DOWNTO 0);
 
   SIGNAL debug_ms : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL debug_signal : STD_LOGIC_VECTOR(31 DOWNTO 0);
     
 BEGIN
   
@@ -395,7 +400,8 @@ BEGIN
       addr_data_f1      => addr_data_f1,
       addr_data_f2      => addr_data_f2,
       addr_data_f3      => addr_data_f3,
-      start_date        => start_date);
+      start_date        => start_date,
+      debug_signal      => debug_signal);
 
   -----------------------------------------------------------------------------
   -----------------------------------------------------------------------------
@@ -710,6 +716,8 @@ BEGIN
       error_input_fifo_write                 => error_input_fifo_write, 
       
       debug_reg                              => debug_ms,--observation_reg,
+    observation_vector_0 => observation_vector_0,
+    observation_vector_1 => observation_vector_1,
       
       status_ready_matrix_f0                 => status_ready_matrix_f0,
       status_ready_matrix_f1                 => status_ready_matrix_f1,
@@ -725,11 +733,16 @@ BEGIN
       matrix_time_f2                         => matrix_time_f2);
 
   -----------------------------------------------------------------------------
-  observation_reg(31 DOWNTO 0) <= debug_ms(31-9 DOWNTO 0) &
-                                  dma_ms_ongoing &      -- 8
-                                  data_ms_done &        -- 7
-                                  dma_done &            -- 6
-                                  dma_sel &             -- 5 .. 1
-                                  ms_softandhard_rstn;  -- 0
+
+  
+  observation_reg(31 DOWNTO 0) <=
+    dma_sel(4) & -- 31
+    dma_ms_ongoing &            -- 30
+    data_ms_done &              -- 29
+    dma_done &                  -- 28
+    ms_softandhard_rstn  &      --27
+    debug_ms(14 DOWNTO 12) &    -- 26 .. 24
+    debug_ms(11 DOWNTO 0) &     -- 23 .. 12
+    debug_signal(11 DOWNTO 0);  -- 11 .. 0
   
 END beh;
