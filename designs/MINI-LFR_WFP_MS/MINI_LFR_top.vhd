@@ -428,7 +428,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000111")  -- aa.bb.cc version
+      top_lfr_version        => X"000112")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => reset,
@@ -530,7 +530,7 @@ BEGIN  -- beh
       IO11 <= '0';
     ELSIF clk_25'event AND clk_25 = '1' THEN  -- rising clock edge
       CASE gpioo.dout(2 DOWNTO 0) IS
-        WHEN "000" => 
+        WHEN "011" => 
           IO0  <= observation_reg(0 );
           IO1  <= observation_reg(1 );
           IO2  <= observation_reg(2 );  
@@ -569,7 +569,7 @@ BEGIN  -- beh
           IO9  <= '0';
           IO10 <= '0';
           IO11 <= '0';
-        WHEN "011" => 
+        WHEN "000" => 
           IO0  <= observation_vector_0(0 );
           IO1  <= observation_vector_0(1 );
           IO2  <= observation_vector_0(2 );  

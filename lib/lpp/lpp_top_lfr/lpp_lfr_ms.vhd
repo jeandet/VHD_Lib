@@ -476,7 +476,8 @@ BEGIN
   -- FSM LOAD FFT
   -----------------------------------------------------------------------------
 
-  sample_ren <= sample_ren_s WHEN sample_load = '1' ELSE (OTHERS => '1');
+  sample_ren <= sample_ren_s    WHEN ping_npong = fft_pong AND sample_load = '1' ELSE
+                (OTHERS => '1');
 
   PROCESS (clk, rstn)
   BEGIN
@@ -551,7 +552,7 @@ BEGIN
   END PROCESS;
 
 --  sample_valid <= sample_valid_r AND sample_load;
-  sample_valid <= sample_valid_r AND (sample_load AND (ping_npong AND fft_pong));
+  sample_valid <= sample_valid_r AND sample_load WHEN ping_npong = fft_pong ELSE '0';
 
   sample_data <= sample_rdata(16*1-1 DOWNTO 16*0) WHEN next_state_fsm_load_FFT = FIFO_1 ELSE
                  sample_rdata(16*2-1 DOWNTO 16*1) WHEN next_state_fsm_load_FFT = FIFO_2 ELSE
@@ -576,7 +577,10 @@ BEGIN
       fft_data_valid => fft_data_valid,
       fft_ready      => fft_ready);
 
-  observation_vector_0(5 DOWNTO 0) <= fft_ready &                         --5
+  observation_vector_0(11 DOWNTO 0) <= "0000" &                            --11 10 9 8
+                                      sample_load_reg &                   --7
+                                      ping_npong &                        --6
+                                      fft_ready &                         --5
                                       fft_data_valid &                    --4
                                       fft_pong &                          --3
                                       sample_load &                       --2
@@ -587,8 +591,8 @@ BEGIN
   PROCESS (clk, rstn)
   BEGIN
     IF rstn = '0' THEN
-      ping_npong <= '0';
-      sample_load_reg <= '0';
+      ping_npong        <= '0';
+      sample_load_reg   <= '0';
     ELSIF clk'event AND clk = '1' THEN
       sample_load_reg <= sample_load;
       IF sample_load_reg = '1' AND sample_load = '0' THEN
@@ -693,16 +697,14 @@ BEGIN
 
   -----------------------------------------------------------------------------
 
-  observation_vector_1(11 DOWNTO 0) <= "0000" &
+  observation_vector_1(11 DOWNTO 0) <= '0' &
+                                       SM_correlation_done      &               --4
+                                       SM_correlation_auto   &                --3
+                                       SM_correlation_start  &  
                                        SM_correlation_start &            --7
                                        status_MS_input(1 DOWNTO 0)&     --6..5
                                        MEM_IN_SM_locked(4 DOWNTO 0);    --4..0
 
-  observation_vector_0(11 DOWNTO 6) <= MEM_IN_SM_locked(0) &
-                                       SM_correlation_done      &               --4
-                                       SM_correlation_auto   &                --3
-                                       SM_correlation_start  &                 --2
-                                       status_component(5 DOWNTO 4);                   --1..0
   -----------------------------------------------------------------------------
   MS_control_1 : MS_control
     PORT MAP (
