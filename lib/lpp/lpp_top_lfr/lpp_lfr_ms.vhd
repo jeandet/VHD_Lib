@@ -234,8 +234,13 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL status_component_fifo_0_end : STD_LOGIC;
   SIGNAL status_component_fifo_1_end : STD_LOGIC;
   -----------------------------------------------------------------------------
-  SIGNAL ping_npong : STD_LOGIC;
-  SIGNAL sample_load_reg : STD_LOGIC;
+  SIGNAL fft_ongoing_counter : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  
+  SIGNAL fft_ready_reg         : STD_LOGIC;
+  SIGNAL fft_ready_rising_down : STD_LOGIC;
+  
+  SIGNAL sample_load_reg         : STD_LOGIC;
+  SIGNAL sample_load_rising_down : STD_LOGIC;
   
 BEGIN
 
@@ -476,7 +481,8 @@ BEGIN
   -- FSM LOAD FFT
   -----------------------------------------------------------------------------
 
-  sample_ren <= sample_ren_s    WHEN ping_npong = fft_pong AND sample_load = '1' ELSE
+  sample_ren <= (OTHERS => '1') WHEN fft_ongoing_counter = "10" ELSE
+                sample_ren_s    WHEN sample_load = '1' ELSE
                 (OTHERS => '1');
 
   PROCESS (clk, rstn)
@@ -551,8 +557,7 @@ BEGIN
     END IF;
   END PROCESS;
 
---  sample_valid <= sample_valid_r AND sample_load;
-  sample_valid <= sample_valid_r AND sample_load WHEN ping_npong = fft_pong ELSE '0';
+  sample_valid <= '0' WHEN fft_ongoing_counter = "10" ELSE sample_valid_r AND sample_load;
 
   sample_data <= sample_rdata(16*1-1 DOWNTO 16*0) WHEN next_state_fsm_load_FFT = FIFO_1 ELSE
                  sample_rdata(16*2-1 DOWNTO 16*1) WHEN next_state_fsm_load_FFT = FIFO_2 ELSE
@@ -577,27 +582,46 @@ BEGIN
       fft_data_valid => fft_data_valid,
       fft_ready      => fft_ready);
 
-  observation_vector_0(11 DOWNTO 0) <= "0000" &                            --11 10 9 8
-                                      sample_load_reg &                   --7
-                                      ping_npong &                        --6
-                                      fft_ready &                         --5
-                                      fft_data_valid &                    --4
-                                      fft_pong &                          --3
-                                      sample_load &                       --2
-                                      fft_read &                          --1
-                                      sample_valid;                       --0
+  observation_vector_0(11 DOWNTO 0) <= "00" &                              --11 10 
+                                       fft_ongoing_counter &               --9 8
+                                       sample_load_rising_down &           --7
+                                       fft_ready_rising_down &             --6
+                                       fft_ready &                         --5
+                                       fft_data_valid &                    --4
+                                       fft_pong &                          --3
+                                       sample_load &                       --2
+                                       fft_read &                          --1
+                                       sample_valid;                       --0
 
   -----------------------------------------------------------------------------
+  fft_ready_rising_down   <= fft_ready_reg AND NOT fft_ready;
+  sample_load_rising_down <= sample_load_reg AND NOT sample_load;
+  
   PROCESS (clk, rstn)
   BEGIN
     IF rstn = '0' THEN
-      ping_npong        <= '0';
+      fft_ready_reg     <= '0';
       sample_load_reg   <= '0';
+
+      fft_ongoing_counter <= "00";
     ELSIF clk'event AND clk = '1' THEN
-      sample_load_reg <= sample_load;
-      IF sample_load_reg = '1' AND sample_load = '0' THEN
-        ping_npong <= NOT ping_npong;
+      fft_ready_reg    <= fft_ready;
+      sample_load_reg  <= sample_load;
+
+      IF fft_ready_rising_down = '1' AND sample_load_rising_down = '0' THEN
+        CASE fft_ongoing_counter IS
+          WHEN "01" => fft_ongoing_counter <= "00";
+          WHEN "10" => fft_ongoing_counter <= "01";
+          WHEN OTHERS => NULL;
+        END CASE;
+      ELSIF fft_ready_rising_down = '0' AND sample_load_rising_down = '1' THEN
+        CASE fft_ongoing_counter IS
+          WHEN "00" => fft_ongoing_counter <= "01";
+          WHEN "01" => fft_ongoing_counter <= "10";
+          WHEN OTHERS => NULL;
+        END CASE;
       END IF;
+
     END IF;
   END PROCESS;
   
