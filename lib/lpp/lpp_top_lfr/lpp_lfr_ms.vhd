@@ -234,7 +234,9 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL status_component_fifo_0_end : STD_LOGIC;
   SIGNAL status_component_fifo_1_end : STD_LOGIC;
   -----------------------------------------------------------------------------
-
+  SIGNAL ping_npong : STD_LOGIC;
+  SIGNAL sample_load_reg : STD_LOGIC;
+  
 BEGIN
 
   
@@ -548,7 +550,8 @@ BEGIN
     END IF;
   END PROCESS;
 
-  sample_valid <= sample_valid_r AND sample_load;
+--  sample_valid <= sample_valid_r AND sample_load;
+  sample_valid <= sample_valid_r AND (sample_load AND (ping_npong AND fft_pong));
 
   sample_data <= sample_rdata(16*1-1 DOWNTO 16*0) WHEN next_state_fsm_load_FFT = FIFO_1 ELSE
                  sample_rdata(16*2-1 DOWNTO 16*1) WHEN next_state_fsm_load_FFT = FIFO_2 ELSE
@@ -580,6 +583,19 @@ BEGIN
                                       fft_read &                          --1
                                       sample_valid;                       --0
 
+  -----------------------------------------------------------------------------
+  PROCESS (clk, rstn)
+  BEGIN
+    IF rstn = '0' THEN
+      ping_npong <= '0';
+      sample_load_reg <= '0';
+    ELSIF clk'event AND clk = '1' THEN
+      sample_load_reg <= sample_load;
+      IF sample_load_reg = '1' AND sample_load = '0' THEN
+        ping_npong <= NOT ping_npong;
+      END IF;
+    END IF;
+  END PROCESS;
   
   -----------------------------------------------------------------------------
   PROCESS (clk, rstn)
