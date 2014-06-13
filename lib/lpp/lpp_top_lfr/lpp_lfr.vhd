@@ -120,7 +120,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   --
   SIGNAL sample_f0_wen    : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL sample_f1_wen    : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL sample_f3_wen    : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL sample_f2_wen    : STD_LOGIC_VECTOR(4 DOWNTO 0);
   --
   SIGNAL sample_f0_val    : STD_LOGIC;
   SIGNAL sample_f1_val    : STD_LOGIC;
@@ -134,7 +134,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   --
   SIGNAL sample_f0_wdata  : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   SIGNAL sample_f1_wdata  : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
-  SIGNAL sample_f3_wdata  : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+  SIGNAL sample_f2_wdata  : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
 
   -- SM
   SIGNAL ready_matrix_f0                      : STD_LOGIC;
@@ -672,12 +672,12 @@ BEGIN
                    NOT(sample_f0_val) & NOT(sample_f0_val);
   sample_f1_wen <= NOT(sample_f1_val) & NOT(sample_f1_val) & NOT(sample_f1_val) &
                    NOT(sample_f1_val) & NOT(sample_f1_val);
-  sample_f3_wen <= NOT(sample_f3_val) & NOT(sample_f3_val) & NOT(sample_f3_val) &
-                   NOT(sample_f3_val) & NOT(sample_f3_val);
+  sample_f2_wen <= NOT(sample_f2_val) & NOT(sample_f2_val) & NOT(sample_f2_val) &
+                   NOT(sample_f2_val) & NOT(sample_f2_val);
 
   sample_f0_wdata <= sample_f0_data((3*16)-1 DOWNTO (1*16)) & sample_f0_data((6*16)-1 DOWNTO (3*16));  -- (MSB) E2 E1 B2 B1 B0 (LSB)
   sample_f1_wdata <= sample_f1_data((3*16)-1 DOWNTO (1*16)) & sample_f1_data((6*16)-1 DOWNTO (3*16));
-  sample_f3_wdata <= sample_f3_data((3*16)-1 DOWNTO (1*16)) & sample_f3_data((6*16)-1 DOWNTO (3*16));
+  sample_f2_wdata <= sample_f2_data((3*16)-1 DOWNTO (1*16)) & sample_f2_data((6*16)-1 DOWNTO (3*16));
 
   -------------------------------------------------------------------------------
 
