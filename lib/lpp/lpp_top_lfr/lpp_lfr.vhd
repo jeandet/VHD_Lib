@@ -698,8 +698,8 @@ BEGIN
       sample_f0_wdata => sample_f0_wdata,
       sample_f1_wen   => sample_f1_wen,
       sample_f1_wdata => sample_f1_wdata,
-      sample_f2_wen   => sample_f3_wen,  -- TODO
-      sample_f2_wdata => sample_f3_wdata,-- TODO
+      sample_f2_wen   => sample_f2_wen,  -- TODO
+      sample_f2_wdata => sample_f2_wdata,-- TODO
 
       dma_addr        => data_ms_addr,         --
       dma_data        => data_ms_data,         --
