@@ -6,4 +6,5 @@ lpp_lfr_apbreg_ms_pointer.vhd
 lpp_lfr_ms_fsmdma.vhd
 lpp_lfr_ms_FFT.vhd
 lpp_lfr_ms.vhd
+lpp_lfr_ms_reg_head.vhd
 lpp_lfr.vhd

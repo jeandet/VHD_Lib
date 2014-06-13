@@ -241,6 +241,16 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   
   SIGNAL sample_load_reg         : STD_LOGIC;
   SIGNAL sample_load_rising_down : STD_LOGIC;
+
+  -----------------------------------------------------------------------------
+  SIGNAL sample_f1_wen_head     : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL sample_f1_wen_head_in  : STD_LOGIC;
+  SIGNAL sample_f1_wen_head_out : STD_LOGIC;
+  SIGNAL sample_f1_full_head_in : STD_LOGIC;
+  SIGNAL sample_f1_full_head_out : STD_LOGIC;
+  SIGNAL sample_f1_empty_head_in : STD_LOGIC;
+  
+  SIGNAL sample_f1_wdata_head   : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   
 BEGIN
 
@@ -317,7 +327,23 @@ BEGIN
   -- sample_f1_wdata in
   -- sample_f1_full  OUT
 
+  sample_f1_wen_head_in   <= '0' WHEN sample_f1_wen   = "00000" ELSE '1';
+  sample_f1_full_head_in  <= '0' WHEN sample_f1_full  = "00000" ELSE '1';
+  sample_f1_empty_head_in <= '1' WHEN sample_f1_empty = "11111" ELSE '0';
+  
+  lpp_lfr_ms_reg_head_1:lpp_lfr_ms_reg_head
+    PORT MAP (
+      clk      => clk,
+      rstn     => rstn,
+      in_wen   => sample_f1_wen_head_in,
+      in_data  => sample_f1_wdata,
+      in_full  => sample_f1_full_head_in,
+      in_empty => sample_f1_empty_head_in,
+      out_wen  => sample_f1_wen_head_out,
+      out_data => sample_f1_wdata_head,
+      out_full => sample_f1_full_head_out);
 
+  sample_f1_wen_head    <= sample_f1_wen_head_out & sample_f1_wen_head_out & sample_f1_wen_head_out & sample_f1_wen_head_out & sample_f1_wen_head_out;
   
   
   lppFIFOxN_f1 : lppFIFOxN
@@ -333,8 +359,8 @@ BEGIN
 
       ReUse => (OTHERS => '0'),
 
-      wen         => sample_f1_wen,
-      wdata       => sample_f1_wdata,
+      wen         => sample_f1_wen_head,
+      wdata       => sample_f1_wdata_head,
       ren         => sample_f1_ren,
       rdata       => sample_f1_rdata,
       empty       => sample_f1_empty,
@@ -350,7 +376,7 @@ BEGIN
       one_sample_f1_full <= '0';
       error_wen_f1       <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      IF sample_f1_full = "00000" THEN
+      IF sample_f1_full_head_out = '0' THEN
         one_sample_f1_full <= '0';
       ELSE
         one_sample_f1_full <= '1';

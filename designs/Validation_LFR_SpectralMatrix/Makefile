@@ -399,6 +399,7 @@ vcom_lpp:
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_apbreg_simu.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_apbreg_ms_pointer.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_ms.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_ms_reg_head.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_ms_fsmdma.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/lpp_top_lfr/lpp_lfr_ms_FFT.vhd
 	@echo "vcom lpp done"
