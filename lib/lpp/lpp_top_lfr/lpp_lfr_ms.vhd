@@ -234,7 +234,7 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL status_component_fifo_0_end : STD_LOGIC;
   SIGNAL status_component_fifo_1_end : STD_LOGIC;
   -----------------------------------------------------------------------------
-  SIGNAL fft_ongoing_counter : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL fft_ongoing_counter : STD_LOGIC;--_VECTOR(1 DOWNTO 0);
   
   SIGNAL fft_ready_reg         : STD_LOGIC;
   SIGNAL fft_ready_rising_down : STD_LOGIC;
@@ -310,8 +310,16 @@ BEGIN
       rdata       => sample_f0_B_rdata,
       empty       => sample_f0_B_empty,
       full        => sample_f0_B_full,
-      almost_full => OPEN);             
+      almost_full => OPEN);
 
+  -----------------------------------------------------------------------------
+  -- sample_f1_wen   in
+  -- sample_f1_wdata in
+  -- sample_f1_full  OUT
+
+
+  
+  
   lppFIFOxN_f1 : lppFIFOxN
     GENERIC MAP (
       tech    => 0,
@@ -350,6 +358,8 @@ BEGIN
       error_wen_f1 <= one_sample_f1_wen AND one_sample_f1_full;
     END IF;
   END PROCESS;
+
+  -----------------------------------------------------------------------------
 
 
   lppFIFOxN_f2 : lppFIFOxN
@@ -481,7 +491,7 @@ BEGIN
   -- FSM LOAD FFT
   -----------------------------------------------------------------------------
 
-  sample_ren <= (OTHERS => '1') WHEN fft_ongoing_counter = "10" ELSE
+  sample_ren <= (OTHERS => '1') WHEN fft_ongoing_counter = '1' ELSE
                 sample_ren_s    WHEN sample_load = '1' ELSE
                 (OTHERS => '1');
 
@@ -557,7 +567,7 @@ BEGIN
     END IF;
   END PROCESS;
 
-  sample_valid <= '0' WHEN fft_ongoing_counter = "10" ELSE sample_valid_r AND sample_load;
+  sample_valid <= '0' WHEN fft_ongoing_counter = '1' ELSE sample_valid_r AND sample_load;
 
   sample_data <= sample_rdata(16*1-1 DOWNTO 16*0) WHEN next_state_fsm_load_FFT = FIFO_1 ELSE
                  sample_rdata(16*2-1 DOWNTO 16*1) WHEN next_state_fsm_load_FFT = FIFO_2 ELSE
@@ -582,7 +592,7 @@ BEGIN
       fft_data_valid => fft_data_valid,
       fft_ready      => fft_ready);
 
-  observation_vector_0(11 DOWNTO 0) <= "00" &                              --11 10 
+  observation_vector_0(11 DOWNTO 0) <= "000" &                              --11 10 
                                        fft_ongoing_counter &               --9 8
                                        sample_load_rising_down &           --7
                                        fft_ready_rising_down &             --6
@@ -603,23 +613,26 @@ BEGIN
       fft_ready_reg     <= '0';
       sample_load_reg   <= '0';
 
-      fft_ongoing_counter <= "00";
+      fft_ongoing_counter <= '0';
     ELSIF clk'event AND clk = '1' THEN
       fft_ready_reg    <= fft_ready;
       sample_load_reg  <= sample_load;
 
       IF fft_ready_rising_down = '1' AND sample_load_rising_down = '0' THEN
-        CASE fft_ongoing_counter IS
-          WHEN "01" => fft_ongoing_counter <= "00";
-          WHEN "10" => fft_ongoing_counter <= "01";
-          WHEN OTHERS => NULL;
-        END CASE;
+        fft_ongoing_counter <= '0';
+
+--        CASE fft_ongoing_counter IS
+--          WHEN "01" => fft_ongoing_counter <= "00";
+----          WHEN "10" => fft_ongoing_counter <= "01";
+--          WHEN OTHERS => NULL;
+--        END CASE;
       ELSIF fft_ready_rising_down = '0' AND sample_load_rising_down = '1' THEN
-        CASE fft_ongoing_counter IS
-          WHEN "00" => fft_ongoing_counter <= "01";
-          WHEN "01" => fft_ongoing_counter <= "10";
-          WHEN OTHERS => NULL;
-        END CASE;
+        fft_ongoing_counter <= '1';
+--        CASE fft_ongoing_counter IS
+--          WHEN "00" => fft_ongoing_counter <= "01";
+----          WHEN "01" => fft_ongoing_counter <= "10";
+--          WHEN OTHERS => NULL;
+--        END CASE;
       END IF;
 
     END IF;
