@@ -138,6 +138,9 @@ ARCHITECTURE beh OF LFR_em IS
 
   -----------------------------------------------------------------------------
   SIGNAL rstn : STD_LOGIC;
+
+  SIGNAL ADC_smpclk_s : STD_LOGIC;
+
 BEGIN  -- beh
 
   -----------------------------------------------------------------------------
@@ -371,6 +374,8 @@ BEGIN  -- beh
       coarse_time     => coarse_time,
       fine_time       => fine_time,
       data_shaping_BW => bias_fail_sw,
+      observation_vector_0 => OPEN,
+      observation_vector_1 => OPEN,
       observation_reg => observation_reg);
 
 
@@ -389,14 +394,16 @@ BEGIN  -- beh
     PORT MAP (
       cnv_clk    => clk_24,             -- TODO : 49.152
       cnv_rstn   => rstn,               -- ok
-      cnv        => ADC_smpclk,         -- ok
+      cnv        => ADC_smpclk_s,         -- ok
       clk        => clk_25,             -- ok
       rstn       => rstn,               -- ok
       ADC_data   => ADC_data,           -- ok
       ADC_nOE    => ADC_OEB_bar_CH,     -- ok
       sample     => sample,             -- ok
       sample_val => sample_val);        -- ok
-
-  TAG8 <= ADC_smpclk;
+  
+  ADC_smpclk <= ADC_smpclk_s;
+  
+  TAG8 <= ADC_smpclk_s;
 
 END beh;
