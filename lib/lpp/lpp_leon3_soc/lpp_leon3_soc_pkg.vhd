@@ -76,5 +76,52 @@ PACKAGE lpp_leon3_soc_pkg IS
       ahbi_m_ext : OUT   AHB_Mst_In_Type;
       ahbo_m_ext : IN    soc_ahb_mst_out_vector(NB_AHB_MASTER-1+NB_CPU DOWNTO NB_CPU));
   END COMPONENT;
+   
+
+  COMPONENT leon3ft_soc
+    GENERIC (
+      fabtech         : INTEGER;
+      memtech         : INTEGER;
+      padtech         : INTEGER;
+      clktech         : INTEGER;
+      disas           : INTEGER;
+      dbguart         : INTEGER;
+      pclow           : INTEGER;
+      clk_freq        : INTEGER;
+      NB_CPU          : INTEGER;
+      ENABLE_FPU      : INTEGER;
+      FPU_NETLIST     : INTEGER;
+      ENABLE_DSU      : INTEGER;
+      ENABLE_AHB_UART : INTEGER;
+      ENABLE_APB_UART : INTEGER;
+      ENABLE_IRQMP    : INTEGER;
+      ENABLE_GPT      : INTEGER;
+      NB_AHB_MASTER   : INTEGER;
+      NB_AHB_SLAVE    : INTEGER;
+      NB_APB_SLAVE    : INTEGER);
+    PORT (
+      clk        : IN    STD_ULOGIC;
+      reset      : IN    STD_ULOGIC;
+      errorn     : OUT   STD_ULOGIC;
+      ahbrxd     : IN    STD_ULOGIC;
+      ahbtxd     : OUT   STD_ULOGIC;
+      urxd1      : IN    STD_ULOGIC;
+      utxd1      : OUT   STD_ULOGIC;
+      address    : OUT   STD_LOGIC_VECTOR(19 DOWNTO 0);
+      data       : INOUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      nSRAM_BE0  : OUT   STD_LOGIC;
+      nSRAM_BE1  : OUT   STD_LOGIC;
+      nSRAM_BE2  : OUT   STD_LOGIC;
+      nSRAM_BE3  : OUT   STD_LOGIC;
+      nSRAM_WE   : OUT   STD_LOGIC;
+      nSRAM_CE   : OUT   STD_LOGIC;
+      nSRAM_OE   : OUT   STD_LOGIC;
+      apbi_ext   : OUT   apb_slv_in_type;
+      apbo_ext   : IN    soc_apb_slv_out_vector(NB_APB_SLAVE-1+5 DOWNTO 5);
+      ahbi_s_ext : OUT   ahb_slv_in_type;
+      ahbo_s_ext : IN    soc_ahb_slv_out_vector(NB_AHB_SLAVE-1+3 DOWNTO 3);
+      ahbi_m_ext : OUT   AHB_Mst_In_Type;
+      ahbo_m_ext : IN    soc_ahb_mst_out_vector(NB_AHB_MASTER-1+NB_CPU DOWNTO NB_CPU));
+  END COMPONENT;
   
 END;

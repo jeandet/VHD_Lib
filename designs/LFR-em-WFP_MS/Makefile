@@ -35,6 +35,7 @@ DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	./general_purpose/lpp_delay \
 	./lpp_bootloader \
 	./lpp_cna \
+	./dsp/lpp_fft_rtax \
 	./lpp_uart \
 	./lpp_usb \
 
