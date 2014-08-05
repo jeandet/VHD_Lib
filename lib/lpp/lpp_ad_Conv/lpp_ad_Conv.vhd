@@ -338,6 +338,24 @@ COMPONENT ADS7886_drvr_v2 IS
     sample_val : OUT STD_LOGIC
     );    
 END COMPONENT;
+
+COMPONENT top_ad_conv_RHF1401_withFilter
+  GENERIC (
+    ChanelCount     : INTEGER;
+    ncycle_cnv_high : INTEGER;
+    ncycle_cnv      : INTEGER);
+  PORT (
+    cnv_clk    : IN  STD_LOGIC;
+    cnv_rstn   : IN  STD_LOGIC;
+    cnv        : OUT STD_LOGIC;
+    clk        : IN  STD_LOGIC;
+    rstn       : IN  STD_LOGIC;
+    ADC_data   : IN  Samples14;
+    ADC_nOE    : OUT STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
+    sample     : OUT Samples14v(ChanelCount-1 DOWNTO 0);
+    sample_val : OUT STD_LOGIC);
+END COMPONENT;
+
   
 END lpp_ad_conv;
 

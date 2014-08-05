@@ -386,21 +386,40 @@ BEGIN  -- beh
   -----------------------------------------------------------------------------
   -- 
   -----------------------------------------------------------------------------
-  top_ad_conv_RHF1401_1 : top_ad_conv_RHF1401
+  top_ad_conv_RHF1401_withFilter_1: top_ad_conv_RHF1401_withFilter
     GENERIC MAP (
       ChanelCount     => 8,
-      ncycle_cnv_high => 40,            -- TODO : 79
-      ncycle_cnv      => 250)           -- TODO : 500
+      ncycle_cnv_high => 13,
+      ncycle_cnv      => 25)
     PORT MAP (
-      cnv_clk    => clk_24,             -- TODO : 49.152
-      cnv_rstn   => rstn,               -- ok
-      cnv        => ADC_smpclk_s,         -- ok
-      clk        => clk_25,             -- ok
-      rstn       => rstn,               -- ok
-      ADC_data   => ADC_data,           -- ok
-      ADC_nOE    => ADC_OEB_bar_CH,     -- ok
-      sample     => sample,             -- ok
-      sample_val => sample_val);        -- ok
+      cnv_clk    => clk_24,         
+      cnv_rstn   => rstn,           
+      cnv        => ADC_smpclk_s,   
+      clk        => clk_25,         
+      rstn       => rstn,           
+      ADC_data   => ADC_data,       
+      ADC_nOE    => ADC_OEB_bar_CH, 
+      sample     => sample,         
+      sample_val => sample_val);    
+
+
+
+  
+  --top_ad_conv_RHF1401_1 : top_ad_conv_RHF1401
+  --  GENERIC MAP (
+  --    ChanelCount     => 8,
+  --    ncycle_cnv_high => 40,            -- TODO : 79
+  --    ncycle_cnv      => 250)           -- TODO : 500
+  --  PORT MAP (
+  --    cnv_clk    => clk_24,             -- TODO : 49.152
+  --    cnv_rstn   => rstn,               -- ok
+  --    cnv        => ADC_smpclk_s,         -- ok
+  --    clk        => clk_25,             -- ok
+  --    rstn       => rstn,               -- ok
+  --    ADC_data   => ADC_data,           -- ok
+  --    ADC_nOE    => ADC_OEB_bar_CH,     -- ok
+  --    sample     => sample,             -- ok
+  --    sample_val => sample_val);        -- ok
   
   ADC_smpclk <= ADC_smpclk_s;
   
