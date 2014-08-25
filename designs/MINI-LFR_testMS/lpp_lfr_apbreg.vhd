@@ -98,14 +98,14 @@ BEGIN  -- beh
   BEGIN
     IF HRESETn = '0' THEN
       reg_ftt.MEM_IN_SM_wData <= (OTHERS => '0');
-      reg_ftt.MEM_IN_SM_wen   <= (OTHERS => '1');
 
-      reg_ftt.out_ren    <= (OTHERS => '1');
+      reg_ftt.MEM_IN_SM_wen   <= (OTHERS => '1');
+      reg_ftt.out_ren         <= (OTHERS => '1');
       
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
 
       reg_ftt.MEM_IN_SM_wen <= (OTHERS => '1');
-      reg_ftt.out_ren   <= (OTHERS => '1');
+      reg_ftt.out_ren       <= (OTHERS => '1');
 
       paddr             := "000000";
       paddr(7 DOWNTO 2) := apbi.paddr(7 DOWNTO 2);
@@ -142,13 +142,21 @@ BEGIN  -- beh
             WHEN "000010" => reg_ftt.MEM_IN_SM_wData(32*3-1 DOWNTO 32*2) <= apbi.pwdata(31 DOWNTO  0);
             WHEN "000011" => reg_ftt.MEM_IN_SM_wData(32*4-1 DOWNTO 32*3) <= apbi.pwdata(31 DOWNTO  0);
             WHEN "000100" => reg_ftt.MEM_IN_SM_wData(32*5-1 DOWNTO 32*4) <= apbi.pwdata(31 DOWNTO  0);
-            WHEN "000101" => reg_ftt.MEM_IN_SM_wen                     <= apbi.pwdata(4 DOWNTO 0);
+            WHEN "000101" => reg_ftt.MEM_IN_SM_wen                       <= apbi.pwdata(4 DOWNTO 0);
 
-            WHEN "001000" => reg_ftt.out_ren <= apbi.pwdata(1 DOWNTO 0);
+            WHEN "001000" => reg_ftt.out_ren                             <= apbi.pwdata(1 DOWNTO 0);
                              
             WHEN OTHERS => NULL;
           END CASE;
         END IF;
+
+        --IF (apbi.psel(pindex) AND apbi.pwrite AND apbi.penable) = '1' AND paddr(7 DOWNTO 2) = "000101" THEN
+        --  reg_ftt.MEM_IN_SM_wen <= apbi.pwdata(4 DOWNTO 0);
+        --ELSE
+        --  reg_ftt.MEM_IN_SM_wen <= (OTHERS => '1');
+        --END IF;
+
+        
       END IF;
       
     END IF;
@@ -156,6 +164,6 @@ BEGIN  -- beh
   
   apbo.pindex  <= pindex;
   apbo.pconfig <= pconfig;
-  apbo.prdata  <= prdata;
+  apbo.prdata  <= prdata ;
   
 END beh;

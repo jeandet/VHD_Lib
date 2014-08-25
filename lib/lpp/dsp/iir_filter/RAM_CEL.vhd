@@ -19,57 +19,66 @@
 --                    Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@lpp.polytechnique.fr
 ------------------------------------------------------------------------------
-library ieee;
-use ieee.std_logic_1164.all;
-use IEEE.numeric_std.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
-entity RAM_CEL is 
-    generic(DataSz        :   integer range 1 to 32 := 8;
-            abits         :   integer range 2 to 12 := 8);
-    port( WD : in std_logic_vector(DataSz-1 downto 0); RD : out
-        std_logic_vector(DataSz-1 downto 0);WEN, REN : in std_logic;
-        WADDR : in std_logic_vector(abits-1 downto 0); RADDR : in 
-        std_logic_vector(abits-1 downto 0);RWCLK, RESET : in std_logic
-        ) ;
-end RAM_CEL;
-
-
-
-architecture ar_RAM_CEL of RAM_CEL is
-
-constant VectInit : std_logic_vector(DataSz-1 downto 0):=(others => '0');
-constant MAX : integer := 2**(abits);
-
-type    RAMarrayT   is array (0 to MAX-1) of std_logic_vector(DataSz-1 downto 0);
-
-signal  RAMarray           :   RAMarrayT:=(others => VectInit);
-signal  RD_int       :   std_logic_vector(DataSz-1 downto 0);
-
-begin
-
-RD_int  <=  RAMarray(to_integer(unsigned(RADDR)));
+ENTITY RAM_CEL IS
+  GENERIC(
+    DataSz : INTEGER RANGE 1 TO 32 := 8;
+    abits  : INTEGER RANGE 2 TO 12 := 8);
+  PORT(
+    WD           : IN  STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+    RD           : OUT STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+    WEN, REN     : IN  STD_LOGIC;
+    WADDR        : IN  STD_LOGIC_VECTOR(abits-1 DOWNTO 0);
+    RADDR        : IN  STD_LOGIC_VECTOR(abits-1 DOWNTO 0);
+    RWCLK, RESET : IN  STD_LOGIC
+    ) ;
+END RAM_CEL;
 
 
-process(RWclk,reset)
-begin
-if reset = '0' then
-	RD <= VectInit;
-rst:for i in 0 to MAX-1 loop
-        RAMarray(i)    <=  (others => '0');
-      end loop;
 
-elsif RWclk'event and RWclk = '1' then
-    if REN = '0' then
-        RD      <=  RD_int;
-    end if;
+ARCHITECTURE ar_RAM_CEL OF RAM_CEL IS
 
-    if WEN = '0' then
-        RAMarray(to_integer(unsigned(WADDR)))      <=  WD;
-    end if;
+  CONSTANT VectInit : STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0) := (OTHERS => '0');
+  CONSTANT MAX      : INTEGER                             := 2**(abits);
 
-end if;
-end process;
-end ar_RAM_CEL;
+  TYPE RAMarrayT IS ARRAY (0 TO MAX-1) OF STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+
+  SIGNAL RAMarray : RAMarrayT := (OTHERS => VectInit);
+  SIGNAL RD_int   : STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+  
+  SIGNAL RADDR_reg        :  STD_LOGIC_VECTOR(abits-1 DOWNTO 0);
+
+BEGIN
+
+  RD_int <= RAMarray(to_integer(UNSIGNED(RADDR)));
+
+
+  PROCESS(RWclk, reset)
+  BEGIN
+    IF reset = '0' THEN
+      RD <= VectInit;
+      rst : FOR i IN 0 TO MAX-1 LOOP
+        RAMarray(i) <= (OTHERS => '0');
+      END LOOP;
+
+    ELSIF RWclk'EVENT AND RWclk = '1' THEN
+--      IF REN = '0' THEN
+      RD <= RD_int;
+--      END IF;
+      IF REN = '0' THEN
+        RADDR_reg <= RADDR;
+      END IF;
+      
+      IF WEN = '0' THEN
+        RAMarray(to_integer(UNSIGNED(WADDR))) <= WD;
+      END IF;
+
+    END IF;
+  END PROCESS;
+END ar_RAM_CEL;
 
 
 
