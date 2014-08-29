@@ -1,3 +1,4 @@
+lpp_matrix.vhd
 ALU_Driver.vhd
 APB_Matrix.vhd
 ReUse_CTRLR.vhd
@@ -11,4 +12,3 @@ Starter.vhd
 TopMatrix_PDR.vhd
 TopSpecMatrix.vhd
 Top_MatrixSpec.vhd
-lpp_matrix.vhd

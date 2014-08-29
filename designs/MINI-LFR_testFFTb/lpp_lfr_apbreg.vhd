@@ -164,7 +164,7 @@ BEGIN  -- beh
           WHEN "001111" => prdata(31 DOWNTO 0) <= MEM_IN_SM_rData(32*4-1 DOWNTO 32*3);
           WHEN "010000" => prdata(31 DOWNTO 0) <= MEM_IN_SM_rData(32*5-1 DOWNTO 32*4);
 
-          WHEN "010001" => prdata(4 DOWNTO 0) <= reg_ftt.out_ren;
+          WHEN "010001" => prdata(4 DOWNTO 0)   <= reg_ftt.out_ren;
                            prdata(9 DOWNTO 5)   <= reg_ftt.out_reuse;
                            prdata(14 DOWNTO 10) <= reg_ftt.out_locked;
                            prdata(19 DOWNTO 15) <= MEM_IN_SM_Full;
