@@ -73,8 +73,9 @@ BEGIN
     WEN <= NOT ram_write;
     REN <= NOT ram_read;
 --    RAMblk : RAM_CEL_N
-    RAMblk : RAM_CEL_N
-      GENERIC MAP(Input_SZ_1)
+--       GENERIC MAP(Input_SZ_1)
+    RAMblk : RAM_CEL
+      GENERIC MAP(Input_SZ_1, 8)
       PORT MAP(
         WD    => WD,
         RD    => RD,

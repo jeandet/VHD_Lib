@@ -73,6 +73,7 @@ BEGIN
   -- DATA_REN_FIFO
   -----------------------------------------------------------------------------
   i_data_ren <= s_ren;
+  
   PROCESS (clk, rstn)
   BEGIN
     IF rstn = '0' THEN
@@ -88,17 +89,17 @@ BEGIN
 
   s_ren(0) <= o_data_ren(0) WHEN one_ren_and_notEmpty = '1' ELSE
               NOT ((NOT i_empty(0)) AND (NOT reg_full(0)));
-  s_ren(1) <= o_data_ren(1) WHEN one_ren_and_notEmpty = '1' ELSE
-              '1' WHEN s_ren(0) = '0' ELSE
+  s_ren(1) <= '1' WHEN s_ren(0) = '0' ELSE
+              o_data_ren(1) WHEN one_ren_and_notEmpty = '1' ELSE
               NOT ((NOT i_empty(1)) AND (NOT reg_full(1)));
-  s_ren(2) <= o_data_ren(2) WHEN one_ren_and_notEmpty = '1' ELSE
-              '1' WHEN s_ren(0) = '0' ELSE
+  s_ren(2) <= '1' WHEN s_ren(0) = '0' ELSE
               '1' WHEN s_ren(1) = '0' ELSE
+              o_data_ren(2) WHEN one_ren_and_notEmpty = '1' ELSE
               NOT ((NOT i_empty(2)) AND (NOT reg_full(2)));
-  s_ren(3) <= o_data_ren(3) WHEN one_ren_and_notEmpty = '1' ELSE
-              '1' WHEN s_ren(0) = '0' ELSE
+  s_ren(3) <= '1' WHEN s_ren(0) = '0' ELSE
               '1' WHEN s_ren(1) = '0' ELSE
               '1' WHEN s_ren(2) = '0' ELSE
+              o_data_ren(3) WHEN one_ren_and_notEmpty = '1' ELSE
               NOT ((NOT i_empty(3)) AND (NOT reg_full(3)));
   -----------------------------------------------------------------------------
   all_ren : FOR I IN 3 DOWNTO 0 GENERATE
@@ -128,10 +129,10 @@ BEGIN
         IF s_ren_reg(2) = '0' THEN s_rdata_2 <= i_rdata; END IF; 
         IF s_ren_reg(3) = '0' THEN s_rdata_3 <= i_rdata; END IF; 
       ELSE
-      s_rdata_0 <= (OTHERS => '0');
-      s_rdata_1 <= (OTHERS => '0');
-      s_rdata_2 <= (OTHERS => '0');
-      s_rdata_3 <= (OTHERS => '0');
+        s_rdata_0 <= (OTHERS => '0');
+        s_rdata_1 <= (OTHERS => '0');
+        s_rdata_2 <= (OTHERS => '0');
+        s_rdata_3 <= (OTHERS => '0');
       END IF;
     END IF;
   END PROCESS;
