@@ -6,8 +6,9 @@
 ./lpp_amba
 ./dsp/iir_filter
 ./dsp/lpp_downsampling
-./dsp/lpp_fft
 ./dsp/lpp_fft_rtax
+./lpp_memory
+./dsp/lpp_fft
 ./lfr_time_management
 ./lpp_ad_Conv
 ./lpp_bootloader
@@ -16,11 +17,10 @@
 ./lpp_demux
 ./lpp_Header
 ./lpp_matrix
-./lpp_memory
-./lpp_dma
 ./lpp_uart
 ./lpp_usb
 ./lpp_waveform
+./lpp_dma
 ./lpp_top_lfr
 ./lpp_Header
 ./lpp_leon3_soc

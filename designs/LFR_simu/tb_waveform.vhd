@@ -39,11 +39,12 @@ LIBRARY lpp;
 USE lpp.lpp_waveform_pkg.ALL;
 USE lpp.lpp_memory.ALL;
 USE lpp.lpp_ad_conv.ALL;
-USE lpp.testbench_package.ALL;
 USE lpp.lpp_lfr_pkg.ALL;
 USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
 USE lpp.CY7C1061DV33_pkg.ALL;
+
+USE work.testbench_package.ALL;
 
 ENTITY testbench IS
 END;
@@ -111,6 +112,7 @@ ARCHITECTURE behav OF testbench IS
 
   -- AD Converter RHF1401
   SIGNAL sample     : Samples14v(7 DOWNTO 0);
+  SIGNAL sample_s    : Samples(7 DOWNTO 0);
   SIGNAL sample_val : STD_LOGIC;
 
   -- AHB/APB SIGNAL
@@ -314,8 +316,8 @@ BEGIN
     PORT MAP (
       clk             => clk25MHz,
       rstn            => rstn,
-      sample_B        => sample(2 DOWNTO 0),
-      sample_E        => sample(7 DOWNTO 3),
+      sample_B        => sample_s(2 DOWNTO 0),
+      sample_E        => sample_s(7 DOWNTO 3),
       sample_val      => sample_val,
       apbi            => apbi,
       apbo            => apbo(15),
@@ -324,6 +326,10 @@ BEGIN
       coarse_time     => coarse_time,
       fine_time       => fine_time,
       data_shaping_BW => bias_fail_bw);
+  
+  all_sample: FOR I IN 7 DOWNTO 0 GENERATE
+    sample_s(I) <= sample(I)(11 DOWNTO 0) & '0' & '0' & '0' & '0';
+  END GENERATE all_sample;
 
   -----------------------------------------------------------------------------
   ---  AHB CONTROLLER  -------------------------------------------------

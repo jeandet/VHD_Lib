@@ -1,8 +1,8 @@
+fft_components.vhd
 lpp_fft.vhd
 actar.vhd
 actram.vhd
 CoreFFT.vhd
-fft_components.vhd
 fftDp.vhd
 fftSm.vhd
 primitives.vhd
