@@ -327,8 +327,8 @@ BEGIN
   
   all_bit_sample_f2 : FOR I IN 15 DOWNTO 0 GENERATE
     sample_f2_wdata_s(I)      <= sample_f2(0, I);
-    sample_f2_wdata_s(16*1+I) <= sample_f2(1, I) WHEN data_shaping_R2 = '1' ELSE sample_f1(3, I);;
-    sample_f2_wdata_s(16*2+I) <= sample_f2(2, I) WHEN data_shaping_R2 = '1' ELSE sample_f1(4, I);;
+    sample_f2_wdata_s(16*1+I) <= sample_f2(1, I) WHEN data_shaping_R2 = '1' ELSE sample_f1(3, I);
+    sample_f2_wdata_s(16*2+I) <= sample_f2(2, I) WHEN data_shaping_R2 = '1' ELSE sample_f1(4, I);
     sample_f2_wdata_s(16*3+I) <= sample_f2(3, I);
     sample_f2_wdata_s(16*4+I) <= sample_f2(4, I);
     sample_f2_wdata_s(16*5+I) <= sample_f2(5, I);
