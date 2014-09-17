@@ -204,6 +204,7 @@ PACKAGE lpp_lfr_pkg IS
       data_shaping_SP1 : IN  STD_LOGIC;
       data_shaping_R0  : IN  STD_LOGIC;
       data_shaping_R1  : IN  STD_LOGIC;
+      data_shaping_R2  : IN  STD_LOGIC;
       sample_f0_val    : OUT STD_LOGIC;
       sample_f1_val    : OUT STD_LOGIC;
       sample_f2_val    : OUT STD_LOGIC;
@@ -332,6 +333,7 @@ PACKAGE lpp_lfr_pkg IS
       data_shaping_SP1                       : OUT STD_LOGIC;
       data_shaping_R0                        : OUT STD_LOGIC;
       data_shaping_R1                        : OUT STD_LOGIC;
+      data_shaping_R2                        : OUT STD_LOGIC;
       delta_snapshot                         : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
       delta_f0                               : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
       delta_f0_2                             : OUT STD_LOGIC_VECTOR(delta_vector_size_f0_2-1 DOWNTO 0);

@@ -291,6 +291,8 @@ BEGIN
 
       ReUse => (OTHERS => '0'),
 
+      run   => (OTHERS => '1'),
+
       wen   => sample_f0_A_wen,
       wdata => sample_f0_wdata,
 
@@ -313,6 +315,7 @@ BEGIN
       rstn => rstn,
 
       ReUse => (OTHERS => '0'),
+      run   => (OTHERS => '1'),
 
       wen         => sample_f0_B_wen,
       wdata       => sample_f0_wdata,
@@ -358,6 +361,7 @@ BEGIN
       rstn => rstn,
 
       ReUse => (OTHERS => '0'),
+      run   => (OTHERS => '1'),
 
       wen         => sample_f1_wen_head,
       wdata       => sample_f1_wdata_head,
@@ -400,6 +404,7 @@ BEGIN
       rstn => rstn,
 
       ReUse => (OTHERS => '0'),
+      run   => (OTHERS => '1'),
 
       wen         => sample_f2_wen,
       wdata       => sample_f2_wdata,
@@ -748,6 +753,7 @@ BEGIN
       rstn => rstn,
 
       ReUse => MEM_IN_SM_ReUse,
+      run   => (OTHERS => '1'),
 
       wen   => MEM_IN_SM_wen,
       wdata => MEM_IN_SM_wData,
@@ -887,6 +893,7 @@ BEGIN
       rstn => rstn,
 
       ReUse => (OTHERS => '0'),
+      run   => (OTHERS => '1'),
 
       wen   => MEM_OUT_SM_Write,
       wdata => MEM_OUT_SM_Data_in,

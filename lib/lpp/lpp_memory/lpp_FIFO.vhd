@@ -30,51 +30,47 @@ USE techmap.gencomp.ALL;
 
 ENTITY lpp_fifo IS
   GENERIC(
-    tech         : INTEGER               := 0;
-    Mem_use      : INTEGER               := use_RAM;
-    DataSz       : INTEGER RANGE 1 TO 32 := 8;
-    AddrSz       : INTEGER RANGE 2 TO 12 := 8
+    tech                  : INTEGER               := 0;
+    Mem_use               : INTEGER               := use_RAM;
+    EMPTY_THRESHOLD_LIMIT : INTEGER               := 16;
+    FULL_THRESHOLD_LIMIT  : INTEGER               := 5;
+    DataSz                : INTEGER RANGE 1 TO 32 := 8;
+    AddrSz                : INTEGER RANGE 2 TO 12 := 8
     );
   PORT(
-    clk         : IN  STD_LOGIC;
-    rstn        : IN  STD_LOGIC;
+    clk   : IN STD_LOGIC;
+    rstn  : IN STD_LOGIC;
     --
-    reUse       : IN STD_LOGIC;
-    
-    --IN
-    ren         : IN  STD_LOGIC;
-    rdata       : OUT STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
-    
-    --OUT
-    wen         : IN  STD_LOGIC;
-    wdata       : IN  STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+    reUse : IN STD_LOGIC;
+    run   : IN STD_LOGIC;
 
-    empty       : OUT STD_LOGIC;
-    full        : OUT STD_LOGIC;
-    almost_full : OUT STD_LOGIC
+    --IN
+    ren   : IN  STD_LOGIC;
+    rdata : OUT STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+
+    --OUT
+    wen   : IN STD_LOGIC;
+    wdata : IN STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+
+    empty           : OUT STD_LOGIC;
+    full            : OUT STD_LOGIC;
+    full_almost     : OUT STD_LOGIC;
+    empty_threshold : OUT STD_LOGIC;
+    full_threshold  : OUT STD_LOGIC
     );
 END ENTITY;
 
 
 ARCHITECTURE ar_lpp_fifo OF lpp_fifo IS
 
-  SIGNAL sFull    : STD_LOGIC;
-  SIGNAL sFull_s  : STD_LOGIC;
-  SIGNAL sEmpty_s : STD_LOGIC;
+  SIGNAL sREN : STD_LOGIC;
+  SIGNAL sWEN : STD_LOGIC;
+  SIGNAL sRE  : STD_LOGIC;
+  SIGNAL sWE  : STD_LOGIC;
 
-  SIGNAL sEmpty : STD_LOGIC;
-  SIGNAL sREN   : STD_LOGIC;
-  SIGNAL sWEN   : STD_LOGIC;
-  SIGNAL sRE    : STD_LOGIC;
-  SIGNAL sWE    : STD_LOGIC;
+  SIGNAL Waddr_vect : STD_LOGIC_VECTOR(AddrSz-1 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL Raddr_vect : STD_LOGIC_VECTOR(AddrSz-1 DOWNTO 0) := (OTHERS => '0');
 
-  SIGNAL Waddr_vect   : STD_LOGIC_VECTOR(AddrSz-1 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL Raddr_vect   : STD_LOGIC_VECTOR(AddrSz-1 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL Waddr_vect_s : STD_LOGIC_VECTOR(AddrSz-1 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL Raddr_vect_s : STD_LOGIC_VECTOR(AddrSz-1 DOWNTO 0) := (OTHERS => '0');
-
-  SIGNAL almost_full_s : STD_LOGIC;
-  SIGNAL almost_full_r   : STD_LOGIC;
 BEGIN
 
 --==================================================================================
@@ -93,75 +89,33 @@ BEGIN
       PORT MAP(wdata, rdata, sWEN, sREN, Waddr_vect, Raddr_vect, CLK, rstn);
   END GENERATE;
 --================================================================================== 
-
---=============================
---     Read section
---=============================
-  sREN <= REN OR sEmpty;
-  sRE  <= NOT sREN;
-
-  sEmpty_s <= '0' WHEN ReUse = '1'  else
-              '1' WHEN sEmpty = '1' AND Wen = '1'                                               ELSE
-              '1' WHEN sEmpty = '0' AND (Wen = '1' AND Ren = '0' AND Raddr_vect_s = Waddr_vect) ELSE
-              '0';
-
-  Raddr_vect_s <= STD_LOGIC_VECTOR(UNSIGNED(Raddr_vect) +1);
-
-  PROCESS (clk, rstn)
-  BEGIN
-    IF(rstn = '0')then
-      Raddr_vect <= (OTHERS => '0');
-      sempty     <= '1';
-    ELSIF(clk'EVENT AND clk = '1')then
-      sEmpty <= sempty_s;
-
-      IF(sREN = '0' and sempty = '0')then
-        Raddr_vect <= Raddr_vect_s;
-      END IF;
-
-    END IF;
-  END PROCESS;
-
---=============================
---     Write section
---=============================
-  sWEN <= WEN OR sFull;
-  sWE  <= NOT sWEN;
-
-  sFull_s <= '1' WHEN ReUse = '1' else
-             '1' WHEN Waddr_vect_s = Raddr_vect AND REN = '1' AND WEN = '0' ELSE
-             '1' WHEN sFull = '1' AND REN = '1'                             ELSE
-             '0';
-
-  almost_full_s <= '1' WHEN STD_LOGIC_VECTOR(UNSIGNED(Waddr_vect) +2) = Raddr_vect AND REN = '1' AND WEN = '0' ELSE
-                   '1' WHEN almost_full_r = '1' AND WEN = REN ELSE
-                   '0';
-  
-  Waddr_vect_s <= STD_LOGIC_VECTOR(UNSIGNED(Waddr_vect) +1);
-
-  PROCESS (clk, rstn)
-  BEGIN
-    IF(rstn = '0')then
-      Waddr_vect <= (OTHERS => '0');
-      sfull      <= '0';
-      almost_full_r <= '0';
-    ELSIF(clk'EVENT AND clk = '1')then
-      sfull <= sfull_s;
-      almost_full_r      <= almost_full_s;
-
-      IF(sWEN = '0' and sfull = '0')THEN
-        Waddr_vect <= Waddr_vect_s;
-      END IF;
-      
-    END IF;
-  END PROCESS;
-
-  almost_full <= almost_full_s;
-  full        <= sFull_s;
-  empty       <= sEmpty_s;
+  sRE <= NOT sREN;
+  sWE <= NOT sWEN;
 
 
-  
+  lpp_fifo_control_1 : lpp_fifo_control
+    GENERIC MAP (
+      AddrSz                => AddrSz,
+      EMPTY_THRESHOLD_LIMIT => EMPTY_THRESHOLD_LIMIT,
+      FULL_THRESHOLD_LIMIT  => FULL_THRESHOLD_LIMIT)
+    PORT MAP (
+      clk             => clk,
+      rstn            => rstn,
+      run             => run,
+      reUse           => reUse,
+      fifo_r_en       => ren,
+      fifo_w_en       => wen,
+      mem_r_en        => sREN,
+      mem_w_en        => SWEN,
+      mem_r_addr      => Raddr_vect,
+      mem_w_addr      => Waddr_vect,
+      empty           => empty,
+      full            => full,
+      full_almost     => full_almost,
+      empty_threshold => empty_threshold,
+      full_threshold  => full_threshold);
+
+
 END ARCHITECTURE;
 
 

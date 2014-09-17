@@ -13,236 +13,135 @@ ENTITY testbench IS
 END;
 
 ARCHITECTURE behav OF testbench IS
+  
+  COMPONENT fifo_verif
+    PORT (
+      verif_clk         : OUT STD_LOGIC;
+      verif_rstn        : OUT STD_LOGIC;
+      verif_ren         : OUT STD_LOGIC;
+      verif_rdata       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      verif_wen         : OUT STD_LOGIC;
+      verif_wdata       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      verif_empty       : IN  STD_LOGIC;
+      verif_full        : IN  STD_LOGIC;
+      verif_almost_full : IN  STD_LOGIC;
+      error_now         : OUT STD_LOGIC;
+      error_new         : OUT STD_LOGIC);
+  END COMPONENT;
 
   -----------------------------------------------------------------------------
-  -- Common signal
-  SIGNAL clk  : STD_LOGIC := '0';
-  SIGNAL rstn : STD_LOGIC := '0';
-  SIGNAL run  : STD_LOGIC := '0';
-
+  SIGNAL CEL_clk  : STD_LOGIC := '0';
+  SIGNAL CEL_rstn : STD_LOGIC := '0';
+  -----------------------------------------------------------------------------
+  SIGNAL CEL_data_ren    : STD_LOGIC;
+  SIGNAL CEL_data_out    : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL CEL_data_wen    : STD_LOGIC;
+  SIGNAL CEL_wdata       : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL CEL_full_almost : STD_LOGIC;
+  SIGNAL CEL_full        : STD_LOGIC;
+  SIGNAL CEL_empty       : STD_LOGIC;
+  -----------------------------------------------------------------------------
+  SIGNAL CEL_error_now : STD_LOGIC;
+  SIGNAL CEL_error_new : STD_LOGIC;
   -----------------------------------------------------------------------------
 
-  SIGNAL full_almost : STD_LOGIC;
-  SIGNAL full        : STD_LOGIC;
-  SIGNAL data_wen    : STD_LOGIC;
-  SIGNAL wdata       : STD_LOGIC_VECTOR(31 DOWNTO 0);
-
-  SIGNAL empty        : STD_LOGIC;
-  SIGNAL data_ren     : STD_LOGIC;
-  SIGNAL data_out     : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL data_out_obs : STD_LOGIC_VECTOR(31 DOWNTO 0);
-
-  SIGNAL empty_reg : STD_LOGIC;
-  SIGNAL full_reg  : STD_LOGIC;
-
   -----------------------------------------------------------------------------
-  TYPE   DATA_CHANNEL IS ARRAY (0 TO 128-1) OF STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL data_in : DATA_CHANNEL;
-
+  SIGNAL RAM_clk  : STD_LOGIC := '0';
+  SIGNAL RAM_rstn : STD_LOGIC := '0';
   -----------------------------------------------------------------------------
-  CONSTANT RANDOM_VECTOR_SIZE           : INTEGER := 1+1;  --READ + WRITE + CHANNEL_READ + CHANNEL_WRITE
-  CONSTANT TWO_POWER_RANDOM_VECTOR_SIZE : REAL    := (2**RANDOM_VECTOR_SIZE)*1.0;
-  SIGNAL   random_vector                : STD_LOGIC_VECTOR(RANDOM_VECTOR_SIZE-1 DOWNTO 0);
-  --
-  SIGNAL   rand_ren                     : STD_LOGIC;
-  SIGNAL   rand_wen                     : STD_LOGIC;
-
-  SIGNAL pointer_read  : INTEGER;
-  SIGNAL pointer_write : INTEGER := 0;
-
-  SIGNAL error_now : STD_LOGIC;
-  SIGNAL error_new : STD_LOGIC;
-
-  SIGNAL read_stop : STD_LOGIC;
+  SIGNAL RAM_data_ren    : STD_LOGIC;
+  SIGNAL RAM_data_out    : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL RAM_data_wen    : STD_LOGIC;
+  SIGNAL RAM_wdata       : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL RAM_full_almost : STD_LOGIC;
+  SIGNAL RAM_full        : STD_LOGIC;
+  SIGNAL RAM_empty       : STD_LOGIC;
+  -----------------------------------------------------------------------------
+  SIGNAL RAM_error_now : STD_LOGIC;
+  SIGNAL RAM_error_new : STD_LOGIC;
+  -----------------------------------------------------------------------------
+  
 BEGIN
 
 
-  all_J : FOR J IN 0 TO 127 GENERATE
-    data_in(J) <= STD_LOGIC_VECTOR(to_unsigned(J*2+1, 32));
-  END GENERATE all_J;
-
-
   -----------------------------------------------------------------------------
-  lpp_fifo_1 : lpp_fifo
+  lpp_fifo_CEL : lpp_fifo
     GENERIC MAP (
       tech    => 0,
       Mem_use => use_CEL,
+    EMPTY_THRESHOLD_LIMIT => 1,
+    FULL_THRESHOLD_LIMIT  => 1,
       DataSz  => 32,
       AddrSz  => 8)
     PORT MAP (
-      clk         => clk,
-      rstn        => rstn,
+      clk         => CEL_clk,
+      rstn        => CEL_rstn,
       reUse       => '0',
-      ren         => data_ren,
-      rdata       => data_out,
-      wen         => data_wen,
-      wdata       => wdata,
-      empty       => empty,
-      full        => full,
-      almost_full => full_almost);
-
+      ren         => CEL_data_ren,
+      rdata       => CEL_data_out,
+      wen         => CEL_data_wen,
+      wdata       => CEL_wdata,
+      empty       => CEL_empty,
+      full        => CEL_full,
+      full_almost => CEL_full_almost,
+      empty_threshold => OPEN,
+      full_threshold  => OPEN);
   -----------------------------------------------------------------------------
-
+  fifo_verif_CEL : fifo_verif
+    PORT MAP (
+      verif_clk         => CEL_clk,
+      verif_rstn        => CEL_rstn,
+      verif_ren         => CEL_data_ren,
+      verif_rdata       => CEL_data_out,
+      verif_wen         => CEL_data_wen,
+      verif_wdata       => CEL_wdata,
+      verif_empty       => CEL_empty,
+      verif_full        => CEL_full,
+      verif_almost_full => CEL_full_almost,
+      error_now         => CEL_error_now,
+      error_new         => CEL_error_new
+      );
+  -----------------------------------------------------------------------------
 
   
   -----------------------------------------------------------------------------
-  -- READ
+  lpp_fifo_RAM : lpp_fifo
+    GENERIC MAP (
+      tech    => 0,
+      Mem_use => use_RAM,
+      EMPTY_THRESHOLD_LIMIT => 1,
+      FULL_THRESHOLD_LIMIT  => 1,
+      DataSz  => 32,
+      AddrSz  => 8)
+    PORT MAP (
+      clk         => RAM_clk,
+      rstn        => RAM_rstn,
+      reUse       => '0',
+      ren         => RAM_data_ren,
+      rdata       => RAM_data_out,
+      wen         => RAM_data_wen,
+      wdata       => RAM_wdata,
+      empty       => RAM_empty,
+      full        => RAM_full,
+      full_almost => RAM_full_almost,
+      empty_threshold => OPEN,
+      full_threshold  => OPEN);
   -----------------------------------------------------------------------------
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      empty_reg <= '1';
-    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      empty_reg <= empty;
-    END IF;
-  END PROCESS;
-
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      data_out_obs <= (OTHERS => '0');
-
-      pointer_read <= 0;
-      error_now    <= '0';
-      error_new    <= '0';
-      
-    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      error_now <= '0';
-      IF empty_reg = '0' THEN
-        IF data_ren = '0' THEN
-          --IF data_ren_and_not_empty = '0' THEN
-          error_new    <= '0';
-          data_out_obs <= data_out;
-
-          IF pointer_read < 127 THEN
-            pointer_read <= pointer_read + 1;
-          ELSE
-            pointer_read <= 0;
-          END IF;
-
-          IF data_out /= data_in(pointer_read) THEN
-            error_now <= '1';
-            error_new <= '1';
-          END IF;
-        END IF;
-        
-      END IF;
-    END IF;
-  END PROCESS;
+  fifo_verif_RAM : fifo_verif
+    PORT MAP (
+      verif_clk         => RAM_clk,
+      verif_rstn        => RAM_rstn,
+      verif_ren         => RAM_data_ren,
+      verif_rdata       => RAM_data_out,
+      verif_wen         => RAM_data_wen,
+      verif_wdata       => RAM_wdata,
+      verif_empty       => RAM_empty,
+      verif_full        => RAM_full,
+      verif_almost_full => RAM_full_almost,
+      error_now         => RAM_error_now,
+      error_new         => RAM_error_new
+      );
   -----------------------------------------------------------------------------
 
 
-
-
-  -----------------------------------------------------------------------------
-  -- WRITE
-  -----------------------------------------------------------------------------
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      full_reg <= '0';
-    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      full_reg <= full;
-    END IF;
-  END PROCESS;
-
-  proc_verif : PROCESS (clk, rstn)
-  BEGIN  -- PROCESS proc_verif
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      pointer_write <= 0;
-    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      IF data_wen = '0' THEN
-        IF full_reg = '0' THEN
-          IF pointer_write < 127 THEN
-            pointer_write <= pointer_write+1;
-          ELSE
-            pointer_write <= 0;
-          END IF;
-        END IF;
-      END IF;
-    END IF;
-  END PROCESS proc_verif;
-
-  wdata <= data_in(pointer_write) WHEN data_wen = '0' ELSE (OTHERS => 'X');
-  -----------------------------------------------------------------------------
-
-
-
-  -----------------------------------------------------------------------------
-  clk <= NOT clk AFTER 5 ns;            -- 100 MHz
-  -----------------------------------------------------------------------------
-  WaveGen_Proc : PROCESS
-  BEGIN
-    -- insert signal assignments here
-    WAIT UNTIL clk = '1';
-    read_stop <= '0';
-    rstn      <= '0';
-    run       <= '0';
-    WAIT UNTIL clk = '1';
-    WAIT UNTIL clk = '1';
-    WAIT UNTIL clk = '1';
-    rstn      <= '1';
-    WAIT UNTIL clk = '1';
-    WAIT UNTIL clk = '1';
-    WAIT UNTIL clk = '1';
-    WAIT UNTIL clk = '1';
-    WAIT UNTIL clk = '1';
-    run       <= '1';
-    WAIT UNTIL clk = '1';
-    WAIT UNTIL clk = '1';
-    WAIT UNTIL clk = '1';
-    WAIT UNTIL clk = '1';
-    WAIT FOR 10 us;
-    read_stop <= '1';
-    WAIT FOR 10 us;
-    read_stop <= '0';
-    WAIT FOR 80 us;
-    REPORT "*** END simulation ***" SEVERITY failure;
-    WAIT;
-  END PROCESS WaveGen_Proc;
-  -----------------------------------------------------------------------------
-
-
-  
-  -----------------------------------------------------------------------------
-  -- RANDOM GENERATOR
-  -----------------------------------------------------------------------------
-  PROCESS (clk, rstn)
-    VARIABLE seed1, seed2      : POSITIVE;
-    VARIABLE rand1             : REAL;
-    VARIABLE RANDOM_VECTOR_VAR : STD_LOGIC_VECTOR(RANDOM_VECTOR_SIZE-1 DOWNTO 0);
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      random_vector <= (OTHERS => '0');
-    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      UNIFORM(seed1, seed2, rand1);
-      RANDOM_VECTOR_VAR := STD_LOGIC_VECTOR(
-        to_unsigned(INTEGER(TRUNC(rand1*TWO_POWER_RANDOM_VECTOR_SIZE)),
-                    RANDOM_VECTOR_VAR'LENGTH)
-        );
-      random_vector <= RANDOM_VECTOR_VAR;
-    END IF;
-  END PROCESS;
-  -----------------------------------------------------------------------------
-  rand_wen <= random_vector(1);
-  rand_ren <= random_vector(0);
-  -----------------------------------------------------------------------------
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      data_wen <= '1';
-      data_ren <= '1';
-    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      data_wen <= rand_wen;
-      IF read_stop = '0' THEN
-        data_ren <= rand_ren;
-      ELSE
-        data_ren <= '1';
-      END IF;
-    END IF;
-  END PROCESS;
-  -----------------------------------------------------------------------------
-  
-
-  
 END;

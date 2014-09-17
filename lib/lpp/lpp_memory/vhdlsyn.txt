@@ -1,4 +1,9 @@
 lpp_memory.vhd
 lpp_FIFO.vhd
+lpp_FIFO_4_Shared.vhd
+lpp_FIFO_control.vhd
+lpp_FIFO_4_Shared_headreg_latency_0.vhd
+lpp_FIFO_4_Shared_headreg_latency_1.vhd
 lppFIFOxN.vhd
+
 

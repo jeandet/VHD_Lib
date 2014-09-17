@@ -32,6 +32,8 @@ USE GRLIB.DMA2AHB_Package.ALL;
 
 LIBRARY lpp;
 USE lpp.lpp_waveform_pkg.ALL;
+USE lpp.iir_filter.ALL;
+USE lpp.lpp_memory.ALL;
 
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
@@ -212,15 +214,18 @@ ARCHITECTURE beh OF lpp_waveform IS
   SIGNAL s_empty_almost : STD_LOGIC_VECTOR(3 DOWNTO 0);  --occupancy is lesser than 16 * 32b
   SIGNAL s_empty        : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL s_data_ren     : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL s_rdata        : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL s_rdata        : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL s_rdata_v        : STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
 
   --
 
   SIGNAL observation_reg_s : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL status_full_s       : STD_LOGIC_VECTOR(3 DOWNTO 0);
+
   
 BEGIN  -- beh
 
+  
   -----------------------------------------------------------------------------
   -- DEBUG
   -----------------------------------------------------------------------------
@@ -454,49 +459,83 @@ BEGIN  -- beh
   --debug_f3_data_fifo_in       <= wdata;s
   -----------------------------------------------------------------------------
 
-  lpp_waveform_fifo_1 : lpp_waveform_fifo
-    GENERIC MAP (tech => tech)
-    PORT MAP (
-      clk  => clk,
-      rstn => rstn,
-      run  => run,
+  
+ -- lpp_fifo_4_shared_1: lpp_fifo_4_shared
+ --   GENERIC MAP (
+ --     tech               => tech,
+ --     Mem_use            => use_RAM,
+ --     EMPTY_ALMOST_LIMIT => 16,
+ --     FULL_ALMOST_LIMIT  => 5,
+ --     DataSz             => 32,
+ --     AddrSz             => 7
+ --     )
+ --   PORT MAP (
+ --     clk          => clk,
+ --     rstn         => rstn,
+ --     run          => run,
+ --     empty_almost => s_empty_almost,
+ --     empty        => s_empty,
+ --     r_en         => s_data_ren,
+ --     r_data       => s_rdata,
+ --     full_almost  => full_almost,
+ --     full         => full,
+ --     w_en         => data_wen,
+ --     w_data       => wdata);
 
-      empty        => s_empty,
-      empty_almost => s_empty_almost,
-      data_ren     => s_data_ren,
-      rdata        => s_rdata,
+ --lpp_waveform_fifo_headreg_1 : lpp_fifo_4_shared_headreg_latency_1
+ --  PORT MAP (
+ --    clk            => clk,
+ --    rstn           => rstn,
+ --    run            => run,
+ --    o_empty_almost => empty_almost,
+ --    o_empty        => empty,
 
+ --    o_data_ren => data_ren,
+ --    o_rdata_0  => data_f0_data_out,
+ --    o_rdata_1  => data_f1_data_out,
+ --    o_rdata_2  => data_f2_data_out,
+ --    o_rdata_3  => data_f3_data_out,
 
-      full_almost => full_almost,
-      full        => full,
-      data_wen    => data_wen,
-      wdata       => wdata);
+ --    i_empty_almost => s_empty_almost,
+ --    i_empty        => s_empty,
+ --    i_data_ren     => s_data_ren,
+ --    i_rdata        => s_rdata);
 
-  lpp_waveform_fifo_headreg_1 : lpp_waveform_fifo_headreg
-    GENERIC MAP (tech => tech)
-    PORT MAP (
-      clk            => clk,
-      rstn           => rstn,
-      run            => run,
-      o_empty_almost => empty_almost,
-      o_empty        => empty,
+  generate_all_fifo: FOR I IN 0 TO 3 GENERATE
+    lpp_fifo_1: lpp_fifo
+      GENERIC MAP (
+        tech                  => tech,
+        Mem_use               => use_RAM,
+        EMPTY_THRESHOLD_LIMIT => 16,
+        FULL_THRESHOLD_LIMIT  => 5,
+        DataSz                => 32,
+        AddrSz                => 7)
+      PORT MAP (
+        clk             => clk,
+        rstn            => rstn,
+        reUse           => '0',
+        run           => run,
+        ren             => data_ren(I),
+        rdata           => s_rdata_v((I+1)*32-1 downto I*32),
+        wen             => data_wen(I),
+        wdata           => wdata,
+        empty           => empty(I),
+        full            => full(I),
+        full_almost     => OPEN,
+        empty_threshold => empty_almost(I),
+        full_threshold  => full_almost(I) );
+    
+  END GENERATE generate_all_fifo;
 
-      o_data_ren => data_ren,
-      o_rdata_0  => data_f0_data_out,
-      o_rdata_1  => data_f1_data_out,
-      o_rdata_2  => data_f2_data_out,
-      o_rdata_3  => data_f3_data_out,
-
-      i_empty_almost => s_empty_almost,
-      i_empty        => s_empty,
-      i_data_ren     => s_data_ren,
-      i_rdata        => s_rdata);
-
-
-  --data_f0_data_out <= rdata;
-  --data_f1_data_out <= rdata;
-  --data_f2_data_out <= rdata;
-  --data_f3_data_out <= rdata;
+  
+  --empty <= s_empty;
+  --empty_almost <= s_empty_almost;
+  --s_data_ren <= data_ren;
+  
+  data_f0_data_out <= s_rdata_v(31 downto 0);
+  data_f1_data_out <= s_rdata_v(31+32 downto 0+32);
+  data_f2_data_out <= s_rdata_v(31+32*2 downto 32*2);
+  data_f3_data_out <= s_rdata_v(31+32*3 downto 32*3);
 
   data_ren <= data_f3_data_out_ren &
               data_f2_data_out_ren &

@@ -42,6 +42,8 @@ ENTITY lppFIFOxN IS
 
     ReUse : IN STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
 
+    run : IN STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
+
     wen   : IN STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
     wdata : IN STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);
 
@@ -64,19 +66,25 @@ BEGIN
       GENERIC MAP (
         tech         => tech,
         Mem_use      => Mem_use,
+        EMPTY_THRESHOLD_LIMIT => 1,
+        FULL_THRESHOLD_LIMIT  => 1,
         DataSz       => Data_sz,
         AddrSz       => Addr_sz)
       PORT MAP (
         clk         => clk,
         rstn        => rstn,
         reUse       => reUse(I),
+        run       => run(I),
         ren         => ren(I),
         rdata       => rdata( ((I+1)*Data_sz)-1 DOWNTO (I*Data_sz) ),
         wen         => wen(I),
         wdata       => wdata(((I+1)*Data_sz)-1 DOWNTO (I*Data_sz)),
         empty       => empty(I),
         full        => full(I),
-        almost_full => almost_full(I));
+        full_almost => almost_full(I),
+        empty_threshold => OPEN,
+        full_threshold  => OPEN
+        );
   END GENERATE;
 
 END ARCHITECTURE;

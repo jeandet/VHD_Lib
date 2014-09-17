@@ -102,6 +102,7 @@ ENTITY lpp_lfr_apbreg IS
     data_shaping_SP1 : OUT STD_LOGIC;
     data_shaping_R0  : OUT STD_LOGIC;
     data_shaping_R1  : OUT STD_LOGIC;
+    data_shaping_R2  : OUT STD_LOGIC;
 
     delta_snapshot    : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
     delta_f0          : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
@@ -182,6 +183,7 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
     data_shaping_SP1  : STD_LOGIC;
     data_shaping_R0   : STD_LOGIC;
     data_shaping_R1   : STD_LOGIC;
+    data_shaping_R2   : STD_LOGIC;
     delta_snapshot    : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
     delta_f0          : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
     delta_f0_2        : STD_LOGIC_VECTOR(delta_vector_size_f0_2-1 DOWNTO 0);
@@ -267,6 +269,7 @@ BEGIN  -- beh
   data_shaping_SP1 <= reg_wp.data_shaping_SP1;
   data_shaping_R0  <= reg_wp.data_shaping_R0;
   data_shaping_R1  <= reg_wp.data_shaping_R1;
+  data_shaping_R2  <= reg_wp.data_shaping_R2;
 
   delta_snapshot    <= reg_wp.delta_snapshot;
   delta_f0          <= reg_wp.delta_f0;
@@ -342,6 +345,7 @@ BEGIN  -- beh
       reg_wp.data_shaping_SP1  <= '0';
       reg_wp.data_shaping_R0   <= '0';
       reg_wp.data_shaping_R1   <= '0';
+      reg_wp.data_shaping_R2   <= '0';
       reg_wp.enable_f0         <= '0';
       reg_wp.enable_f1         <= '0';
       reg_wp.enable_f2         <= '0';
@@ -458,6 +462,7 @@ BEGIN  -- beh
                            prdata(2) <= reg_wp.data_shaping_SP1;
                            prdata(3) <= reg_wp.data_shaping_R0;
                            prdata(4) <= reg_wp.data_shaping_R1;
+                           prdata(5) <= reg_wp.data_shaping_R2;
                            --21
           WHEN "010101" => prdata(0) <= reg_wp.enable_f0;
                            prdata(1) <= reg_wp.enable_f1;
@@ -536,6 +541,7 @@ BEGIN  -- beh
                              reg_wp.data_shaping_SP1 <= apbi.pwdata(2);
                              reg_wp.data_shaping_R0  <= apbi.pwdata(3);
                              reg_wp.data_shaping_R1  <= apbi.pwdata(4);
+                             reg_wp.data_shaping_R2  <= apbi.pwdata(5);
             WHEN "010101" => reg_wp.enable_f0 <= apbi.pwdata(0);
                              reg_wp.enable_f1 <= apbi.pwdata(1);
                              reg_wp.enable_f2 <= apbi.pwdata(2);

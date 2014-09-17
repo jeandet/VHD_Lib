@@ -117,6 +117,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL data_shaping_SP1 : STD_LOGIC;
   SIGNAL data_shaping_R0  : STD_LOGIC;
   SIGNAL data_shaping_R1  : STD_LOGIC;
+  SIGNAL data_shaping_R2  : STD_LOGIC;
   --
   SIGNAL sample_f0_wen    : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL sample_f1_wen    : STD_LOGIC_VECTOR(4 DOWNTO 0);
@@ -312,6 +313,7 @@ BEGIN
       data_shaping_SP1 => data_shaping_SP1,
       data_shaping_R0  => data_shaping_R0,
       data_shaping_R1  => data_shaping_R1,
+      data_shaping_R2  => data_shaping_R2,
       sample_f0_val    => sample_f0_val,
       sample_f1_val    => sample_f1_val,
       sample_f2_val    => sample_f2_val,
@@ -380,6 +382,7 @@ BEGIN
       data_shaping_SP1  => data_shaping_SP1,
       data_shaping_R0   => data_shaping_R0,
       data_shaping_R1   => data_shaping_R1,
+      data_shaping_R2   => data_shaping_R2,
       delta_snapshot    => delta_snapshot,
       delta_f0          => delta_f0,
       delta_f0_2        => delta_f0_2,
