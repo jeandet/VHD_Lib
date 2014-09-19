@@ -514,7 +514,7 @@ BEGIN  -- beh
         clk             => clk,
         rstn            => rstn,
         reUse           => '0',
-        run           => run,
+        run             => run,
         ren             => data_ren(I),
         rdata           => s_rdata_v((I+1)*32-1 downto I*32),
         wen             => data_wen(I),
