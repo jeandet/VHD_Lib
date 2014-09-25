@@ -10,7 +10,10 @@
 #
 # Clocks
 #
-define_clock  {clk} -name {clk}  -freq 60 -clockgroup default_clkgroup -route 5
+
+
+define_clock  {clk_50} -name {clk_50}  -freq 100    -clockgroup default_clkgroup -route 5
+define_clock  {clk_49} -name {clk_49}  -freq 49.152 -clockgroup default_clkgroup -route 5
 
 #
 # Clock to Clock
