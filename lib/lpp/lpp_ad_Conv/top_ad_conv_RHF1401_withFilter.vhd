@@ -43,7 +43,7 @@ ARCHITECTURE ar_top_ad_conv_RHF1401 OF top_ad_conv_RHF1401_withFilter IS
   CONSTANT MAX_COUNTER : INTEGER := ChanelCount*2+1;
 
   SIGNAL ADC_data_selected : Samples14;
-  SIGNAL ADC_data_result   : Samples14;
+  SIGNAL ADC_data_result   : Samples15;
 
   SIGNAL sample_counter : INTEGER;
   
@@ -146,14 +146,14 @@ BEGIN
       sample_val     <= '0';
 
       CASE channel_counter IS
-        WHEN 0*2 => sample_reg(0) <= ADC_data_result;
-        WHEN 1*2 => sample_reg(1) <= ADC_data_result;
-        WHEN 2*2 => sample_reg(2) <= ADC_data_result;
-        WHEN 3*2 => sample_reg(3) <= ADC_data_result;
-        WHEN 4*2 => sample_reg(4) <= ADC_data_result;
-        WHEN 5*2 => sample_reg(5) <= ADC_data_result;
-        WHEN 6*2 => sample_reg(6) <= ADC_data_result;
-        WHEN 7*2 => sample_reg(7) <= ADC_data_result;
+        WHEN 0*2 => sample_reg(0) <= ADC_data_result(14 DOWNTO 1);
+        WHEN 1*2 => sample_reg(1) <= ADC_data_result(14 DOWNTO 1);
+        WHEN 2*2 => sample_reg(2) <= ADC_data_result(14 DOWNTO 1);
+        WHEN 3*2 => sample_reg(3) <= ADC_data_result(14 DOWNTO 1);
+        WHEN 4*2 => sample_reg(4) <= ADC_data_result(14 DOWNTO 1);
+        WHEN 5*2 => sample_reg(5) <= ADC_data_result(14 DOWNTO 1);
+        WHEN 6*2 => sample_reg(6) <= ADC_data_result(14 DOWNTO 1);
+        WHEN 7*2 => sample_reg(7) <= ADC_data_result(14 DOWNTO 1);
           IF sample_counter = 9 THEN
             sample_counter <= 0 ;
             sample_val     <= '1';
@@ -179,7 +179,7 @@ BEGIN
                          sample_reg(7) WHEN OTHERS ;
     
   
-  ADC_data_result <= std_logic_vector( (signed(ADC_data_selected) + signed(ADC_data)) / 2);
+  ADC_data_result <= std_logic_vector( (signed( ADC_data_selected(13) & ADC_data_selected) + signed( ADC_data(13) & ADC_data)) );
 
   sample <= sample_reg;
 
