@@ -51,7 +51,8 @@ PACKAGE lpp_leon3_soc_pkg IS
       ENABLE_GPT      : INTEGER;
       NB_AHB_MASTER   : INTEGER;
       NB_AHB_SLAVE    : INTEGER;
-      NB_APB_SLAVE    : INTEGER);
+      NB_APB_SLAVE    : INTEGER;
+      ADDRESS_SIZE    : INTEGER);
     PORT (
       clk        : IN    STD_ULOGIC;
       reset      : IN    STD_ULOGIC;
@@ -60,7 +61,7 @@ PACKAGE lpp_leon3_soc_pkg IS
       ahbtxd     : OUT   STD_ULOGIC;
       urxd1      : IN    STD_ULOGIC;
       utxd1      : OUT   STD_ULOGIC;
-      address    : OUT   STD_LOGIC_VECTOR(19 DOWNTO 0);
+      address    : OUT   STD_LOGIC_VECTOR(ADDRESS_SIZE-1 DOWNTO 0);
       data       : INOUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       nSRAM_BE0  : OUT   STD_LOGIC;
       nSRAM_BE1  : OUT   STD_LOGIC;

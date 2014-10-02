@@ -65,7 +65,9 @@ ENTITY leon3_soc IS
     --
     NB_AHB_MASTER : INTEGER := 0;
     NB_AHB_SLAVE  : INTEGER := 0;
-    NB_APB_SLAVE  : INTEGER := 0
+    NB_APB_SLAVE  : INTEGER := 0;
+    --
+    ADDRESS_SIZE  : INTEGER := 20
     );
   PORT (
     clk    : IN STD_ULOGIC;
@@ -82,7 +84,7 @@ ENTITY leon3_soc IS
     utxd1 : OUT STD_ULOGIC;             -- UART1 tx data    
 
     -- RAM --------------------------------------------------------------------
-    address   : OUT   STD_LOGIC_VECTOR(19 DOWNTO 0);
+    address   : OUT   STD_LOGIC_VECTOR(ADDRESS_SIZE-1 DOWNTO 0);
     data      : INOUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     nSRAM_BE0 : OUT   STD_LOGIC;
     nSRAM_BE1 : OUT   STD_LOGIC;
@@ -326,8 +328,8 @@ BEGIN
         memi.data(31-i*8 DOWNTO 24-i*8));
   END GENERATE;
 
-  addr_pad : outpadv GENERIC MAP (width => 20, tech => padtech)
-    PORT MAP (address, memo.address(21 DOWNTO 2));
+  addr_pad : outpadv GENERIC MAP (width => ADDRESS_SIZE, tech => padtech)
+    PORT MAP (address, memo.address(ADDRESS_SIZE+1 DOWNTO 2));
   nSRAM_CE_s <= NOT(memo.ramsn(0));
   rams_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_CE, nSRAM_CE_s);
   oen_pad  : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_OE, memo.ramoen(0));
@@ -394,7 +396,7 @@ BEGIN
     apbuarti.ctsn   <= '0';
   END GENERATE;
   noua0 : IF CFG_UART1_ENABLE = 0 GENERATE apbo(1) <= apb_none; END GENERATE;
-  
+
 -------------------------------------------------------------------------------
 -- AMBA BUS -------------------------------------------------------------------
 -------------------------------------------------------------------------------
