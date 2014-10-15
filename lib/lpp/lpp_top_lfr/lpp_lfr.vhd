@@ -59,13 +59,13 @@ ENTITY lpp_lfr IS
     coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);  -- todo
     fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
     -- 
-    data_shaping_BW : OUT STD_LOGIC;
+    data_shaping_BW : OUT STD_LOGIC
     --
     --
-    observation_vector_0: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
-    observation_vector_1: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
-    
-    observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+--    observation_vector_0: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    observation_vector_1: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+
+--    observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 
     --debug
     --debug_f0_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
@@ -138,25 +138,27 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL sample_f2_wdata  : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
 
   -- SM
-  SIGNAL ready_matrix_f0                      : STD_LOGIC;
-  SIGNAL ready_matrix_f0_1                      : STD_LOGIC;
-  SIGNAL ready_matrix_f1                        : STD_LOGIC;
-  SIGNAL ready_matrix_f2                        : STD_LOGIC;
+  SIGNAL ready_matrix_f0          : STD_LOGIC;
+  SIGNAL ready_matrix_f0_1        : STD_LOGIC;
+  SIGNAL ready_matrix_f1          : STD_LOGIC;
+  SIGNAL ready_matrix_f2          : STD_LOGIC;
 --  SIGNAL error_anticipating_empty_fifo          : STD_LOGIC;
-  SIGNAL error_bad_component_error              : STD_LOGIC;
+--  SIGNAL error_bad_component_error              : STD_LOGIC;
 --  SIGNAL debug_reg                              : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL status_ready_matrix_f0               : STD_LOGIC;
-  SIGNAL status_ready_matrix_f0_1               : STD_LOGIC;
-  SIGNAL status_ready_matrix_f1                 : STD_LOGIC;
-  SIGNAL status_ready_matrix_f2                 : STD_LOGIC;
+  SIGNAL status_ready_matrix_f0   : STD_LOGIC;
+  SIGNAL status_ready_matrix_f0_1 : STD_LOGIC;
+  SIGNAL status_ready_matrix_f1   : STD_LOGIC;
+  SIGNAL status_ready_matrix_f2   : STD_LOGIC;
 --  SIGNAL status_error_anticipating_empty_fifo   : STD_LOGIC;
 --  SIGNAL status_error_bad_component_error       : STD_LOGIC;
-  SIGNAL config_active_interruption_onNewMatrix : STD_LOGIC;
-  SIGNAL config_active_interruption_onError     : STD_LOGIC;
-  SIGNAL addr_matrix_f0                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
---  SIGNAL addr_matrix_f0_1                       : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL addr_matrix_f1                         : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL addr_matrix_f2                         : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  --SIGNAL config_active_interruption_onNewMatrix : STD_LOGIC;
+--  SIGNAL config_active_interruption_onError     : STD_LOGIC;
+  SIGNAL addr_matrix_f0           : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL addr_matrix_f1           : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL addr_matrix_f2           : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL length_matrix_f0         : STD_LOGIC_VECTOR(25 DOWNTO 0);
+  SIGNAL length_matrix_f1         : STD_LOGIC_VECTOR(25 DOWNTO 0);
+  SIGNAL length_matrix_f2         : STD_LOGIC_VECTOR(25 DOWNTO 0);
 
   -- WFP
   SIGNAL status_full     : STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -278,19 +280,30 @@ ARCHITECTURE beh OF lpp_lfr IS
 
   SIGNAL run_ms              : STD_LOGIC;
   SIGNAL ms_softandhard_rstn : STD_LOGIC;
-  
-  SIGNAL matrix_time_f0    : STD_LOGIC_VECTOR(47 DOWNTO 0);
---  SIGNAL matrix_time_f0_1    : STD_LOGIC_VECTOR(47 DOWNTO 0);
-  SIGNAL matrix_time_f1      : STD_LOGIC_VECTOR(47 DOWNTO 0);
-  SIGNAL matrix_time_f2      : STD_LOGIC_VECTOR(47 DOWNTO 0);
-  
-  
-  SIGNAL error_buffer_full         :  STD_LOGIC;
-  SIGNAL error_input_fifo_write    :  STD_LOGIC_VECTOR(2 DOWNTO 0);
 
-  SIGNAL debug_ms : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL matrix_time_f0 : STD_LOGIC_VECTOR(47 DOWNTO 0);
+--  SIGNAL matrix_time_f0_1    : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL matrix_time_f1 : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL matrix_time_f2 : STD_LOGIC_VECTOR(47 DOWNTO 0);
+
+
+  SIGNAL error_buffer_full      : STD_LOGIC;
+  SIGNAL error_input_fifo_write : STD_LOGIC_VECTOR(2 DOWNTO 0);
+
+--  SIGNAL debug_ms : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL debug_signal : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    
+
+  -----------------------------------------------------------------------------
+  SIGNAL dma_fifo_burst_valid : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL dma_fifo_data        : STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);
+  SIGNAL dma_fifo_ren         : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL dma_buffer_new       : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL dma_buffer_addr      : STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);
+  SIGNAL dma_buffer_length    : STD_LOGIC_VECTOR(26*5-1 DOWNTO 0);
+  SIGNAL dma_buffer_full      : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL dma_buffer_full_err  : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL dma_grant_error      : STD_LOGIC;
+  
 BEGIN
   
   sample_s(4 DOWNTO 0) <= sample_E(4 DOWNTO 0);
@@ -345,33 +358,26 @@ BEGIN
 
       run_ms => run_ms,
 
-      ready_matrix_f0                      => ready_matrix_f0,
---      ready_matrix_f0_1                      => ready_matrix_f0_1,
-      ready_matrix_f1                        => ready_matrix_f1,
-      ready_matrix_f2                        => ready_matrix_f2,
---      error_anticipating_empty_fifo          => error_anticipating_empty_fifo,
-      error_bad_component_error              => error_bad_component_error,
-      error_buffer_full                      => error_buffer_full,      -- TODO
-      error_input_fifo_write                 => error_input_fifo_write, -- TODO
---      debug_reg                              => debug_reg,
-      status_ready_matrix_f0               => status_ready_matrix_f0,
---      status_ready_matrix_f0_1               => status_ready_matrix_f0_1,
-      status_ready_matrix_f1                 => status_ready_matrix_f1,
-      status_ready_matrix_f2                 => status_ready_matrix_f2,
---      status_error_anticipating_empty_fifo   => status_error_anticipating_empty_fifo,
---      status_error_bad_component_error       => status_error_bad_component_error,
-      config_active_interruption_onNewMatrix => config_active_interruption_onNewMatrix,
-      config_active_interruption_onError     => config_active_interruption_onError,
+      ready_matrix_f0        => ready_matrix_f0,
+      ready_matrix_f1        => ready_matrix_f1,
+      ready_matrix_f2        => ready_matrix_f2,
+      error_buffer_full      => error_buffer_full,       -- TODO
+      error_input_fifo_write => error_input_fifo_write,  -- TODO
+      status_ready_matrix_f0 => status_ready_matrix_f0,
+      status_ready_matrix_f1 => status_ready_matrix_f1,
+      status_ready_matrix_f2 => status_ready_matrix_f2,
 
       matrix_time_f0 => matrix_time_f0,
---      matrix_time_f0_1 => matrix_time_f0_1,
-      matrix_time_f1   => matrix_time_f1,
-      matrix_time_f2   => matrix_time_f2,
+      matrix_time_f1 => matrix_time_f1,
+      matrix_time_f2 => matrix_time_f2,
 
-      addr_matrix_f0  => addr_matrix_f0,
---      addr_matrix_f0_1  => addr_matrix_f0_1,
-      addr_matrix_f1    => addr_matrix_f1,
-      addr_matrix_f2    => addr_matrix_f2,
+      addr_matrix_f0 => addr_matrix_f0,
+      addr_matrix_f1 => addr_matrix_f1,
+      addr_matrix_f2 => addr_matrix_f2,
+
+      length_matrix_f0  => length_matrix_f0,
+      length_matrix_f1  => length_matrix_f1,
+      length_matrix_f2  => length_matrix_f2,
       -------------------------------------------------------------------------
       status_full       => status_full,
       status_full_ack   => status_full_ack,
@@ -452,19 +458,19 @@ BEGIN
       --f0
       addr_data_f0                 => addr_data_f0,
       data_f0_in_valid             => sample_f0_val,
-      data_f0_in                   => sample_f0_data,  
+      data_f0_in                   => sample_f0_data,
       --f1
       addr_data_f1                 => addr_data_f1,
       data_f1_in_valid             => sample_f1_val,
-      data_f1_in                   => sample_f1_data,  
+      data_f1_in                   => sample_f1_data,
       --f2
       addr_data_f2                 => addr_data_f2,
       data_f2_in_valid             => sample_f2_val,
-      data_f2_in                   => sample_f2_data,  
+      data_f2_in                   => sample_f2_data,
       --f3
       addr_data_f3                 => addr_data_f3,
       data_f3_in_valid             => sample_f3_val,
-      data_f3_in                   => sample_f3_data,  
+      data_f3_in                   => sample_f3_data,
       -- OUTPUT -- DMA interface
       --f0
       data_f0_addr_out             => data_f0_addr_out_s,
@@ -492,7 +498,7 @@ BEGIN
       data_f3_data_out_ren         => data_f3_data_out_ren ,
 
       -------------------------------------------------------------------------
-      observation_reg => OPEN 
+      observation_reg => OPEN
 
       );
 
@@ -605,8 +611,8 @@ BEGIN
             dma_send        <= '1';
             dma_valid_burst <= data_ms_valid_burst;
             dma_sel_valid   <= data_ms_valid;
-          --ELSE
-          --dma_ms_ongoing  <= '0';            
+            --ELSE
+            --dma_ms_ongoing  <= '0';            
           END IF;
 
           IF dma_ms_ongoing = '1' AND dma_done = '1' THEN
@@ -658,8 +664,8 @@ BEGIN
       HCLK           => clk,
       HRESETn        => rstn,
       run            => run,
-      AHB_Master_In  => ahbi,
-      AHB_Master_Out => ahbo,
+      AHB_Master_In  => OPEN,
+      AHB_Master_Out => OPEN,
 
       send        => dma_send,
       valid_burst => dma_valid_burst,
@@ -693,6 +699,7 @@ BEGIN
     PORT MAP (
       clk  => clk,
       rstn => ms_softandhard_rstn,      --rstn,
+      run  => run_ms,
 
       coarse_time => coarse_time,
       fine_time   => fine_time,
@@ -701,51 +708,64 @@ BEGIN
       sample_f0_wdata => sample_f0_wdata,
       sample_f1_wen   => sample_f1_wen,
       sample_f1_wdata => sample_f1_wdata,
-      sample_f2_wen   => sample_f2_wen,  -- TODO
-      sample_f2_wdata => sample_f2_wdata,-- TODO
+      sample_f2_wen   => sample_f2_wen,
+      sample_f2_wdata => sample_f2_wdata,
 
-      dma_addr        => data_ms_addr,         --
-      dma_data        => data_ms_data,         --
-      dma_valid       => data_ms_valid,        --
-      dma_valid_burst => data_ms_valid_burst,  --
-      dma_ren         => data_ms_ren,          --
-      dma_done        => data_ms_done,         --
+      --DMA
+      dma_fifo_burst_valid => dma_fifo_burst_valid(4),                  -- OUT
+      dma_fifo_data        => dma_fifo_data((4+1)*32-1 DOWNTO 4*32),    -- OUT
+      dma_fifo_ren         => dma_fifo_ren(4),                          -- IN
+      dma_buffer_new       => dma_buffer_new(4),                        -- OUT
+      dma_buffer_addr      => dma_buffer_addr((4+1)*32-1 DOWNTO 4*32),  -- OUT
+      dma_buffer_length    => dma_buffer_length((4+1)*26-1 DOWNTO 4*26),  -- OUT
+      dma_buffer_full      => dma_buffer_full(4),                       -- IN
+      dma_buffer_full_err  => dma_buffer_full_err(4),                   -- IN
 
-      ready_matrix_f0                        => ready_matrix_f0,
-      ready_matrix_f1                        => ready_matrix_f1,
-      ready_matrix_f2                        => ready_matrix_f2,
-      error_bad_component_error              => error_bad_component_error,
-      error_buffer_full                      => error_buffer_full,      
-      error_input_fifo_write                 => error_input_fifo_write, 
-      
-      debug_reg                              => debug_ms,--observation_reg,
-    observation_vector_0 => observation_vector_0,
-    observation_vector_1 => observation_vector_1,
-      
-      status_ready_matrix_f0                 => status_ready_matrix_f0,
-      status_ready_matrix_f1                 => status_ready_matrix_f1,
-      status_ready_matrix_f2                 => status_ready_matrix_f2,
-      config_active_interruption_onNewMatrix => config_active_interruption_onNewMatrix,
-      config_active_interruption_onError     => config_active_interruption_onError,
-      addr_matrix_f0                         => addr_matrix_f0,
-      addr_matrix_f1                         => addr_matrix_f1,
-      addr_matrix_f2                         => addr_matrix_f2,
 
-      matrix_time_f0                         => matrix_time_f0,
-      matrix_time_f1                         => matrix_time_f1,
-      matrix_time_f2                         => matrix_time_f2);
+
+      --REG
+      ready_matrix_f0        => ready_matrix_f0,
+      ready_matrix_f1        => ready_matrix_f1,
+      ready_matrix_f2        => ready_matrix_f2,
+      error_buffer_full      => error_buffer_full,
+      error_input_fifo_write => error_input_fifo_write,   
+
+      status_ready_matrix_f0 => status_ready_matrix_f0,
+      status_ready_matrix_f1 => status_ready_matrix_f1,
+      status_ready_matrix_f2 => status_ready_matrix_f2,
+      addr_matrix_f0         => addr_matrix_f0,
+      addr_matrix_f1         => addr_matrix_f1,
+      addr_matrix_f2         => addr_matrix_f2,
+
+      length_matrix_f0 => length_matrix_f0,
+      length_matrix_f1 => length_matrix_f1,
+      length_matrix_f2 => length_matrix_f2,
+
+      matrix_time_f0 => matrix_time_f0,
+      matrix_time_f1 => matrix_time_f1,
+      matrix_time_f2 => matrix_time_f2);
 
   -----------------------------------------------------------------------------
 
-  
-  observation_reg(31 DOWNTO 0) <=
-    dma_sel(4) & -- 31
-    dma_ms_ongoing &            -- 30
-    data_ms_done &              -- 29
-    dma_done &                  -- 28
-    ms_softandhard_rstn  &      --27
-    debug_ms(14 DOWNTO 12) &    -- 26 .. 24
-    debug_ms(11 DOWNTO 0) &     -- 23 .. 12
-    debug_signal(11 DOWNTO 0);  -- 11 .. 0
-  
+  DMA_SubSystem_1 : DMA_SubSystem
+    GENERIC MAP (
+      hindex => hindex)
+    PORT MAP (
+      clk  => clk,
+      rstn => rstn,
+      run  => run_ms,
+      ahbi => ahbi,
+      ahbo => ahbo,
+
+      fifo_burst_valid => dma_fifo_burst_valid,  --fifo_burst_valid,
+      fifo_data        => dma_fifo_data,         --fifo_data,
+      fifo_ren         => dma_fifo_ren,          --fifo_ren,
+
+      buffer_new      => dma_buffer_new,       --buffer_new,
+      buffer_addr     => dma_buffer_addr,      --buffer_addr,
+      buffer_length   => dma_buffer_length,    --buffer_length,
+      buffer_full     => dma_buffer_full,      --buffer_full,
+      buffer_full_err => dma_buffer_full_err,  --buffer_full_err,
+      grant_error     => dma_grant_error);     --grant_error);
+
 END beh;

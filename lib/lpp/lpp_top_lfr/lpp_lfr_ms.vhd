@@ -21,6 +21,7 @@ ENTITY lpp_lfr_ms IS
   PORT (
     clk  : IN STD_LOGIC;
     rstn : IN STD_LOGIC;
+    run  : IN STD_LOGIC;
 
     ---------------------------------------------------------------------------
     -- DATA INPUT
@@ -41,40 +42,39 @@ ENTITY lpp_lfr_ms IS
     ---------------------------------------------------------------------------
     -- DMA
     ---------------------------------------------------------------------------
-    dma_addr        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    dma_data        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    dma_valid       : OUT STD_LOGIC;
-    dma_valid_burst : OUT STD_LOGIC;
-    dma_ren         : IN  STD_LOGIC;
-    dma_done        : IN  STD_LOGIC;
+    dma_fifo_burst_valid: OUT STD_LOGIC;                      --TODO
+    dma_fifo_data       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --TODO
+    dma_fifo_ren        : IN  STD_LOGIC;                      --TODO
+    dma_buffer_new      : OUT STD_LOGIC;                      --TODO
+    dma_buffer_addr     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --TODO
+    dma_buffer_length   : OUT STD_LOGIC_VECTOR(25 DOWNTO 0);  --TODO
+    dma_buffer_full     : IN  STD_LOGIC;                      --TODO
+    dma_buffer_full_err : IN  STD_LOGIC;                      --TODO
 
     -- Reg out
-    ready_matrix_f0           : OUT STD_LOGIC;
-    ready_matrix_f1           : OUT STD_LOGIC;
-    ready_matrix_f2           : OUT STD_LOGIC;
-    error_bad_component_error : OUT STD_LOGIC;
-    error_buffer_full         : OUT STD_LOGIC;
+    ready_matrix_f0           : OUT STD_LOGIC;                  -- TODO
+    ready_matrix_f1           : OUT STD_LOGIC;                  -- TODO
+    ready_matrix_f2           : OUT STD_LOGIC;                  -- TODO
+--    error_bad_component_error : OUT STD_LOGIC;                  -- TODO
+    error_buffer_full         : OUT STD_LOGIC;                  -- TODO
     error_input_fifo_write    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 
-    debug_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --
-    observation_vector_0: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
-    observation_vector_1: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
-
     -- Reg In
-    status_ready_matrix_f0 : IN STD_LOGIC;
-    status_ready_matrix_f1 : IN STD_LOGIC;
-    status_ready_matrix_f2 : IN STD_LOGIC;
+    status_ready_matrix_f0 : IN STD_LOGIC;                      -- TODO
+    status_ready_matrix_f1 : IN STD_LOGIC;                      -- TODO
+    status_ready_matrix_f2 : IN STD_LOGIC;                      -- TODO
 
-    config_active_interruption_onNewMatrix : IN STD_LOGIC;
-    config_active_interruption_onError     : IN STD_LOGIC;
-    addr_matrix_f0                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f1                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f2                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    addr_matrix_f0                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0); -- TODO
+    addr_matrix_f1                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0); -- TODO
+    addr_matrix_f2                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0); -- TODO
+    
+    length_matrix_f0                         : IN STD_LOGIC_VECTOR(25 DOWNTO 0); -- TODO
+    length_matrix_f1                         : IN STD_LOGIC_VECTOR(25 DOWNTO 0); -- TODO
+    length_matrix_f2                         : IN STD_LOGIC_VECTOR(25 DOWNTO 0); -- TODO
 
-    matrix_time_f0 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
-    matrix_time_f1 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
-    matrix_time_f2 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
+    matrix_time_f0 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0); -- TODO
+    matrix_time_f1 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0); -- TODO
+    matrix_time_f2 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)  -- TODO
 
     );
 END;
@@ -195,6 +195,7 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
 
   SIGNAL FSM_DMA_fifo_ren    : STD_LOGIC;
   SIGNAL FSM_DMA_fifo_empty  : STD_LOGIC;
+  SIGNAL FSM_DMA_fifo_empty_threshold  : STD_LOGIC;
   SIGNAL FSM_DMA_fifo_data   : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL FSM_DMA_fifo_status : STD_LOGIC_VECTOR(53 DOWNTO 0);
   -----------------------------------------------------------------------------
@@ -204,6 +205,7 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL MEM_OUT_SM_Data_out : STD_LOGIC_VECTOR(63 DOWNTO 0);
   SIGNAL MEM_OUT_SM_Full     : STD_LOGIC_VECTOR(1 DOWNTO 0);
   SIGNAL MEM_OUT_SM_Empty    : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL MEM_OUT_SM_Empty_Threshold    : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
   -----------------------------------------------------------------------------
   -- TIME REG & INFOs
@@ -623,17 +625,6 @@ BEGIN
       fft_data_valid => fft_data_valid,
       fft_ready      => fft_ready);
 
-  observation_vector_0(11 DOWNTO 0) <= "000" &                              --11 10 
-                                       fft_ongoing_counter &               --9 8
-                                       sample_load_rising_down &           --7
-                                       fft_ready_rising_down &             --6
-                                       fft_ready &                         --5
-                                       fft_data_valid &                    --4
-                                       fft_pong &                          --3
-                                       sample_load &                       --2
-                                       fft_read &                          --1
-                                       sample_valid;                       --0
-
   -----------------------------------------------------------------------------
   fft_ready_rising_down   <= fft_ready_reg AND NOT fft_ready;
   sample_load_rising_down <= sample_load_reg AND NOT sample_load;
@@ -764,15 +755,6 @@ BEGIN
       empty       => MEM_IN_SM_Empty,
       almost_full => OPEN);
 
-  -----------------------------------------------------------------------------
-
-  observation_vector_1(11 DOWNTO 0) <= '0' &
-                                       SM_correlation_done      &               --4
-                                       SM_correlation_auto   &                --3
-                                       SM_correlation_start  &  
-                                       SM_correlation_start &            --7
-                                       status_MS_input(1 DOWNTO 0)&     --6..5
-                                       MEM_IN_SM_locked(4 DOWNTO 0);    --4..0
 
   -----------------------------------------------------------------------------
   MS_control_1 : MS_control
@@ -881,29 +863,60 @@ BEGIN
   MEM_OUT_SM_Data_in <= MEM_OUT_SM_Data_in_s & MEM_OUT_SM_Data_in_s;
   -----------------------------------------------------------------------------
 
-  Mem_Out_SpectralMatrix : lppFIFOxN
-    GENERIC MAP (
-      tech    => 0,
-      Mem_use => Mem_use,
-      Data_sz => 32,
-      Addr_sz => 8,
-      FifoCnt => 2)
-    PORT MAP (
-      clk  => clk,
-      rstn => rstn,
+  --Mem_Out_SpectralMatrix : lppFIFOxN
+  --  GENERIC MAP (
+  --    tech    => 0,
+  --    Mem_use => Mem_use,
+  --    Data_sz => 32,
+  --    Addr_sz => 8,
+  --    FifoCnt => 2)
+  --  PORT MAP (
+  --    clk  => clk,
+  --    rstn => rstn,
 
-      ReUse => (OTHERS => '0'),
-      run   => (OTHERS => '1'),
+  --    ReUse => (OTHERS => '0'),
+  --    run   => (OTHERS => '1'),
 
-      wen   => MEM_OUT_SM_Write,
-      wdata => MEM_OUT_SM_Data_in,
+  --    wen   => MEM_OUT_SM_Write,
+  --    wdata => MEM_OUT_SM_Data_in,
 
-      ren   => MEM_OUT_SM_Read,
-      rdata => MEM_OUT_SM_Data_out,
+  --    ren   => MEM_OUT_SM_Read,
+  --    rdata => MEM_OUT_SM_Data_out,
 
-      full        => MEM_OUT_SM_Full,
-      empty       => MEM_OUT_SM_Empty,
-      almost_full => OPEN);
+  --    full        => MEM_OUT_SM_Full,
+  --    empty       => MEM_OUT_SM_Empty,
+  --    almost_full => OPEN);
+
+  
+  all_Mem_Out_SpectralMatrix: FOR I IN 1 DOWNTO 0 GENERATE
+    Mem_Out_SpectralMatrix_I: lpp_fifo
+      GENERIC MAP (
+        tech                  => 0,
+        Mem_use               => Mem_use,
+        EMPTY_THRESHOLD_LIMIT => 15,
+        FULL_THRESHOLD_LIMIT  => 1,
+        DataSz                => 32,
+        AddrSz                => 8)
+      PORT MAP (
+        clk             => clk,
+        rstn            => rstn,
+        reUse           => '0',
+        run             => run,
+
+        ren             => MEM_OUT_SM_Read(I),                 
+        rdata           => MEM_OUT_SM_Data_out(32*(I+1)-1 DOWNTO 32*i),
+        
+        wen             => MEM_OUT_SM_Write(I),                           
+        wdata           => MEM_OUT_SM_Data_in(32*(I+1)-1 DOWNTO 32*i),                         
+        
+        empty           => MEM_OUT_SM_Empty(I),                
+        full            => MEM_OUT_SM_Full(I),                         
+        full_almost     => OPEN,                   
+        empty_threshold => MEM_OUT_SM_Empty_Threshold(I),      
+                                                        
+        full_threshold  => OPEN);
+    
+  END GENERATE all_Mem_Out_SpectralMatrix;
 
   -----------------------------------------------------------------------------
 --  MEM_OUT_SM_Read <= "00";
@@ -949,51 +962,140 @@ BEGIN
   FSM_DMA_fifo_data <= MEM_OUT_SM_Data_out(31 DOWNTO 0) WHEN fifo_ongoing = '0' ELSE
                        MEM_OUT_SM_Data_out(63 DOWNTO 32);
 
+    
+  FSM_DMA_fifo_empty_threshold <= MEM_OUT_SM_Empty_Threshold(0) WHEN fifo_ongoing = '0' AND fifo_0_ready = '1'  ELSE
+                                  MEM_OUT_SM_Empty_Threshold(1) WHEN fifo_ongoing = '1' AND fifo_1_ready = '1'  ELSE
+                                   '0';
+  
   -----------------------------------------------------------------------------
-  lpp_lfr_ms_fsmdma_1 : lpp_lfr_ms_fsmdma
+  --    fifo_matrix_type      => FSM_DMA_fifo_status(5 DOWNTO 4),       --IN
+  --    fifo_matrix_component => FSM_DMA_fifo_status(3 DOWNTO 0),       --IN
+  --    fifo_matrix_time      => FSM_DMA_fifo_status(53 DOWNTO 6),      --IN
+  --    fifo_data             => FSM_DMA_fifo_data,                     --IN
+  --    fifo_empty            => FSM_DMA_fifo_empty,                    --IN
+  --    fifo_empty_threshold  => FSM_DMA_fifo_empty_threshold,          --IN
+  --    fifo_ren              => FSM_DMA_fifo_ren,                      --OUT
+  
+
+  lpp_lfr_ms_fsmdma_1: lpp_lfr_ms_fsmdma
     PORT MAP (
-      HCLK    => clk,
-      HRESETn => rstn,
-
-      fifo_matrix_type      => FSM_DMA_fifo_status(5 DOWNTO 4),
-      fifo_matrix_component => FSM_DMA_fifo_status(3 DOWNTO 0),
-      fifo_matrix_time      => FSM_DMA_fifo_status(53 DOWNTO 6),
-      fifo_data             => FSM_DMA_fifo_data,
-      fifo_empty            => FSM_DMA_fifo_empty,
-      fifo_ren              => FSM_DMA_fifo_ren,
-
-      dma_addr        => dma_addr,
-      dma_data        => dma_data,
-      dma_valid       => dma_valid,
-      dma_valid_burst => dma_valid_burst,
-      dma_ren         => dma_ren,
-      dma_done        => dma_done,
-
-      ready_matrix_f0 => ready_matrix_f0,
-      ready_matrix_f1 => ready_matrix_f1,
-      ready_matrix_f2 => ready_matrix_f2,
-
-      error_bad_component_error => error_bad_component_error,
-      error_buffer_full         => error_buffer_full,
-
-      debug_reg              => debug_reg,
+      clk                    => clk,
+      rstn                   => rstn,
+      run                    => run,
+      
+      fifo_matrix_type       => FSM_DMA_fifo_status(5 DOWNTO 4),
+      fifo_matrix_time       => FSM_DMA_fifo_status(53 DOWNTO 6),
+      fifo_data              => FSM_DMA_fifo_data,
+      fifo_empty             => FSM_DMA_fifo_empty,
+      fifo_empty_threshold   => FSM_DMA_fifo_empty_threshold,
+      fifo_ren               => FSM_DMA_fifo_ren,
+      
+      dma_fifo_valid_burst   => dma_fifo_burst_valid,
+      dma_fifo_data          => dma_fifo_data,
+      dma_fifo_ren           => dma_fifo_ren,
+      dma_buffer_new         => dma_buffer_new,
+      dma_buffer_addr        => dma_buffer_addr,
+      dma_buffer_length      => dma_buffer_length,
+      dma_buffer_full        => dma_buffer_full,
+      dma_buffer_full_err    => dma_buffer_full_err,
+      
       status_ready_matrix_f0 => status_ready_matrix_f0,
       status_ready_matrix_f1 => status_ready_matrix_f1,
       status_ready_matrix_f2 => status_ready_matrix_f2,
+      addr_matrix_f0         => addr_matrix_f0,
+      addr_matrix_f1         => addr_matrix_f1,
+      addr_matrix_f2         => addr_matrix_f2,
+      length_matrix_f0       => length_matrix_f0,
+      length_matrix_f1       => length_matrix_f1,
+      length_matrix_f2       => length_matrix_f2,
+      ready_matrix_f0        => ready_matrix_f0,
+      ready_matrix_f1        => ready_matrix_f1,
+      ready_matrix_f2        => ready_matrix_f2,
+      matrix_time_f0         => matrix_time_f0,
+      matrix_time_f1         => matrix_time_f1,
+      matrix_time_f2         => matrix_time_f2,
+      error_buffer_full      => error_buffer_full);
+  
 
-      config_active_interruption_onNewMatrix => config_active_interruption_onNewMatrix,
-      config_active_interruption_onError     => config_active_interruption_onError,
+  
 
-      addr_matrix_f0 => addr_matrix_f0,
-      addr_matrix_f1 => addr_matrix_f1,
-      addr_matrix_f2 => addr_matrix_f2,
+    
+  --dma_fifo_burst_valid: OUT STD_LOGIC;                      --TODO
+  --dma_fifo_data       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --TODO
+  --dma_fifo_ren        : IN  STD_LOGIC;                      --TODO
+  --dma_buffer_new      : OUT STD_LOGIC;                      --TODO
+  --dma_buffer_addr     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --TODO
+  --dma_buffer_length   : OUT STD_LOGIC_VECTOR(25 DOWNTO 0);  --TODO
+  --dma_buffer_full     : IN  STD_LOGIC;                      --TODO
+  --dma_buffer_full_err : IN  STD_LOGIC;                      --TODO
 
-      matrix_time_f0 => matrix_time_f0,
-      matrix_time_f1 => matrix_time_f1,
-      matrix_time_f2 => matrix_time_f2
-      );
+  ---- Reg out
+  --ready_matrix_f0           : OUT STD_LOGIC;                  -- TODO
+  --ready_matrix_f1           : OUT STD_LOGIC;                  -- TODO
+  --ready_matrix_f2           : OUT STD_LOGIC;                  -- TODO
+  --error_bad_component_error : OUT STD_LOGIC;                  -- TODO
+  --error_buffer_full         : OUT STD_LOGIC;                  -- TODO
+
+  ---- Reg In
+  --status_ready_matrix_f0 : IN STD_LOGIC;                      -- TODO
+  --status_ready_matrix_f1 : IN STD_LOGIC;                      -- TODO
+  --status_ready_matrix_f2 : IN STD_LOGIC;                      -- TODO
+
+  --addr_matrix_f0                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0); -- TODO
+  --addr_matrix_f1                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0); -- TODO
+  --addr_matrix_f2                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0); -- TODO
+
+  --matrix_time_f0 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0); -- TODO
+  --matrix_time_f1 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0); -- TODO
+  --matrix_time_f2 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)  -- TODO
+  -----------------------------------------------------------------------------
+  
+  -----------------------------------------------------------------------------
+  --lpp_lfr_ms_fsmdma_1 : lpp_lfr_ms_fsmdma
+  --  PORT MAP (
+  --    HCLK    => clk,
+  --    HRESETn => rstn,
+
+  --    fifo_matrix_type      => FSM_DMA_fifo_status(5 DOWNTO 4),
+  --    fifo_matrix_component => FSM_DMA_fifo_status(3 DOWNTO 0),
+  --    fifo_matrix_time      => FSM_DMA_fifo_status(53 DOWNTO 6),
+  --    fifo_data             => FSM_DMA_fifo_data,
+  --    fifo_empty            => FSM_DMA_fifo_empty,
+  --    fifo_ren              => FSM_DMA_fifo_ren,
+
+  --    dma_addr        => dma_addr,
+  --    dma_data        => dma_data,
+  --    dma_valid       => dma_valid,
+  --    dma_valid_burst => dma_valid_burst,
+  --    dma_ren         => dma_ren,
+  --    dma_done        => dma_done,
+
+  --    ready_matrix_f0 => ready_matrix_f0,
+  --    ready_matrix_f1 => ready_matrix_f1,
+  --    ready_matrix_f2 => ready_matrix_f2,
+
+  --    error_bad_component_error => error_bad_component_error,
+  --    error_buffer_full         => error_buffer_full,
+
+  --    debug_reg              => debug_reg,
+  --    status_ready_matrix_f0 => status_ready_matrix_f0,
+  --    status_ready_matrix_f1 => status_ready_matrix_f1,
+  --    status_ready_matrix_f2 => status_ready_matrix_f2,
+
+  --    config_active_interruption_onNewMatrix => config_active_interruption_onNewMatrix,
+  --    config_active_interruption_onError     => config_active_interruption_onError,
+
+  --    addr_matrix_f0 => addr_matrix_f0,
+  --    addr_matrix_f1 => addr_matrix_f1,
+  --    addr_matrix_f2 => addr_matrix_f2,
+
+  --    matrix_time_f0 => matrix_time_f0,
+  --    matrix_time_f1 => matrix_time_f1,
+  --    matrix_time_f2 => matrix_time_f2
+  --    );
   -----------------------------------------------------------------------------
 
+  
 
 
 

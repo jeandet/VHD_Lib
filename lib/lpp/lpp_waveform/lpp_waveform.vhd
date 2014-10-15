@@ -103,58 +103,18 @@ ENTITY lpp_waveform IS
     addr_data_f3     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f3_in_valid : IN STD_LOGIC;
     data_f3_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-
+        
     ---------------------------------------------------------------------------
-    -- OUTPUT
-    --f0
-    data_f0_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data_f0_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data_f0_data_out_valid       : OUT STD_LOGIC;
-    data_f0_data_out_valid_burst : OUT STD_LOGIC;
-    data_f0_data_out_ren         : IN  STD_LOGIC;
-    --f1
-    data_f1_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data_f1_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data_f1_data_out_valid       : OUT STD_LOGIC;
-    data_f1_data_out_valid_burst : OUT STD_LOGIC;
-    data_f1_data_out_ren         : IN  STD_LOGIC;
-    --f2
-    data_f2_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data_f2_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data_f2_data_out_valid       : OUT STD_LOGIC;
-    data_f2_data_out_valid_burst : OUT STD_LOGIC;
-    data_f2_data_out_ren         : IN  STD_LOGIC;
-    --f3
-    data_f3_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data_f3_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    data_f3_data_out_valid       : OUT STD_LOGIC;
-    data_f3_data_out_valid_burst : OUT STD_LOGIC;
-    data_f3_data_out_ren         : IN  STD_LOGIC;
-
-    ---------------------------------------------------------------------------
-    --
-    observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+    -- DMA --------------------------------------------------------------------
     
-
-    ----debug SNAPSHOT OUT
-    --debug_f0_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    --debug_f0_data_valid : OUT STD_LOGIC;
-    --debug_f1_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    --debug_f1_data_valid : OUT STD_LOGIC;
-    --debug_f2_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    --debug_f2_data_valid : OUT STD_LOGIC;
-    --debug_f3_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-    --debug_f3_data_valid : OUT STD_LOGIC;
-
-    ----debug FIFO IN
-    --debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
-    --debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
-    --debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
-    --debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f3_data_fifo_in_valid : OUT STD_LOGIC
+    dma_fifo_valid_burst : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    dma_fifo_data        : OUT STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
+    dma_fifo_ren         : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    dma_buffer_new       : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    dma_buffer_addr      : OUT STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
+    dma_buffer_length    : OUT STD_LOGIC_VECTOR(26*4-1 DOWNTO 0);
+    dma_buffer_full      : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    dma_buffer_full_err  : IN  STD_LOGIC_VECTOR(3 DOWNTO 0)
 
     );
 
@@ -219,30 +179,11 @@ ARCHITECTURE beh OF lpp_waveform IS
 
   --
 
-  SIGNAL observation_reg_s : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL status_full_s       : STD_LOGIC_VECTOR(3 DOWNTO 0);
 
   
 BEGIN  -- beh
 
-  
-  -----------------------------------------------------------------------------
-  -- DEBUG
-  -----------------------------------------------------------------------------
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      observation_reg <= (OTHERS => '0');
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      observation_reg <= observation_reg_s;
-    END IF;
-  END PROCESS;
-  observation_reg_s( 2 DOWNTO  0) <= start_snapshot_f2 & start_snapshot_f1 & start_snapshot_f0;
-  observation_reg_s( 5 DOWNTO  3) <= data_f2_out_valid & data_f1_out_valid & data_f0_out_valid;
-  observation_reg_s( 8 DOWNTO  6) <= status_full_s(2 DOWNTO 0) ;
-  observation_reg_s(11 DOWNTO  9) <= status_full_ack(2 DOWNTO 0);
-  observation_reg_s(14 DOWNTO 12) <= data_wen(2 DOWNTO 0);
-  observation_reg_s(31 DOWNTO 15) <= (OTHERS => '0');
   -----------------------------------------------------------------------------
   
   lpp_waveform_snapshot_controler_1 : lpp_waveform_snapshot_controler
@@ -506,8 +447,8 @@ BEGIN  -- beh
       GENERIC MAP (
         tech                  => tech,
         Mem_use               => use_RAM,
-        EMPTY_THRESHOLD_LIMIT => 16,
-        FULL_THRESHOLD_LIMIT  => 5,
+        EMPTY_THRESHOLD_LIMIT => 15,
+        FULL_THRESHOLD_LIMIT  => 3,
         DataSz                => 32,
         AddrSz                => 7)
       PORT MAP (
@@ -528,70 +469,108 @@ BEGIN  -- beh
   END GENERATE generate_all_fifo;
 
   
-  --empty <= s_empty;
-  --empty_almost <= s_empty_almost;
-  --s_data_ren <= data_ren;
+  ----empty <= s_empty;
+  ----empty_almost <= s_empty_almost;
+  ----s_data_ren <= data_ren;
   
-  data_f0_data_out <= s_rdata_v(31 downto 0);
-  data_f1_data_out <= s_rdata_v(31+32 downto 0+32);
-  data_f2_data_out <= s_rdata_v(31+32*2 downto 32*2);
-  data_f3_data_out <= s_rdata_v(31+32*3 downto 32*3);
+  --data_f0_data_out <= s_rdata_v(31 downto 0);
+  --data_f1_data_out <= s_rdata_v(31+32 downto 0+32);
+  --data_f2_data_out <= s_rdata_v(31+32*2 downto 32*2);
+  --data_f3_data_out <= s_rdata_v(31+32*3 downto 32*3);
 
-  data_ren <= data_f3_data_out_ren &
-              data_f2_data_out_ren &
-              data_f1_data_out_ren &
-              data_f0_data_out_ren;
+  --data_ren <= data_f3_data_out_ren &
+  --            data_f2_data_out_ren &
+  --            data_f1_data_out_ren &
+  --            data_f0_data_out_ren;
   
-  lpp_waveform_gen_address_1 : lpp_waveform_genaddress
-    GENERIC MAP (
-      nb_data_by_buffer_size => nb_word_by_buffer_size)
-    PORT MAP (
-      clk  => clk,
-      rstn => rstn,
-      run  => run,
+  --lpp_waveform_gen_address_1 : lpp_waveform_genaddress
+  --  GENERIC MAP (
+  --    nb_data_by_buffer_size => nb_word_by_buffer_size)
+  --  PORT MAP (
+  --    clk  => clk,
+  --    rstn => rstn,
+  --    run  => run,
 
-      -------------------------------------------------------------------------
-      -- CONFIG
-      -------------------------------------------------------------------------
-      nb_data_by_buffer => nb_word_by_buffer,
+  --    -------------------------------------------------------------------------
+  --    -- CONFIG
+  --    -------------------------------------------------------------------------
+  --    nb_data_by_buffer => nb_word_by_buffer,
 
-      addr_data_f0 => addr_data_f0,
-      addr_data_f1 => addr_data_f1,
-      addr_data_f2 => addr_data_f2,
-      addr_data_f3 => addr_data_f3,
-      -------------------------------------------------------------------------
-      -- CTRL
-      -------------------------------------------------------------------------
-      -- IN
-      empty        => empty,
-      empty_almost => empty_almost,
-      data_ren     => data_ren,
+  --    addr_data_f0 => addr_data_f0,
+  --    addr_data_f1 => addr_data_f1,
+  --    addr_data_f2 => addr_data_f2,
+  --    addr_data_f3 => addr_data_f3,
+  --    -------------------------------------------------------------------------
+  --    -- CTRL
+  --    -------------------------------------------------------------------------
+  --    -- IN
+  --    empty        => empty,
+  --    empty_almost => empty_almost,
+  --    data_ren     => data_ren,
 
-      -------------------------------------------------------------------------
-      -- STATUS
-      -------------------------------------------------------------------------
-      status_full     => status_full_s,
-      status_full_ack => status_full_ack,
-      status_full_err => status_full_err,
+  --    -------------------------------------------------------------------------
+  --    -- STATUS
+  --    -------------------------------------------------------------------------
+  --    status_full     => status_full_s,
+  --    status_full_ack => status_full_ack,
+  --    status_full_err => status_full_err,
 
-      -------------------------------------------------------------------------
-      -- ADDR DATA OUT
-      -------------------------------------------------------------------------
-      data_f0_data_out_valid_burst => data_f0_data_out_valid_burst,
-      data_f1_data_out_valid_burst => data_f1_data_out_valid_burst,
-      data_f2_data_out_valid_burst => data_f2_data_out_valid_burst,
-      data_f3_data_out_valid_burst => data_f3_data_out_valid_burst,
+  --    -------------------------------------------------------------------------
+  --    -- ADDR DATA OUT
+  --    -------------------------------------------------------------------------
+  --    data_f0_data_out_valid_burst => data_f0_data_out_valid_burst,
+  --    data_f1_data_out_valid_burst => data_f1_data_out_valid_burst,
+  --    data_f2_data_out_valid_burst => data_f2_data_out_valid_burst,
+  --    data_f3_data_out_valid_burst => data_f3_data_out_valid_burst,
 
-      data_f0_data_out_valid => data_f0_data_out_valid,
-      data_f1_data_out_valid => data_f1_data_out_valid,
-      data_f2_data_out_valid => data_f2_data_out_valid,
-      data_f3_data_out_valid => data_f3_data_out_valid,
+  --    data_f0_data_out_valid => data_f0_data_out_valid,
+  --    data_f1_data_out_valid => data_f1_data_out_valid,
+  --    data_f2_data_out_valid => data_f2_data_out_valid,
+  --    data_f3_data_out_valid => data_f3_data_out_valid,
 
-      data_f0_addr_out => data_f0_addr_out,
-      data_f1_addr_out => data_f1_addr_out,
-      data_f2_addr_out => data_f2_addr_out,
-      data_f3_addr_out => data_f3_addr_out
-      );
-  status_full <= status_full_s;
+  --    data_f0_addr_out => data_f0_addr_out,
+  --    data_f1_addr_out => data_f1_addr_out,
+  --    data_f2_addr_out => data_f2_addr_out,
+  --    data_f3_addr_out => data_f3_addr_out
+  --    );
+  --status_full <= status_full_s;
+
+
+  -----------------------------------------------------------------------------
+  -- 
+  -----------------------------------------------------------------------------
+  
+  all_channel: FOR I IN 3 DOWNTO 0 GENERATE
+    lpp_waveform_fsmdma_I: lpp_waveform_fsmdma
+      PORT MAP (
+        clk                  => clk,
+        rstn                 => rstn,
+        run                  => run,
+        
+        fifo_buffer_time     => fifo_buffer_time(48*(I+1)-1 DOWNTO 48*I),       -- TODO
+        
+        fifo_data            => s_rdata_v(32*(I+1)-1 DOWNTO 32*I),             
+        fifo_empty           => empty(I),
+        fifo_empty_threshold => empty_almost(I),
+        fifo_ren             => data_ren(I),        
+        
+        dma_fifo_valid_burst => dma_fifo_valid_burst(I),
+        dma_fifo_data        => dma_fifo_data(32*(I+1)-1 DOWNTO 32*I),
+        dma_fifo_ren         => dma_fifo_ren(I),
+        dma_buffer_new       => dma_buffer_new(I),
+        dma_buffer_addr      => dma_buffer_addr(32*(I+1)-1 DOWNTO 32*I),
+        dma_buffer_length    => dma_buffer_length(26*(I+1)-1 DOWNTO 26*I),
+        dma_buffer_full      => dma_buffer_full(I),
+        dma_buffer_full_err  => dma_buffer_full_err(I),
+        
+        status_buffer_ready  => status_buffer_ready(I),                 -- TODO
+        addr_buffer          => addr_buffer(32*(I+1)-1 DOWNTO 32*I),    -- TODO
+        length_buffer        => length_buffer(26*(I+1)-1 DOWNTO 26*I),  -- TODO
+        ready_buffer         => ready_buffer(I),                        -- TODO
+        buffer_time          => buffer_time(48*(I+1)-1 DOWNTO 48*I),    -- TODO
+        error_buffer_full    => error_buffer_full(I));                  -- TODO
+    
+  END GENERATE all_channel;
+
   
 END beh;

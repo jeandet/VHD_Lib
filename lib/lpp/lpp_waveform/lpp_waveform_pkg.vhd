@@ -372,5 +372,31 @@ PACKAGE lpp_waveform_pkg IS
       data      : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
       data_s    : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0));
   END COMPONENT;
+
+  COMPONENT lpp_waveform_fsmdma
+    PORT (
+      clk                  : IN  STD_ULOGIC;
+      rstn                 : IN  STD_ULOGIC;
+      run                  : IN  STD_LOGIC;
+      fifo_buffer_time     : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
+      fifo_data            : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      fifo_empty           : IN  STD_LOGIC;
+      fifo_empty_threshold : IN  STD_LOGIC;
+      fifo_ren             : OUT STD_LOGIC;
+      dma_fifo_valid_burst : OUT STD_LOGIC;
+      dma_fifo_data        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      dma_fifo_ren         : IN  STD_LOGIC;
+      dma_buffer_new       : OUT STD_LOGIC;
+      dma_buffer_addr      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      dma_buffer_length    : OUT STD_LOGIC_VECTOR(25 DOWNTO 0);
+      dma_buffer_full      : IN  STD_LOGIC;
+      dma_buffer_full_err  : IN  STD_LOGIC;
+      status_buffer_ready  : IN  STD_LOGIC;
+      addr_buffer          : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      length_buffer        : IN  STD_LOGIC_VECTOR(25 DOWNTO 0);
+      ready_buffer         : OUT STD_LOGIC;
+      buffer_time          : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      error_buffer_full    : OUT STD_LOGIC);
+  END COMPONENT;
   
 END lpp_waveform_pkg;

@@ -5,3 +5,7 @@ lpp_dma_ip.vhd
 lpp_dma_send_16word.vhd
 lpp_dma_send_1word.vhd
 lpp_dma_singleOrBurst.vhd
+DMA_SubSystem.vhd
+DMA_SubSystem_GestionBuffer.vhd
+DMA_SubSystem_Arbiter.vhd
+DMA_SubSystem_MUX.vhd

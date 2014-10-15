@@ -41,259 +41,147 @@ USE techmap.gencomp.ALL;
 ENTITY lpp_lfr_ms_fsmdma IS
   PORT (
     -- AMBA AHB system signals
-    HCLK    : IN STD_ULOGIC;
-    HRESETn : IN STD_ULOGIC;
+    clk                  : IN  STD_ULOGIC;
+    rstn                 : IN  STD_ULOGIC;
+    run                  : IN  STD_LOGIC;
 
     ---------------------------------------------------------------------------
     -- FIFO - IN
-    fifo_matrix_type      : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
-    fifo_matrix_component : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    fifo_matrix_time      : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
-    fifo_data             : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-    fifo_empty            : IN  STD_LOGIC;
-    fifo_ren              : OUT STD_LOGIC;
+    fifo_matrix_type     : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+    fifo_matrix_time     : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
+    fifo_data            : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+    fifo_empty           : IN  STD_LOGIC;
+    fifo_empty_threshold : IN  STD_LOGIC;
+    fifo_ren             : OUT STD_LOGIC;
 
     ---------------------------------------------------------------------------
     -- DMA - OUT
-    dma_addr        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    dma_data        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    dma_valid       : OUT STD_LOGIC;
-    dma_valid_burst : OUT STD_LOGIC;
-    dma_ren         : IN  STD_LOGIC;
-    dma_done        : IN  STD_LOGIC;
+    dma_fifo_valid_burst : OUT STD_LOGIC;
+    dma_fifo_data        : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    dma_fifo_ren         : IN  STD_LOGIC;
+
+    dma_buffer_new      : OUT STD_LOGIC;
+    dma_buffer_addr     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    dma_buffer_length   : OUT STD_LOGIC_VECTOR(25 DOWNTO 0);
+    dma_buffer_full     : IN  STD_LOGIC;
+    dma_buffer_full_err : IN  STD_LOGIC;
 
     ---------------------------------------------------------------------------
-    -- Reg out
-    ready_matrix_f0               : OUT STD_LOGIC;
-    ready_matrix_f1               : OUT STD_LOGIC;
-    ready_matrix_f2               : OUT STD_LOGIC;
-    
-    error_bad_component_error     : OUT STD_LOGIC;
-    error_buffer_full             : OUT STD_LOGIC;
-    debug_reg                     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-
     -- Reg In
-    status_ready_matrix_f0               : IN STD_LOGIC;
-    status_ready_matrix_f1               : IN STD_LOGIC;
-    status_ready_matrix_f2               : IN STD_LOGIC;
+    status_ready_matrix_f0 : IN STD_LOGIC;
+    status_ready_matrix_f1 : IN STD_LOGIC;
+    status_ready_matrix_f2 : IN STD_LOGIC;
 
-    config_active_interruption_onNewMatrix : IN STD_LOGIC;
-    config_active_interruption_onError     : IN STD_LOGIC;
-    addr_matrix_f0                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f1                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_matrix_f2                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    addr_matrix_f0 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    addr_matrix_f1 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    addr_matrix_f2 : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-    matrix_time_f0 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
-    matrix_time_f1   : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
-    matrix_time_f2   : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
+    length_matrix_f0 : IN STD_LOGIC_VECTOR(25 DOWNTO 0);
+    length_matrix_f1 : IN STD_LOGIC_VECTOR(25 DOWNTO 0);
+    length_matrix_f2 : IN STD_LOGIC_VECTOR(25 DOWNTO 0);
 
+    -- Reg Out
+    ready_matrix_f0 : OUT STD_LOGIC;
+    ready_matrix_f1 : OUT STD_LOGIC;
+    ready_matrix_f2 : OUT STD_LOGIC;
+
+    matrix_time_f0    : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    matrix_time_f1    : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    matrix_time_f2    : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    error_buffer_full : OUT STD_LOGIC
     );                                      
 END;
 
 ARCHITECTURE Behavioral OF lpp_lfr_ms_fsmdma IS
-  -----------------------------------------------------------------------------
-  TYPE state_DMAWriteBurst IS (IDLE,
-                               CHECK_COMPONENT_TYPE,
-                               WRITE_COARSE_TIME,
-                               WRITE_FINE_TIME,
-                               TRASH_FIFO,
-                               SEND_DATA,
-                               WAIT_DATA_ACK
-                               );
-  SIGNAL state : state_DMAWriteBurst; 
 
-  SIGNAL matrix_type        : STD_LOGIC_VECTOR(1 DOWNTO 0);
-  SIGNAL component_type     : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL component_type_pre : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL header_check_ok    : STD_LOGIC;
-  SIGNAL address_matrix     : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL Address            : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  -----------------------------------------------------------------------------
-  -----------------------------------------------------------------------------
+  TYPE   FSM_DMA_STATE IS (IDLE, ONGOING);
+  SIGNAL state         : FSM_DMA_STATE;
+  SIGNAL burst_valid_s : STD_LOGIC;
 
-  SIGNAL component_send     : STD_LOGIC;
-  SIGNAL component_send_ok  : STD_LOGIC;
-  -----------------------------------------------------------------------------
-  SIGNAL fifo_ren_trash     : STD_LOGIC;
-
-  -----------------------------------------------------------------------------
-  SIGNAL debug_reg_s   : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  -----------------------------------------------------------------------------
-  SIGNAL log_empty_fifo : STD_LOGIC;
-  -----------------------------------------------------------------------------
-
-  SIGNAL matrix_buffer_ready : STD_LOGIC;  
+  SIGNAL current_matrix_type : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  
 BEGIN
-  
-  debug_reg <= debug_reg_s;
+  burst_valid_s <= NOT fifo_empty_threshold;
 
-  
-  matrix_buffer_ready <= '1' WHEN matrix_type = "00" AND status_ready_matrix_f0 = '0' ELSE
-                         '1' WHEN matrix_type = "01" AND status_ready_matrix_f1 = '0'   ELSE
-                         '1' WHEN matrix_type = "10" AND status_ready_matrix_f2 = '0'   ELSE
-                         '0';
-  
-  header_check_ok <= '0' WHEN component_type = "1111" ELSE  -- ?? component_type_pre = "1111"
-                     '1' WHEN component_type = "0000" ELSE  --AND component_type_pre = "0000" ELSE
-                     '1' WHEN component_type = component_type_pre + "0001" ELSE
-                     '0';
+  error_buffer_full <= dma_buffer_full_err;
 
-  address_matrix <= addr_matrix_f0 WHEN matrix_type = "00" ELSE
-                    addr_matrix_f1   WHEN matrix_type = "01" ELSE
-                    addr_matrix_f2   WHEN matrix_type = "10" ELSE
-                    (OTHERS => '0');
+  fifo_ren             <= dma_fifo_ren  WHEN state = ONGOING ELSE '1';
+  dma_fifo_data        <= fifo_data;
+  dma_fifo_valid_burst <= burst_valid_s WHEN state = ONGOING ELSE '1';
 
-  debug_reg_s(31 DOWNTO 15) <= (OTHERS => '0');
-  -----------------------------------------------------------------------------
-  -- DMA control
-  -----------------------------------------------------------------------------
-  DMAWriteFSM_p : PROCESS (HCLK, HRESETn)
-  BEGIN
-    IF HRESETn = '0' THEN
-      matrix_type                   <= (OTHERS => '0');
-      component_type                <= (OTHERS => '0');
-      state                         <= IDLE;
-      ready_matrix_f0             <= '0';
-      ready_matrix_f1               <= '0';
-      ready_matrix_f2               <= '0';
-      error_bad_component_error     <= '0';
-      error_buffer_full             <= '0';  -- TODO
-      component_type_pre            <= "0000";
-      fifo_ren_trash                <= '1';
-      component_send                <= '0';
-      address                       <= (OTHERS => '0');
-
-      debug_reg_s(2 DOWNTO 0)  <= (OTHERS => '0');
-      debug_reg_s(5 DOWNTO 3)  <= (OTHERS => '0');
-      debug_reg_s(8 DOWNTO 6)  <= (OTHERS => '0');
-      debug_reg_s(10 DOWNTO 9)  <= (OTHERS => '0');
-      debug_reg_s(14 DOWNTO 11)  <= (OTHERS => '0');
-
-      log_empty_fifo <= '0';
-
-      matrix_time_f0 <= (OTHERS => '0');
-      matrix_time_f1 <= (OTHERS => '0');
-      matrix_time_f2 <= (OTHERS => '0');
-
-    ELSIF HCLK'EVENT AND HCLK = '1' THEN
-      --
-      debug_reg_s(3)  <= status_ready_matrix_f0;
-      debug_reg_s(4)  <= status_ready_matrix_f1;
-      debug_reg_s(5)  <= status_ready_matrix_f2;
-      debug_reg_s(6)  <= '0';
-      debug_reg_s(7)  <= '0';
-      debug_reg_s(8)  <= '0';
-      debug_reg_s(10 DOWNTO 9)  <= matrix_type;
-      debug_reg_s(14 DOWNTO 11)  <= component_type;
-      
-      --
-
-      
-
-      ready_matrix_f0           <= '0';
-      ready_matrix_f1           <= '0';
-      ready_matrix_f2           <= '0';
-      error_bad_component_error <= '0';
-      error_buffer_full         <= '0'; 
-
-      CASE state IS
-        WHEN IDLE =>
-          debug_reg_s(2 DOWNTO 0) <= "000";
-          IF fifo_empty = '0' THEN
-            state              <= CHECK_COMPONENT_TYPE;
-            matrix_type        <= fifo_matrix_type;
-            component_type     <= fifo_matrix_component;
-            component_type_pre <= component_type;
-          END IF;
-         
-          log_empty_fifo <= '0';
-          
-        WHEN CHECK_COMPONENT_TYPE =>
-          debug_reg_s(2 DOWNTO 0) <= "001";
-
-          IF header_check_ok = '1' AND matrix_buffer_ready = '1'THEN
-            IF component_type = "0000" THEN
-              address <= address_matrix;
-              CASE matrix_type IS
-                WHEN "00"   => matrix_time_f0   <= fifo_matrix_time;
-                WHEN "01"   => matrix_time_f1   <= fifo_matrix_time;
-                WHEN "10"   => matrix_time_f2   <= fifo_matrix_time;
-                WHEN OTHERS => NULL;
-              END CASE;
-              component_send <= '1';
-            END IF;
-            state <= SEND_DATA;
-            --
-          ELSE
-            error_bad_component_error <= NOT header_check_ok;
-            error_buffer_full         <= NOT matrix_buffer_ready;  -- TODO
-            component_type_pre        <= "0000";
-            state                     <= TRASH_FIFO;
-          END IF;
-          
-        WHEN TRASH_FIFO =>
-          debug_reg_s(2 DOWNTO 0) <= "100";
-          
-          error_buffer_full             <= '0';
-          error_bad_component_error     <= '0';
-          IF fifo_empty = '1' THEN
-            state          <= IDLE;
-            fifo_ren_trash <= '1';
-          ELSE
-            fifo_ren_trash <= '0';
-          END IF;
-
-        WHEN SEND_DATA =>
-          debug_reg_s(2 DOWNTO 0) <= "010";
-
-          IF fifo_empty = '1' OR log_empty_fifo = '1' THEN
-            state <= IDLE;
-            IF component_type = "1110" THEN
-              CASE matrix_type IS
-                WHEN "00"   =>
-                  ready_matrix_f0   <= '1';
-                  debug_reg_s(6)    <= '1';
-                WHEN "01"   =>
-                  ready_matrix_f1   <= '1';
-                  debug_reg_s(7)    <= '1';
-                WHEN "10"   =>
-                  ready_matrix_f2   <= '1';
-                  debug_reg_s(8)    <= '1';
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS
+    IF rstn = '0' THEN                  -- asynchronous reset (active low)
+      state               <= IDLE;
+      current_matrix_type <= "00";
+      matrix_time_f0      <= (OTHERS => '0');
+      matrix_time_f1      <= (OTHERS => '0');
+      matrix_time_f2      <= (OTHERS => '0');
+      dma_buffer_addr     <= (OTHERS => '0');
+      dma_buffer_length   <= (OTHERS => '0');
+      dma_buffer_new      <= '0';
+      ready_matrix_f0     <= '0';
+      ready_matrix_f1     <= '0';
+      ready_matrix_f2     <= '0';
+    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
+      ready_matrix_f0 <= '0';
+      ready_matrix_f1 <= '0';
+      ready_matrix_f2 <= '0';
+      IF run = '1' THEN
+        CASE state IS
+          WHEN IDLE =>
+            IF fifo_empty = '0' THEN
+              current_matrix_type <= fifo_matrix_type;
+              CASE fifo_matrix_type IS
+                WHEN "00" =>
+                  IF status_ready_matrix_f0 = '0' THEN
+                    state             <= ONGOING;
+                    matrix_time_f0    <= fifo_matrix_time;
+                    dma_buffer_addr   <= addr_matrix_f0;
+                    dma_buffer_length <= length_matrix_f0;
+                    dma_buffer_new    <= '1';
+                  END IF;
+                WHEN "01" =>
+                  IF status_ready_matrix_f1 = '0' THEN
+                    state             <= ONGOING;
+                    matrix_time_f1    <= fifo_matrix_time;
+                    dma_buffer_addr   <= addr_matrix_f1;
+                    dma_buffer_length <= length_matrix_f1;
+                    dma_buffer_new    <= '1';
+                  END IF;
+                WHEN "10" =>
+                  IF status_ready_matrix_f2 = '0' THEN
+                    state             <= ONGOING;
+                    matrix_time_f2    <= fifo_matrix_time;
+                    dma_buffer_addr   <= addr_matrix_f2;
+                    dma_buffer_length <= length_matrix_f2;
+                    dma_buffer_new    <= '1';
+                  END IF;
                 WHEN OTHERS => NULL;
               END CASE;
             END IF;
-          ELSE
-            component_send <= '1';
-            address        <= address;
-            state          <= WAIT_DATA_ACK;
-          END IF;
-
-        WHEN WAIT_DATA_ACK =>
-          log_empty_fifo <= fifo_empty OR log_empty_fifo;
-
-          debug_reg_s(2 DOWNTO 0) <= "011";
-
-          IF dma_ren = '0' THEN
-            component_send <= '0';
-          END IF;
-
-          IF component_send_ok = '1' THEN
-            address <= address + 64;
-            state   <= SEND_DATA;
-          END IF;
-          
-        WHEN OTHERS => NULL;
-      END CASE;
-      
+          WHEN ONGOING =>
+            IF dma_buffer_full = '1' THEN
+              CASE current_matrix_type IS
+                WHEN "00"   => ready_matrix_f0 <= '1'; state <= IDLE;
+                WHEN "01"   => ready_matrix_f1 <= '1'; state <= IDLE;
+                WHEN "10"   => ready_matrix_f2 <= '1'; state <= IDLE;
+                WHEN OTHERS => NULL;
+              END CASE;
+            END IF;
+          WHEN OTHERS => NULL;
+        END CASE;
+      ELSE
+        state               <= IDLE;
+        current_matrix_type <= "00";
+        matrix_time_f0      <= (OTHERS => '0');
+        matrix_time_f1      <= (OTHERS => '0');
+        matrix_time_f2      <= (OTHERS => '0');
+        dma_buffer_addr     <= (OTHERS => '0');
+        dma_buffer_length   <= (OTHERS => '0');
+        dma_buffer_new      <= '0';
+      END IF;
     END IF;
-  END PROCESS DMAWriteFSM_p;
-
-  dma_valid_burst <= component_send;
-  dma_valid       <= '0';
-  dma_data        <= fifo_data;
-  dma_addr        <= address;
-  fifo_ren        <= dma_ren AND fifo_ren_trash;
-
-  component_send_ok <= dma_done;
+  END PROCESS;
   
 END Behavioral;
