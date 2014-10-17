@@ -275,9 +275,9 @@ BEGIN  -- beh
     PORT MAP (spw1_sout, swno.s(0));
   -- PADS FOR SPW2
   spw2_rxd_pad : inpad GENERIC MAP (tech => inferred)  -- bad naming of the MINI-LFR /!\
-    PORT MAP (spw2_sin, dtmp(1));
+    PORT MAP (spw2_din, dtmp(1));
   spw2_rxs_pad : inpad GENERIC MAP (tech => inferred)  -- bad naming of the MINI-LFR /!\
-    PORT MAP (spw2_din, stmp(1));
+    PORT MAP (spw2_sin, stmp(1));
   spw2_txd_pad : outpad GENERIC MAP (tech => inferred)
     PORT MAP (spw2_dout, swno.d(1));
   spw2_txs_pad : outpad GENERIC MAP (tech => inferred)
