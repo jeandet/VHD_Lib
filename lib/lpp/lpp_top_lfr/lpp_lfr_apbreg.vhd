@@ -38,7 +38,7 @@ USE techmap.gencomp.ALL;
 ENTITY lpp_lfr_apbreg IS
   GENERIC (
     nb_data_by_buffer_size : INTEGER := 11;
-    nb_word_by_buffer_size : INTEGER := 11;
+--    nb_word_by_buffer_size : INTEGER := 11;
     nb_snapshot_param_size : INTEGER := 11;
     delta_vector_size      : INTEGER := 20;
     delta_vector_size_f0_2 : INTEGER := 3;
@@ -95,11 +95,11 @@ ENTITY lpp_lfr_apbreg IS
     ---------------------------------------------------------------------------
     ---------------------------------------------------------------------------
     -- WaveForm picker Reg
-    status_full     : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    status_full_ack : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    status_full_err : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    --status_full     : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    --status_full_ack : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    --status_full_err : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
     status_new_err  : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-
+   
     -- OUT
     data_shaping_BW  : OUT STD_LOGIC;
     data_shaping_SP0 : OUT STD_LOGIC;
@@ -114,7 +114,7 @@ ENTITY lpp_lfr_apbreg IS
     delta_f1          : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
     delta_f2          : OUT STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
     nb_data_by_buffer : OUT STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
-    nb_word_by_buffer : OUT STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
+    --nb_word_by_buffer : OUT STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
     nb_snapshot_param : OUT STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
 
     enable_f0 : OUT STD_LOGIC;
@@ -128,14 +128,15 @@ ENTITY lpp_lfr_apbreg IS
 
     run : OUT STD_LOGIC;
 
-    addr_data_f0 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_data_f1 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_data_f2 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_data_f3 : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     start_date   : OUT STD_LOGIC_VECTOR(30 DOWNTO 0);
-    ---------------------------------------------------------------------------
-    debug_signal : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
-    ---------------------------------------------------------------------------
+    
+    wfp_status_buffer_ready : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    wfp_addr_buffer         : OUT STD_LOGIC_VECTOR(32*4 DOWNTO 0);
+    wfp_length_buffer       : OUT STD_LOGIC_VECTOR(25 DOWNTO 0);
+    wfp_ready_buffer        : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+    wfp_buffer_time         : IN STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
+    wfp_error_buffer_full   : IN STD_LOGIC_VECTOR(3 DOWNTO 0)
+    
     );
 
 END lpp_lfr_apbreg;
@@ -181,8 +182,8 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
   SIGNAL reg_sp : lpp_SpectralMatrix_regs;
 
   TYPE lpp_WaveformPicker_regs IS RECORD
-    status_full       : STD_LOGIC_VECTOR(3 DOWNTO 0);
-    status_full_err   : STD_LOGIC_VECTOR(3 DOWNTO 0);
+--    status_full       : STD_LOGIC_VECTOR(3 DOWNTO 0);
+--    status_full_err   : STD_LOGIC_VECTOR(3 DOWNTO 0);
     status_new_err    : STD_LOGIC_VECTOR(3 DOWNTO 0);
     data_shaping_BW   : STD_LOGIC;
     data_shaping_SP0  : STD_LOGIC;
@@ -196,7 +197,7 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
     delta_f1          : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
     delta_f2          : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
     nb_data_by_buffer : STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
-    nb_word_by_buffer : STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
+--    nb_word_by_buffer : STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
     nb_snapshot_param : STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
     enable_f0         : STD_LOGIC;
     enable_f1         : STD_LOGIC;
@@ -206,10 +207,11 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
     burst_f1          : STD_LOGIC;
     burst_f2          : STD_LOGIC;
     run               : STD_LOGIC;
-    addr_data_f0      : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_data_f1      : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_data_f2      : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_data_f3      : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    status_ready_buffer_f : STD_LOGIC_VECTOR(4*2-1 DOWNTO 0);     
+    addr_buffer_f         : STD_LOGIC_VECTOR(4*2*32-1 DOWNTO 0);  
+    time_buffer_f         : STD_LOGIC_VECTOR(4*2*48-1 DOWNTO 0); 
+    length_buffer         : STD_LOGIC_VECTOR(25 DOWNTO 0);
+    error_buffer_full   :  STD_LOGIC_VECTOR(3 DOWNTO 0);
     start_date        : STD_LOGIC_VECTOR(30 DOWNTO 0);
   END RECORD;
   SIGNAL reg_wp : lpp_WaveformPicker_regs;
@@ -254,6 +256,8 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
   SIGNAL reg1_matrix_time_f2  : STD_LOGIC_VECTOR(47 DOWNTO 0);
   SIGNAL apbo_irq_ms : STD_LOGIC;
   SIGNAL apbo_irq_wfp : STD_LOGIC;
+  -----------------------------------------------------------------------------
+  SIGNAL reg_ready_buffer_f : STD_LOGIC_VECTOR( 2*4-1 DOWNTO 0);
   
 BEGIN  -- beh
 
@@ -283,7 +287,6 @@ BEGIN  -- beh
   delta_f1          <= reg_wp.delta_f1;
   delta_f2          <= reg_wp.delta_f2;
   nb_data_by_buffer <= reg_wp.nb_data_by_buffer;
-  nb_word_by_buffer <= reg_wp.nb_word_by_buffer;
   nb_snapshot_param <= reg_wp.nb_snapshot_param;
 
   enable_f0 <= reg_wp.enable_f0;
@@ -297,16 +300,16 @@ BEGIN  -- beh
 
   run <= reg_wp.run;
 
-  addr_data_f0 <= reg_wp.addr_data_f0;
-  addr_data_f1 <= reg_wp.addr_data_f1;
-  addr_data_f2 <= reg_wp.addr_data_f2;
-  addr_data_f3 <= reg_wp.addr_data_f3;
+  --addr_data_f0 <= reg_wp.addr_data_f0;
+  --addr_data_f1 <= reg_wp.addr_data_f1;
+  --addr_data_f2 <= reg_wp.addr_data_f2;
+  --addr_data_f3 <= reg_wp.addr_data_f3;
 
   start_date <= reg_wp.start_date;
 
-  length_matrix_f0 <= reg_sp.length_matrix;
-  length_matrix_f1 <= reg_sp.length_matrix;
-  length_matrix_f2 <= reg_sp.length_matrix;
+  --length_matrix_f0 <= reg_sp.length_matrix;
+  --length_matrix_f1 <= reg_sp.length_matrix;
+  --length_matrix_f2 <= reg_sp.length_matrix;
   
 
   lpp_lfr_apbreg : PROCESS (HCLK, HRESETn)
@@ -322,7 +325,6 @@ BEGIN  -- beh
       reg_sp.status_ready_matrix_f0_1               <= '0';
       reg_sp.status_ready_matrix_f1_1               <= '0';
       reg_sp.status_ready_matrix_f2_1               <= '0';
---      reg_sp.status_error_bad_component_error       <= '0';
       reg_sp.status_error_buffer_full               <= '0';
       reg_sp.status_error_input_fifo_write          <= (OTHERS => '0');
 
@@ -351,7 +353,7 @@ BEGIN  -- beh
       apbo_irq_wfp <= '0';
       
 
-      status_full_ack <= (OTHERS => '0');
+--      status_full_ack <= (OTHERS => '0');
 
       reg_wp.data_shaping_BW   <= '0';
       reg_wp.data_shaping_SP0  <= '0';
@@ -367,13 +369,10 @@ BEGIN  -- beh
       reg_wp.burst_f1          <= '0';
       reg_wp.burst_f2          <= '0';
       reg_wp.run               <= '0';
-      reg_wp.addr_data_f0      <= (OTHERS => '0');
-      reg_wp.addr_data_f1      <= (OTHERS => '0');
-      reg_wp.addr_data_f2      <= (OTHERS => '0');
-      reg_wp.addr_data_f3      <= (OTHERS => '0');
-      reg_wp.status_full       <= (OTHERS => '0');
-      reg_wp.status_full_err   <= (OTHERS => '0');
+--      reg_wp.status_full       <= (OTHERS => '0');
+--      reg_wp.status_full_err   <= (OTHERS => '0');
       reg_wp.status_new_err    <= (OTHERS => '0');
+      reg_wp.error_buffer_full <= (OTHERS => '0');
       reg_wp.delta_snapshot    <= (OTHERS => '0');
       reg_wp.delta_f0          <= (OTHERS => '0');
       reg_wp.delta_f0_2        <= (OTHERS => '0');
@@ -385,7 +384,7 @@ BEGIN  -- beh
       
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
 
-      status_full_ack <= (OTHERS => '0');
+--      status_full_ack <= (OTHERS => '0');
 
       reg_sp.status_ready_matrix_f0_0 <= reg_sp.status_ready_matrix_f0_0 OR reg0_ready_matrix_f0;
       reg_sp.status_ready_matrix_f1_0 <= reg_sp.status_ready_matrix_f1_0 OR reg0_ready_matrix_f1;
@@ -395,7 +394,10 @@ BEGIN  -- beh
       reg_sp.status_ready_matrix_f1_1 <= reg_sp.status_ready_matrix_f1_1 OR reg1_ready_matrix_f1;
       reg_sp.status_ready_matrix_f2_1 <= reg_sp.status_ready_matrix_f2_1 OR reg1_ready_matrix_f2;
 
---      reg_sp.status_error_bad_component_error <= reg_sp.status_error_bad_component_error OR error_bad_component_error;
+      all_status_ready_buffer_bit: FOR I IN 4*2-1 DOWNTO 0 LOOP
+        reg_wp.status_ready_buffer_f(I) <= reg_wp.status_ready_buffer_f(I) OR reg_ready_buffer_f(I);
+      END LOOP all_status_ready_buffer_bit;
+
 
       reg_sp.status_error_buffer_full         <= reg_sp.status_error_buffer_full OR error_buffer_full;
       reg_sp.status_error_input_fifo_write(0) <= reg_sp.status_error_input_fifo_write(0) OR error_input_fifo_write(0);
@@ -405,9 +407,8 @@ BEGIN  -- beh
 
 
       all_status : FOR I IN 3 DOWNTO 0 LOOP
-        reg_wp.status_full(I)     <= status_full(I) AND reg_wp.run;
-        reg_wp.status_full_err(I) <= status_full_err(I) AND reg_wp.run;
-        reg_wp.status_new_err(I)  <= status_new_err(I) AND reg_wp.run;
+        reg_wp.error_buffer_full(I) <=  reg_wp.error_buffer_full(I) OR wfp_error_buffer_full(I);
+        reg_wp.status_new_err(I)    <=  reg_wp.status_new_err(I) OR status_new_err(I);
       END LOOP all_status;
 
       paddr             := "000000";
@@ -488,35 +489,58 @@ BEGIN  -- beh
                            prdata(6) <= reg_wp.burst_f2;
                            prdata(7) <= reg_wp.run;
                            --22
-          WHEN "010111" => prdata             <= reg_wp.addr_data_f0;
-                           --23
-          WHEN "011000" => prdata             <= reg_wp.addr_data_f1;
-                           --24
-          WHEN "011001" => prdata             <= reg_wp.addr_data_f2;
-                           --25
-          WHEN "011010" => prdata             <= reg_wp.addr_data_f3;
-                           --26
-          WHEN "011011" => prdata(3 DOWNTO 0) <= reg_wp.status_full;
-                           prdata(7 DOWNTO 4)  <= reg_wp.status_full_err;
-                           prdata(11 DOWNTO 8) <= reg_wp.status_new_err;
+                           --ON GOING \/
+          WHEN "010111" => prdata             <= reg_wp.addr_buffer_f(32*1-1 DOWNTO 32*0);
+          WHEN "011000" => prdata             <= reg_wp.addr_buffer_f(32*2-1 DOWNTO 32*1);
+          WHEN "011001" => prdata             <= reg_wp.addr_buffer_f(32*3-1 DOWNTO 32*2);
+          WHEN "011010" => prdata             <= reg_wp.addr_buffer_f(32*4-1 DOWNTO 32*3);
+          WHEN "011011" => prdata             <= reg_wp.addr_buffer_f(32*5-1 DOWNTO 32*4);
+          WHEN "011100" => prdata             <= reg_wp.addr_buffer_f(32*6-1 DOWNTO 32*5);
+          WHEN "011101" => prdata             <= reg_wp.addr_buffer_f(32*7-1 DOWNTO 32*6);
+          WHEN "011110" => prdata             <= reg_wp.addr_buffer_f(32*8-1 DOWNTO 32*7);
+                           --ON GOING /\
+          WHEN "011111" => prdata(7  DOWNTO  0) <= reg_wp.status_ready_buffer_f;
+                           prdata(11 DOWNTO  8) <= reg_wp.error_buffer_full;
+                           prdata(15 DOWNTO 12) <= reg_wp.status_new_err;
+            --prdata(3 DOWNTO 0) <= reg_wp.status_full;
+            --               prdata(7 DOWNTO 4)  <= reg_wp.status_full_err;
                            --27
-          WHEN "011100" => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_snapshot;
+          WHEN "100000" => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_snapshot;
                            --28
-          WHEN "011101" => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_f0;
+          WHEN "100001" => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_f0;
                            --29
-          WHEN "011110" => prdata(delta_vector_size_f0_2-1 DOWNTO 0) <= reg_wp.delta_f0_2;
+          WHEN "100010" => prdata(delta_vector_size_f0_2-1 DOWNTO 0) <= reg_wp.delta_f0_2;
                            --30
-          WHEN "011111" => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_f1;
+          WHEN "100011" => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_f1;
                            --31
-          WHEN "100000" => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_f2;
+          WHEN "100100" => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_f2;
                            --32
-          WHEN "100001" => prdata(nb_data_by_buffer_size-1 DOWNTO 0) <= reg_wp.nb_data_by_buffer;
+          WHEN "100101" => prdata(nb_data_by_buffer_size-1 DOWNTO 0) <= reg_wp.nb_data_by_buffer;
                            --33
-          WHEN "100010" => prdata(nb_snapshot_param_size-1 DOWNTO 0) <= reg_wp.nb_snapshot_param;
+          WHEN "100110" => prdata(nb_snapshot_param_size-1 DOWNTO 0) <= reg_wp.nb_snapshot_param;
                            --34
-          WHEN "100011" => prdata(30 DOWNTO 0)                       <= reg_wp.start_date;
+          WHEN "100111" => prdata(30 DOWNTO 0)                       <= reg_wp.start_date;
                            --35
-          WHEN "100100" => prdata(nb_word_by_buffer_size-1 DOWNTO 0) <= reg_wp.nb_word_by_buffer;
+          WHEN "101000" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*0+15 DOWNTO 48*0);
+          WHEN "101001" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*0+47 DOWNTO 48*0+16);
+          WHEN "101010" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*1+15 DOWNTO 48*1);
+          WHEN "101011" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*1+47 DOWNTO 48*1+16);
+          WHEN "101100" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*2+15 DOWNTO 48*2);
+          WHEN "101110" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*2+47 DOWNTO 48*2+16);
+          WHEN "101111" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*3+15 DOWNTO 48*3);
+          WHEN "110000" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*3+47 DOWNTO 48*3+16);
+                           
+          WHEN "110001" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*4+15 DOWNTO 48*4);
+          WHEN "111010" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*4+47 DOWNTO 48*4+16);
+          WHEN "110011" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*5+15 DOWNTO 48*5);
+          WHEN "110100" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*5+47 DOWNTO 48*5+16);
+          WHEN "110101" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*6+15 DOWNTO 48*6);
+          WHEN "110110" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*6+47 DOWNTO 48*6+16);
+          WHEN "110111" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*7+15 DOWNTO 48*7);
+          WHEN "111000" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*7+47 DOWNTO 48*7+16);
+          WHEN "111001" => prdata(25 DOWNTO 0) <= reg_wp.length_buffer;                         
+            
+--          WHEN "100100" => prdata(nb_word_by_buffer_size-1 DOWNTO 0) <= reg_wp.nb_word_by_buffer;
                            ----------------------------------------------------
           WHEN "111100" => prdata(23 DOWNTO 0)                       <= top_lfr_version(23 DOWNTO 0);
           WHEN OTHERS   => NULL;
@@ -527,8 +551,8 @@ BEGIN  -- beh
           CASE paddr(7 DOWNTO 2) IS
             --
             WHEN "000000" => reg_sp.config_active_interruption_onNewMatrix <= apbi.pwdata(0);
-                             reg_sp.config_active_interruption_onError <= apbi.pwdata(1);
-                             reg_sp.config_ms_run                      <= apbi.pwdata(2);
+                             reg_sp.config_active_interruption_onError     <= apbi.pwdata(1);
+                             reg_sp.config_ms_run                          <= apbi.pwdata(2);
                              
             WHEN "000001" =>
               reg_sp.status_ready_matrix_f0_0         <= ((NOT apbi.pwdata(0) ) AND reg_sp.status_ready_matrix_f0_0        ) OR reg0_ready_matrix_f0;
@@ -567,27 +591,39 @@ BEGIN  -- beh
                              reg_wp.burst_f2  <= apbi.pwdata(6);
                              reg_wp.run       <= apbi.pwdata(7);
                              --22
-            WHEN "010111" => reg_wp.addr_data_f0 <= apbi.pwdata;
-            WHEN "011000" => reg_wp.addr_data_f1 <= apbi.pwdata;
-            WHEN "011001" => reg_wp.addr_data_f2 <= apbi.pwdata;
-            WHEN "011010" => reg_wp.addr_data_f3 <= apbi.pwdata;
+            WHEN "010111" => reg_wp.addr_buffer_f(32*1-1 DOWNTO 32*0) <= apbi.pwdata;
+            WHEN "011000" => reg_wp.addr_buffer_f(32*2-1 DOWNTO 32*1) <= apbi.pwdata;
+            WHEN "011001" => reg_wp.addr_buffer_f(32*3-1 DOWNTO 32*2) <= apbi.pwdata;
+            WHEN "011010" => reg_wp.addr_buffer_f(32*4-1 DOWNTO 32*3) <= apbi.pwdata;
+            WHEN "011011" => reg_wp.addr_buffer_f(32*5-1 DOWNTO 32*4) <= apbi.pwdata;
+            WHEN "011100" => reg_wp.addr_buffer_f(32*6-1 DOWNTO 32*5) <= apbi.pwdata;
+            WHEN "011101" => reg_wp.addr_buffer_f(32*7-1 DOWNTO 32*6) <= apbi.pwdata;
+            WHEN "011110" => reg_wp.addr_buffer_f(32*8-1 DOWNTO 32*7) <= apbi.pwdata;
                              --26
-            WHEN "011011" => reg_wp.status_full  <= apbi.pwdata(3 DOWNTO 0);
-                             reg_wp.status_full_err <= apbi.pwdata(7 DOWNTO 4);
-                             reg_wp.status_new_err  <= apbi.pwdata(11 DOWNTO 8);
-                             status_full_ack(0)     <= reg_wp.status_full(0) AND NOT apbi.pwdata(0);
-                             status_full_ack(1)     <= reg_wp.status_full(1) AND NOT apbi.pwdata(1);
-                             status_full_ack(2)     <= reg_wp.status_full(2) AND NOT apbi.pwdata(2);
-                             status_full_ack(3)     <= reg_wp.status_full(3) AND NOT apbi.pwdata(3);
-            WHEN "011100" => reg_wp.delta_snapshot    <= apbi.pwdata(delta_vector_size-1 DOWNTO 0);
-            WHEN "011101" => reg_wp.delta_f0          <= apbi.pwdata(delta_vector_size-1 DOWNTO 0);
-            WHEN "011110" => reg_wp.delta_f0_2        <= apbi.pwdata(delta_vector_size_f0_2-1 DOWNTO 0);
-            WHEN "011111" => reg_wp.delta_f1          <= apbi.pwdata(delta_vector_size-1 DOWNTO 0);
-            WHEN "100000" => reg_wp.delta_f2          <= apbi.pwdata(delta_vector_size-1 DOWNTO 0);
-            WHEN "100001" => reg_wp.nb_data_by_buffer <= apbi.pwdata(nb_data_by_buffer_size-1 DOWNTO 0);
-            WHEN "100010" => reg_wp.nb_snapshot_param <= apbi.pwdata(nb_snapshot_param_size-1 DOWNTO 0);
-            WHEN "100011" => reg_wp.start_date        <= apbi.pwdata(30 DOWNTO 0);
-            WHEN "100100" => reg_wp.nb_word_by_buffer <= apbi.pwdata(nb_word_by_buffer_size-1 DOWNTO 0);
+            WHEN "011111" =>
+              all_reg_wp_status_bit: FOR I IN 3 DOWNTO 0 LOOP
+                reg_wp.status_ready_buffer_f(I)     <= ((NOT apbi.pwdata(I)    ) AND reg_wp.status_ready_buffer_f(I)    ) OR reg_ready_buffer_f(I);
+                reg_wp.status_ready_buffer_f(I*2+1) <= ((NOT apbi.pwdata(I*2+1)) AND reg_wp.status_ready_buffer_f(I*2+1)) OR reg_ready_buffer_f(I*2+1);
+                reg_wp.error_buffer_full(I)         <= ((NOT apbi.pwdata(I+8)  ) AND reg_wp.error_buffer_full(I)        ) OR wfp_error_buffer_full(I); 
+                reg_wp.status_new_err(I)            <= ((NOT apbi.pwdata(I+12) ) AND reg_wp.status_new_err(I)           ) OR status_new_err(I);
+              END LOOP all_reg_wp_status_bit;
+
+            WHEN "100000" => reg_wp.delta_snapshot    <= apbi.pwdata(delta_vector_size-1 DOWNTO 0);
+            WHEN "100001" => reg_wp.delta_f0          <= apbi.pwdata(delta_vector_size-1 DOWNTO 0);
+            WHEN "100010" => reg_wp.delta_f0_2        <= apbi.pwdata(delta_vector_size_f0_2-1 DOWNTO 0);
+            WHEN "100011" => reg_wp.delta_f1          <= apbi.pwdata(delta_vector_size-1 DOWNTO 0);
+            WHEN "100100" => reg_wp.delta_f2          <= apbi.pwdata(delta_vector_size-1 DOWNTO 0);
+            WHEN "100101" => reg_wp.nb_data_by_buffer <= apbi.pwdata(nb_data_by_buffer_size-1 DOWNTO 0);
+            WHEN "100110" => reg_wp.nb_snapshot_param <= apbi.pwdata(nb_snapshot_param_size-1 DOWNTO 0);
+            WHEN "100111" => reg_wp.start_date        <= apbi.pwdata(30 DOWNTO 0);
+                             
+            WHEN "111001" => reg_wp.length_buffer    <=  apbi.pwdata(25 DOWNTO 0);                         
+
+
+
+
+                             
+--            WHEN "100100" => reg_wp.nb_word_by_buffer <= apbi.pwdata(nb_word_by_buffer_size-1 DOWNTO 0);
                              --
             WHEN OTHERS   => NULL;
           END CASE;
@@ -622,7 +658,7 @@ BEGIN  -- beh
   -----------------------------------------------------------------------------
   -- IRQ
   -----------------------------------------------------------------------------
-  irq_wfp_reg_s <= status_full & status_full_err & status_new_err;
+  irq_wfp_reg_s <= wfp_status_buffer_ready & wfp_error_buffer_full & status_new_err;
 
   PROCESS (HCLK, HRESETn)
   BEGIN  -- PROCESS
@@ -706,16 +742,29 @@ BEGIN  -- beh
       matrix_time         => matrix_time_f2);
 
   -----------------------------------------------------------------------------
-  debug_signal(31 DOWNTO 12) <= (OTHERS => '0');
-  debug_signal(11 DOWNTO  0) <= apbo_irq_ms &  --11
-                               reg_sp.status_error_input_fifo_write(2) &--10
-                               reg_sp.status_error_input_fifo_write(1) &--9
-                               reg_sp.status_error_input_fifo_write(0) &--8
-                               reg_sp.status_error_buffer_full         &
-                               '0' &
---                               reg_sp.status_error_bad_component_error & --7 6
-                               reg_sp.status_ready_matrix_f2_1         & reg_sp.status_ready_matrix_f2_0 &--5 4
-                               reg_sp.status_ready_matrix_f1_1         & reg_sp.status_ready_matrix_f1_0 &--3 2
-                               reg_sp.status_ready_matrix_f0_1         & reg_sp.status_ready_matrix_f0_0; --1 0
+  all_wfp_pointer: FOR I IN 3 DOWNTO 0 GENERATE
+    lpp_apbreg_wfp_pointer_fi : lpp_apbreg_ms_pointer
+      PORT MAP (
+        clk  => HCLK,
+        rstn => HRESETn,
+
+        reg0_status_ready_matrix => reg_wp.status_ready_buffer_f(2*I),
+        reg0_ready_matrix        => reg_ready_buffer_f(2*I),
+        reg0_addr_matrix         => reg_wp.addr_buffer_f((2*I+1)*32-1 DOWNTO (2*I)*32),
+        reg0_matrix_time         => reg_wp.time_buffer_f((2*I+1)*48-1 DOWNTO (2*I)*48), 
+
+        reg1_status_ready_matrix => reg_wp.status_ready_buffer_f(2*I+1),
+        reg1_ready_matrix        => reg_ready_buffer_f(2*I+1),
+        reg1_addr_matrix         => reg_wp.addr_buffer_f((2*I+2)*32-1 DOWNTO (2*I+1)*32),
+        reg1_matrix_time         => reg_wp.time_buffer_f((2*I+2)*48-1 DOWNTO (2*I+1)*48),  
+
+        ready_matrix        => wfp_ready_buffer(I),
+        status_ready_matrix => wfp_status_buffer_ready(I),
+        addr_matrix         => wfp_addr_buffer((I+1)*32-1 DOWNTO I*32),
+        matrix_time         => wfp_buffer_time((I+1)*48-1 DOWNTO I*48)
+        );
+      
+  END GENERATE all_wfp_pointer; 
+  -----------------------------------------------------------------------------
         
 END beh;

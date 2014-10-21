@@ -37,7 +37,7 @@ ENTITY lpp_waveform_dma_genvalid IS
     valid_in : IN STD_LOGIC;
     time_in  : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
 
-    ack_in    : IN STD_LOGIC;
+    ack_in    : IN  STD_LOGIC;
     valid_out : OUT STD_LOGIC;
     time_out  : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
     error     : OUT STD_LOGIC
@@ -55,25 +55,21 @@ BEGIN
       state     <= IDLE;
       valid_out <= '0';
       error     <= '0';
-      time_out <= (OTHERS => '0');
+      time_out  <= (OTHERS => '0');
     ELSIF HCLK'EVENT AND HCLK = '1' THEN
-      CASE state IS
-        WHEN IDLE =>
-          
-          valid_out <= '0';
-          error     <= '0';
-          IF run = '1' AND valid_in = '1' THEN
-            state     <= VALID;
-            valid_out <= '1';
-            time_out  <= time_in;
-          END IF;
-
-        WHEN VALID =>
-          IF run = '0' THEN
-            state     <= IDLE;
-            valid_out <= '0';
+      IF run = '1' THEN
+        CASE state IS
+          WHEN IDLE =>
+            
+            valid_out <= valid_in;
             error     <= '0';
-          ELSE
+            time_out  <= time_in;
+
+            IF valid_in = '1' THEN
+              state <= VALID;
+            END IF;
+
+          WHEN VALID =>
             IF valid_in = '1' THEN
               IF ack_in = '1' THEN
                 state     <= VALID;
@@ -88,10 +84,16 @@ BEGIN
               state     <= IDLE;
               valid_out <= '0';
             END IF;
-          END IF;
-          
-        WHEN OTHERS => NULL;
-      END CASE;
+            
+          WHEN OTHERS => NULL;
+        END CASE;
+
+      ELSE
+        state     <= IDLE;
+        valid_out <= '0';
+        error     <= '0';
+        time_out  <= (OTHERS => '0');
+      END IF;
     END IF;
   END PROCESS FSM_SELECT_ADDRESS;
   

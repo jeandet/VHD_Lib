@@ -105,7 +105,6 @@ PACKAGE lpp_waveform_pkg IS
       tech                   : INTEGER;
       data_size              : INTEGER;
       nb_data_by_buffer_size : INTEGER;
-      nb_word_by_buffer_size : INTEGER;
       nb_snapshot_param_size : INTEGER;
       delta_vector_size      : INTEGER;
       delta_vector_size_f0_2 : INTEGER);
@@ -127,24 +126,22 @@ PACKAGE lpp_waveform_pkg IS
       burst_f1                     : IN  STD_LOGIC;
       burst_f2                     : IN  STD_LOGIC;
       nb_data_by_buffer            : IN  STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
-      nb_word_by_buffer            : IN  STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
       nb_snapshot_param            : IN  STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
-      status_full                  : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-      status_full_ack              : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-      status_full_err              : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       status_new_err               : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      status_buffer_ready : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+      addr_buffer         : IN STD_LOGIC_VECTOR(32*4 DOWNTO 0);
+      length_buffer       : IN STD_LOGIC_VECTOR(25 DOWNTO 0);
+      ready_buffer        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      buffer_time         : OUT STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
+      error_buffer_full   : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       coarse_time                  : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       fine_time                    : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-      addr_data_f0                 : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       data_f0_in_valid             : IN  STD_LOGIC;
       data_f0_in                   : IN  STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      addr_data_f1                 : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       data_f1_in_valid             : IN  STD_LOGIC;
       data_f1_in                   : IN  STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      addr_data_f2                 : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       data_f2_in_valid             : IN  STD_LOGIC;
       data_f2_in                   : IN  STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      addr_data_f3                 : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       data_f3_in_valid             : IN  STD_LOGIC;
       data_f3_in                   : IN  STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
       data_f0_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -167,27 +164,15 @@ PACKAGE lpp_waveform_pkg IS
       data_f3_data_out_valid       : OUT STD_LOGIC;
       data_f3_data_out_valid_burst : OUT STD_LOGIC;
       data_f3_data_out_ren         : IN  STD_LOGIC;
-
-      --debug
-      observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
-      --debug_f0_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      --debug_f0_data_valid : OUT STD_LOGIC;
-      --debug_f1_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      --debug_f1_data_valid : OUT STD_LOGIC;
-      --debug_f2_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      --debug_f2_data_valid : OUT STD_LOGIC;
-      --debug_f3_data       : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      --debug_f3_data_valid : OUT STD_LOGIC;
-
-      ----debug FIFO IN
-      --debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      --debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
-      --debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      --debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
-      --debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      --debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
-      --debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      --debug_f3_data_fifo_in_valid : OUT STD_LOGIC
+    
+      dma_fifo_valid_burst : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      dma_fifo_data        : OUT STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
+      dma_fifo_ren         : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      dma_buffer_new       : OUT  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      dma_buffer_addr      : OUT STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
+      dma_buffer_length    : OUT STD_LOGIC_VECTOR(26*4-1 DOWNTO 0);
+      dma_buffer_full      : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      dma_buffer_full_err  : IN  STD_LOGIC_VECTOR(3 DOWNTO 0)
       );
   END COMPONENT;
 
@@ -243,7 +228,10 @@ PACKAGE lpp_waveform_pkg IS
       data_out          : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       data_out_wen      : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       full_almost       : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-      full              : IN  STD_LOGIC_VECTOR(3 DOWNTO 0));
+      full              : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      time_out     : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      time_out_new : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)    
+      );
   END COMPONENT;
 
   COMPONENT lpp_waveform_fifo
@@ -370,7 +358,9 @@ PACKAGE lpp_waveform_pkg IS
       enable    : IN  STD_LOGIC;
       sel       : IN  STD_LOGIC_VECTOR(data_nb-1 DOWNTO 0);
       data      : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      data_s    : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0));
+      data_s    : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+      time_out     : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      time_out_new : OUT STD_LOGIC_VECTOR(3 DOWNTO 0));
   END COMPONENT;
 
   COMPONENT lpp_waveform_fsmdma

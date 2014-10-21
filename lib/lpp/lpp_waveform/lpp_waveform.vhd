@@ -44,7 +44,7 @@ ENTITY lpp_waveform IS
     tech                   : INTEGER := inferred;
     data_size              : INTEGER := 96;  --16*6
     nb_data_by_buffer_size : INTEGER := 11;
-    nb_word_by_buffer_size : INTEGER := 11;
+--    nb_word_by_buffer_size : INTEGER := 11;
     nb_snapshot_param_size : INTEGER := 11;
     delta_vector_size      : INTEGER := 20;
     delta_vector_size_f0_2 : INTEGER := 3);
@@ -76,31 +76,36 @@ ENTITY lpp_waveform IS
     burst_f2 : IN STD_LOGIC;
 
     nb_data_by_buffer : IN  STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
-    nb_word_by_buffer : IN  STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
+--    nb_word_by_buffer : IN  STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
     nb_snapshot_param : IN  STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
-    status_full       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    status_full_ack   : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    status_full_err   : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+
     status_new_err    : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);  -- New data f(i) before the current data is write by dma
+
+
+    -- REG DMA
+    status_buffer_ready : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+    addr_buffer         : IN STD_LOGIC_VECTOR(32*4 DOWNTO 0);
+    length_buffer       : IN STD_LOGIC_VECTOR(25 DOWNTO 0);
+    
+    ready_buffer        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    buffer_time         : OUT STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
+    error_buffer_full   : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+           
     ---------------------------------------------------------------------------
     -- INPUT
     coarse_time       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
     fine_time         : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 
     --f0
-    addr_data_f0     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f0_in_valid : IN STD_LOGIC;
     data_f0_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
     --f1
-    addr_data_f1     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f1_in_valid : IN STD_LOGIC;
     data_f1_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
     --f2
-    addr_data_f2     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f2_in_valid : IN STD_LOGIC;
     data_f2_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
     --f3
-    addr_data_f3     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     data_f3_in_valid : IN STD_LOGIC;
     data_f3_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
         
@@ -110,7 +115,7 @@ ENTITY lpp_waveform IS
     dma_fifo_valid_burst : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
     dma_fifo_data        : OUT STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
     dma_fifo_ren         : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    dma_buffer_new       : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    dma_buffer_new       : OUT  STD_LOGIC_VECTOR(3 DOWNTO 0);
     dma_buffer_addr      : OUT STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
     dma_buffer_length    : OUT STD_LOGIC_VECTOR(26*4-1 DOWNTO 0);
     dma_buffer_full      : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -178,9 +183,10 @@ ARCHITECTURE beh OF lpp_waveform IS
   SIGNAL s_rdata_v        : STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
 
   --
+  SIGNAL arbiter_time_out      : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL arbiter_time_out_new  : STD_LOGIC_VECTOR(3 DOWNTO 0);
 
-  SIGNAL status_full_s       : STD_LOGIC_VECTOR(3 DOWNTO 0);
-
+  SIGNAL fifo_buffer_time : STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
   
 BEGIN  -- beh
 
@@ -357,19 +363,6 @@ BEGIN  -- beh
     END GENERATE all_sample_of_time_out;
   END GENERATE all_bit_of_time_out;
 
-  -- DEBUG --
-  --time_out_debug(0) <= x"0A0A" & x"0A0A0A0A";
-  --time_out_debug(1) <= x"1B1B" & x"1B1B1B1B";
-  --time_out_debug(2) <= x"2C2C" & x"2C2C2C2C";
-  --time_out_debug(3) <= x"3D3D" & x"3D3D3D3D";
-
-  --all_bit_of_time_out : FOR I IN 47 DOWNTO 0 GENERATE
-  --  all_sample_of_time_out : FOR J IN 3 DOWNTO 0 GENERATE
-  --    time_out_2(J, I) <= time_out_debug(J)(I);
-  --  END GENERATE all_sample_of_time_out;
-  --END GENERATE all_bit_of_time_out;
-  -- DEBUG --
-
   lpp_waveform_fifo_arbiter_1 : lpp_waveform_fifo_arbiter
     GENERIC MAP (tech                   => tech,
                  nb_data_by_buffer_size => nb_data_by_buffer_size)
@@ -386,61 +379,15 @@ BEGIN  -- beh
       data_out     => wdata,
       data_out_wen => data_wen,
       full_almost  => full_almost,
-      full         => full);
+      full         => full,
+
+      time_out          => arbiter_time_out,                     
+      time_out_new      => arbiter_time_out_new
+      
+      );
 
   -----------------------------------------------------------------------------
-  -- DEBUG -- SNAPSHOT IN
-  --debug_f0_data_fifo_in_valid <= NOT data_wen(0);
-  --debug_f0_data_fifo_in       <= wdata;
-  --debug_f1_data_fifo_in_valid <= NOT data_wen(1);
-  --debug_f1_data_fifo_in       <= wdata;
-  --debug_f2_data_fifo_in_valid <= NOT data_wen(2);
-  --debug_f2_data_fifo_in       <= wdata;
-  --debug_f3_data_fifo_in_valid <= NOT data_wen(3);
-  --debug_f3_data_fifo_in       <= wdata;s
   -----------------------------------------------------------------------------
-
-  
- -- lpp_fifo_4_shared_1: lpp_fifo_4_shared
- --   GENERIC MAP (
- --     tech               => tech,
- --     Mem_use            => use_RAM,
- --     EMPTY_ALMOST_LIMIT => 16,
- --     FULL_ALMOST_LIMIT  => 5,
- --     DataSz             => 32,
- --     AddrSz             => 7
- --     )
- --   PORT MAP (
- --     clk          => clk,
- --     rstn         => rstn,
- --     run          => run,
- --     empty_almost => s_empty_almost,
- --     empty        => s_empty,
- --     r_en         => s_data_ren,
- --     r_data       => s_rdata,
- --     full_almost  => full_almost,
- --     full         => full,
- --     w_en         => data_wen,
- --     w_data       => wdata);
-
- --lpp_waveform_fifo_headreg_1 : lpp_fifo_4_shared_headreg_latency_1
- --  PORT MAP (
- --    clk            => clk,
- --    rstn           => rstn,
- --    run            => run,
- --    o_empty_almost => empty_almost,
- --    o_empty        => empty,
-
- --    o_data_ren => data_ren,
- --    o_rdata_0  => data_f0_data_out,
- --    o_rdata_1  => data_f1_data_out,
- --    o_rdata_2  => data_f2_data_out,
- --    o_rdata_3  => data_f3_data_out,
-
- --    i_empty_almost => s_empty_almost,
- --    i_empty        => s_empty,
- --    i_data_ren     => s_data_ren,
- --    i_rdata        => s_rdata);
 
   generate_all_fifo: FOR I IN 0 TO 3 GENERATE
     lpp_fifo_1: lpp_fifo
@@ -468,86 +415,34 @@ BEGIN  -- beh
     
   END GENERATE generate_all_fifo;
 
-  
-  ----empty <= s_empty;
-  ----empty_almost <= s_empty_almost;
-  ----s_data_ren <= data_ren;
-  
-  --data_f0_data_out <= s_rdata_v(31 downto 0);
-  --data_f1_data_out <= s_rdata_v(31+32 downto 0+32);
-  --data_f2_data_out <= s_rdata_v(31+32*2 downto 32*2);
-  --data_f3_data_out <= s_rdata_v(31+32*3 downto 32*3);
-
-  --data_ren <= data_f3_data_out_ren &
-  --            data_f2_data_out_ren &
-  --            data_f1_data_out_ren &
-  --            data_f0_data_out_ren;
-  
-  --lpp_waveform_gen_address_1 : lpp_waveform_genaddress
-  --  GENERIC MAP (
-  --    nb_data_by_buffer_size => nb_word_by_buffer_size)
-  --  PORT MAP (
-  --    clk  => clk,
-  --    rstn => rstn,
-  --    run  => run,
-
-  --    -------------------------------------------------------------------------
-  --    -- CONFIG
-  --    -------------------------------------------------------------------------
-  --    nb_data_by_buffer => nb_word_by_buffer,
-
-  --    addr_data_f0 => addr_data_f0,
-  --    addr_data_f1 => addr_data_f1,
-  --    addr_data_f2 => addr_data_f2,
-  --    addr_data_f3 => addr_data_f3,
-  --    -------------------------------------------------------------------------
-  --    -- CTRL
-  --    -------------------------------------------------------------------------
-  --    -- IN
-  --    empty        => empty,
-  --    empty_almost => empty_almost,
-  --    data_ren     => data_ren,
-
-  --    -------------------------------------------------------------------------
-  --    -- STATUS
-  --    -------------------------------------------------------------------------
-  --    status_full     => status_full_s,
-  --    status_full_ack => status_full_ack,
-  --    status_full_err => status_full_err,
-
-  --    -------------------------------------------------------------------------
-  --    -- ADDR DATA OUT
-  --    -------------------------------------------------------------------------
-  --    data_f0_data_out_valid_burst => data_f0_data_out_valid_burst,
-  --    data_f1_data_out_valid_burst => data_f1_data_out_valid_burst,
-  --    data_f2_data_out_valid_burst => data_f2_data_out_valid_burst,
-  --    data_f3_data_out_valid_burst => data_f3_data_out_valid_burst,
-
-  --    data_f0_data_out_valid => data_f0_data_out_valid,
-  --    data_f1_data_out_valid => data_f1_data_out_valid,
-  --    data_f2_data_out_valid => data_f2_data_out_valid,
-  --    data_f3_data_out_valid => data_f3_data_out_valid,
-
-  --    data_f0_addr_out => data_f0_addr_out,
-  --    data_f1_addr_out => data_f1_addr_out,
-  --    data_f2_addr_out => data_f2_addr_out,
-  --    data_f3_addr_out => data_f3_addr_out
-  --    );
-  --status_full <= status_full_s;
-
-
   -----------------------------------------------------------------------------
   -- 
   -----------------------------------------------------------------------------
   
   all_channel: FOR I IN 3 DOWNTO 0 GENERATE
+
+    PROCESS (clk, rstn)
+    BEGIN
+      IF rstn = '0' THEN
+        fifo_buffer_time(48*(I+1)-1 DOWNTO 48*I) <= (OTHERS => '0');
+      ELSIF clk'event AND clk = '1' THEN
+        IF run = '0' THEN
+          fifo_buffer_time(48*(I+1)-1 DOWNTO 48*I) <= (OTHERS => '0');
+        ELSE
+          IF arbiter_time_out_new(I) = '0' THEN
+            fifo_buffer_time(48*(I+1)-1 DOWNTO 48*I) <= arbiter_time_out;
+          END IF;
+        END IF;
+      END IF;
+    END PROCESS;
+        
     lpp_waveform_fsmdma_I: lpp_waveform_fsmdma
       PORT MAP (
         clk                  => clk,
         rstn                 => rstn,
         run                  => run,
         
-        fifo_buffer_time     => fifo_buffer_time(48*(I+1)-1 DOWNTO 48*I),       -- TODO
+        fifo_buffer_time     => fifo_buffer_time(48*(I+1)-1 DOWNTO 48*I),
         
         fifo_data            => s_rdata_v(32*(I+1)-1 DOWNTO 32*I),             
         fifo_empty           => empty(I),
@@ -565,7 +460,7 @@ BEGIN  -- beh
         
         status_buffer_ready  => status_buffer_ready(I),                 -- TODO
         addr_buffer          => addr_buffer(32*(I+1)-1 DOWNTO 32*I),    -- TODO
-        length_buffer        => length_buffer(26*(I+1)-1 DOWNTO 26*I),  -- TODO
+        length_buffer        => length_buffer,--(26*(I+1)-1 DOWNTO 26*I),  -- TODO
         ready_buffer         => ready_buffer(I),                        -- TODO
         buffer_time          => buffer_time(48*(I+1)-1 DOWNTO 48*I),    -- TODO
         error_buffer_full    => error_buffer_full(I));                  -- TODO
