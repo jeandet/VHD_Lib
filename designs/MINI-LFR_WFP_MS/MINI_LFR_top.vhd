@@ -418,7 +418,7 @@ BEGIN  -- beh
     GENERIC MAP (
       Mem_use                => use_RAM,
       nb_data_by_buffer_size => 32,
-      nb_word_by_buffer_size => 30,
+--      nb_word_by_buffer_size => 30,
       nb_snapshot_param_size => 32,
       delta_vector_size      => 32,
       delta_vector_size_f0_2 => 7,      -- log2(96)
@@ -441,10 +441,7 @@ BEGIN  -- beh
       ahbo            => ahbo_m_ext(2),
       coarse_time     => coarse_time,
       fine_time       => fine_time,
-      data_shaping_BW => bias_fail_sw_sig,
-      observation_vector_0=> observation_vector_0,
-      observation_vector_1 => observation_vector_1,
-      observation_reg => observation_reg);
+      data_shaping_BW => bias_fail_sw_sig);
 
   all_sample: FOR I IN 7 DOWNTO 0 GENERATE
     sample_s(I) <= sample(I)(11 DOWNTO 0) & '0' & '0' & '0' & '0';

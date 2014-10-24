@@ -45,7 +45,7 @@ ENTITY lpp_lfr_ms IS
     dma_fifo_burst_valid: OUT STD_LOGIC;                      --TODO
     dma_fifo_data       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --TODO
     dma_fifo_ren        : IN  STD_LOGIC;                      --TODO
-    dma_buffer_new      : OUT STD_LOGIC;                      --TODO
+    dma_buffer_new      : OUT STD_LOGIC;                      --TODOx
     dma_buffer_addr     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --TODO
     dma_buffer_length   : OUT STD_LOGIC_VECTOR(25 DOWNTO 0);  --TODO
     dma_buffer_full     : IN  STD_LOGIC;                      --TODO
@@ -965,7 +965,7 @@ BEGIN
     
   FSM_DMA_fifo_empty_threshold <= MEM_OUT_SM_Empty_Threshold(0) WHEN fifo_ongoing = '0' AND fifo_0_ready = '1'  ELSE
                                   MEM_OUT_SM_Empty_Threshold(1) WHEN fifo_ongoing = '1' AND fifo_1_ready = '1'  ELSE
-                                   '0';
+                                  '1';
   
   -----------------------------------------------------------------------------
   --    fifo_matrix_type      => FSM_DMA_fifo_status(5 DOWNTO 4),       --IN

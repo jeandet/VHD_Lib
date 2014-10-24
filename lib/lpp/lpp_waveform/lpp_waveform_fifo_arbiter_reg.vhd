@@ -30,19 +30,18 @@ USE lpp.general_purpose.ALL;
 ENTITY lpp_waveform_fifo_arbiter_reg IS
   GENERIC(
     data_size : INTEGER;
-    data_nb   : INTEGER
-    );
+    data_nb   : INTEGER);
   PORT(
-    clk               : IN  STD_LOGIC;
-    rstn              : IN  STD_LOGIC;
+    clk  : IN STD_LOGIC;
+    rstn : IN STD_LOGIC;
     ---------------------------------------------------------------------------
-    run               : IN  STD_LOGIC;
+    run  : IN STD_LOGIC;
 
     max_count : IN STD_LOGIC_VECTOR(data_size -1 DOWNTO 0);
 
     enable : IN STD_LOGIC;
     sel    : IN STD_LOGIC_VECTOR(data_nb-1 DOWNTO 0);
-    
+
     data   : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
     data_s : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0)
     );
@@ -59,19 +58,19 @@ ARCHITECTURE ar_lpp_waveform_fifo_arbiter_reg OF lpp_waveform_fifo_arbiter_reg I
 
 BEGIN
   
-  all_reg: FOR I IN data_nb-1 DOWNTO 0 GENERATE
+  all_reg : FOR I IN data_nb-1 DOWNTO 0 GENERATE
     PROCESS (clk, rstn)
     BEGIN  -- PROCESS
       IF rstn = '0' THEN                  -- asynchronous reset (active low)
         reg(I) <= 0;
-      ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
         IF run = '0' THEN
           reg(I) <= 0;
         ELSE
           IF sel(I) = '1' THEN
             reg(I) <= reg_sel_s;
           END IF;
-        END IF;      
+        END IF;
       END IF;
     END PROCESS;
   END GENERATE all_reg;
@@ -81,12 +80,12 @@ BEGIN
              reg(2) WHEN sel(2) = '1' ELSE
              reg(3);
 
-  reg_sel_s <= reg_sel     WHEN enable = '0' ELSE
+  reg_sel_s <= reg_sel WHEN enable = '0' ELSE
                reg_sel + 1 WHEN reg_sel < UNSIGNED(max_count) ELSE
                0;
 
-  data   <= STD_LOGIC_VECTOR(to_unsigned(reg_sel  ,data_size));
-  data_s <= STD_LOGIC_VECTOR(to_unsigned(reg_sel_s,data_size));
+  data   <= STD_LOGIC_VECTOR(to_unsigned(reg_sel , data_size));
+  data_s <= STD_LOGIC_VECTOR(to_unsigned(reg_sel_s, data_size));
   
 END ARCHITECTURE;
 

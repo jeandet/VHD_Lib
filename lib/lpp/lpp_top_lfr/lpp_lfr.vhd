@@ -280,7 +280,9 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL dma_buffer_full      : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL dma_buffer_full_err  : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL dma_grant_error      : STD_LOGIC;
-  
+
+  -----------------------------------------------------------------------------
+  SIGNAL run_dma : STD_LOGIC;
 BEGIN
   
   sample_s(4 DOWNTO 0) <= sample_E(4 DOWNTO 0);
@@ -487,7 +489,9 @@ BEGIN
       Mem_use => Mem_use)
     PORT MAP (
       clk  => clk,
-      rstn => ms_softandhard_rstn,      --rstn,
+      --rstn => ms_softandhard_rstn,      --rstn,
+      rstn => rstn,
+      
       run  => run_ms,
 
       coarse_time => coarse_time,
@@ -535,14 +539,15 @@ BEGIN
       matrix_time_f2 => matrix_time_f2);
 
   -----------------------------------------------------------------------------
-
+  run_dma <= run_ms OR run;
+  
   DMA_SubSystem_1 : DMA_SubSystem
     GENERIC MAP (
       hindex => hindex)
     PORT MAP (
       clk  => clk,
       rstn => rstn,
-      run  => run_ms,
+      run  => run_dma,
       ahbi => ahbi,
       ahbo => ahbo,
 

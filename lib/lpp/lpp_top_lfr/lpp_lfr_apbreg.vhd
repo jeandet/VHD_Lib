@@ -307,9 +307,10 @@ BEGIN  -- beh
 
   start_date <= reg_wp.start_date;
 
-  --length_matrix_f0 <= reg_sp.length_matrix;
-  --length_matrix_f1 <= reg_sp.length_matrix;
-  --length_matrix_f2 <= reg_sp.length_matrix;
+  length_matrix_f0 <= reg_sp.length_matrix;
+  length_matrix_f1 <= reg_sp.length_matrix;
+  length_matrix_f2 <= reg_sp.length_matrix;
+  wfp_length_buffer <= reg_wp.length_buffer;
   
 
   lpp_lfr_apbreg : PROCESS (HCLK, HRESETn)
@@ -318,7 +319,7 @@ BEGIN  -- beh
     IF HRESETn = '0' THEN               -- asynchronous reset (active low)
       reg_sp.config_active_interruption_onNewMatrix <= '0';
       reg_sp.config_active_interruption_onError     <= '0';
-      reg_sp.config_ms_run                          <= '1';
+      reg_sp.config_ms_run                          <= '0';
       reg_sp.status_ready_matrix_f0_0               <= '0';
       reg_sp.status_ready_matrix_f1_0               <= '0';
       reg_sp.status_ready_matrix_f2_0               <= '0';
@@ -382,6 +383,8 @@ BEGIN  -- beh
       reg_wp.nb_snapshot_param <= (OTHERS => '0');
       reg_wp.start_date        <= (OTHERS => '0');
       
+      reg_wp.status_ready_buffer_f <= (OTHERS => '0');
+      reg_wp.length_buffer <= (OTHERS => '0');
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
 
 --      status_full_ack <= (OTHERS => '0');
@@ -490,13 +493,13 @@ BEGIN  -- beh
                            prdata(7) <= reg_wp.run;
                            --22
                            --ON GOING \/
-          WHEN "010111" => prdata             <= reg_wp.addr_buffer_f(32*1-1 DOWNTO 32*0);
+          WHEN "010111" => prdata             <= reg_wp.addr_buffer_f(32*1-1 DOWNTO 32*0);--0
           WHEN "011000" => prdata             <= reg_wp.addr_buffer_f(32*2-1 DOWNTO 32*1);
-          WHEN "011001" => prdata             <= reg_wp.addr_buffer_f(32*3-1 DOWNTO 32*2);
+          WHEN "011001" => prdata             <= reg_wp.addr_buffer_f(32*3-1 DOWNTO 32*2);--1
           WHEN "011010" => prdata             <= reg_wp.addr_buffer_f(32*4-1 DOWNTO 32*3);
-          WHEN "011011" => prdata             <= reg_wp.addr_buffer_f(32*5-1 DOWNTO 32*4);
+          WHEN "011011" => prdata             <= reg_wp.addr_buffer_f(32*5-1 DOWNTO 32*4);--2
           WHEN "011100" => prdata             <= reg_wp.addr_buffer_f(32*6-1 DOWNTO 32*5);
-          WHEN "011101" => prdata             <= reg_wp.addr_buffer_f(32*7-1 DOWNTO 32*6);
+          WHEN "011101" => prdata             <= reg_wp.addr_buffer_f(32*7-1 DOWNTO 32*6);--3
           WHEN "011110" => prdata             <= reg_wp.addr_buffer_f(32*8-1 DOWNTO 32*7);
                            --ON GOING /\
           WHEN "011111" => prdata(7  DOWNTO  0) <= reg_wp.status_ready_buffer_f;
@@ -525,20 +528,23 @@ BEGIN  -- beh
           WHEN "101001" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*0+47 DOWNTO 48*0+16);
           WHEN "101010" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*1+15 DOWNTO 48*1);
           WHEN "101011" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*1+47 DOWNTO 48*1+16);
-          WHEN "101100" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*2+15 DOWNTO 48*2);
-          WHEN "101110" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*2+47 DOWNTO 48*2+16);
-          WHEN "101111" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*3+15 DOWNTO 48*3);
-          WHEN "110000" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*3+47 DOWNTO 48*3+16);
                            
-          WHEN "110001" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*4+15 DOWNTO 48*4);
-          WHEN "111010" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*4+47 DOWNTO 48*4+16);
-          WHEN "110011" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*5+15 DOWNTO 48*5);
-          WHEN "110100" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*5+47 DOWNTO 48*5+16);
-          WHEN "110101" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*6+15 DOWNTO 48*6);
-          WHEN "110110" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*6+47 DOWNTO 48*6+16);
-          WHEN "110111" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*7+15 DOWNTO 48*7);
-          WHEN "111000" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*7+47 DOWNTO 48*7+16);
-          WHEN "111001" => prdata(25 DOWNTO 0) <= reg_wp.length_buffer;                         
+          WHEN "101100" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*2+15 DOWNTO 48*2);
+          WHEN "101101" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*2+47 DOWNTO 48*2+16);
+          WHEN "101110" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*3+15 DOWNTO 48*3);
+          WHEN "101111" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*3+47 DOWNTO 48*3+16);
+                           
+          WHEN "110000" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*4+15 DOWNTO 48*4);
+          WHEN "110001" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*4+47 DOWNTO 48*4+16);
+          WHEN "110010" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*5+15 DOWNTO 48*5);
+          WHEN "110011" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*5+47 DOWNTO 48*5+16);
+                           
+          WHEN "110100" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*6+15 DOWNTO 48*6);
+          WHEN "110101" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*6+47 DOWNTO 48*6+16);
+          WHEN "110110" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*7+15 DOWNTO 48*7);
+          WHEN "110111" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*7+47 DOWNTO 48*7+16);
+
+          WHEN "111000" => prdata(25 DOWNTO 0) <= reg_wp.length_buffer;                         
             
 --          WHEN "100100" => prdata(nb_word_by_buffer_size-1 DOWNTO 0) <= reg_wp.nb_word_by_buffer;
                            ----------------------------------------------------
@@ -617,7 +623,7 @@ BEGIN  -- beh
             WHEN "100110" => reg_wp.nb_snapshot_param <= apbi.pwdata(nb_snapshot_param_size-1 DOWNTO 0);
             WHEN "100111" => reg_wp.start_date        <= apbi.pwdata(30 DOWNTO 0);
                              
-            WHEN "111001" => reg_wp.length_buffer    <=  apbi.pwdata(25 DOWNTO 0);                         
+            WHEN "111000" => reg_wp.length_buffer    <=  apbi.pwdata(25 DOWNTO 0);                         
 
 
 
@@ -658,7 +664,7 @@ BEGIN  -- beh
   -----------------------------------------------------------------------------
   -- IRQ
   -----------------------------------------------------------------------------
-  irq_wfp_reg_s <= wfp_status_buffer_ready & wfp_error_buffer_full & status_new_err;
+  irq_wfp_reg_s <= wfp_ready_buffer & wfp_error_buffer_full & status_new_err;
 
   PROCESS (HCLK, HRESETn)
   BEGIN  -- PROCESS

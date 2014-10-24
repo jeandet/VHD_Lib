@@ -481,11 +481,17 @@ vcom_lpp:
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_dma/lpp_dma_pkg.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_dma/fifo_latency_correction.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_waveform/lpp_waveform_pkg.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_top_lfr/lpp_top_lfr_pkg.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_top_lfr/lpp_lfr_pkg.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_dma/lpp_dma.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_dma/lpp_dma_ip.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_dma/lpp_dma_send_16word.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_dma/lpp_dma_send_1word.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_dma/lpp_dma_singleOrBurst.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_dma/DMA_SubSystem.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_dma/DMA_SubSystem_GestionBuffer.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_dma/DMA_SubSystem_Arbiter.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_dma/DMA_SubSystem_MUX.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_waveform/lpp_waveform.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_waveform/lpp_waveform_burst.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_waveform/lpp_waveform_fifo_withoutLatency.vhd
@@ -499,6 +505,7 @@ vcom_lpp:
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_waveform/lpp_waveform_genaddress.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_waveform/lpp_waveform_dma_genvalid.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_waveform/lpp_waveform_fifo_arbiter_reg.vhd
+	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_waveform/lpp_waveform_fsmdma.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_top_lfr/lpp_top_lfr_pkg.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_top_lfr/lpp_lfr_pkg.vhd
 	$(CMD_VCOM) lpp $(VHDLIB)/lib/lpp/./lpp_top_lfr/lpp_lfr_filter.vhd

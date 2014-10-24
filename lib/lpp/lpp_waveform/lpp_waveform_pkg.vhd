@@ -144,26 +144,6 @@ PACKAGE lpp_waveform_pkg IS
       data_f2_in                   : IN  STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
       data_f3_in_valid             : IN  STD_LOGIC;
       data_f3_in                   : IN  STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      data_f0_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      data_f0_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      data_f0_data_out_valid       : OUT STD_LOGIC;
-      data_f0_data_out_valid_burst : OUT STD_LOGIC;
-      data_f0_data_out_ren         : IN  STD_LOGIC;
-      data_f1_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      data_f1_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      data_f1_data_out_valid       : OUT STD_LOGIC;
-      data_f1_data_out_valid_burst : OUT STD_LOGIC;
-      data_f1_data_out_ren         : IN  STD_LOGIC;
-      data_f2_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      data_f2_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      data_f2_data_out_valid       : OUT STD_LOGIC;
-      data_f2_data_out_valid_burst : OUT STD_LOGIC;
-      data_f2_data_out_ren         : IN  STD_LOGIC;
-      data_f3_addr_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      data_f3_data_out             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      data_f3_data_out_valid       : OUT STD_LOGIC;
-      data_f3_data_out_valid_burst : OUT STD_LOGIC;
-      data_f3_data_out_ren         : IN  STD_LOGIC;
     
       dma_fifo_valid_burst : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       dma_fifo_data        : OUT STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
@@ -358,9 +338,7 @@ PACKAGE lpp_waveform_pkg IS
       enable    : IN  STD_LOGIC;
       sel       : IN  STD_LOGIC_VECTOR(data_nb-1 DOWNTO 0);
       data      : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      data_s    : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
-      time_out     : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
-      time_out_new : OUT STD_LOGIC_VECTOR(3 DOWNTO 0));
+      data_s    : OUT STD_LOGIC_VECTOR(data_size-1 DOWNTO 0));
   END COMPONENT;
 
   COMPONENT lpp_waveform_fsmdma

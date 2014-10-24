@@ -175,7 +175,8 @@ BEGIN
               data_2 WHEN sel(2) = '1' ELSE
               data_3;
 
-  all_time_bit: FOR I IN 3 DOWNTO 0 GENERATE
+  all_time_bit: FOR I IN 47 DOWNTO 0 GENERATE
+    
     time_sel(I) <= time_in(0,I) WHEN sel(0) = '1' ELSE
                    time_in(1,I) WHEN sel(1) = '1' ELSE
                    time_in(2,I) WHEN sel(2) = '1' ELSE

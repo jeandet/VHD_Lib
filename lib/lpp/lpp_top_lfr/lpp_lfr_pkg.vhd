@@ -188,7 +188,7 @@ PACKAGE lpp_lfr_pkg IS
     GENERIC (
       Mem_use                : INTEGER;
       nb_data_by_buffer_size : INTEGER;
-      nb_word_by_buffer_size : INTEGER;
+--      nb_word_by_buffer_size : INTEGER;
       nb_snapshot_param_size : INTEGER;
       delta_vector_size      : INTEGER;
       delta_vector_size_f0_2 : INTEGER;
@@ -212,11 +212,7 @@ PACKAGE lpp_lfr_pkg IS
       ahbo            : OUT AHB_Mst_Out_Type;
       coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-      data_shaping_BW : OUT STD_LOGIC;
-      --
-      observation_vector_0: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
-      observation_vector_1: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
-      observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+      data_shaping_BW : OUT STD_LOGIC
       );
   END COMPONENT;
 

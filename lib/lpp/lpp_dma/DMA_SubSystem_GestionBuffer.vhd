@@ -60,7 +60,7 @@ BEGIN
           buffer_full_err <= '0';
           buffer_full     <= '0';
           IF burst_send = '1' THEN
-            IF burst_send_counter_add1 < buffer_length THEN
+            IF unsigned(burst_send_counter_add1) < unsigned(buffer_length) THEN
               burst_send_counter <= burst_send_counter_add1;
             ELSE
               buffer_full <= '1';

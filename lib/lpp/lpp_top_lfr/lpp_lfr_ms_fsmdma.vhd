@@ -107,7 +107,7 @@ BEGIN
 
   fifo_ren             <= dma_fifo_ren  WHEN state = ONGOING ELSE '1';
   dma_fifo_data        <= fifo_data;
-  dma_fifo_valid_burst <= burst_valid_s WHEN state = ONGOING ELSE '1';
+  dma_fifo_valid_burst <= burst_valid_s WHEN state = ONGOING ELSE '0';
 
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
@@ -128,6 +128,7 @@ BEGIN
       ready_matrix_f1 <= '0';
       ready_matrix_f2 <= '0';
       IF run = '1' THEN
+        dma_buffer_new      <= '0';
         CASE state IS
           WHEN IDLE =>
             IF fifo_empty = '0' THEN
