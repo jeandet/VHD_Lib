@@ -1,0 +1,6 @@
+cic_pkg.vhd
+cic.vhd
+cic_integrator.vhd
+cic_downsampler.vhd
+cic_comb.vhd
+cic_lfr.vhd

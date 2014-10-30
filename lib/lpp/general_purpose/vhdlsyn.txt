@@ -1,3 +1,4 @@
+data_type_pkg.vhd
 general_purpose.vhd
 ADDRcntr.vhd
 ALU.vhd
