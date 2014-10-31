@@ -29,7 +29,10 @@ USE lpp.cic_pkg.ALL;
 USE lpp.data_type_pkg.ALL;
 
 ENTITY cic_lfr IS
-    
+  GENERIC(
+    tech         : INTEGER := 0;
+    use_RAM_nCEL : INTEGER := 0         -- 1 => RAM(tech) , 0 => RAM_CEL
+    );    
   PORT (
     clk            : IN  STD_LOGIC;
     rstn           : IN  STD_LOGIC;
@@ -38,17 +41,28 @@ ENTITY cic_lfr IS
     data_in        : IN  sample_vector(5 DOWNTO 0,15 DOWNTO 0);
     data_in_valid  : IN  STD_LOGIC;
 
-    data_out_16    : OUT sample_vector(5 DOWNTO 0,15 DOWNTO 0);
-    data_out_256   : OUT sample_vector(5 DOWNTO 0,15 DOWNTO 0);
-    data_out_valid : OUT STD_LOGIC
+    data_out_16        : OUT sample_vector(5 DOWNTO 0,15 DOWNTO 0);
+    data_out_16_valid  : OUT STD_LOGIC;
+    data_out_256       : OUT sample_vector(5 DOWNTO 0,15 DOWNTO 0);
+    data_out_256_valid : OUT STD_LOGIC
     );
 
 END cic_lfr;
 
 ARCHITECTURE beh OF cic_lfr IS
-  
+  SIGNAL sel_sample  : STD_LOGIC_VECTOR(2 DOWNTO 0);
+  SIGNAL sample_temp : sample_vector(3 DOWNTO 0,15 DOWNTO 0);
+  SIGNAL sample      : STD_LOGIC_VECTOR(15 DOWNTO 0);
 BEGIN
 
+  -----------------------------------------------------------------------------
+  -- SEL_SAMPLE
+  -----------------------------------------------------------------------------
+  sample_temp(0) <= sample_vector(0) WHEN sel_sample(0) = '0' ELSE sample_vector(1);
+  sample_temp(1) <= sample_vector(3) WHEN sel_sample(0) = '0' ELSE sample_vector(4);
+  sample_temp(2) <= sample_temp(0)   WHEN sel_sample(1) = '0' ELSE sample_vector(2);
+  sample_temp(3) <= sample_temp(1)   WHEN sel_sample(1) = '0' ELSE sample_vector(5);
+  sample         <= sample_temp(2)   WHEN sel_sample(2) = '0' ELSE sample_temp(3);
   
   
 END beh;
