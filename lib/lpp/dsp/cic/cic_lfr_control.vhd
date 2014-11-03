@@ -58,6 +58,8 @@ ARCHITECTURE beh OF cic_lfr_control IS
 
   TYPE STATE_CIC_LFR_TYPE IS (IDLE,INT_0, INT_1, INT_2);
   SIGNAL STATE_CIC_LFR : STATE_CIC_LFR_TYPE;
+
+  SIGNAL nb_data_receipt : INTEGER;
   
 BEGIN
 
@@ -81,6 +83,8 @@ BEGIN
       w_addr_init <= '0';
       w_addr_base <= (OTHERS => '0');
       w_addr_add1 <= '0';
+      --
+      nb_data_receipt <= 0;
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
       IF run = '0' THEN
         STATE_CIC_LFR      <= IDLE;
@@ -100,6 +104,8 @@ BEGIN
         w_addr_init <= '0';
         w_addr_base <= (OTHERS => '0');
         w_addr_add1 <= '0';
+        --
+        nb_data_receipt <= 0;
       ELSE
         CASE STATE_CIC_LFR IS
           WHEN IDLE => 
@@ -118,6 +124,12 @@ BEGIN
             w_addr_init <= '0';
             w_addr_base <= (OTHERS => '0');
             w_addr_add1 <= '0';
+            IF data_in_valid = '1' THEN
+              nb_data_receipt <= 0;
+              STATE_CIC_LFR <= INT_0;
+            END IF;
+          WHEN INT_0 =>
+            
           WHEN OTHERS => NULL;
         END CASE;
       END IF;

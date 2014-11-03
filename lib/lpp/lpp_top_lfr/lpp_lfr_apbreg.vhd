@@ -608,7 +608,7 @@ BEGIN  -- beh
                              --26
             WHEN "011111" =>
               all_reg_wp_status_bit: FOR I IN 3 DOWNTO 0 LOOP
-                reg_wp.status_ready_buffer_f(I)     <= ((NOT apbi.pwdata(I)    ) AND reg_wp.status_ready_buffer_f(I)    ) OR reg_ready_buffer_f(I);
+                reg_wp.status_ready_buffer_f(I*2)   <= ((NOT apbi.pwdata(I*2)  ) AND reg_wp.status_ready_buffer_f(I*2)  ) OR reg_ready_buffer_f(I*2);
                 reg_wp.status_ready_buffer_f(I*2+1) <= ((NOT apbi.pwdata(I*2+1)) AND reg_wp.status_ready_buffer_f(I*2+1)) OR reg_ready_buffer_f(I*2+1);
                 reg_wp.error_buffer_full(I)         <= ((NOT apbi.pwdata(I+8)  ) AND reg_wp.error_buffer_full(I)        ) OR wfp_error_buffer_full(I); 
                 reg_wp.status_new_err(I)            <= ((NOT apbi.pwdata(I+12) ) AND reg_wp.status_new_err(I)           ) OR status_new_err(I);
