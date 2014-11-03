@@ -524,25 +524,25 @@ BEGIN  -- beh
                            --34
           WHEN "100111" => prdata(30 DOWNTO 0)                       <= reg_wp.start_date;
                            --35
-          WHEN "101000" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*0+15 DOWNTO 48*0);
-          WHEN "101001" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*0+47 DOWNTO 48*0+16);
-          WHEN "101010" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*1+15 DOWNTO 48*1);
-          WHEN "101011" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*1+47 DOWNTO 48*1+16);
+          WHEN "101000" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*0 + 31 DOWNTO 48*0);          --reg_wp.time_buffer_f(48*0+15 DOWNTO 48*0);
+          WHEN "101001" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*0 + 47 DOWNTO 48*0 + 32);     --reg_wp.time_buffer_f(48*0+47 DOWNTO 48*0+16);
+          WHEN "101010" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*1 + 31 DOWNTO 48*1);
+          WHEN "101011" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*1 + 47 DOWNTO 48*1 + 32);
                            
-          WHEN "101100" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*2+15 DOWNTO 48*2);
-          WHEN "101101" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*2+47 DOWNTO 48*2+16);
-          WHEN "101110" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*3+15 DOWNTO 48*3);
-          WHEN "101111" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*3+47 DOWNTO 48*3+16);
+          WHEN "101100" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*2 + 31 DOWNTO 48*2);
+          WHEN "101101" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*2 + 47 DOWNTO 48*2 + 32);
+          WHEN "101110" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*3 + 31 DOWNTO 48*3);
+          WHEN "101111" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*3 + 47 DOWNTO 48*3 + 32);
                            
-          WHEN "110000" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*4+15 DOWNTO 48*4);
-          WHEN "110001" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*4+47 DOWNTO 48*4+16);
-          WHEN "110010" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*5+15 DOWNTO 48*5);
-          WHEN "110011" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*5+47 DOWNTO 48*5+16);
+          WHEN "110000" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*4 + 31 DOWNTO 48*4);
+          WHEN "110001" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*4 + 47 DOWNTO 48*4 + 32);
+          WHEN "110010" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*5 + 31 DOWNTO 48*5);
+          WHEN "110011" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*5 + 47 DOWNTO 48*5 + 32);
                            
-          WHEN "110100" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*6+15 DOWNTO 48*6);
-          WHEN "110101" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*6+47 DOWNTO 48*6+16);
-          WHEN "110110" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*7+15 DOWNTO 48*7);
-          WHEN "110111" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*7+47 DOWNTO 48*7+16);
+          WHEN "110100" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*6 + 31 DOWNTO 48*6);
+          WHEN "110101" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*6 + 47 DOWNTO 48*6 + 32);
+          WHEN "110110" => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*7 + 31 DOWNTO 48*7);
+          WHEN "110111" => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*7 + 47 DOWNTO 48*7 + 32);
 
           WHEN "111000" => prdata(25 DOWNTO 0) <= reg_wp.length_buffer;                         
             

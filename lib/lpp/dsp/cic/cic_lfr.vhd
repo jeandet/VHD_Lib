@@ -58,12 +58,13 @@ BEGIN
   -----------------------------------------------------------------------------
   -- SEL_SAMPLE
   -----------------------------------------------------------------------------
-  sample_temp(0) <= sample_vector(0) WHEN sel_sample(0) = '0' ELSE sample_vector(1);
-  sample_temp(1) <= sample_vector(3) WHEN sel_sample(0) = '0' ELSE sample_vector(4);
-  sample_temp(2) <= sample_temp(0)   WHEN sel_sample(1) = '0' ELSE sample_vector(2);
-  sample_temp(3) <= sample_temp(1)   WHEN sel_sample(1) = '0' ELSE sample_vector(5);
-  sample         <= sample_temp(2)   WHEN sel_sample(2) = '0' ELSE sample_temp(3);
-  
+  all_bit: FOR I IN 15 DOWNTO 0 GENERATE
+    sample_temp(0,I) <= data_in(0,I)     WHEN sel_sample(0) = '0' ELSE data_in(1,I);
+    sample_temp(1,I) <= data_in(3,I)     WHEN sel_sample(0) = '0' ELSE data_in(4,I);
+    sample_temp(2,I) <= sample_temp(0,I) WHEN sel_sample(1) = '0' ELSE data_in(2,I);
+    sample_temp(3,I) <= sample_temp(1,I) WHEN sel_sample(1) = '0' ELSE data_in(5,I);
+    sample(I)        <= sample_temp(2,I) WHEN sel_sample(2) = '0' ELSE sample_temp(3,I);
+  END GENERATE all_bit;
   
 END beh;
 

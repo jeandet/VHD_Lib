@@ -86,4 +86,26 @@ PACKAGE cic_pkg IS
   END COMPONENT;
   -----------------------------------------------------------------------------
 
+
+  -----------------------------------------------------------------------------
+  COMPONENT cic_lfr_control
+    PORT (
+      clk                : IN  STD_LOGIC;
+      rstn               : IN  STD_LOGIC;
+      run                : IN  STD_LOGIC;
+      data_in_valid      : IN  STD_LOGIC;
+      data_out_16_valid  : OUT STD_LOGIC;
+      data_out_256_valid : OUT STD_LOGIC;
+      sel_sample         : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+      op_valid           : OUT STD_LOGIC;
+      op_ADD_SUBn        : OUT STD_LOGIC;
+      r_addr_init        : OUT STD_LOGIC;
+      r_addr_base        : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+      r_addr_add1        : OUT STD_LOGIC;
+      w_en               : OUT STD_LOGIC;
+      w_addr_init        : OUT STD_LOGIC;
+      w_addr_base        : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+      w_addr_add1        : OUT STD_LOGIC);
+  END COMPONENT;
+  -----------------------------------------------------------------------------
 END cic_pkg;
