@@ -204,12 +204,17 @@ BEGIN
       sel <= "0000";
       sel_reg <= '0';
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      IF sel_reg = '0' OR sel_ack = '1' THEN
-        sel <= sel_s;
-        IF sel_s = "0000" THEN
-          sel_reg <= '0';
-        ELSE
-          sel_reg <= '1';
+      IF run = '0' THEN
+        sel <= "0000";
+        sel_reg <= '0';
+      ELSE
+        IF sel_reg = '0' OR sel_ack = '1' THEN
+          sel <= sel_s;
+          IF sel_s = "0000" THEN
+            sel_reg <= '0';
+          ELSE
+            sel_reg <= '1';
+          END IF;
         END IF;
       END IF;
     END IF;

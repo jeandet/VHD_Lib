@@ -692,6 +692,8 @@ BEGIN  -- beh
       clk  => HCLK,
       rstn => HRESETn,
 
+      run  => reg_sp.config_ms_run,
+      
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f0_0,
       reg0_ready_matrix        => reg0_ready_matrix_f0,
       reg0_addr_matrix         => reg_sp.addr_matrix_f0_0,  --reg0_addr_matrix_f0,            
@@ -712,6 +714,8 @@ BEGIN  -- beh
       clk  => HCLK,
       rstn => HRESETn,
 
+      run  => reg_sp.config_ms_run,
+
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f1_0,
       reg0_ready_matrix        => reg0_ready_matrix_f1,
       reg0_addr_matrix         => reg_sp.addr_matrix_f1_0,  --reg0_addr_matrix_f1,
@@ -731,6 +735,8 @@ BEGIN  -- beh
     PORT MAP (
       clk  => HCLK,
       rstn => HRESETn,
+
+      run  => reg_sp.config_ms_run,
 
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f2_0,
       reg0_ready_matrix        => reg0_ready_matrix_f2,
@@ -753,6 +759,8 @@ BEGIN  -- beh
       PORT MAP (
         clk  => HCLK,
         rstn => HRESETn,
+
+        run  => reg_wp.run,
 
         reg0_status_ready_matrix => reg_wp.status_ready_buffer_f(2*I),
         reg0_ready_matrix        => reg_ready_buffer_f(2*I),

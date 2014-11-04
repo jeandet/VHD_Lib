@@ -29,6 +29,7 @@ ENTITY lpp_apbreg_ms_pointer IS
   PORT (
     clk  : IN STD_LOGIC;
     rstn : IN STD_LOGIC;
+    run  : IN STD_LOGIC;
 
     -- REG 0
     reg0_status_ready_matrix : IN  STD_LOGIC;
@@ -60,22 +61,28 @@ BEGIN  -- beh
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      current_reg <= '0';
+      current_reg      <= '0';
       reg0_matrix_time <= (OTHERS => '0');
       reg1_matrix_time <= (OTHERS => '0');
       
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      IF ready_matrix = '1' THEN
-        current_reg <= NOT current_reg;
-      
-        IF current_reg = '0' THEN
-          reg0_matrix_time <= matrix_time;
-        END IF;
+      IF run = '0' THEN
+        current_reg      <= '0';
+        reg0_matrix_time <= (OTHERS => '0');
+        reg1_matrix_time <= (OTHERS => '0');
+      ELSE
+        IF ready_matrix = '1' THEN
+          current_reg <= NOT current_reg;
 
-        IF current_reg = '1' THEN
-          reg1_matrix_time <= matrix_time;
+          IF current_reg = '0' THEN
+            reg0_matrix_time <= matrix_time;
+          END IF;
+
+          IF current_reg = '1' THEN
+            reg1_matrix_time <= matrix_time;
+          END IF;
+          
         END IF;
-        
       END IF;
       
     END IF;

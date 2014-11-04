@@ -347,7 +347,6 @@ PACKAGE lpp_lfr_pkg IS
       matrix_time_f0_1                       : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
       matrix_time_f1                         : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
       matrix_time_f2                         : IN STD_LOGIC_VECTOR(47 DOWNTO 0)
-     
       );
   END COMPONENT;
 
@@ -355,6 +354,7 @@ PACKAGE lpp_lfr_pkg IS
     PORT (
       clk                      : IN  STD_LOGIC;
       rstn                     : IN  STD_LOGIC;
+      run                      : IN  STD_LOGIC;
       reg0_status_ready_matrix : IN  STD_LOGIC;
       reg0_ready_matrix        : OUT STD_LOGIC;
       reg0_addr_matrix         : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);

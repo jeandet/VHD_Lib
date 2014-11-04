@@ -75,9 +75,14 @@ ARCHITECTURE beh OF cic_lfr_control IS
                               COMB_0_256_d2, COMB_1_256_d2, COMB_2_256_d2,
                               
                               READ_INT_2_d0,
-                              READ_INT_2_d1
+                              READ_INT_2_d1,
+                              
+                              Wait_step,
+                                                            
+                              INT_0,      INT_1,      INT_2
                               );
-  SIGNAL STATE_CIC_LFR : STATE_CIC_LFR_TYPE;
+  SIGNAL STATE_CIC_LFR     : STATE_CIC_LFR_TYPE;
+  SIGNAL STATE_CIC_LFR_pre : STATE_CIC_LFR_TYPE;
 
   SIGNAL nb_data_receipt : INTEGER;
   SIGNAL current_channel : INTEGER;
@@ -86,6 +91,10 @@ ARCHITECTURE beh OF cic_lfr_control IS
   
   SIGNAL   base_addr_INT   : ARRAY_OF_ADDR;
   CONSTANT base_addr_delta : INTEGER := 40;
+
+  CONSTANT SEL_OUT : INTEGER := 6;
+  
+  signal nb_cycle_wait : integer;
 BEGIN
 
   all_channel: FOR I IN 5 DOWNTO 0 GENERATE
@@ -178,31 +187,39 @@ BEGIN
               STATE_CIC_LFR     <= INT_0_d0;
             END IF;
 
-            -------------------------------------------------------------------
-          WHEN INT_0_d0 =>
-            sel_sample    <= STD_LOGIC_VECTOR(to_unsigned(current_channel, 3));
-            STATE_CIC_LFR <= INT_0_d1;
-            r_addr_init   <= '1';
-            r_addr_base   <= base_addr_INT(current_channel);
+          
+          WHEN WAIT_step => ---------------------------------------------------
+            IF nb_cycle_wait > 0 THEN
+              nb_cycle_wait <= nb_cycle_wait -1;
+            ELSE
+              STATE_CIC_LFR <= STATE_CIC_LFR_pre;
+            END IF;
             
             
-          WHEN INT_0_d1 =>
-            STATE_CIC_LFR <= INT_0_d2;
+          WHEN INT_0 => -------------------------------------------------------
+            sel_sample        <= STD_LOGIC_VECTOR(to_unsigned(current_channel, 3));
+            r_addr_init       <= '1';
+            r_addr_base       <= base_addr_INT(current_channel);
+            nb_cycle_wait     <= 1;
+            op_ADD_SUBn       <= '1';
+            op_valid          <= '1';
+            STATE_CIC_LFR     <= WAIT_step;
+            STATE_CIC_LFR_pre <= INT_1;
+                        
+          WHEN INT_1 => 
+            sel_sample    <= STD_LOGIC_VECTOR(to_unsigned(SEL_OUT, 3)); 
             r_addr_add1   <= '1';
-            
-          WHEN INT_0_d2 =>
-            STATE_CIC_LFR <= INT_1_d0;
-            r_addr_add1   <= '1';
+            nb_cycle_wait <= 3;
             op_ADD_SUBn   <= '1';
             op_valid      <= '1';
-                           
-          WHEN INT_1_d0 => STATE_CIC_LFR <= INT_1_d1;
-          WHEN INT_1_d1 => STATE_CIC_LFR <= INT_1_d2;
-          WHEN INT_1_d2 => STATE_CIC_LFR <= INT_2_d0;
+            STATE_CIC_LFR <= INT_2;
                         
-          WHEN INT_2_d0 => STATE_CIC_LFR <= INT_2_d1;
-          WHEN INT_2_d1 => STATE_CIC_LFR <= INT_2_d2;
-          WHEN INT_2_d2 => 
+          WHEN INT_2 => 
+            sel_sample    <= STD_LOGIC_VECTOR(to_unsigned(SEL_OUT, 3)); 
+            r_addr_add1   <= '1';
+            nb_cycle_wait <= 3;
+            op_ADD_SUBn   <= '1';
+            op_valid      <= '1';
             IF nb_data_receipt = 256 THEN
               STATE_CIC_LFR <= COMB_0_256_d0;
             ELSIF (nb_data_receipt mod 16) = 0 THEN
@@ -212,7 +229,7 @@ BEGIN
                 STATE_CIC_LFR   <= IDLE;
               ELSE
                 current_channel <= current_channel +1;
-                STATE_CIC_LFR   <= INT_0_d0;
+                STATE_CIC_LFR   <= INT_0;
               END IF;
             END IF;
 
@@ -262,4 +279,3 @@ BEGIN
   END PROCESS;
   
 END beh;
-
