@@ -50,7 +50,9 @@ ENTITY apb_lfr_time_management IS
     apbo : OUT apb_slv_out_type;        --! APB slave output signals
 
     coarse_time : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --! coarse time
-    fine_time   : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)   --! fine time
+    fine_time   : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);   --! fine TIME
+    ---------------------------------------------------------------------------
+    LFR_soft_rstn : OUT STD_LOGIC
     );
 
 END apb_lfr_time_management;
@@ -69,6 +71,7 @@ ARCHITECTURE Behavioral OF apb_lfr_time_management IS
     coarse_time_load : STD_LOGIC_VECTOR(30 DOWNTO 0);
     coarse_time      : STD_LOGIC_VECTOR(31 DOWNTO 0);
     fine_time        : STD_LOGIC_VECTOR(15 DOWNTO 0);
+    LFR_soft_reset   : STD_LOGIC;
   END RECORD;
   SIGNAL r                   : apb_lfr_time_management_Reg;
   
@@ -108,6 +111,8 @@ ARCHITECTURE Behavioral OF apb_lfr_time_management IS
   
 BEGIN
 
+  LFR_soft_rstn <= NOT r.LFR_soft_reset;
+  
   PROCESS(resetn, clk25MHz)
   BEGIN
 
@@ -116,6 +121,8 @@ BEGIN
       r.coarse_time_load  <= (OTHERS => '0');
       r.soft_reset              <= '0';
       r.ctrl              <= '0';
+      r.LFR_soft_reset    <= '1';
+      
       force_tick          <= '0';
       previous_force_tick <= '0';
       soft_tick           <= '0';
@@ -145,8 +152,9 @@ BEGIN
       IF (apbi.psel(pindex) AND apbi.penable AND apbi.pwrite) = '1' THEN
         CASE apbi.paddr(7 DOWNTO 2) IS
           WHEN "000000" =>
-            r.ctrl       <= apbi.pwdata(0);
-            r.soft_reset <= apbi.pwdata(1);
+            r.ctrl              <= apbi.pwdata(0);
+            r.soft_reset        <= apbi.pwdata(1);
+            r.LFR_soft_reset    <= apbi.pwdata(2);
           WHEN "000001" =>
             r.coarse_time_load     <= apbi.pwdata(30 DOWNTO 0);
             coarsetime_reg_updated <= '1';
@@ -168,7 +176,8 @@ BEGIN
           WHEN "000000" =>
             Rdata(0)            <= r.ctrl;
             Rdata(1)            <= r.soft_reset;
-            Rdata(31 DOWNTO 1)  <= (others => '0');
+            Rdata(2)            <= r.LFR_soft_reset;
+            Rdata(31 DOWNTO 3)  <= (others => '0');
           WHEN "000001" =>
             Rdata(30 DOWNTO 0)  <= r.coarse_time_load(30 DOWNTO 0);
           WHEN "000010" =>

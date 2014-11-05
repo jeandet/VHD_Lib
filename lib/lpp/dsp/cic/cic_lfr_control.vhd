@@ -78,9 +78,9 @@ ARCHITECTURE beh OF cic_lfr_control IS
                               READ_INT_2_d1,
                               
                               Wait_step,
-                                                            
                               INT_0,      INT_1,      INT_2
                               );
+  
   SIGNAL STATE_CIC_LFR     : STATE_CIC_LFR_TYPE;
   SIGNAL STATE_CIC_LFR_pre : STATE_CIC_LFR_TYPE;
 

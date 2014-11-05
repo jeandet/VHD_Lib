@@ -74,6 +74,7 @@ PACKAGE lpp_lfr_pkg IS
       clk                    : IN  STD_LOGIC;
       rstn                   : IN  STD_LOGIC;
       run                    : IN  STD_LOGIC;
+      start_date      : IN STD_LOGIC_VECTOR(30 DOWNTO 0);
       coarse_time            : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       fine_time              : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
       sample_f0_wen          : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);

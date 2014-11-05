@@ -381,7 +381,7 @@ BEGIN  -- beh
       reg_wp.delta_f2          <= (OTHERS => '0');
       reg_wp.nb_data_by_buffer <= (OTHERS => '0');
       reg_wp.nb_snapshot_param <= (OTHERS => '0');
-      reg_wp.start_date        <= (OTHERS => '0');
+      reg_wp.start_date        <= (OTHERS => '1');
       
       reg_wp.status_ready_buffer_f <= (OTHERS => '0');
       reg_wp.length_buffer <= (OTHERS => '0');
@@ -692,7 +692,7 @@ BEGIN  -- beh
       clk  => HCLK,
       rstn => HRESETn,
 
-      run  => reg_sp.config_ms_run,
+      run  => '1',--reg_sp.config_ms_run,
       
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f0_0,
       reg0_ready_matrix        => reg0_ready_matrix_f0,
@@ -714,7 +714,7 @@ BEGIN  -- beh
       clk  => HCLK,
       rstn => HRESETn,
 
-      run  => reg_sp.config_ms_run,
+      run  => '1',--reg_sp.config_ms_run,
 
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f1_0,
       reg0_ready_matrix        => reg0_ready_matrix_f1,
@@ -736,7 +736,7 @@ BEGIN  -- beh
       clk  => HCLK,
       rstn => HRESETn,
 
-      run  => reg_sp.config_ms_run,
+      run  => '1',--reg_sp.config_ms_run,
 
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f2_0,
       reg0_ready_matrix        => reg0_ready_matrix_f2,
@@ -760,7 +760,7 @@ BEGIN  -- beh
         clk  => HCLK,
         rstn => HRESETn,
 
-        run  => reg_wp.run,
+        run  => '1',--reg_wp.run,
 
         reg0_status_ready_matrix => reg_wp.status_ready_buffer_f(2*I),
         reg0_ready_matrix        => reg_ready_buffer_f(2*I),

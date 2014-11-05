@@ -1,5 +1,6 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
 
 LIBRARY lpp;
@@ -26,6 +27,7 @@ ENTITY lpp_lfr_ms IS
     ---------------------------------------------------------------------------
     -- DATA INPUT
     ---------------------------------------------------------------------------
+    start_date      : IN STD_LOGIC_VECTOR(30 DOWNTO 0);
     -- TIME
     coarse_time     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);  -- todo
     fine_time       : IN STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
@@ -253,9 +255,37 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL sample_f1_empty_head_in : STD_LOGIC;
   
   SIGNAL sample_f1_wdata_head   : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+  -----------------------------------------------------------------------------
+  SIGNAL sample_f0_wen_s : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL sample_f1_wen_s : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL sample_f2_wen_s : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL ongoing : STD_LOGIC;
   
 BEGIN
 
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS
+    IF rstn = '0' THEN                  -- asynchronous reset (active low)
+      sample_f0_wen_s <= (OTHERS => '1');
+      sample_f1_wen_s <= (OTHERS => '1');
+      sample_f2_wen_s <= (OTHERS => '1');
+      ongoing <= '0';      
+    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      IF ongoing = '1' THEN
+        sample_f0_wen_s <= sample_f0_wen;
+        sample_f1_wen_s <= sample_f1_wen;
+        sample_f2_wen_s <= sample_f2_wen;
+      ELSE
+        IF start_date = coarse_time(30 DOWNTO 0) THEN
+          ongoing <= '1';
+        END IF;        
+        sample_f0_wen_s <= (OTHERS => '1');
+        sample_f1_wen_s <= (OTHERS => '1');
+        sample_f2_wen_s <= (OTHERS => '1');
+      END IF;
+    END IF;
+  END PROCESS;
+  
   
   error_input_fifo_write <= error_wen_f2 & error_wen_f1 & error_wen_f0;
 
@@ -265,7 +295,7 @@ BEGIN
       clk  => clk,
       rstn => rstn,
 
-      sample_wen => sample_f0_wen,
+      sample_wen => sample_f0_wen_s,
 
       fifo_A_empty => sample_f0_A_empty,
       fifo_A_full  => sample_f0_A_full,
@@ -332,7 +362,7 @@ BEGIN
   -- sample_f1_wdata in
   -- sample_f1_full  OUT
 
-  sample_f1_wen_head_in   <= '0' WHEN sample_f1_wen   = "00000" ELSE '1';
+  sample_f1_wen_head_in   <= '0' WHEN sample_f1_wen_s   = "00000" ELSE '1';
   sample_f1_full_head_in  <= '0' WHEN sample_f1_full  = "00000" ELSE '1';
   sample_f1_empty_head_in <= '1' WHEN sample_f1_empty = "11111" ELSE '0';
   
@@ -374,7 +404,7 @@ BEGIN
       almost_full => sample_f1_almost_full); 
 
 
-  one_sample_f1_wen <= '0' WHEN sample_f1_wen = "11111" ELSE '1';
+  one_sample_f1_wen <= '0' WHEN sample_f1_wen_s = "11111" ELSE '1';
 
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
@@ -417,7 +447,7 @@ BEGIN
       almost_full => OPEN);             
 
 
-  one_sample_f2_wen <= '0' WHEN sample_f2_wen = "11111" ELSE '1';
+  one_sample_f2_wen <= '0' WHEN sample_f2_wen_s = "11111" ELSE '1';
 
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS

@@ -44,7 +44,8 @@ PACKAGE lpp_lfr_time_management IS
       apbi         : IN  apb_slv_in_type;   --! APB slave input signals
       apbo         : OUT apb_slv_out_type;  --! APB slave output signals
       coarse_time  : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --! coarse time
-      fine_time    : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)   --! fine time
+      fine_time    : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);   --! fine TIME
+      LFR_soft_rstn : OUT STD_LOGIC      
       );
   END COMPONENT;
 

@@ -175,6 +175,9 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   SIGNAL observation_vector_0: STD_LOGIC_VECTOR(11 DOWNTO 0);
   SIGNAL observation_vector_1: STD_LOGIC_VECTOR(11 DOWNTO 0);
   -----------------------------------------------------------------------------
+
+  SIGNAL LFR_soft_rstn : STD_LOGIC;
+  SIGNAL LFR_rstn : STD_LOGIC;
   
 BEGIN  -- beh
 
@@ -323,7 +326,9 @@ BEGIN  -- beh
       apbi         => apbi_ext,
       apbo         => apbo_ext(6),
       coarse_time  => coarse_time,
-      fine_time    => fine_time);
+      fine_time    => fine_time,
+      LFR_soft_rstn => LFR_soft_rstn
+      );
 
 -----------------------------------------------------------------------
 ---  SpaceWire --------------------------------------------------------
@@ -414,11 +419,14 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
 -- LFR ------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+
+
+  LFR_rstn <= LFR_soft_rstn AND reset;
+  
   lpp_lfr_1 : lpp_lfr
     GENERIC MAP (
       Mem_use                => use_RAM,
       nb_data_by_buffer_size => 32,
---      nb_word_by_buffer_size => 30,
       nb_snapshot_param_size => 32,
       delta_vector_size      => 32,
       delta_vector_size_f0_2 => 7,      -- log2(96)
@@ -428,10 +436,10 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"00011F")  -- aa.bb.cc version
+      top_lfr_version        => X"000120")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
-      rstn            => reset,
+      rstn            => LFR_rstn,
       sample_B        => sample_s(2 DOWNTO 0),
       sample_E        => sample_s(7 DOWNTO 3),
       sample_val      => sample_val,

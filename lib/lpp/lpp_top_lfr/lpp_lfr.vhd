@@ -181,7 +181,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL burst_f1          : STD_LOGIC;
   SIGNAL burst_f2          : STD_LOGIC;
 
-  SIGNAL run        : STD_LOGIC;
+  --SIGNAL run        : STD_LOGIC;
   SIGNAL start_date : STD_LOGIC_VECTOR(30 DOWNTO 0);
 
   -----------------------------------------------------------------------------
@@ -255,7 +255,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL data_ms_done        : STD_LOGIC;
   SIGNAL dma_ms_ongoing      : STD_LOGIC;
 
-  SIGNAL run_ms              : STD_LOGIC;
+--  SIGNAL run_ms              : STD_LOGIC;
   SIGNAL ms_softandhard_rstn : STD_LOGIC;
 
   SIGNAL matrix_time_f0 : STD_LOGIC_VECTOR(47 DOWNTO 0);
@@ -282,7 +282,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL dma_grant_error      : STD_LOGIC;
 
   -----------------------------------------------------------------------------
-  SIGNAL run_dma : STD_LOGIC;
+--  SIGNAL run_dma : STD_LOGIC;
 BEGIN
   
   sample_s(4 DOWNTO 0) <= sample_E(4 DOWNTO 0);
@@ -335,7 +335,7 @@ BEGIN
       apbi    => apbi,
       apbo    => apbo,
 
-      run_ms => run_ms,
+      run_ms => OPEN,--run_ms,
 
       ready_matrix_f0        => ready_matrix_f0,
       ready_matrix_f1        => ready_matrix_f1,
@@ -383,7 +383,7 @@ BEGIN
       burst_f0          => burst_f0,
       burst_f1          => burst_f1,
       burst_f2          => burst_f2,
-      run               => run,
+      run               => OPEN, --run,
       start_date        => start_date,
 --      debug_signal      => debug_signal,
       wfp_status_buffer_ready => wfp_status_buffer_ready,-- TODO
@@ -410,7 +410,7 @@ BEGIN
       clk  => clk,
       rstn => rstn,
 
-      reg_run            => run,
+      reg_run            => '1',--run,
       reg_start_date     => start_date,
       reg_delta_snapshot => delta_snapshot,
       reg_delta_f0       => delta_f0,
@@ -481,7 +481,7 @@ BEGIN
 
   -------------------------------------------------------------------------------
 
-  ms_softandhard_rstn <= rstn AND run_ms AND run;
+  --ms_softandhard_rstn <= rstn AND run_ms AND run;
 
   -----------------------------------------------------------------------------
   lpp_lfr_ms_1 : lpp_lfr_ms
@@ -492,8 +492,10 @@ BEGIN
       --rstn => ms_softandhard_rstn,      --rstn,
       rstn => rstn,
       
-      run  => run_ms,
+      run  => '1',--run_ms,
 
+      start_date => start_date,
+      
       coarse_time => coarse_time,
       fine_time   => fine_time,
 
@@ -539,7 +541,7 @@ BEGIN
       matrix_time_f2 => matrix_time_f2);
 
   -----------------------------------------------------------------------------
-  run_dma <= run_ms OR run;
+  --run_dma <= run_ms OR run;
   
   DMA_SubSystem_1 : DMA_SubSystem
     GENERIC MAP (
@@ -547,7 +549,7 @@ BEGIN
     PORT MAP (
       clk  => clk,
       rstn => rstn,
-      run  => run_dma,
+      run  => '1',--run_dma,
       ahbi => ahbi,
       ahbo => ahbo,
 
