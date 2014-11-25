@@ -5,3 +5,5 @@ cic_downsampler.vhd
 cic_comb.vhd
 cic_lfr.vhd
 cic_lfr_control.vhd
+cic_lfr_add_sub.vhd
+cic_lfr_address_gen.vhd

@@ -39,20 +39,8 @@ ENTITY cic_lfr_control IS
     data_in_valid      : IN  STD_LOGIC;
     data_out_16_valid  : OUT STD_LOGIC;
     data_out_256_valid : OUT STD_LOGIC;
-    -- dataflow
-    sel_sample  : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
     --
-    op_valid    : OUT STD_LOGIC;
-    op_ADD_SUBn : OUT STD_LOGIC;
-    --
-    r_addr_init : OUT STD_LOGIC;
-    r_addr_base : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-    r_addr_add1 : OUT STD_LOGIC;
-    --
-    w_en        : OUT STD_LOGIC;
-    w_addr_init : OUT STD_LOGIC;
-    w_addr_base : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-    w_addr_add1 : OUT STD_LOGIC
+    OPERATION          : OUT STD_LOGIC_VECTOR(14 DOWNTO 0)
     );
 
 END cic_lfr_control;
@@ -60,222 +48,163 @@ END cic_lfr_control;
 ARCHITECTURE beh OF cic_lfr_control IS
 
   TYPE STATE_CIC_LFR_TYPE IS (IDLE,
-                              
-                              INT_0_d0,      INT_1_d0,      INT_2_d0,
-                              INT_0_d1,      INT_1_d1,      INT_2_d1,
-                              INT_0_d2,      INT_1_d2,      INT_2_d2,
-                              
-                              WAIT_INT_to_COMB_16,
-                              
-                              COMB_0_16_d0,  COMB_1_16_d0,  COMB_2_16_d0,
-                              COMB_0_16_d1,  COMB_1_16_d1,  COMB_2_16_d1,
-                              
-                              COMB_0_256_d0, COMB_1_256_d0, COMB_2_256_d0,
-                              COMB_0_256_d1, COMB_1_256_d1, COMB_2_256_d1,
-                              COMB_0_256_d2, COMB_1_256_d2, COMB_2_256_d2,
-                              
-                              READ_INT_2_d0,
-                              READ_INT_2_d1,
-                              
-                              Wait_step,
-                              INT_0,      INT_1,      INT_2
+                              RUN_PROG_I,
+                              RUN_PROG_C16,
+                              RUN_PROG_C256
                               );
   
   SIGNAL STATE_CIC_LFR     : STATE_CIC_LFR_TYPE;
-  SIGNAL STATE_CIC_LFR_pre : STATE_CIC_LFR_TYPE;
 
-  SIGNAL nb_data_receipt : INTEGER;
-  SIGNAL current_channel : INTEGER;
+  SIGNAL nb_data_receipt : INTEGER := 0;
+  SIGNAL current_cmd : INTEGER := 0;
+  SIGNAL current_channel : INTEGER := 0;
+  SIGNAL sample_16_odd : STD_LOGIC;
+  SIGNAL sample_256_odd : STD_LOGIC;
 
-  TYPE ARRAY_OF_ADDR IS ARRAY (5 DOWNTO 0) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
+  TYPE PROGRAM_ARRAY IS ARRAY (INTEGER RANGE <>) OF STD_LOGIC_VECTOR(11 DOWNTO 0);
+  --OPERATION( 8 DOWNTO  0) <= PROGRAM_ARRAY( 8 DOWNTO 0) sauf pour PROG_I(0)
+  --OPERATION(13 DOWNTO 12) <= PROGRAM_ARRAY(10 DOWNTO 9)
+  --OPERATION(11 DOWNTO  9) <= current_channel
+  --OPERATION(14)           <= PROGRAM_ARRAY(11) selon sample_X_odd et l'etat
+  CONSTANT PROG : PROGRAM_ARRAY(0 TO 28) :=
+    (
+      --PROG I
+      "0001"&X"C0",                        --0
+      "0001"&X"70",                        --1
+      "0001"&X"70",                        --2
+      "0001"&X"7A",                        --3
+      "0001"&X"7A",                        --4
+      "0001"&X"7A",                        --5
+      "0001"&X"7A",                        --6
+      "0001"&X"7A",                        --7
+      "0001"&X"7A",                        --8
+      --PROG_C16
+      "0010"&X"38",                        --9
+      "1001"&X"71",                        --10
+      "1001"&X"71",                        --11
+      "1001"&X"71",                        --12
+      "0100"&X"38",                        --13
+      "1001"&X"77",                        --14
+      "1001"&X"77",                        --15
+      "1001"&X"77",                        --16
+      --PROG_C256
+      "0010"&X"38",                        --17
+      "1001"&X"71",                        --18
+      "1001"&X"71",                        --19
+      "1001"&X"71",                        --20
+      "0100"&X"38",                        --21
+      "1001"&X"77",                        --22
+      "1001"&X"77",                        --23
+      "1001"&X"77",                        --24
+      "0110"&X"38",                        --25
+      "1001"&X"77",                        --26
+      "1001"&X"77",                        --27
+      "1001"&X"77"                         --28
+     );
+
   
-  SIGNAL   base_addr_INT   : ARRAY_OF_ADDR;
-  CONSTANT base_addr_delta : INTEGER := 40;
-
-  CONSTANT SEL_OUT : INTEGER := 6;
+  CONSTANT PROG_START_I    : INTEGER := 0;
+  CONSTANT PROG_END_I      : INTEGER := 8;
+  CONSTANT PROG_START_C16  : INTEGER := 9;
+  CONSTANT PROG_END_C16    : INTEGER := 16;
+  CONSTANT PROG_START_C256 : INTEGER := 17;
+  CONSTANT PROG_END_C256   : INTEGER := 28;
   
-  signal nb_cycle_wait : integer;
 BEGIN
 
-  all_channel: FOR I IN 5 DOWNTO 0 GENERATE
-    all_bit: FOR J IN 7 DOWNTO 0 GENERATE
-      base_addr_INT(I)(J) <= '1' WHEN (base_addr_delta * I/(2**J)) MOD 2 = 1 ELSE '0';
-    END GENERATE all_bit;
-  END GENERATE all_channel;
+  OPERATION( 1 DOWNTO  0) <= PROG(current_cmd)( 1 DOWNTO 0);
+  OPERATION( 2 )          <= '0' WHEN STATE_CIC_LFR = IDLE ELSE
+                             PROG(current_cmd)( 2 );
+  OPERATION( 5 DOWNTO  3) <= STD_LOGIC_VECTOR(to_unsigned(current_channel,3)) WHEN STATE_CIC_LFR = RUN_PROG_I AND current_cmd = 0 ELSE
+                             PROG(current_cmd)(5 DOWNTO  3);
+  OPERATION( 8 DOWNTO  6) <= "000" WHEN STATE_CIC_LFR = IDLE ELSE
+                             PROG(current_cmd)( 8 DOWNTO 6);
+  OPERATION(11 DOWNTO  9) <= STD_LOGIC_VECTOR(to_unsigned(current_channel,3));
+  OPERATION(13 DOWNTO 12) <= PROG(current_cmd)(10 DOWNTO 9);  
+  OPERATION(14)           <= PROG(current_cmd)(11) AND sample_16_odd  WHEN STATE_CIC_LFR = RUN_PROG_C16  ELSE
+                             PROG(current_cmd)(11) AND sample_256_odd WHEN STATE_CIC_LFR = RUN_PROG_C256 ELSE '0';
 
   PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      STATE_CIC_LFR      <= IDLE;
-      --
-      data_out_16_valid  <= '0';
-      data_out_256_valid <= '0';
-      --
-      sel_sample  <= (OTHERS => '0');
-      --
-      op_valid    <= '0';
-      op_ADD_SUBn <= '0';
-      --
-      r_addr_init <= '0';
-      r_addr_base <= (OTHERS => '0');
-      r_addr_add1 <= '0';
-      --
-      w_en        <= '1';
-      w_addr_init <= '0';
-      w_addr_base <= (OTHERS => '0');
-      w_addr_add1 <= '0';
-      --
+  BEGIN
+    IF rstn = '0' THEN
+      STATE_CIC_LFR <= IDLE;
       nb_data_receipt <= 0;
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      current_channel <= 0;
+      current_cmd     <= 0;
+      sample_16_odd <= '0';
+      sample_256_odd <= '0';
       data_out_16_valid  <= '0';
-      data_out_256_valid <= '0';
-      op_valid    <= '0';
-      op_ADD_SUBn <= '0';
-      r_addr_init <= '0';
-      r_addr_base <= (OTHERS => '0');
-      r_addr_add1 <= '0';
-      w_en        <= '1';
-      w_addr_init <= '0';
-      w_addr_base <= (OTHERS => '0');
-      w_addr_add1 <= '0';
-
-      IF run = '0' THEN
-        STATE_CIC_LFR      <= IDLE;
-        --
-        data_out_16_valid  <= '0';
-        data_out_256_valid <= '0';
-        --
-        sel_sample  <= (OTHERS => '0');
-        --
-        op_valid    <= '0';
-        op_ADD_SUBn <= '0';
-        --
-        r_addr_init <= '0';
-        r_addr_base <= (OTHERS => '0');
-        r_addr_add1 <= '0';
-        --
-        w_en        <= '1';
-        w_addr_init <= '0';
-        w_addr_base <= (OTHERS => '0');
-        w_addr_add1 <= '0';
-        --
-        nb_data_receipt <= 0;
-        current_channel   <= 0;
-      ELSE
-        CASE STATE_CIC_LFR IS
-          WHEN IDLE => 
-            data_out_16_valid  <= '0';
-            data_out_256_valid <= '0';
-            --
-            sel_sample  <= (OTHERS => '0');
-            --
-            op_valid    <= '0';
-            op_ADD_SUBn <= '0';
-            --
-            r_addr_init <= '0';
-            r_addr_base <= (OTHERS => '0');
-            r_addr_add1 <= '0';
-            --
-            w_en        <= '1';
-            w_addr_init <= '0';
-            w_addr_base <= (OTHERS => '0');
-            w_addr_add1 <= '0';
-            --
-            IF data_in_valid = '1' THEN
-              nb_data_receipt   <= nb_data_receipt+1;
-              current_channel   <= 0;
-              STATE_CIC_LFR     <= INT_0_d0;
-            END IF;
-
+      data_out_256_valid  <= '0';
+      
+    ELSIF clk'event AND clk = '1' THEN
+      data_out_16_valid  <= '0';
+      data_out_256_valid  <= '0';
+      CASE STATE_CIC_LFR IS
+        WHEN IDLE =>
+          IF data_in_valid = '1' THEN
+            STATE_CIC_LFR   <= RUN_PROG_I;
+            current_cmd     <= PROG_START_I;
+            current_channel <= 0;
+            nb_data_receipt <= nb_data_receipt + 1;
+          END IF;
           
-          WHEN WAIT_step => ---------------------------------------------------
-            IF nb_cycle_wait > 0 THEN
-              nb_cycle_wait <= nb_cycle_wait -1;
-            ELSE
-              STATE_CIC_LFR <= STATE_CIC_LFR_pre;
-            END IF;
-            
-            
-          WHEN INT_0 => -------------------------------------------------------
-            sel_sample        <= STD_LOGIC_VECTOR(to_unsigned(current_channel, 3));
-            r_addr_init       <= '1';
-            r_addr_base       <= base_addr_INT(current_channel);
-            nb_cycle_wait     <= 1;
-            op_ADD_SUBn       <= '1';
-            op_valid          <= '1';
-            STATE_CIC_LFR     <= WAIT_step;
-            STATE_CIC_LFR_pre <= INT_1;
-                        
-          WHEN INT_1 => 
-            sel_sample    <= STD_LOGIC_VECTOR(to_unsigned(SEL_OUT, 3)); 
-            r_addr_add1   <= '1';
-            nb_cycle_wait <= 3;
-            op_ADD_SUBn   <= '1';
-            op_valid      <= '1';
-            STATE_CIC_LFR <= INT_2;
-                        
-          WHEN INT_2 => 
-            sel_sample    <= STD_LOGIC_VECTOR(to_unsigned(SEL_OUT, 3)); 
-            r_addr_add1   <= '1';
-            nb_cycle_wait <= 3;
-            op_ADD_SUBn   <= '1';
-            op_valid      <= '1';
-            IF nb_data_receipt = 256 THEN
-              STATE_CIC_LFR <= COMB_0_256_d0;
-            ELSIF (nb_data_receipt mod 16) = 0 THEN
-              STATE_CIC_LFR   <= WAIT_INT_to_COMB_16;
-            ELSE
-              IF current_channel = 5 THEN
-                STATE_CIC_LFR   <= IDLE;
-              ELSE
-                current_channel <= current_channel +1;
-                STATE_CIC_LFR   <= INT_0;
-              END IF;
-            END IF;
-
-            -------------------------------------------------------------------
-          WHEN WAIT_INT_to_COMB_16 =>
-            STATE_CIC_LFR   <= COMB_0_16_d0;
-
-          WHEN COMB_0_16_d0 => STATE_CIC_LFR <= COMB_0_16_d1;
-          WHEN COMB_0_16_d1 => STATE_CIC_LFR <= COMB_1_16_d0;
-                               
-          WHEN COMB_1_16_d0 => STATE_CIC_LFR <= COMB_1_16_d1;
-          WHEN COMB_1_16_d1 => STATE_CIC_LFR <= COMB_2_16_d0;
-
-          WHEN COMB_2_16_d0 => STATE_CIC_LFR <= COMB_2_16_d1;
-          WHEN COMB_2_16_d1 =>
+        WHEN RUN_PROG_I =>
+          IF current_cmd = PROG_END_I THEN
             IF current_channel = 5 THEN
-              STATE_CIC_LFR <= IDLE;
-              IF nb_data_receipt = 256 THEN
-                nb_data_receipt   <= 0;
-              END IF;
+              current_channel <= 0;
+              IF nb_data_receipt MOD 16 = 0 THEN
+                STATE_CIC_LFR   <= RUN_PROG_C16;
+                current_cmd     <= PROG_START_C16;     
+                sample_16_odd   <= NOT sample_16_odd;
+              ELSE
+                STATE_CIC_LFR   <= IDLE;
+              END IF;              
             ELSE
               current_channel <= current_channel +1;
-              STATE_CIC_LFR   <= INT_0_d0;
+              current_cmd     <= PROG_START_I;
             END IF;
-
-            -------------------------------------------------------------------
-          WHEN COMB_0_256_d0 => STATE_CIC_LFR <= COMB_0_256_d1;
-          WHEN COMB_0_256_d1 => STATE_CIC_LFR <= COMB_0_256_d2;
-          WHEN COMB_0_256_d2 => STATE_CIC_LFR <= COMB_1_256_d0;
-                             
-          WHEN COMB_1_256_d0 => STATE_CIC_LFR <= COMB_1_256_d1;
-          WHEN COMB_1_256_d1 => STATE_CIC_LFR <= COMB_1_256_d2;
-          WHEN COMB_1_256_d2 => STATE_CIC_LFR <= COMB_2_256_d0;
-                             
-          WHEN COMB_2_256_d0 => STATE_CIC_LFR <= COMB_2_256_d1;
-          WHEN COMB_2_256_d1 => STATE_CIC_LFR <= COMB_2_256_d2;
-          WHEN COMB_2_256_d2 => STATE_CIC_LFR <= READ_INT_2_d0;
-
-            -------------------------------------------------------------------
-          WHEN READ_INT_2_d0 => STATE_CIC_LFR <= READ_INT_2_d1;
-          WHEN READ_INT_2_d1 => STATE_CIC_LFR <= COMB_0_16_d0;
-            
-          WHEN OTHERS => NULL;
-        END CASE;
-      END IF;
+          ELSE
+            current_cmd <= current_cmd +1;
+          END IF;
+          
+        WHEN RUN_PROG_C16 =>
+          IF current_cmd = PROG_END_C16 THEN
+            data_out_16_valid <= '1';
+            IF current_channel = 5 THEN
+              current_channel <= 0;
+              IF nb_data_receipt MOD 256 = 0 THEN 
+                sample_256_odd  <= NOT sample_256_odd;
+                STATE_CIC_LFR   <= RUN_PROG_C256;
+                current_cmd     <= PROG_START_C256;     
+              ELSE
+                STATE_CIC_LFR   <= IDLE;
+              END IF;              
+            ELSE
+              current_channel <= current_channel +1;
+              current_cmd     <= PROG_START_C16;
+            END IF;
+          ELSE
+            current_cmd <= current_cmd +1;
+          END IF;
+                    
+        WHEN RUN_PROG_C256 =>
+          IF current_cmd = PROG_END_C256 THEN
+            data_out_256_valid <= '1';
+            IF current_channel = 5 THEN
+              nb_data_receipt <= 0;
+              current_channel <= 0;
+              STATE_CIC_LFR   <= IDLE;
+            ELSE
+              current_channel <= current_channel +1;
+              current_cmd     <= PROG_START_C256;
+            END IF;
+          ELSE
+            current_cmd <= current_cmd +1;
+          END IF;
+          
+        WHEN OTHERS => NULL;
+      END CASE;
     END IF;
   END PROCESS;
-  
+
 END beh;

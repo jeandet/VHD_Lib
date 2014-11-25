@@ -24,6 +24,9 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 
+LIBRARY lpp;
+USE lpp.data_type_pkg.ALL;
+
 PACKAGE cic_pkg IS
 
   -----------------------------------------------------------------------------
@@ -88,6 +91,22 @@ PACKAGE cic_pkg IS
 
 
   -----------------------------------------------------------------------------
+  COMPONENT cic_lfr
+    GENERIC (
+      tech         : INTEGER;
+      use_RAM_nCEL : INTEGER);
+    PORT (
+      clk                : IN  STD_LOGIC;
+      rstn               : IN  STD_LOGIC;
+      run                : IN  STD_LOGIC;
+      data_in            : IN  sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
+      data_in_valid      : IN  STD_LOGIC;
+      data_out_16        : OUT sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
+      data_out_16_valid  : OUT STD_LOGIC;
+      data_out_256       : OUT sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
+      data_out_256_valid : OUT STD_LOGIC);
+  END COMPONENT;
+
   COMPONENT cic_lfr_control
     PORT (
       clk                : IN  STD_LOGIC;
@@ -96,16 +115,33 @@ PACKAGE cic_pkg IS
       data_in_valid      : IN  STD_LOGIC;
       data_out_16_valid  : OUT STD_LOGIC;
       data_out_256_valid : OUT STD_LOGIC;
-      sel_sample         : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-      op_valid           : OUT STD_LOGIC;
-      op_ADD_SUBn        : OUT STD_LOGIC;
-      r_addr_init        : OUT STD_LOGIC;
-      r_addr_base        : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-      r_addr_add1        : OUT STD_LOGIC;
-      w_en               : OUT STD_LOGIC;
-      w_addr_init        : OUT STD_LOGIC;
-      w_addr_base        : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-      w_addr_add1        : OUT STD_LOGIC);
+      OPERATION          : OUT STD_LOGIC_VECTOR(14 DOWNTO 0));
   END COMPONENT;
+
+  COMPONENT cic_lfr_add_sub
+    PORT (
+      clk            : IN  STD_LOGIC;
+      rstn           : IN  STD_LOGIC;
+      run            : IN  STD_LOGIC;
+      OP             : IN  STD_LOGIC_VECTOR( 1 DOWNTO 0);
+      data_in_A      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+      data_in_B      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+      data_in_Carry  : IN  STD_LOGIC;
+      data_out       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      data_out_Carry : OUT STD_LOGIC);
+  END COMPONENT;
+
+  COMPONENT cic_lfr_address_gen
+    PORT (
+      clk        : IN  STD_LOGIC;
+      rstn       : IN  STD_LOGIC;
+      run        : IN  STD_LOGIC;
+      addr_base  : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+      addr_init  : IN STD_LOGIC;
+      addr_add_1 : IN STD_LOGIC;
+      addr       : OUT STD_LOGIC_VECTOR(7 DOWNTO 0));
+  END COMPONENT;
+
+  
   -----------------------------------------------------------------------------
 END cic_pkg;
