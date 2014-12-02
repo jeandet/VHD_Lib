@@ -73,7 +73,7 @@ BEGIN  -- beh
               counter_downsampler <= counter_downsampler + 1;
             END IF;
 
-            IF counter_downsampler = 0 THEN
+            IF counter_downsampler = R_downsampling_decimation_factor-1 THEN
               data_out_valid <= '1';
               data_out       <= data_in;
             END IF;

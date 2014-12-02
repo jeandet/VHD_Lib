@@ -115,7 +115,7 @@ PACKAGE cic_pkg IS
       data_in_valid      : IN  STD_LOGIC;
       data_out_16_valid  : OUT STD_LOGIC;
       data_out_256_valid : OUT STD_LOGIC;
-      OPERATION          : OUT STD_LOGIC_VECTOR(14 DOWNTO 0));
+      OPERATION          : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
   END COMPONENT;
 
   COMPONENT cic_lfr_add_sub

@@ -56,17 +56,18 @@ BEGIN  -- beh
 
   data_add <= STD_LOGIC_VECTOR(resize(SIGNED(data_in)+SIGNED(data_reg),b_data_size));
   
+  data_out_valid <= data_in_valid;
+
   PROCESS (clk, rstn)
     BEGIN  -- PROCESS
       IF rstn = '0' THEN                -- asynchronous reset (active low)
         data_reg <= (OTHERS => '0');
-        data_out_valid <= '0';
+        --data_out_valid <= '0';
       ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
         IF run = '0' THEN
           data_reg <= (OTHERS => '0');
-          data_out_valid <= '0';
+          --data_out_valid <= '0';
         ELSE
-          data_out_valid <= data_in_valid;
           IF data_in_valid = '1' THEN
             data_reg <= data_add;
           END IF;
