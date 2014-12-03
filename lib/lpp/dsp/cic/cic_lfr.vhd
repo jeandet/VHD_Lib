@@ -184,19 +184,20 @@ BEGIN
   -----------------------------------------------------------------------------
   -- CARRY_MANAGER
   -----------------------------------------------------------------------------
-  data_in_Carry <= carry_reg(S_parameter-2);
+  data_in_Carry <= carry_reg(S_parameter-2) WHEN OPERATION_reg(7) = '0' ELSE carry_reg(S_parameter-1);
   
-  CARRY_PUSH <= OPERATION_reg(7);
-  CARRY_POP  <= OPERATION_reg(6);
+--  CARRY_PUSH <= OPERATION_reg(7);
+--  CARRY_POP  <= OPERATION_reg(6);
+
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
       carry_reg <= (OTHERS => '0');
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      IF CARRY_POP = '1' OR CARRY_PUSH = '1' THEN
+      --IF CARRY_POP = '1' OR CARRY_PUSH = '1' THEN
         carry_reg(S_parameter-1 DOWNTO 1) <= carry_reg(S_parameter-2 DOWNTO 0);
         carry_reg(0)                      <= data_out_Carry;
-      END IF;
+      --END IF;
     END IF;
   END PROCESS;
   
