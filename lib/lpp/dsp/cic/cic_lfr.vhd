@@ -56,21 +56,30 @@ END cic_lfr;
 
 ARCHITECTURE beh OF cic_lfr IS
   --
-  CONSTANT S_parameter : INTEGER := 2;
-  --
-  SIGNAL sel_sample  : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL sample_temp : sample_vector(6 DOWNTO 0,15 DOWNTO 0);
+  SIGNAL sel_sample  : STD_LOGIC_VECTOR(2 DOWNTO 0);
+  SIGNAL sample_temp : sample_vector(5 DOWNTO 0,15 DOWNTO 0);
   SIGNAL sample      : STD_LOGIC_VECTOR(15 DOWNTO 0);
-
-  SIGNAL OPERATION    : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  
-  -- ALU
-  SIGNAL data_in_A      : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL data_in_B      : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  --
+  SIGNAL sel_A  : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL data_A_temp : sample_vector(2 DOWNTO 0,15 DOWNTO 0);
+  SIGNAL data_A  : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  --
+  SIGNAL ALU_OP : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL data_B      : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_B_reg      : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_out      : STD_LOGIC_VECTOR(15 DOWNTO 0);
   SIGNAL data_in_Carry  : STD_LOGIC;
   SIGNAL data_out_Carry : STD_LOGIC;
-
-  SIGNAL carry_reg : STD_LOGIC_VECTOR(S_parameter DOWNTO 0);
+  --
+  CONSTANT S_parameter : INTEGER := 3;
+  SIGNAL carry_reg  : STD_LOGIC_VECTOR(S_parameter-1 DOWNTO 0);
+  SIGNAL CARRY_PUSH : STD_LOGIC;
+  SIGNAL CARRY_POP  : STD_LOGIC;
+  --
+  
+  SIGNAL OPERATION    : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL OPERATION_reg: STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL OPERATION_reg2: STD_LOGIC_VECTOR(15 DOWNTO 0);
 
   -----------------------------------------------------------------------------
   TYPE ARRAY_OF_ADDR IS ARRAY (5 DOWNTO 0) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -80,13 +89,14 @@ ARCHITECTURE beh OF cic_lfr IS
   SIGNAL addr_gen: STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL addr_read: STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL addr_write: STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL addr_write_mux: STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL addr_write_s: STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL data_we: STD_LOGIC;
   SIGNAL data_we_s: STD_LOGIC;
   SIGNAL data_wen       : STD_LOGIC;
-  SIGNAL data_write     : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL data_read      : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL data_read_pre      : STD_LOGIC_VECTOR(15 DOWNTO 0);
+--  SIGNAL data_write     : STD_LOGIC_VECTOR(15 DOWNTO 0);
+--  SIGNAL data_read      : STD_LOGIC_VECTOR(15 DOWNTO 0);
+--  SIGNAL data_read_pre      : STD_LOGIC_VECTOR(15 DOWNTO 0);
   -----------------------------------------------------------------------------
   SIGNAL sample_out_reg16   : sample_vector(6*2-1 DOWNTO 0, 15 DOWNTO 0);
   SIGNAL sample_out_reg256  : sample_vector(6*3-1 DOWNTO 0, 15 DOWNTO 0);
@@ -94,68 +104,68 @@ ARCHITECTURE beh OF cic_lfr IS
   SIGNAL sample_valid_reg256: STD_LOGIC_VECTOR(6*3 DOWNTO 0);
   SIGNAL  data_out_16_valid_s  : STD_LOGIC;
   SIGNAL  data_out_256_valid_s : STD_LOGIC;
+  SIGNAL  data_out_16_valid_s1  : STD_LOGIC;
+  SIGNAL  data_out_256_valid_s1 : STD_LOGIC;
   SIGNAL  data_out_16_valid_s2  : STD_LOGIC;
   SIGNAL  data_out_256_valid_s2 : STD_LOGIC;
   -----------------------------------------------------------------------------
   SIGNAL sample_out_reg16_s   : sample_vector(5 DOWNTO 0, 16*2-1 DOWNTO 0);
   SIGNAL sample_out_reg256_s  : sample_vector(5 DOWNTO 0, 16*3-1 DOWNTO 0);  
   -----------------------------------------------------------------------------
-  SIGNAL ALU_OP : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
   
 BEGIN
-  -----------------------------------------------------------------------------
-  -- 
-  -----------------------------------------------------------------------------
+
+
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      data_read_pre <= (OTHERS => '0');
+      data_B_reg <=  (OTHERS => '0');
+      OPERATION_reg <= (OTHERS => '0');
+      OPERATION_reg2 <= (OTHERS => '0');
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      data_read_pre <= data_read;
+      OPERATION_reg <= OPERATION;
+      OPERATION_reg2 <= OPERATION_reg;
+      data_B_reg <= data_B;
     END IF;
   END PROCESS;
+
   
   -----------------------------------------------------------------------------
   -- SEL_SAMPLE
   -----------------------------------------------------------------------------
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      sel_sample <= (OTHERS => '0');
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      sel_sample <= OPERATION(15) & OPERATION(5 DOWNTO 3);
-    END IF;
-  END PROCESS;
+  sel_sample <= OPERATION_reg(2 DOWNTO 0);
   
   all_bit: FOR I IN 15 DOWNTO 0 GENERATE
     sample_temp(0,I) <= data_in(0,I)     WHEN sel_sample(0) = '0' ELSE data_in(1,I);
     sample_temp(1,I) <= data_in(2,I)     WHEN sel_sample(0) = '0' ELSE data_in(3,I);
     sample_temp(2,I) <= data_in(4,I)     WHEN sel_sample(0) = '0' ELSE data_in(5,I);
-    sample_temp(3,I) <= data_write(I)    WHEN sel_sample(0) = '0' ELSE data_read_pre(I);
 
     sample_temp(4,I) <= sample_temp(0,I) WHEN sel_sample(1) = '0' ELSE sample_temp(1,I);
-    sample_temp(5,I) <= sample_temp(2,I) WHEN sel_sample(1) = '0' ELSE sample_temp(3,I);
-    sample_temp(6,I) <= sample_temp(4,I) WHEN sel_sample(2) = '0' ELSE sample_temp(5,I);
-    sample(I)        <= sample_temp(6,I) WHEN sel_sample(3) = '0' ELSE
-                        data_in(0,15)    WHEN sel_sample(0) = '0' ELSE '0';
+    sample_temp(5,I) <= sample_temp(2,I) WHEN sel_sample(1) = '0' ELSE '0';
+
+    sample(I)        <= sample_temp(4,I) WHEN sel_sample(2) = '0' ELSE sample_temp(5,I);
   END GENERATE all_bit;  
 
-  data_in_A <= sample;
+  -----------------------------------------------------------------------------
+  -- SEL_DATA_IN_A
+  -----------------------------------------------------------------------------
+  sel_A <= OPERATION_reg(4 DOWNTO 3);
+
+  all_data_mux_A: FOR I IN 15 DOWNTO 0 GENERATE
+    data_A_temp(0,I) <= sample(I) WHEN sel_A(0) = '0' ELSE data_out(I);
+    data_A_temp(1,I) <= '0'       WHEN sel_A(0) = '0' ELSE sample(15);    
+    data_A_temp(2,I) <= data_A_temp(0,I) WHEN sel_A(1) = '0' ELSE data_A_temp(1,I);
+    data_A(I)        <= data_A_temp(2,I) WHEN OPERATION_reg(14) = '0' ELSE data_B_reg(I);
+  END GENERATE all_data_mux_A;
+
   
+    
   -----------------------------------------------------------------------------
   -- ALU
   -----------------------------------------------------------------------------
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      ALU_OP <=   (OTHERS => '0');    
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      ALU_OP <=   OPERATION(1 DOWNTO 0);    
-    END IF;
-  END PROCESS;
+  ALU_OP <= OPERATION_reg(6 DOWNTO 5);
   
-
   ALU: cic_lfr_add_sub
     PORT MAP (
       clk            => clk,
@@ -164,27 +174,32 @@ BEGIN
 
       OP             => ALU_OP,
 
-      data_in_A      => sample,
-      data_in_B      => data_read,
+      data_in_A      => data_A,
+      data_in_B      => data_B,
       data_in_Carry  => data_in_Carry,
       
-      data_out       => data_write,
+      data_out       => data_out,
       data_out_Carry => data_out_Carry);
 
+  -----------------------------------------------------------------------------
+  -- CARRY_MANAGER
+  -----------------------------------------------------------------------------
+  data_in_Carry <= carry_reg(S_parameter-2);
+  
+  CARRY_PUSH <= OPERATION_reg(7);
+  CARRY_POP  <= OPERATION_reg(6);
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
       carry_reg <= (OTHERS => '0');
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      carry_reg(0) <= data_out_Carry;
-      all_carry: FOR I IN S_parameter DOWNTO 1 LOOP
-        carry_reg(I) <= carry_reg(I-1);
-      END LOOP all_carry;
+      IF CARRY_POP = '1' OR CARRY_PUSH = '1' THEN
+        carry_reg(S_parameter-1 DOWNTO 1) <= carry_reg(S_parameter-2 DOWNTO 0);
+        carry_reg(0)                      <= data_out_Carry;
+      END IF;
     END IF;
   END PROCESS;
-
-  data_in_Carry <= carry_reg(S_parameter-1) WHEN OPERATION(2) = '0' ELSE carry_reg(S_parameter);
-
+  
   -----------------------------------------------------------------------------
   -- MEMORY
   -----------------------------------------------------------------------------
@@ -193,10 +208,8 @@ BEGIN
       base_addr_INT(I)(J) <= '1' WHEN (base_addr_delta * I/(2**J)) MOD 2 = 1 ELSE '0';
     END GENERATE all_bit;
   END GENERATE all_channel;
+  addr_base_sel <= base_addr_INT(to_integer(UNSIGNED(OPERATION(2 DOWNTO 0))));
   
-  addr_base_sel <= base_addr_INT(to_integer(UNSIGNED(OPERATION(11 DOWNTO 9))));
-  
-
   cic_lfr_address_gen_1: cic_lfr_address_gen
     PORT MAP (
       clk               => clk,
@@ -204,39 +217,43 @@ BEGIN
       run               => run,
       
       addr_base         => addr_base_sel,
-      addr_init         => OPERATION(7),
-      addr_add_1        => OPERATION(8),
+      addr_init         => OPERATION(8),
+      addr_add_1        => OPERATION(9),
       addr              => addr_gen);
 
     
-  addr_read <= addr_gen                                                               WHEN OPERATION(14 DOWNTO 12) = "000" ELSE
-               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_base_sel))+2,8)) WHEN OPERATION(14 DOWNTO 12) = "001" ELSE
-               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_base_sel))+5,8)) WHEN OPERATION(14 DOWNTO 12) = "010" ELSE
-               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_base_sel))+8,8)) WHEN OPERATION(14 DOWNTO 12) = "011" ELSE
+  addr_read <= addr_gen                                                               WHEN OPERATION(12 DOWNTO 10) = "000" ELSE
+               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_base_sel))+2,8)) WHEN OPERATION(12 DOWNTO 10) = "001" ELSE
+               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_base_sel))+5,8)) WHEN OPERATION(12 DOWNTO 10) = "010" ELSE
+               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_base_sel))+8,8)) WHEN OPERATION(12 DOWNTO 10) = "011" ELSE
                STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_gen     ))+6,8));
   
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      addr_write <= (OTHERS => '0');
-      data_we    <= '0';
+      addr_write   <= (OTHERS => '0');
+      data_we      <= '0';
       addr_write_s <= (OTHERS => '0');
       data_we_s    <= '0';
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
       addr_write_s <= addr_read;
-      data_we_s    <= OPERATION(6);
-      addr_write   <= addr_write_s;
+      data_we_s    <= OPERATION(13);
+      IF OPERATION_reg(15) = '0' THEN
+        addr_write   <= addr_write_s;
+      ELSE
+        addr_write <= addr_read;
+      END IF;
       data_we      <= data_we_s;
     END IF;
   END PROCESS;
-  
+
   memCEL : IF use_RAM_nCEL = 0 GENERATE
     data_wen <= NOT data_we;
     RAMblk : RAM_CEL
       GENERIC MAP(16, 8)
       PORT MAP(
-        WD    => data_write,
-        RD    => data_read,
+        WD    => data_out,
+        RD    => data_B,
         WEN   => data_wen,
         REN   => '0',
         WADDR => addr_write,
@@ -249,8 +266,8 @@ BEGIN
   memRAM : IF use_RAM_nCEL = 1 GENERATE
     SRAM : syncram_2p
       GENERIC MAP(tech, 8, 16)
-      PORT MAP(clk, '1', addr_read,  data_read,
-               clk, data_we, addr_write, data_write);
+      PORT MAP(clk, '1', addr_read,  data_B,
+               clk, data_we, addr_write, data_out);
   END GENERATE;
 
   -----------------------------------------------------------------------------
@@ -265,15 +282,20 @@ BEGIN
       data_out_16_valid  => data_out_16_valid_s,
       data_out_256_valid => data_out_256_valid_s,
       OPERATION          => OPERATION);
+  
   -----------------------------------------------------------------------------
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
+      data_out_16_valid_s1 <= '0';
+      data_out_256_valid_s1 <= '0';
       data_out_16_valid_s2 <= '0';
       data_out_256_valid_s2 <= '0';
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      data_out_16_valid_s2  <= data_out_16_valid_s;
-      data_out_256_valid_s2 <= data_out_256_valid_s;      
+      data_out_16_valid_s1 <= data_out_16_valid_s;
+      data_out_256_valid_s1 <= data_out_256_valid_s;
+      data_out_16_valid_s2  <= data_out_16_valid_s1;
+      data_out_256_valid_s2 <= data_out_256_valid_s1;      
     END IF;
   END PROCESS;
 
@@ -313,7 +335,7 @@ BEGIN
             sample_out_reg16(I,J)  <= '0';
           ELSE
             IF sample_valid_reg16(I) = '1' AND data_out_16_valid_s2 = '1' THEN
-              sample_out_reg16(I,J) <= data_read(J);
+              sample_out_reg16(I,J) <= data_out(J);
             END IF;
           END IF;
         END IF;
@@ -330,7 +352,7 @@ BEGIN
             sample_out_reg256(I,J) <= '0';
           ELSE
             IF sample_valid_reg256(I) = '1' AND data_out_256_valid_s2 = '1' THEN
-              sample_out_reg256(I,J) <= data_read(J);
+              sample_out_reg256(I,J) <= data_out(J);
             END IF;
           END IF;
         END IF;

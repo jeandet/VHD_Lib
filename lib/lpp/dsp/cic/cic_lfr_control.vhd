@@ -68,39 +68,39 @@ ARCHITECTURE beh OF cic_lfr_control IS
   --OPERATION(14)           <= PROGRAM_ARRAY(11) selon sample_X_odd et l'etat
   CONSTANT PROG : PROGRAM_ARRAY(0 TO 28) :=
     (
-      --    BA9876   543210
---PROG I
-      "00"&"000111"&"000000" --C0                     --0
-      "00"&"000101"&"111000" --78                     --1
-      "00"&"000101"&"111000" --78                     --2
-      "01"&"000101"&"000010" --42                     --3
-      "01"&"000101"&"111010" --7A                     --4
-      "01"&"000101"&"111010" --7A                     --5
-      "01"&"000101"&"000010" --42                     --6
-      "01"&"000101"&"111010" --7A                     --7
-      "01"&"000101"&"111010" --7A                     --8
---PROG_C16
-      "11"&"001000"&"111000" --38                     --9
-      "00"&"100101"&"110001" --71                     --10
-      "00"&"100101"&"110001" --71                     --11
-      "00"&"100101"&"110001" --71                     --12
-      "11"&"010000"&"111000" --38                     --13
-      "00"&"100101"&"111111" --7F                     --14
-      "00"&"100101"&"110111" --77                     --15
-      "00"&"100101"&"110111" --77                     --16
---PROG_C256
-      "11"&"001000"&"111000" --38                     --17
-      "00"&"100101"&"110001" --71                     --18
-      "00"&"100101"&"110001" --71                     --19
-      "00"&"100101"&"110001" --71                     --20
-      "11"&"010000"&"111000" --38                     --21
-      "00"&"100101"&"111111" --7F                     --22
-      "00"&"100101"&"110111" --77                     --23
-      "00"&"100101"&"110111" --77                     --24
-      "11"&"011000"&"111000" --38                     --25
-      "00"&"100101"&"111111" --7F                     --26
-      "00"&"100101"&"110111" --77                     --27
-      "00"&"100101"&"110111" --77                     --28
+    -- DCBA     98765     43210
+    --PROG I------------------
+      "0001" & "00011" & "10000",                     --0
+      "0101" & "00010" & "10001",                     --1
+      "0101" & "00010" & "10001",                     --2
+      "0001" & "00010" & "11011",                     --3
+      "0101" & "00010" & "11001",                     --4
+      "0101" & "00010" & "11001",                     --5
+      "0001" & "00010" & "01011",                     --6
+      "0101" & "00010" & "01001",                     --7
+      "0101" & "00010" & "01001",                     --8
+    --PROG_C16                
+      "1001" & "00100" & "00010",                     --9
+      "1001" & "10010" & "10101",                     --10
+      "1001" & "10010" & "10101",                     --11
+      "1010" & "10010" & "10101",                     --12
+      "1001" & "01000" & "00010",                     --13
+      "1001" & "10010" & "01101",                     --14
+      "1001" & "10010" & "01101",                     --15
+      "1010" & "10010" & "01101",                     --16
+    --PROG_C256                
+      "1001" & "00100" & "00010",                     --17
+      "1001" & "10010" & "10101",                     --18
+      "1001" & "10010" & "10101",                     --19
+      "1010" & "10010" & "10101",                     --20
+      "1001" & "01000" & "00010",                     --21
+      "1001" & "10010" & "11101",                     --22
+      "1001" & "10010" & "11101",                     --23
+      "1010" & "10010" & "11101",                     --24
+      "1001" & "01100" & "00010",                     --25
+      "1001" & "10010" & "01101",                     --26
+      "1001" & "10010" & "01101",                     --27
+      "1010" & "10010" & "01101"                      --28
       );
 
   
@@ -113,23 +113,47 @@ ARCHITECTURE beh OF cic_lfr_control IS
   
 BEGIN
 
-  OPERATION(1 DOWNTO 0) <= PROG(current_cmd)(1 DOWNTO 0);
-  OPERATION(2)          <= '0' WHEN STATE_CIC_LFR = IDLE ELSE
-                             PROG(current_cmd)(2);
-  OPERATION(5 DOWNTO 3) <= STD_LOGIC_VECTOR(to_unsigned(current_channel, 3)) WHEN STATE_CIC_LFR = RUN_PROG_I AND current_cmd = 0 ELSE
-                             PROG(current_cmd)(5 DOWNTO 3);
+  OPERATION(2 DOWNTO 0)   <= STD_LOGIC_VECTOR(to_unsigned(current_channel, 3));                                   --SEL_SAMPLE
+  OPERATION(4 DOWNTO 3)   <= PROG(current_cmd)(1 DOWNTO 0);                                                       --SEL_DATA_A
+  OPERATION(6 DOWNTO 5)   <= "00" WHEN STATE_CIC_LFR = IDLE ELSE PROG(current_cmd)(3 DOWNTO 2);                                                       --ALU_CMD
+  OPERATION(7)            <= '0'  WHEN STATE_CIC_LFR = IDLE ELSE PROG(current_cmd)(4);                                                                --CARRY_PUSH
+  OPERATION(8)            <= PROG(current_cmd)(5);                                                                --@_init
+  OPERATION(9)            <= PROG(current_cmd)(6);                                                                --@_add_1
+  OPERATION(11 DOWNTO 10) <= PROG(current_cmd)(8 DOWNTO 7);                                                       --@_sel(1..0)
+  OPERATION(12)           <= PROG(current_cmd)(9) AND sample_16_odd  WHEN STATE_CIC_LFR = RUN_PROG_C16 ELSE
+                             PROG(current_cmd)(9) AND sample_256_odd WHEN STATE_CIC_LFR = RUN_PROG_C256 ELSE '0'; --@_sel(2)
+  OPERATION(13)           <= '0' WHEN STATE_CIC_LFR = IDLE ELSE PROG(current_cmd)(10);                            --WE
+  OPERATION(14)           <= PROG(current_cmd)(12);  -- SEL_DATA_A = data_b_reg
+  OPERATION(15)           <= PROG(current_cmd)(13);  -- WRITE_ADDR_sel
+  data_out_16_valid       <= PROG(current_cmd)(11) WHEN STATE_CIC_LFR = RUN_PROG_C16  ELSE '0';
+  data_out_256_valid      <= PROG(current_cmd)(11) WHEN STATE_CIC_LFR = RUN_PROG_C256 ELSE '0';
   
-  OPERATION(8 DOWNTO 6) <= "000" WHEN STATE_CIC_LFR = IDLE ELSE
-                             PROG(current_cmd)(8 DOWNTO 6);
-  OPERATION(11 DOWNTO 9)  <= STD_LOGIC_VECTOR(to_unsigned(current_channel, 3));
-  OPERATION(13 DOWNTO 12) <= PROG(current_cmd)(10 DOWNTO 9);
-  OPERATION(14)           <= PROG(current_cmd)(11) AND sample_16_odd  WHEN STATE_CIC_LFR = RUN_PROG_C16 ELSE
-                             PROG(current_cmd)(11) AND sample_256_odd WHEN STATE_CIC_LFR = RUN_PROG_C256 ELSE '0';
 
-  OPERATION(15)           <= PROG(current_cmd)(12);
 
-  data_out_16_valid  <= PROG(current_cmd)(13) WHEN STATE_CIC_LFR = RUN_PROG_C16  ELSE '0';
-  data_out_256_valid <= PROG(current_cmd)(13) WHEN STATE_CIC_LFR = RUN_PROG_C256 ELSE '0';
+
+
+
+
+
+
+  
+  --OPERATION(1 DOWNTO 0) <= PROG(current_cmd)(1 DOWNTO 0);
+  --OPERATION(2)          <= '0' WHEN STATE_CIC_LFR = IDLE ELSE
+  --                           PROG(current_cmd)(2);
+  --OPERATION(5 DOWNTO 3) <= STD_LOGIC_VECTOR(to_unsigned(current_channel, 3)) WHEN STATE_CIC_LFR = RUN_PROG_I AND current_cmd = 0 ELSE
+  --                           PROG(current_cmd)(5 DOWNTO 3);
+  
+  --OPERATION(8 DOWNTO 6) <= "000" WHEN STATE_CIC_LFR = IDLE ELSE
+  --                           PROG(current_cmd)(8 DOWNTO 6);
+  --OPERATION(11 DOWNTO 9)  <= STD_LOGIC_VECTOR(to_unsigned(current_channel, 3));
+  --OPERATION(13 DOWNTO 12) <= PROG(current_cmd)(10 DOWNTO 9);
+  --OPERATION(14)           <= PROG(current_cmd)(11) AND sample_16_odd  WHEN STATE_CIC_LFR = RUN_PROG_C16 ELSE
+  --                           PROG(current_cmd)(11) AND sample_256_odd WHEN STATE_CIC_LFR = RUN_PROG_C256 ELSE '0';
+
+  --OPERATION(15)           <= PROG(current_cmd)(12);
+
+  --data_out_16_valid  <= PROG(current_cmd)(13) WHEN STATE_CIC_LFR = RUN_PROG_C16  ELSE '0';
+  --data_out_256_valid <= PROG(current_cmd)(13) WHEN STATE_CIC_LFR = RUN_PROG_C256 ELSE '0';
   
   PROCESS (clk, rstn)
   BEGIN
@@ -140,13 +164,8 @@ BEGIN
       current_cmd        <= 0;
       sample_16_odd      <= '0';
       sample_256_odd     <= '0';
---      data_out_16_valid  <= '0';
---      data_out_256_valid <= '0';
       
     ELSIF clk'EVENT AND clk = '1' THEN
-      
---      data_out_16_valid  <= '0';
---      data_out_256_valid <= '0';
       
       CASE STATE_CIC_LFR IS
         WHEN IDLE =>
@@ -180,7 +199,6 @@ BEGIN
           
         WHEN RUN_PROG_C16 =>
           IF current_cmd = PROG_END_C16 THEN
---          data_out_16_valid  <= '1';
             IF nb_data_receipt MOD 256 = 255 THEN
               STATE_CIC_LFR <= RUN_PROG_C256;
               current_cmd   <= PROG_START_C256;
