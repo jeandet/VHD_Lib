@@ -139,11 +139,11 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   CONSTANT NB_AHB_MASTER : INTEGER := 2;   -- 2 = grspw + waveform picker
 
   SIGNAL apbi_ext   : apb_slv_in_type;
-  SIGNAL apbo_ext   : soc_apb_slv_out_vector(NB_APB_SLAVE-1+5 DOWNTO 5)  := (OTHERS => apb_none);
+  SIGNAL apbo_ext   : soc_apb_slv_out_vector(NB_APB_SLAVE-1+5 DOWNTO 5);--  := (OTHERS => apb_none);
   SIGNAL ahbi_s_ext : ahb_slv_in_type;
-  SIGNAL ahbo_s_ext : soc_ahb_slv_out_vector(NB_AHB_SLAVE-1+3 DOWNTO 3)  := (OTHERS => ahbs_none);
+  SIGNAL ahbo_s_ext : soc_ahb_slv_out_vector(NB_AHB_SLAVE-1+3 DOWNTO 3);--  := (OTHERS => ahbs_none);
   SIGNAL ahbi_m_ext : AHB_Mst_In_Type;
-  SIGNAL ahbo_m_ext : soc_ahb_mst_out_vector(NB_AHB_MASTER-1+1 DOWNTO 1) := (OTHERS => ahbm_none);
+  SIGNAL ahbo_m_ext : soc_ahb_mst_out_vector(NB_AHB_MASTER-1+1 DOWNTO 1);-- := (OTHERS => ahbm_none);
 
 -- Spacewire signals
   SIGNAL dtmp        : STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -282,7 +282,8 @@ BEGIN  -- beh
       ENABLE_GPT      => 1,
       NB_AHB_MASTER   => NB_AHB_MASTER,
       NB_AHB_SLAVE    => NB_AHB_SLAVE,
-      NB_APB_SLAVE    => NB_APB_SLAVE)
+      NB_APB_SLAVE    => NB_APB_SLAVE,
+      ADDRESS_SIZE    => 20)
     PORT MAP (
       clk       => clk_25,
       reset     => reset,
@@ -436,7 +437,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000120")  -- aa.bb.cc version
+      top_lfr_version        => X"000121")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
@@ -605,5 +606,24 @@ BEGIN  -- beh
       
     END IF;
   END PROCESS;
+  -----------------------------------------------------------------------------
+  -- 
+  -----------------------------------------------------------------------------
+  all_apbo_ext: FOR I IN NB_APB_SLAVE-1+5 DOWNTO 5 GENERATE
+    apbo_ext_not_used: IF I /= 5 AND I /= 6 AND I /= 11 AND I /= 15 GENERATE
+      apbo_ext(I) <= apb_none;
+    END GENERATE apbo_ext_not_used;
+  END GENERATE all_apbo_ext;
+  
+
+  all_ahbo_ext: FOR I IN NB_AHB_SLAVE-1+3 DOWNTO 3 GENERATE
+    ahbo_s_ext(I) <= ahbs_none;
+  END GENERATE all_ahbo_ext;
+  
+  all_ahbo_m_ext: FOR I IN NB_AHB_MASTER-1+1 DOWNTO 1 GENERATE
+    ahbo_m_ext_not_used: IF I /=1 AND I /= 2 GENERATE
+      ahbo_m_ext(I) <= ahbm_none;
+    END GENERATE ahbo_m_ext_not_used;
+  END GENERATE all_ahbo_m_ext;
 
 END beh;

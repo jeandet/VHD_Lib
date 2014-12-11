@@ -10,8 +10,9 @@ QSF=$(VHDLIB)/boards/$(BOARD)/$(TOP).qsf
 EFFORT=high
 XSTOPT=
 SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_constraint 0"
-VHDLSYNFILES=	MINI_LFR_top.vhd 
-
+VHDLSYNFILES= MINI_LFR_top.vhd 
+VHDLSIMFILES= testbench.vhd
+SIMTOP=testbench
 PDC=$(VHDLIB)/boards/$(BOARD)/default.pdc
 ##SDC=$(VHDLIB)/boards/$(BOARD)/default.sdc
 SDCFILE=$(VHDLIB)/boards/$(BOARD)/MINI_LFR_synthesis.sdc
@@ -41,7 +42,8 @@ FILESKIP =i2cmst.vhd \
 	APB_MULTI_DIODE.vhd \
 	APB_SIMPLE_DIODE.vhd \
 	Top_MatrixSpec.vhd \
-	APB_FFT.vhd
+	APB_FFT.vhd \
+	CoreFFT_simu.vhd
 
 include $(GRLIB)/bin/Makefile
 include $(GRLIB)/software/leon3/Makefile

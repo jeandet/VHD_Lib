@@ -1,5 +1,6 @@
 lpp_top_lfr_pkg.vhd
 lpp_lfr_pkg.vhd
+lpp_lfr_apbreg_pkg.vhd
 lpp_lfr_filter.vhd
 lpp_lfr_apbreg.vhd
 lpp_lfr_apbreg_ms_pointer.vhd

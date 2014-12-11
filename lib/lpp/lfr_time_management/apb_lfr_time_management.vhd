@@ -28,6 +28,8 @@ LIBRARY lpp;
 USE lpp.apb_devices_list.ALL;
 USE lpp.general_purpose.ALL;
 USE lpp.lpp_lfr_time_management.ALL;
+USE lpp.lpp_lfr_time_management_apbreg_pkg.ALL;
+
 
 ENTITY apb_lfr_time_management IS
 
@@ -151,11 +153,11 @@ BEGIN
 --APB Write OP
       IF (apbi.psel(pindex) AND apbi.penable AND apbi.pwrite) = '1' THEN
         CASE apbi.paddr(7 DOWNTO 2) IS
-          WHEN "000000" =>
+          WHEN ADDR_LFR_TM_CONTROL =>
             r.ctrl              <= apbi.pwdata(0);
             r.soft_reset        <= apbi.pwdata(1);
             r.LFR_soft_reset    <= apbi.pwdata(2);
-          WHEN "000001" =>
+          WHEN ADDR_LFR_TM_TIME_LOAD =>
             r.coarse_time_load     <= apbi.pwdata(30 DOWNTO 0);
             coarsetime_reg_updated <= '1';
           WHEN OTHERS =>
@@ -173,16 +175,16 @@ BEGIN
 --APB READ OP
       IF (apbi.psel(pindex) AND (NOT apbi.pwrite)) = '1' THEN
         CASE apbi.paddr(7 DOWNTO 2) IS
-          WHEN "000000" =>
+          WHEN ADDR_LFR_TM_CONTROL =>
             Rdata(0)            <= r.ctrl;
             Rdata(1)            <= r.soft_reset;
             Rdata(2)            <= r.LFR_soft_reset;
             Rdata(31 DOWNTO 3)  <= (others => '0');
-          WHEN "000001" =>
+          WHEN ADDR_LFR_TM_TIME_LOAD =>
             Rdata(30 DOWNTO 0)  <= r.coarse_time_load(30 DOWNTO 0);
-          WHEN "000010" =>
+          WHEN ADDR_LFR_TM_TIME_COARSE =>
             Rdata(31 DOWNTO 0)  <= r.coarse_time(31 DOWNTO 0);
-          WHEN "000011" =>
+          WHEN ADDR_LFR_TM_TIME_FINE =>
             Rdata(31 DOWNTO 16) <= (OTHERS => '0');
             Rdata(15 DOWNTO 0)  <= r.fine_time(15 DOWNTO 0);
           WHEN OTHERS =>
@@ -193,6 +195,7 @@ BEGIN
     END IF;
   END PROCESS;
 
+  apbo.pirq    <= (OTHERS => '0');
   apbo.prdata  <= Rdata;
   apbo.pconfig <= pconfig;
   apbo.pindex  <= pindex;
