@@ -191,6 +191,18 @@ BEGIN
   ADC_SDO      <= x"AA";
 
   SRAM_DQ      <= (OTHERS => 'Z');
+  IO0          <= 'Z';
+  IO1          <= 'Z';
+  IO2          <= 'Z';
+  IO3          <= 'Z';
+  IO4          <= 'Z';
+  IO5          <= 'Z';
+  IO6          <= 'Z';
+  IO7          <= 'Z';
+  IO8          <= 'Z';
+  IO9          <= 'Z';
+  IO10         <= 'Z';
+  IO11         <= 'Z';
 
   -----------------------------------------------------------------------------
   -- DUT
@@ -249,7 +261,7 @@ BEGIN
       
       SRAM_nWE     => SRAM_nWE,
       SRAM_CE      => SRAM_CE,
-      SRAM_nOE     => SRAM_nOE,ddr_buffer_f
+      SRAM_nOE     => SRAM_nOE,
       SRAM_nBE     => SRAM_nBE,
       SRAM_A       => SRAM_A,
       SRAM_DQ      => SRAM_DQ);

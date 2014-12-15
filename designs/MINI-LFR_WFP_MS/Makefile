@@ -43,7 +43,8 @@ FILESKIP =i2cmst.vhd \
 	APB_SIMPLE_DIODE.vhd \
 	Top_MatrixSpec.vhd \
 	APB_FFT.vhd \
-	CoreFFT_simu.vhd
+	CoreFFT_simu.vhd \
+	lpp_lfr_apbreg_simu.vhd
 
 include $(GRLIB)/bin/Makefile
 include $(GRLIB)/software/leon3/Makefile

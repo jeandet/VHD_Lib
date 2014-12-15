@@ -178,39 +178,100 @@ ARCHITECTURE beh OF MINI_LFR_top IS
 
   SIGNAL LFR_soft_rstn : STD_LOGIC;
   SIGNAL LFR_rstn : STD_LOGIC;
+
+
+  SIGNAL rstn_25    : STD_LOGIC;
+  SIGNAL rstn_25_d1 : STD_LOGIC;
+  SIGNAL rstn_25_d2 : STD_LOGIC;
+  SIGNAL rstn_25_d3 : STD_LOGIC;
   
+  SIGNAL rstn_50    : STD_LOGIC;
+  SIGNAL rstn_50_d1 : STD_LOGIC;
+  SIGNAL rstn_50_d2 : STD_LOGIC;
+  SIGNAL rstn_50_d3 : STD_LOGIC;
 BEGIN  -- beh
 
   -----------------------------------------------------------------------------
   -- CLK
   -----------------------------------------------------------------------------
 
-  PROCESS(clk_50)
-  BEGIN
-    IF clk_50'EVENT AND clk_50 = '1' THEN
-      clk_50_s <= NOT clk_50_s;
-    END IF;
-  END PROCESS;
+  --PROCESS(clk_50)
+  --BEGIN
+  --  IF clk_50'EVENT AND clk_50 = '1' THEN
+  --    clk_50_s <= NOT clk_50_s;
+  --  END IF;
+  --END PROCESS;
 
-  PROCESS(clk_50_s)
-  BEGIN
-    IF clk_50_s'EVENT AND clk_50_s = '1' THEN
-      clk_25 <= NOT clk_25;
-    END IF;
-  END PROCESS;
+  --PROCESS(clk_50_s)
+  --BEGIN
+  --  IF clk_50_s'EVENT AND clk_50_s = '1' THEN
+  --    clk_25 <= NOT clk_25;
+  --  END IF;
+  --END PROCESS;
 
-  PROCESS(clk_49)
-  BEGIN
-    IF clk_49'EVENT AND clk_49 = '1' THEN
-      clk_24 <= NOT clk_24;
-    END IF;
-  END PROCESS;
+  --PROCESS(clk_49)
+  --BEGIN
+  --  IF clk_49'EVENT AND clk_49 = '1' THEN
+  --    clk_24 <= NOT clk_24;
+  --  END IF;
+  --END PROCESS;
+  
+  --PROCESS(clk_25)
+  --BEGIN
+  --  IF clk_25'EVENT AND clk_25 = '1' THEN
+  --    rstn_25 <= reset;
+  --  END IF;
+  --END PROCESS;
 
-  -----------------------------------------------------------------------------
-
-  PROCESS (clk_25, reset)
+  PROCESS (clk_50, reset)
   BEGIN  -- PROCESS
     IF reset = '0' THEN                 -- asynchronous reset (active low)
+      clk_50_s   <= '0';
+      rstn_50    <= '0';
+      rstn_50_d1 <= '0';
+      rstn_50_d2 <= '0';
+      rstn_50_d3 <= '0';
+      
+    ELSIF clk_50'event AND clk_50 = '1' THEN  -- rising clock edge
+      clk_50_s  <= NOT clk_50_s;
+      rstn_50_d1 <= '1';
+      rstn_50_d2 <= rstn_50_d1;
+      rstn_50_d3 <= rstn_50_d2;
+      rstn_50    <= rstn_50_d3;
+    END IF;
+  END PROCESS;
+
+  PROCESS (clk_50_s, rstn_50)
+  BEGIN  -- PROCESS
+    IF rstn_50 = '0' THEN               -- asynchronous reset (active low)
+      clk_25   <= '0';
+      rstn_25    <= '0';
+      rstn_25_d1 <= '0';
+      rstn_25_d2 <= '0';
+      rstn_25_d3 <= '0';
+    ELSIF clk_50_s'event AND clk_50_s = '1' THEN  -- rising clock edge
+      clk_25     <= NOT clk_25;
+      rstn_25_d1 <= '1';
+      rstn_25_d2 <= rstn_25_d1;
+      rstn_25_d3 <= rstn_25_d2;
+      rstn_25    <= rstn_25_d3;
+    END IF;
+  END PROCESS;
+
+  PROCESS (clk_49, reset)
+  BEGIN  -- PROCESS
+    IF reset = '0' THEN                 -- asynchronous reset (active low)
+      clk_24 <= '0';
+    ELSIF clk_49'event AND clk_49 = '1' THEN  -- rising clock edge
+      clk_24 <= NOT clk_24;                
+    END IF;
+  END PROCESS;
+  
+  -----------------------------------------------------------------------------
+
+  PROCESS (clk_25, rstn_25)
+  BEGIN  -- PROCESS
+    IF rstn_25 = '0' THEN                 -- asynchronous reset (active low)
       LED0 <= '0';
       LED1 <= '0';
       LED2 <= '0';
@@ -243,9 +304,9 @@ BEGIN  -- beh
     END IF;
   END PROCESS;
 
-  PROCESS (clk_24, reset)
+  PROCESS (clk_24, rstn_25)
   BEGIN  -- PROCESS
-    IF reset = '0' THEN                 -- asynchronous reset (active low)
+    IF rstn_25 = '0' THEN                 -- asynchronous reset (active low)
       I00_s <= '0';
     ELSIF clk_24'EVENT AND clk_24 = '1' THEN  -- rising clock edge
       I00_s <= NOT I00_s ;
@@ -286,7 +347,7 @@ BEGIN  -- beh
       ADDRESS_SIZE    => 20)
     PORT MAP (
       clk       => clk_25,
-      reset     => reset,
+      reset     => rstn_25,
       errorn    => errorn,
       ahbrxd    => TXD1,
       ahbtxd    => RXD1,
@@ -322,7 +383,7 @@ BEGIN  -- beh
     PORT MAP (
       clk25MHz     => clk_25,
       clk24_576MHz => clk_24,           -- 49.152MHz/2
-      resetn       => reset,
+      resetn       => rstn_25,
       grspw_tick   => swno.tickout,
       apbi         => apbi_ext,
       apbo         => apbo_ext(6),
@@ -404,7 +465,7 @@ BEGIN  -- beh
     --output_type => CFG_SPW_OUTPUT,  -- not used byt the spw core 1
     --rxtx_sameclk => CFG_SPW_RTSAME -- not used byt the spw core 1
     )
-    PORT MAP(reset, clk_25, spw_rxclk(0),
+    PORT MAP(rstn_25, clk_25, spw_rxclk(0),
              spw_rxclk(1), spw_rxtxclk, spw_rxtxclk,
              ahbi_m_ext, ahbo_m_ext(1), apbi_ext, apbo_ext(5),
              swni, swno);
@@ -422,7 +483,8 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
 
 
-  LFR_rstn <= LFR_soft_rstn AND reset;
+  --LFR_rstn <= LFR_soft_rstn AND rstn_25;
+  LFR_rstn <= rstn_25;
   
   lpp_lfr_1 : lpp_lfr
     GENERIC MAP (
@@ -437,7 +499,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000121")  -- aa.bb.cc version
+      top_lfr_version        => X"000122")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
@@ -467,11 +529,11 @@ BEGIN  -- beh
     PORT MAP (
       -- CONV
       cnv_clk    => clk_24,
-      cnv_rstn   => reset,
+      cnv_rstn   => rstn_25,
       cnv        => ADC_nCS_sig,
       -- DATA
       clk        => clk_25,
-      rstn       => reset,
+      rstn       => rstn_25,
       sck        => ADC_CLK_sig,
       sdo        => ADC_SDO_sig,
       -- SAMPLE
@@ -492,7 +554,7 @@ BEGIN  -- beh
 
   grgpio0 : grgpio
     GENERIC MAP(pindex => 11, paddr => 11, imask => 16#0000#, nbits => 8)
-    PORT MAP(reset, clk_25, apbi_ext, apbo_ext(11), gpioi, gpioo);
+    PORT MAP(rstn_25, clk_25, apbi_ext, apbo_ext(11), gpioi, gpioo);
   
   --pio_pad_0 : iopad
   --  GENERIC MAP (tech => CFG_PADTECH)
@@ -519,9 +581,9 @@ BEGIN  -- beh
   --  GENERIC MAP (tech => CFG_PADTECH)
   --  PORT MAP (IO7, gpioo.dout(7), gpioo.oen(7), gpioi.din(7));
 
-  PROCESS (clk_25, reset)
+  PROCESS (clk_25, rstn_25)
   BEGIN  -- PROCESS
-    IF reset = '0' THEN                  -- asynchronous reset (active low)
+    IF rstn_25 = '0' THEN                  -- asynchronous reset (active low)
       IO0  <= '0';
       IO1  <= '0';
       IO2  <= '0';  

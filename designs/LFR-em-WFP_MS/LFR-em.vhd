@@ -347,7 +347,7 @@ BEGIN  -- beh
     GENERIC MAP (
       Mem_use                => use_RAM,
       nb_data_by_buffer_size => 32,
-      nb_word_by_buffer_size => 30,
+      --nb_word_by_buffer_size => 30,
       nb_snapshot_param_size => 32,
       delta_vector_size      => 32,
       delta_vector_size_f0_2 => 7,      -- log2(96)
@@ -357,7 +357,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"01011A")  -- aa.bb.cc version
+      top_lfr_version        => X"010121")  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             --      0 => MINI_LFR
                                             --      1 => EM
@@ -373,10 +373,10 @@ BEGIN  -- beh
       ahbo            => ahbo_m_ext(2),
       coarse_time     => coarse_time,
       fine_time       => fine_time,
-      data_shaping_BW => bias_fail_sw,
-      observation_vector_0 => OPEN,
-      observation_vector_1 => OPEN,
-      observation_reg => observation_reg);
+      data_shaping_BW => bias_fail_sw);--,
+  --observation_vector_0 => OPEN,
+  --observation_vector_1 => OPEN,
+  --observation_reg => observation_reg);
 
 
   all_sample: FOR I IN 7 DOWNTO 0 GENERATE

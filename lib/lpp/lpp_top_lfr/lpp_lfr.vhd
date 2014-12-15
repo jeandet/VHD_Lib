@@ -26,7 +26,6 @@ ENTITY lpp_lfr IS
   GENERIC (
     Mem_use                : INTEGER := use_RAM;
     nb_data_by_buffer_size : INTEGER := 11;
---    nb_word_by_buffer_size : INTEGER := 11; -- TODO
     nb_snapshot_param_size : INTEGER := 11;
     delta_vector_size      : INTEGER := 20;
     delta_vector_size_f0_2 : INTEGER := 7;
@@ -60,57 +59,10 @@ ENTITY lpp_lfr IS
     fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
     -- 
     data_shaping_BW : OUT STD_LOGIC
-    --
-    --
---    observation_vector_0: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
---    observation_vector_1: OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
-
---    observation_reg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
-
-    --debug
-    --debug_f0_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    --debug_f0_data_valid : OUT STD_LOGIC;
-    --debug_f1_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    --debug_f1_data_valid : OUT STD_LOGIC;
-    --debug_f2_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    --debug_f2_data_valid : OUT STD_LOGIC;
-    --debug_f3_data       : OUT STD_LOGIC_VECTOR(95 DOWNTO 0);
-    --debug_f3_data_valid : OUT STD_LOGIC;
-
-    ---- debug FIFO_IN
-    --debug_f0_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f0_data_fifo_in_valid : OUT STD_LOGIC;
-    --debug_f1_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f1_data_fifo_in_valid : OUT STD_LOGIC;
-    --debug_f2_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f2_data_fifo_in_valid : OUT STD_LOGIC;
-    --debug_f3_data_fifo_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f3_data_fifo_in_valid : OUT STD_LOGIC;
-
-    ----debug FIFO OUT
-    --debug_f0_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f0_data_fifo_out_valid : OUT STD_LOGIC;
-    --debug_f1_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f1_data_fifo_out_valid : OUT STD_LOGIC;
-    --debug_f2_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f2_data_fifo_out_valid : OUT STD_LOGIC;
-    --debug_f3_data_fifo_out       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f3_data_fifo_out_valid : OUT STD_LOGIC;
-
-    ----debug DMA IN
-    --debug_f0_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f0_data_dma_in_valid : OUT STD_LOGIC;
-    --debug_f1_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f1_data_dma_in_valid : OUT STD_LOGIC;
-    --debug_f2_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f2_data_dma_in_valid : OUT STD_LOGIC;
-    --debug_f3_data_dma_in       : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    --debug_f3_data_dma_in_valid : OUT STD_LOGIC
     );
 END lpp_lfr;
 
 ARCHITECTURE beh OF lpp_lfr IS
-  --SIGNAL sample           : Samples14v(7 DOWNTO 0);
   SIGNAL sample_s         : Samples(7 DOWNTO 0);
   --
   SIGNAL data_shaping_SP0 : STD_LOGIC;
@@ -142,17 +94,10 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL ready_matrix_f0_1        : STD_LOGIC;
   SIGNAL ready_matrix_f1          : STD_LOGIC;
   SIGNAL ready_matrix_f2          : STD_LOGIC;
---  SIGNAL error_anticipating_empty_fifo          : STD_LOGIC;
---  SIGNAL error_bad_component_error              : STD_LOGIC;
---  SIGNAL debug_reg                              : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL status_ready_matrix_f0   : STD_LOGIC;
   SIGNAL status_ready_matrix_f0_1 : STD_LOGIC;
   SIGNAL status_ready_matrix_f1   : STD_LOGIC;
   SIGNAL status_ready_matrix_f2   : STD_LOGIC;
---  SIGNAL status_error_anticipating_empty_fifo   : STD_LOGIC;
---  SIGNAL status_error_bad_component_error       : STD_LOGIC;
-  --SIGNAL config_active_interruption_onNewMatrix : STD_LOGIC;
---  SIGNAL config_active_interruption_onError     : STD_LOGIC;
   SIGNAL addr_matrix_f0           : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL addr_matrix_f1           : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL addr_matrix_f2           : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -161,9 +106,6 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL length_matrix_f2         : STD_LOGIC_VECTOR(25 DOWNTO 0);
 
   -- WFP
-  --SIGNAL status_full     : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  --SIGNAL status_full_ack : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  --SIGNAL status_full_err : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL status_new_err  : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL delta_snapshot  : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
   SIGNAL delta_f0        : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);

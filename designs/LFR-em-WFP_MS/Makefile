@@ -20,7 +20,7 @@ VHDLSYNFILES=LFR-em.vhd
 #SDC=$(GRLIB)/boards/$(BOARD)/leon3mp.sdc
 PDC=$(VHDLIB)/boards/$(BOARD)/em-LeonLPP-A3PE3kL.pdc
 
-SDCFILE=$(VHDLIB)/boards/$(BOARD)/LFR_EM_synthesis.sdc
+#SDCFILE=$(VHDLIB)/boards/$(BOARD)/LFR_EM_synthesis.sdc
 SDC=$(VHDLIB)/boards/$(BOARD)/LFR_EM_place_and_route.sdc
 
 BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut
