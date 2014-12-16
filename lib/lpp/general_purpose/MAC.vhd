@@ -73,19 +73,19 @@ ARCHITECTURE ar_MAC OF MAC IS
 
   SIGNAL MACMUX2sel : STD_LOGIC;
 
-  SIGNAL add_D            : STD_LOGIC;
-  SIGNAL OP1_2C_D         : STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
-  SIGNAL OP2_2C_D         : STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
-  SIGNAL MULTout_D        : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
-  SIGNAL MACMUXsel_D      : STD_LOGIC;
-  SIGNAL MACMUX2sel_D     : STD_LOGIC;
-  SIGNAL MACMUX2sel_D_D   : STD_LOGIC;
-  SIGNAL clr_MAC_D        : STD_LOGIC;
+  SIGNAL add_D          : STD_LOGIC;
+  SIGNAL OP1_2C_D       : STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+  SIGNAL OP2_2C_D       : STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
+  SIGNAL MULTout_D      : STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0);
+  SIGNAL MACMUXsel_D    : STD_LOGIC;
+  SIGNAL MACMUX2sel_D   : STD_LOGIC;
+  SIGNAL MACMUX2sel_D_D : STD_LOGIC;
+  SIGNAL clr_MAC_D      : STD_LOGIC;
 --  SIGNAL clr_MAC_D_D      : STD_LOGIC;
 --  SIGNAL MAC_MUL_ADD_2C_D : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
-  SIGNAL load_mult_result   : STD_LOGIC;
-  SIGNAL load_mult_result_D : STD_LOGIC;
+--  SIGNAL load_mult_result   : STD_LOGIC;
+--  SIGNAL load_mult_result_D : STD_LOGIC;
 
 BEGIN
 
@@ -100,7 +100,7 @@ BEGIN
       ctrl        => MAC_MUL_ADD_s,
       MULT        => mult,
       ADD         => add,
-      LOAD_ADDER  => load_mult_result,
+      --LOAD_ADDER  => load_mult_result,
       MACMUX_sel  => MACMUXsel,
       MACMUX2_sel => MACMUX2sel
 
@@ -128,14 +128,14 @@ BEGIN
       );
 --==============================================================
 
-  PROCESS (clk, reset)
-  BEGIN  -- PROCESS
-    IF reset = '0' THEN                 -- asynchronous reset (active low)
-      load_mult_result_D <= '0';
-    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      load_mult_result_D <= load_mult_result;
-    END IF;
-  END PROCESS;
+  --PROCESS (clk, reset)
+  --BEGIN  -- PROCESS
+  --  IF reset = '0' THEN                 -- asynchronous reset (active low)
+  --    load_mult_result_D <= '0';
+  --  ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
+  --    load_mult_result_D <= load_mult_result;
+  --  END IF;
+  --END PROCESS;
 
 --==============================================================
 --======================A D D E R ==============================
@@ -149,7 +149,7 @@ BEGIN
       clk   => clk,
       reset => reset,
       clr   => clr_MAC_D,
-      load  => load_mult_result_D,
+      load  => MACMUX2sel_D,            --load_mult_result_D,
       add   => add_D,
       OP1   => ADDERinA,
       OP2   => ADDERinB,
@@ -167,7 +167,7 @@ BEGIN
       PORT MAP(
         clk     => clk,
         reset   => reset,
-        clr     => '0',--clr_MAC,
+        clr     => '0',                 --clr_MAC,
         TwoComp => Comp_2C(0),
         OP      => OP1,
         RES     => OP1_2C
@@ -180,13 +180,12 @@ BEGIN
       PORT MAP(
         clk     => clk,
         reset   => reset,
-        clr     => '0',--clr_MAC,
+        clr     => '0',                 --clr_MAC,
         TwoComp => Comp_2C(1),
         OP      => OP2,
         RES     => OP2_2C
         );
-    
-    
+
     clr_MACREG_comp : MAC_REG
       GENERIC MAP(size => 1)
       PORT MAP(
@@ -195,18 +194,18 @@ BEGIN
         D(0)  => clr_MAC,
         Q(0)  => clr_MAC_s
         );
-    
+
     MAC_MUL_ADD_REG : MAC_REG
-    GENERIC MAP(size => 2)
-    PORT MAP(
-      reset => reset,
-      clk   => clk,
-      D     => MAC_MUL_ADD,
-      Q     => MAC_MUL_ADD_s
-      );
-    
+      GENERIC MAP(size => 2)
+      PORT MAP(
+        reset => reset,
+        clk   => clk,
+        D     => MAC_MUL_ADD,
+        Q     => MAC_MUL_ADD_s
+        );
+
   END GENERATE gen_comp;
-  
+
   no_gen_comp : IF COMP_EN = 1 GENERATE
     OP2_2C <= OP2;
     OP1_2C <= OP1;

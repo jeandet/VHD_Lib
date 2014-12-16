@@ -57,7 +57,7 @@ ARCHITECTURE ar_ADS7886_drvr_v2 OF ADS7886_drvr_v2 IS
   SIGNAL cnv_sync_r         : STD_LOGIC;
   SIGNAL cnv_done           : STD_LOGIC;
   SIGNAL sample_bit_counter : INTEGER;
-  SIGNAL shift_reg          : Samples(ChannelCount-1 DOWNTO 0);
+  SIGNAL shift_reg          : Samples_15(ChannelCount-1 DOWNTO 0);
   
 BEGIN
 
@@ -82,8 +82,8 @@ cnv_sync <= cnv_clk;
   BEGIN  -- PROCESS
     IF rstn = '0' THEN
       FOR k IN 0 TO ChannelCount-1 LOOP
-        shift_reg(k)(15 downto 0)	<= (OTHERS => '0');
-		sample(k)(15 downto 0) 		<= (OTHERS => '0');
+        shift_reg(k)(14 downto 0)	<= (OTHERS => '0');
+	sample(k)(15 downto 0) 		<= (OTHERS => '0');
       END LOOP;
       sample_bit_counter <= 0;
       sample_val         <= '0';
@@ -107,7 +107,7 @@ cnv_sync <= cnv_clk;
       IF (sample_bit_counter MOD 2) = 1 THEN	-- get data on each channel
         FOR k IN 0 TO ChannelCount-1 LOOP
           shift_reg(k)(0)           <= sdo(k);
-          shift_reg(k)(15 DOWNTO 1) <= shift_reg(k)(14 DOWNTO 0);
+          shift_reg(k)(14 DOWNTO 1) <= shift_reg(k)(13 DOWNTO 0);
         END LOOP;
         SCK <= '0';
       ELSE

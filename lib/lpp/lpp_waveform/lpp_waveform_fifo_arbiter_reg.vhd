@@ -80,7 +80,7 @@ BEGIN
              reg(2) WHEN sel(2) = '1' ELSE
              reg(3);
 
-  reg_sel_s <= reg_sel WHEN enable = '0' ELSE
+  reg_sel_s <= reg_sel     WHEN enable = '0' ELSE
                reg_sel + 1 WHEN reg_sel < UNSIGNED(max_count) ELSE
                0;
 
@@ -88,7 +88,6 @@ BEGIN
   data_s <= STD_LOGIC_VECTOR(to_unsigned(reg_sel_s, data_size));
   
 END ARCHITECTURE;
-
 
 
 

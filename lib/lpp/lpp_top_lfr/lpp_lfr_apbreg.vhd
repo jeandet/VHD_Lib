@@ -133,7 +133,7 @@ ENTITY lpp_lfr_apbreg IS
     start_date   : OUT STD_LOGIC_VECTOR(30 DOWNTO 0);
     
     wfp_status_buffer_ready : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-    wfp_addr_buffer         : OUT STD_LOGIC_VECTOR(32*4 DOWNTO 0);
+    wfp_addr_buffer         : OUT STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
     wfp_length_buffer       : OUT STD_LOGIC_VECTOR(25 DOWNTO 0);
     wfp_ready_buffer        : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
     wfp_buffer_time         : IN STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
@@ -238,28 +238,28 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
   -- 
   -----------------------------------------------------------------------------
   SIGNAL reg0_ready_matrix_f0 : STD_LOGIC;
-  SIGNAL reg0_addr_matrix_f0  : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL reg0_matrix_time_f0  : STD_LOGIC_VECTOR(47 DOWNTO 0);
+--  SIGNAL reg0_addr_matrix_f0  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL reg0_matrix_time_f0  : STD_LOGIC_VECTOR(47 DOWNTO 0);
 
   SIGNAL reg1_ready_matrix_f0 : STD_LOGIC;
-  SIGNAL reg1_addr_matrix_f0  : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL reg1_matrix_time_f0  : STD_LOGIC_VECTOR(47 DOWNTO 0);
+--  SIGNAL reg1_addr_matrix_f0  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL reg1_matrix_time_f0  : STD_LOGIC_VECTOR(47 DOWNTO 0);
 
   SIGNAL reg0_ready_matrix_f1 : STD_LOGIC;
-  SIGNAL reg0_addr_matrix_f1  : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL reg0_matrix_time_f1  : STD_LOGIC_VECTOR(47 DOWNTO 0);
+--  SIGNAL reg0_addr_matrix_f1  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL reg0_matrix_time_f1  : STD_LOGIC_VECTOR(47 DOWNTO 0);
 
   SIGNAL reg1_ready_matrix_f1 : STD_LOGIC;
-  SIGNAL reg1_addr_matrix_f1  : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL reg1_matrix_time_f1  : STD_LOGIC_VECTOR(47 DOWNTO 0);
+--  SIGNAL reg1_addr_matrix_f1  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL reg1_matrix_time_f1  : STD_LOGIC_VECTOR(47 DOWNTO 0);
 
   SIGNAL reg0_ready_matrix_f2 : STD_LOGIC;
-  SIGNAL reg0_addr_matrix_f2  : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL reg0_matrix_time_f2  : STD_LOGIC_VECTOR(47 DOWNTO 0);
+--  SIGNAL reg0_addr_matrix_f2  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL reg0_matrix_time_f2  : STD_LOGIC_VECTOR(47 DOWNTO 0);
 
   SIGNAL reg1_ready_matrix_f2 : STD_LOGIC;
-  SIGNAL reg1_addr_matrix_f2  : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL reg1_matrix_time_f2  : STD_LOGIC_VECTOR(47 DOWNTO 0);
+--  SIGNAL reg1_addr_matrix_f2  : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL reg1_matrix_time_f2  : STD_LOGIC_VECTOR(47 DOWNTO 0);
   SIGNAL apbo_irq_ms : STD_LOGIC;
   SIGNAL apbo_irq_wfp : STD_LOGIC;
   -----------------------------------------------------------------------------

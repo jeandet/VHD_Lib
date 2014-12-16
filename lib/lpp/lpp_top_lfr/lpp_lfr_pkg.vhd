@@ -311,7 +311,7 @@ PACKAGE lpp_lfr_pkg IS
       run                     : OUT STD_LOGIC;
       start_date              : OUT STD_LOGIC_VECTOR(30 DOWNTO 0);
       wfp_status_buffer_ready : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-      wfp_addr_buffer         : OUT STD_LOGIC_VECTOR(32*4 DOWNTO 0);
+      wfp_addr_buffer         : OUT STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
       wfp_length_buffer       : OUT STD_LOGIC_VECTOR(25 DOWNTO 0);
       wfp_ready_buffer        : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
       wfp_buffer_time         : IN  STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);

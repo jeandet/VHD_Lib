@@ -19,6 +19,9 @@ USE lpp.lpp_sim_pkg.ALL;
 USE lpp.lpp_lfr_apbreg_pkg.ALL;
 USE lpp.lpp_lfr_time_management_apbreg_pkg.ALL;
 
+LIBRARY postlayout;
+USE postlayout.ALL;
+
 ENTITY testbench IS
 END;
 

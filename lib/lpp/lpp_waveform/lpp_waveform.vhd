@@ -84,7 +84,7 @@ ENTITY lpp_waveform IS
 
     -- REG DMA
     status_buffer_ready : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-    addr_buffer         : IN STD_LOGIC_VECTOR(32*4 DOWNTO 0);
+    addr_buffer         : IN STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
     length_buffer       : IN STD_LOGIC_VECTOR(25 DOWNTO 0);
     
     ready_buffer        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);

@@ -217,7 +217,7 @@ Constant CLR_MAC_V0 : std_logic_vector(3 downto 0) := "0100";
       ctrl        : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
       MULT        : OUT STD_LOGIC;
       ADD         : OUT STD_LOGIC;
-      LOAD_ADDER  : out std_logic;
+--      LOAD_ADDER  : out std_logic;
       MACMUX_sel  : OUT STD_LOGIC;
       MACMUX2_sel : OUT STD_LOGIC
       );

@@ -122,12 +122,12 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   --
   SIGNAL errorn      : STD_LOGIC;
   -- UART AHB ---------------------------------------------------------------
-  SIGNAL ahbrxd      : STD_ULOGIC;      -- DSU rx data  
-  SIGNAL ahbtxd      : STD_ULOGIC;      -- DSU tx data
+--  SIGNAL ahbrxd      : STD_ULOGIC;      -- DSU rx data  
+--  SIGNAL ahbtxd      : STD_ULOGIC;      -- DSU tx data
 
   -- UART APB ---------------------------------------------------------------
-  SIGNAL urxd1 : STD_ULOGIC;            -- UART1 rx data
-  SIGNAL utxd1 : STD_ULOGIC;            -- UART1 tx data
+--  SIGNAL urxd1 : STD_ULOGIC;            -- UART1 rx data
+--  SIGNAL utxd1 : STD_ULOGIC;            -- UART1 tx data
                                         --
   SIGNAL I00_s : STD_LOGIC;
 
@@ -439,6 +439,8 @@ BEGIN  -- beh
         dconnect => swni.dconnect(j*2+1 DOWNTO j*2));
   END GENERATE spw_inputloop;
 
+  swni.rmapnodeaddr <= (others => '0');
+
   -- SPW core
   sw0 : grspwm GENERIC MAP(
     tech         => apa3e,
@@ -514,11 +516,13 @@ BEGIN  -- beh
       fine_time       => fine_time,
       data_shaping_BW => bias_fail_sw_sig);
 
+  observation_reg      <= (others => '0');
+  observation_vector_0 <= (others => '0');
+  observation_vector_1 <= (others => '0');
+
   all_sample: FOR I IN 7 DOWNTO 0 GENERATE
     sample_s(I) <= sample(I)(11 DOWNTO 0) & '0' & '0' & '0' & '0';
   END GENERATE all_sample;
-
-  
 
   top_ad_conv_ADS7886_v2_1 : top_ad_conv_ADS7886_v2
     GENERIC MAP(
@@ -556,6 +560,9 @@ BEGIN  -- beh
     GENERIC MAP(pindex => 11, paddr => 11, imask => 16#0000#, nbits => 8)
     PORT MAP(rstn_25, clk_25, apbi_ext, apbo_ext(11), gpioi, gpioo);
   
+  gpioi.sig_en <= (others => '0');
+  gpioi.sig_in <= (others => '0');
+  gpioi.din    <= (others => '0');
   --pio_pad_0 : iopad
   --  GENERIC MAP (tech => CFG_PADTECH)
   --  PORT MAP (IO0, gpioo.dout(0), gpioo.oen(0), gpioi.din(0));

@@ -73,11 +73,11 @@ ARCHITECTURE ar_lpp_waveform_fifo_arbiter OF lpp_waveform_fifo_arbiter IS
   -- DATA MUX
   -----------------------------------------------------------------------------
   TYPE WORD_VECTOR IS ARRAY (NATURAL RANGE <>) OF STD_LOGIC_VECTOR(31 DOWNTO 0); 
-  SIGNAL data_0   : WORD_VECTOR(3 DOWNTO 0);
-  SIGNAL data_1   : WORD_VECTOR(3 DOWNTO 0);
-  SIGNAL data_2   : WORD_VECTOR(3 DOWNTO 0);
-  SIGNAL data_3   : WORD_VECTOR(3 DOWNTO 0);
-  SIGNAL data_sel : WORD_VECTOR(3 DOWNTO 0);  
+  SIGNAL data_0   : WORD_VECTOR(2 DOWNTO 0);
+  SIGNAL data_1   : WORD_VECTOR(2 DOWNTO 0);
+  SIGNAL data_2   : WORD_VECTOR(2 DOWNTO 0);
+  SIGNAL data_3   : WORD_VECTOR(2 DOWNTO 0);
+  SIGNAL data_sel : WORD_VECTOR(2 DOWNTO 0);  
   
   -----------------------------------------------------------------------------
   -- RR and SELECTION
@@ -243,7 +243,6 @@ BEGIN
 
 
 END ARCHITECTURE;
-
 
 
 

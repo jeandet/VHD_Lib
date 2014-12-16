@@ -138,7 +138,10 @@ ARCHITECTURE beh OF LFR_em IS
 
   -----------------------------------------------------------------------------
   SIGNAL rstn : STD_LOGIC;
-
+  
+  SIGNAL LFR_soft_rstn  : STD_LOGIC;
+  SIGNAL LFR_rstn       : STD_LOGIC;
+  
   SIGNAL ADC_smpclk_s : STD_LOGIC;
 
 BEGIN  -- beh
@@ -252,7 +255,9 @@ BEGIN  -- beh
       apbi         => apbi_ext,
       apbo         => apbo_ext(6),
       coarse_time  => coarse_time,
-      fine_time    => fine_time);
+      fine_time    => fine_time,
+      LFR_soft_rstn => LFR_soft_rstn
+      );
 
 -----------------------------------------------------------------------
 ---  SpaceWire --------------------------------------------------------
@@ -343,6 +348,8 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
 -- LFR ------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+  LFR_rstn <= LFR_soft_rstn AND rstn;
+  
   lpp_lfr_1 : lpp_lfr
     GENERIC MAP (
       Mem_use                => use_RAM,
@@ -357,13 +364,13 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"010121")  -- aa.bb.cc version
+      top_lfr_version        => X"010122")  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             --      0 => MINI_LFR
                                             --      1 => EM
     PORT MAP (
       clk             => clk_25,
-      rstn            => rstn,
+      rstn            => LFR_rstn,
       sample_B        => sample_s(2 DOWNTO 0),
       sample_E        => sample_s(7 DOWNTO 3),
       sample_val      => sample_val,

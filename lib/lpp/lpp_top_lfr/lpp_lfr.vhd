@@ -91,11 +91,11 @@ ARCHITECTURE beh OF lpp_lfr IS
 
   -- SM
   SIGNAL ready_matrix_f0          : STD_LOGIC;
-  SIGNAL ready_matrix_f0_1        : STD_LOGIC;
+--  SIGNAL ready_matrix_f0_1        : STD_LOGIC;
   SIGNAL ready_matrix_f1          : STD_LOGIC;
   SIGNAL ready_matrix_f2          : STD_LOGIC;
   SIGNAL status_ready_matrix_f0   : STD_LOGIC;
-  SIGNAL status_ready_matrix_f0_1 : STD_LOGIC;
+--  SIGNAL status_ready_matrix_f0_1 : STD_LOGIC;
   SIGNAL status_ready_matrix_f1   : STD_LOGIC;
   SIGNAL status_ready_matrix_f2   : STD_LOGIC;
   SIGNAL addr_matrix_f0           : STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -129,24 +129,24 @@ ARCHITECTURE beh OF lpp_lfr IS
   -----------------------------------------------------------------------------
   -- 
   -----------------------------------------------------------------------------
-  SIGNAL data_f0_addr_out_s             : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL data_f0_data_out_valid_s       : STD_LOGIC;
-  SIGNAL data_f0_data_out_valid_burst_s : STD_LOGIC;
+--  SIGNAL data_f0_addr_out_s             : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL data_f0_data_out_valid_s       : STD_LOGIC;
+--  SIGNAL data_f0_data_out_valid_burst_s : STD_LOGIC;
   --f1
-  SIGNAL data_f1_addr_out_s             : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL data_f1_data_out_valid_s       : STD_LOGIC;
-  SIGNAL data_f1_data_out_valid_burst_s : STD_LOGIC;
+--  SIGNAL data_f1_addr_out_s             : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL data_f1_data_out_valid_s       : STD_LOGIC;
+--  SIGNAL data_f1_data_out_valid_burst_s : STD_LOGIC;
   --f2
-  SIGNAL data_f2_addr_out_s             : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL data_f2_data_out_valid_s       : STD_LOGIC;
-  SIGNAL data_f2_data_out_valid_burst_s : STD_LOGIC;
+--  SIGNAL data_f2_addr_out_s             : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL data_f2_data_out_valid_s       : STD_LOGIC;
+--  SIGNAL data_f2_data_out_valid_burst_s : STD_LOGIC;
   --f3
-  SIGNAL data_f3_addr_out_s             : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL data_f3_data_out_valid_s       : STD_LOGIC;
-  SIGNAL data_f3_data_out_valid_burst_s : STD_LOGIC;
+--  SIGNAL data_f3_addr_out_s             : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL data_f3_data_out_valid_s       : STD_LOGIC;
+--  SIGNAL data_f3_data_out_valid_burst_s : STD_LOGIC;
 
   SIGNAL wfp_status_buffer_ready : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL wfp_addr_buffer         : STD_LOGIC_VECTOR(32*4 DOWNTO 0);
+  SIGNAL wfp_addr_buffer         : STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
   SIGNAL wfp_length_buffer       : STD_LOGIC_VECTOR(25 DOWNTO 0);
   SIGNAL wfp_ready_buffer        : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL wfp_buffer_time         : STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
@@ -154,51 +154,51 @@ ARCHITECTURE beh OF lpp_lfr IS
   -----------------------------------------------------------------------------
   -- DMA RR
   -----------------------------------------------------------------------------
-  SIGNAL dma_sel_valid   : STD_LOGIC;
-  SIGNAL dma_rr_valid    : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL dma_rr_grant_s  : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL dma_rr_grant_ms : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL dma_rr_valid_ms : STD_LOGIC_VECTOR(3 DOWNTO 0);
+--  SIGNAL dma_sel_valid   : STD_LOGIC;
+--  SIGNAL dma_rr_valid    : STD_LOGIC_VECTOR(3 DOWNTO 0);
+--  SIGNAL dma_rr_grant_s  : STD_LOGIC_VECTOR(3 DOWNTO 0);
+--  SIGNAL dma_rr_grant_ms : STD_LOGIC_VECTOR(3 DOWNTO 0);
+--  SIGNAL dma_rr_valid_ms : STD_LOGIC_VECTOR(3 DOWNTO 0);
 
-  SIGNAL dma_rr_grant : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL dma_sel      : STD_LOGIC_VECTOR(4 DOWNTO 0);
+--  SIGNAL dma_rr_grant : STD_LOGIC_VECTOR(4 DOWNTO 0);
+--  SIGNAL dma_sel      : STD_LOGIC_VECTOR(4 DOWNTO 0);
 
   -----------------------------------------------------------------------------
   -- DMA_REG
   -----------------------------------------------------------------------------
-  SIGNAL ongoing_reg         : STD_LOGIC;
-  SIGNAL dma_sel_reg         : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL dma_send_reg        : STD_LOGIC;
-  SIGNAL dma_valid_burst_reg : STD_LOGIC;  -- (1 => BURST , 0 => SINGLE)
-  SIGNAL dma_address_reg     : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL dma_data_reg        : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL ongoing_reg         : STD_LOGIC;
+--  SIGNAL dma_sel_reg         : STD_LOGIC_VECTOR(3 DOWNTO 0);
+--  SIGNAL dma_send_reg        : STD_LOGIC;
+--  SIGNAL dma_valid_burst_reg : STD_LOGIC;  -- (1 => BURST , 0 => SINGLE)
+--  SIGNAL dma_address_reg     : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL dma_data_reg        : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
 
   -----------------------------------------------------------------------------
   -- DMA
   -----------------------------------------------------------------------------
-  SIGNAL dma_send        : STD_LOGIC;
-  SIGNAL dma_valid_burst : STD_LOGIC;   -- (1 => BURST , 0 => SINGLE)
-  SIGNAL dma_done        : STD_LOGIC;
-  SIGNAL dma_ren         : STD_LOGIC;
-  SIGNAL dma_address     : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL dma_data        : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL dma_data_2      : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL dma_send        : STD_LOGIC;
+--  SIGNAL dma_valid_burst : STD_LOGIC;   -- (1 => BURST , 0 => SINGLE)
+--  SIGNAL dma_done        : STD_LOGIC;
+--  SIGNAL dma_ren         : STD_LOGIC;
+--  SIGNAL dma_address     : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL dma_data        : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL dma_data_2      : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
   -----------------------------------------------------------------------------
   -- MS
   -----------------------------------------------------------------------------
 
-  SIGNAL data_ms_addr        : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL data_ms_data        : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL data_ms_valid       : STD_LOGIC;
-  SIGNAL data_ms_valid_burst : STD_LOGIC;
-  SIGNAL data_ms_ren         : STD_LOGIC;
-  SIGNAL data_ms_done        : STD_LOGIC;
-  SIGNAL dma_ms_ongoing      : STD_LOGIC;
+--  SIGNAL data_ms_addr        : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL data_ms_data        : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL data_ms_valid       : STD_LOGIC;
+--  SIGNAL data_ms_valid_burst : STD_LOGIC;
+--  SIGNAL data_ms_ren         : STD_LOGIC;
+--  SIGNAL data_ms_done        : STD_LOGIC;
+--  SIGNAL dma_ms_ongoing      : STD_LOGIC;
 
 --  SIGNAL run_ms              : STD_LOGIC;
-  SIGNAL ms_softandhard_rstn : STD_LOGIC;
+--  SIGNAL ms_softandhard_rstn : STD_LOGIC;
 
   SIGNAL matrix_time_f0 : STD_LOGIC_VECTOR(47 DOWNTO 0);
 --  SIGNAL matrix_time_f0_1    : STD_LOGIC_VECTOR(47 DOWNTO 0);
@@ -210,7 +210,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL error_input_fifo_write : STD_LOGIC_VECTOR(2 DOWNTO 0);
 
 --  SIGNAL debug_ms : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL debug_signal : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--  SIGNAL debug_signal : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
   -----------------------------------------------------------------------------
   SIGNAL dma_fifo_burst_valid : STD_LOGIC_VECTOR(4 DOWNTO 0);

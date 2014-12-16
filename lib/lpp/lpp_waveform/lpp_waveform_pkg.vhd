@@ -129,7 +129,7 @@ PACKAGE lpp_waveform_pkg IS
       nb_snapshot_param            : IN  STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
       status_new_err               : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       status_buffer_ready : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-      addr_buffer         : IN STD_LOGIC_VECTOR(32*4 DOWNTO 0);
+      addr_buffer         : IN STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
       length_buffer       : IN STD_LOGIC_VECTOR(25 DOWNTO 0);
       ready_buffer        : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       buffer_time         : OUT STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);

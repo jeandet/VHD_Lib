@@ -121,8 +121,10 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   -----------------------------------------------------------------------------
   TYPE   fsm_select_channel IS (IDLE, SWITCH_F0_A, SWITCH_F0_B, SWITCH_F1, SWITCH_F2);
   SIGNAL state_fsm_select_channel     : fsm_select_channel;
-  SIGNAL pre_state_fsm_select_channel : fsm_select_channel;
-
+--  SIGNAL pre_state_fsm_select_channel : fsm_select_channel;
+  SIGNAL select_channel     : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL select_channel_reg : STD_LOGIC_VECTOR(1 DOWNTO 0);
+    
   SIGNAL sample_rdata : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   SIGNAL sample_ren   : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL sample_full  : STD_LOGIC_VECTOR(4 DOWNTO 0);
@@ -133,7 +135,9 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   -----------------------------------------------------------------------------
   TYPE   fsm_load_FFT IS (IDLE, FIFO_1, FIFO_2, FIFO_3, FIFO_4, FIFO_5);
   SIGNAL state_fsm_load_FFT      : fsm_load_FFT;
-  SIGNAL next_state_fsm_load_FFT : fsm_load_FFT;
+--  SIGNAL next_state_fsm_load_FFT : fsm_load_FFT;
+  SIGNAL select_fifo     : STD_LOGIC_VECTOR(2 DOWNTO 0);
+  SIGNAL select_fifo_reg : STD_LOGIC_VECTOR(2 DOWNTO 0);
 
   SIGNAL sample_ren_s   : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL sample_load    : STD_LOGIC;
@@ -199,7 +203,7 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL FSM_DMA_fifo_empty  : STD_LOGIC;
   SIGNAL FSM_DMA_fifo_empty_threshold  : STD_LOGIC;
   SIGNAL FSM_DMA_fifo_data   : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL FSM_DMA_fifo_status : STD_LOGIC_VECTOR(53 DOWNTO 0);
+  SIGNAL FSM_DMA_fifo_status : STD_LOGIC_VECTOR(53 DOWNTO 4);
   -----------------------------------------------------------------------------
   SIGNAL MEM_OUT_SM_Write    : STD_LOGIC_VECTOR(1 DOWNTO 0);
   SIGNAL MEM_OUT_SM_Read     : STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -233,8 +237,8 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL status_MS_input  : STD_LOGIC_VECTOR(49 DOWNTO 0);
   SIGNAL status_component : STD_LOGIC_VECTOR(53 DOWNTO 0);
 
-  SIGNAL status_component_fifo_0     : STD_LOGIC_VECTOR(53 DOWNTO 0);
-  SIGNAL status_component_fifo_1     : STD_LOGIC_VECTOR(53 DOWNTO 0);
+  SIGNAL status_component_fifo_0     : STD_LOGIC_VECTOR(53 DOWNTO 4);
+  SIGNAL status_component_fifo_1     : STD_LOGIC_VECTOR(53 DOWNTO 4);
   SIGNAL status_component_fifo_0_end : STD_LOGIC;
   SIGNAL status_component_fifo_1_end : STD_LOGIC;
   -----------------------------------------------------------------------------
@@ -471,36 +475,45 @@ BEGIN
   BEGIN
     IF rstn = '0' THEN
       state_fsm_select_channel <= IDLE;
+      select_channel <= (OTHERS => '0');
     ELSIF clk'EVENT AND clk = '1' THEN
       CASE state_fsm_select_channel IS
         WHEN IDLE =>
           IF sample_f1_full = "11111" THEN
             state_fsm_select_channel <= SWITCH_F1;
+            select_channel <= "10";
           ELSIF sample_f1_almost_full = "00000" THEN
             IF sample_f0_A_full = "11111" THEN
               state_fsm_select_channel <= SWITCH_F0_A;
+              select_channel <= "00";
             ELSIF sample_f0_B_full = "11111" THEN
               state_fsm_select_channel <= SWITCH_F0_B;
+              select_channel <= "01";
             ELSIF sample_f2_full = "11111" THEN
               state_fsm_select_channel <= SWITCH_F2;
+              select_channel <= "11";
             END IF;
           END IF;
           
         WHEN SWITCH_F0_A =>
           IF sample_f0_A_empty = "11111" THEN
             state_fsm_select_channel <= IDLE;
+            select_channel <= (OTHERS => '0');
           END IF;
         WHEN SWITCH_F0_B =>
           IF sample_f0_B_empty = "11111" THEN
             state_fsm_select_channel <= IDLE;
+            select_channel <= (OTHERS => '0');
           END IF;
         WHEN SWITCH_F1 =>
           IF sample_f1_empty = "11111" THEN
             state_fsm_select_channel <= IDLE;
+            select_channel <= (OTHERS => '0');
           END IF;
         WHEN SWITCH_F2 =>
           IF sample_f2_empty = "11111" THEN
             state_fsm_select_channel <= IDLE;
+            select_channel <= (OTHERS => '0');
           END IF;
         WHEN OTHERS => NULL;
       END CASE;
@@ -511,9 +524,11 @@ BEGIN
   PROCESS (clk, rstn)
   BEGIN
     IF rstn = '0' THEN
-      pre_state_fsm_select_channel <= IDLE;
+      select_channel_reg <= (OTHERS => '0');
+      --pre_state_fsm_select_channel <= IDLE;
     ELSIF clk'EVENT AND clk = '1' THEN
-      pre_state_fsm_select_channel <= state_fsm_select_channel;
+      select_channel_reg <= select_channel;
+      --pre_state_fsm_select_channel <= state_fsm_select_channel;
     END IF;
   END PROCESS;
 
@@ -533,9 +548,13 @@ BEGIN
                  sample_f2_full   WHEN state_fsm_select_channel = SWITCH_F2   ELSE
                  (OTHERS => '0');
   
-  sample_rdata <= sample_f0_A_rdata WHEN pre_state_fsm_select_channel = SWITCH_F0_A ELSE
-                  sample_f0_B_rdata WHEN pre_state_fsm_select_channel = SWITCH_F0_B ELSE
-                  sample_f1_rdata   WHEN pre_state_fsm_select_channel = SWITCH_F1   ELSE
+  --sample_rdata <= sample_f0_A_rdata WHEN pre_state_fsm_select_channel = SWITCH_F0_A ELSE
+  --                sample_f0_B_rdata WHEN pre_state_fsm_select_channel = SWITCH_F0_B ELSE
+  --                sample_f1_rdata   WHEN pre_state_fsm_select_channel = SWITCH_F1   ELSE
+  --                sample_f2_rdata;  -- WHEN state_fsm_select_channel = SWITCH_F2   ELSE
+  sample_rdata <= sample_f0_A_rdata WHEN select_channel_reg = "00" ELSE
+                  sample_f0_B_rdata WHEN select_channel_reg = "01" ELSE
+                  sample_f1_rdata   WHEN select_channel_reg = "10"   ELSE
                   sample_f2_rdata;  -- WHEN state_fsm_select_channel = SWITCH_F2   ELSE
 
 
@@ -564,6 +583,7 @@ BEGIN
       sample_ren_s       <= (OTHERS => '1');
       state_fsm_load_FFT <= IDLE;
       status_MS_input    <= (OTHERS => '0');
+      select_fifo        <= "000";
       --next_state_fsm_load_FFT <= IDLE;
       --sample_valid              <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN
@@ -574,6 +594,7 @@ BEGIN
           IF sample_full = "11111" AND sample_load = '1' THEN
             state_fsm_load_FFT <= FIFO_1;
             status_MS_input    <= status_channel;
+            select_fifo <= "000";
           END IF;
           
         WHEN FIFO_1 =>
@@ -581,6 +602,7 @@ BEGIN
           IF sample_empty(0) = '1' THEN
             sample_ren_s       <= (OTHERS => '1');
             state_fsm_load_FFT <= FIFO_2;
+            select_fifo <= "001";
           END IF;
           
         WHEN FIFO_2 =>
@@ -588,6 +610,7 @@ BEGIN
           IF sample_empty(1) = '1' THEN
             sample_ren_s       <= (OTHERS => '1');
             state_fsm_load_FFT <= FIFO_3;
+            select_fifo <= "010";
           END IF;
           
         WHEN FIFO_3 =>
@@ -595,6 +618,7 @@ BEGIN
           IF sample_empty(2) = '1' THEN
             sample_ren_s       <= (OTHERS => '1');
             state_fsm_load_FFT <= FIFO_4;
+            select_fifo <= "011";
           END IF;
           
         WHEN FIFO_4 =>
@@ -602,6 +626,7 @@ BEGIN
           IF sample_empty(3) = '1' THEN
             sample_ren_s       <= (OTHERS => '1');
             state_fsm_load_FFT <= FIFO_5;
+            select_fifo <= "100";
           END IF;
           
         WHEN FIFO_5 =>
@@ -609,6 +634,7 @@ BEGIN
           IF sample_empty(4) = '1' THEN
             sample_ren_s       <= (OTHERS => '1');
             state_fsm_load_FFT <= IDLE;
+            select_fifo <= "000";
           END IF;
         WHEN OTHERS => NULL;
       END CASE;
@@ -619,9 +645,11 @@ BEGIN
   BEGIN
     IF rstn = '0' THEN
       sample_valid_r          <= '0';
-      next_state_fsm_load_FFT <= IDLE;
+      select_fifo_reg <= (OTHERS => '0');
+      --next_state_fsm_load_FFT <= IDLE;
     ELSIF clk'EVENT AND clk = '1' THEN
-      next_state_fsm_load_FFT <= state_fsm_load_FFT;
+      select_fifo_reg <= select_fifo;
+      --next_state_fsm_load_FFT <= state_fsm_load_FFT;
       IF sample_ren_s = "11111" THEN
         sample_valid_r <= '0';
       ELSE
@@ -632,12 +660,17 @@ BEGIN
 
   sample_valid <= '0' WHEN fft_ongoing_counter = '1' ELSE sample_valid_r AND sample_load;
 
-  sample_data <= sample_rdata(16*1-1 DOWNTO 16*0) WHEN next_state_fsm_load_FFT = FIFO_1 ELSE
-                 sample_rdata(16*2-1 DOWNTO 16*1) WHEN next_state_fsm_load_FFT = FIFO_2 ELSE
-                 sample_rdata(16*3-1 DOWNTO 16*2) WHEN next_state_fsm_load_FFT = FIFO_3 ELSE
-                 sample_rdata(16*4-1 DOWNTO 16*3) WHEN next_state_fsm_load_FFT = FIFO_4 ELSE
+  --sample_data <= sample_rdata(16*1-1 DOWNTO 16*0) WHEN next_state_fsm_load_FFT = FIFO_1 ELSE
+  --               sample_rdata(16*2-1 DOWNTO 16*1) WHEN next_state_fsm_load_FFT = FIFO_2 ELSE
+  --               sample_rdata(16*3-1 DOWNTO 16*2) WHEN next_state_fsm_load_FFT = FIFO_3 ELSE
+  --               sample_rdata(16*4-1 DOWNTO 16*3) WHEN next_state_fsm_load_FFT = FIFO_4 ELSE
+  --               sample_rdata(16*5-1 DOWNTO 16*4);  --WHEN next_state_fsm_load_FFT = FIFO_5 ELSE
+  sample_data <= sample_rdata(16*1-1 DOWNTO 16*0) WHEN select_fifo_reg = "000" ELSE
+                 sample_rdata(16*2-1 DOWNTO 16*1) WHEN select_fifo_reg = "001" ELSE
+                 sample_rdata(16*3-1 DOWNTO 16*2) WHEN select_fifo_reg = "010" ELSE
+                 sample_rdata(16*4-1 DOWNTO 16*3) WHEN select_fifo_reg = "011"  ELSE
                  sample_rdata(16*5-1 DOWNTO 16*4);  --WHEN next_state_fsm_load_FFT = FIFO_5 ELSE
-
+  
   -----------------------------------------------------------------------------
   -- FFT
   -----------------------------------------------------------------------------
@@ -852,9 +885,9 @@ BEGIN
       status_component_fifo_1_end <= '0';
       IF SM_correlation_begin = '1' THEN
         IF current_matrix_write = '0' THEN
-          status_component_fifo_0 <= status_component;
+          status_component_fifo_0 <= status_component(53 DOWNTO 4);
         ELSE
-          status_component_fifo_1 <= status_component;
+          status_component_fifo_1 <= status_component(53 DOWNTO 4);
         END IF;
       END IF;
 
