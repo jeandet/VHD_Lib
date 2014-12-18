@@ -19,8 +19,6 @@ USE lpp.lpp_sim_pkg.ALL;
 USE lpp.lpp_lfr_apbreg_pkg.ALL;
 USE lpp.lpp_lfr_time_management_apbreg_pkg.ALL;
 
-LIBRARY postlayout;
-USE postlayout.ALL;
 
 ENTITY testbench IS
 END;
@@ -194,18 +192,18 @@ BEGIN
   ADC_SDO      <= x"AA";
 
   SRAM_DQ      <= (OTHERS => 'Z');
-  IO0          <= 'Z';
-  IO1          <= 'Z';
-  IO2          <= 'Z';
-  IO3          <= 'Z';
-  IO4          <= 'Z';
-  IO5          <= 'Z';
-  IO6          <= 'Z';
-  IO7          <= 'Z';
-  IO8          <= 'Z';
-  IO9          <= 'Z';
-  IO10         <= 'Z';
-  IO11         <= 'Z';
+  --IO0          <= 'Z';
+  --IO1          <= 'Z';
+  --IO2          <= 'Z';
+  --IO3          <= 'Z';
+  --IO4          <= 'Z';
+  --IO5          <= 'Z';
+  --IO6          <= 'Z';
+  --IO7          <= 'Z';
+  --IO8          <= 'Z';
+  --IO9          <= 'Z';
+  --IO10         <= 'Z';
+  --IO11         <= 'Z';
 
   -----------------------------------------------------------------------------
   -- DUT

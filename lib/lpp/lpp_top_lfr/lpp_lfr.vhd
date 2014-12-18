@@ -58,7 +58,10 @@ ENTITY lpp_lfr IS
     coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);  -- todo
     fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
     -- 
-    data_shaping_BW : OUT STD_LOGIC
+    data_shaping_BW : OUT STD_LOGIC;
+    --
+    debug_vector    : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);   
+    debug_vector_ms : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)    
     );
 END lpp_lfr;
 
@@ -223,9 +226,13 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL dma_buffer_full_err  : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL dma_grant_error      : STD_LOGIC;
 
+  SIGNAL apb_reg_debug_vector : STD_LOGIC_VECTOR(11 DOWNTO 0);
   -----------------------------------------------------------------------------
 --  SIGNAL run_dma : STD_LOGIC;
 BEGIN
+
+  debug_vector <= apb_reg_debug_vector;
+  -----------------------------------------------------------------------------
   
   sample_s(4 DOWNTO 0) <= sample_E(4 DOWNTO 0);
   sample_s(7 DOWNTO 5) <= sample_B(2 DOWNTO 0);
@@ -334,7 +341,8 @@ BEGIN
     
       wfp_ready_buffer        => wfp_ready_buffer,-- TODO
       wfp_buffer_time         => wfp_buffer_time,-- TODO
-      wfp_error_buffer_full   => wfp_error_buffer_full -- TODO
+      wfp_error_buffer_full   => wfp_error_buffer_full, -- TODO
+      debug_vector => apb_reg_debug_vector
       );
 
   -----------------------------------------------------------------------------
@@ -480,7 +488,9 @@ BEGIN
 
       matrix_time_f0 => matrix_time_f0,
       matrix_time_f1 => matrix_time_f1,
-      matrix_time_f2 => matrix_time_f2);
+      matrix_time_f2 => matrix_time_f2,
+
+      debug_vector   => debug_vector_ms);
 
   -----------------------------------------------------------------------------
   --run_dma <= run_ms OR run;

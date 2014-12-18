@@ -137,7 +137,9 @@ ENTITY lpp_lfr_apbreg IS
     wfp_length_buffer       : OUT STD_LOGIC_VECTOR(25 DOWNTO 0);
     wfp_ready_buffer        : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
     wfp_buffer_time         : IN STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
-    wfp_error_buffer_full   : IN STD_LOGIC_VECTOR(3 DOWNTO 0)
+    wfp_error_buffer_full   : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+    ---------------------------------------------------------------------------
+    debug_vector : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
     
     );
 
@@ -269,6 +271,15 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
   
 BEGIN  -- beh
 
+  debug_vector(0)          <= error_buffer_full;
+  debug_vector(1)          <= reg_sp.status_error_buffer_full;
+  debug_vector(4 DOWNTO 2) <= error_input_fifo_write;
+  debug_vector(7 DOWNTO 5) <= reg_sp.status_error_input_fifo_write;
+  debug_vector(8)          <= ready_matrix_f2;
+  debug_vector(9)          <= reg0_ready_matrix_f2;
+  debug_vector(10)         <= reg1_ready_matrix_f2;
+  debug_vector(11)         <= HRESETn;
+  
 --  status_ready_matrix_f0 <= reg_sp.status_ready_matrix_f0;
 --  status_ready_matrix_f1 <= reg_sp.status_ready_matrix_f1;
 --  status_ready_matrix_f2 <= reg_sp.status_ready_matrix_f2;
@@ -778,4 +789,4 @@ BEGIN  -- beh
         
 END beh;
 
--------------------------------------------------------------------------------
+------------------------------------------------------------------------------

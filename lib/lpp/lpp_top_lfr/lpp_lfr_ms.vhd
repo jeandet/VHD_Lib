@@ -76,8 +76,9 @@ ENTITY lpp_lfr_ms IS
 
     matrix_time_f0 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0); -- TODO
     matrix_time_f1 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0); -- TODO
-    matrix_time_f2 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)  -- TODO
-
+    matrix_time_f2 : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);  -- TODO
+    ---------------------------------------------------------------------------
+    debug_vector : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
     );
 END;
 
@@ -442,7 +443,7 @@ BEGIN
       ReUse => (OTHERS => '0'),
       run   => (OTHERS => '1'),
 
-      wen         => sample_f2_wen,
+      wen         => sample_f2_wen_s,
       wdata       => sample_f2_wdata,
       ren         => sample_f2_ren,
       rdata       => sample_f2_rdata,
@@ -687,7 +688,12 @@ BEGIN
       fft_data_re    => fft_data_re,
       fft_data_valid => fft_data_valid,
       fft_ready      => fft_ready);
+  
+  debug_vector(0) <= fft_data_valid;
+  debug_vector(1) <= fft_ready;
+  debug_vector(11 DOWNTO 2) <= (OTHERS => '0');
 
+    
   -----------------------------------------------------------------------------
   fft_ready_rising_down   <= fft_ready_reg AND NOT fft_ready;
   sample_load_rising_down <= sample_load_reg AND NOT sample_load;

@@ -107,7 +107,8 @@ PACKAGE lpp_lfr_pkg IS
       length_matrix_f2       : IN  STD_LOGIC_VECTOR(25 DOWNTO 0);
       matrix_time_f0         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
       matrix_time_f1         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
-      matrix_time_f2         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0));
+      matrix_time_f2         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      debug_vector           : OUT STD_LOGIC_VECTOR(11 DOWNTO 0));
   END COMPONENT;
 
   COMPONENT lpp_lfr_ms_fsmdma
@@ -213,7 +214,9 @@ PACKAGE lpp_lfr_pkg IS
       ahbo            : OUT AHB_Mst_Out_Type;
       coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-      data_shaping_BW : OUT STD_LOGIC
+      data_shaping_BW : OUT STD_LOGIC ;
+      debug_vector : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+      debug_vector_ms : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
       );
   END COMPONENT;
 
@@ -315,7 +318,8 @@ PACKAGE lpp_lfr_pkg IS
       wfp_length_buffer       : OUT STD_LOGIC_VECTOR(25 DOWNTO 0);
       wfp_ready_buffer        : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
       wfp_buffer_time         : IN  STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
-      wfp_error_buffer_full   : IN  STD_LOGIC_VECTOR(3 DOWNTO 0));
+      wfp_error_buffer_full   : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      debug_vector : OUT STD_LOGIC_VECTOR(11 DOWNTO 0));
   END COMPONENT;
   
   COMPONENT lpp_top_ms

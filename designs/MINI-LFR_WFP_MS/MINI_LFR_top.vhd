@@ -38,7 +38,7 @@ USE esa.memoryctrl.ALL;
 LIBRARY lpp;
 USE lpp.lpp_memory.ALL;
 USE lpp.lpp_ad_conv.ALL;
-USE lpp.lpp_lfr_pkg.ALL;      -- contains lpp_lfr, not in the 206 rev of the VHD_Lib
+USE lpp.lpp_lfr_pkg.ALL;  -- contains lpp_lfr, not in the 206 rev of the VHD_Lib
 USE lpp.lpp_top_lfr_pkg.ALL;            -- contains top_wf_picker
 USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
@@ -128,7 +128,7 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   -- UART APB ---------------------------------------------------------------
 --  SIGNAL urxd1 : STD_ULOGIC;            -- UART1 rx data
 --  SIGNAL utxd1 : STD_ULOGIC;            -- UART1 tx data
-                                        --
+  --
   SIGNAL I00_s : STD_LOGIC;
 
   -- CONSTANTS
@@ -139,11 +139,11 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   CONSTANT NB_AHB_MASTER : INTEGER := 2;   -- 2 = grspw + waveform picker
 
   SIGNAL apbi_ext   : apb_slv_in_type;
-  SIGNAL apbo_ext   : soc_apb_slv_out_vector(NB_APB_SLAVE-1+5 DOWNTO 5);--  := (OTHERS => apb_none);
+  SIGNAL apbo_ext   : soc_apb_slv_out_vector(NB_APB_SLAVE-1+5 DOWNTO 5);  --  := (OTHERS => apb_none);
   SIGNAL ahbi_s_ext : ahb_slv_in_type;
-  SIGNAL ahbo_s_ext : soc_ahb_slv_out_vector(NB_AHB_SLAVE-1+3 DOWNTO 3);--  := (OTHERS => ahbs_none);
+  SIGNAL ahbo_s_ext : soc_ahb_slv_out_vector(NB_AHB_SLAVE-1+3 DOWNTO 3);  --  := (OTHERS => ahbs_none);
   SIGNAL ahbi_m_ext : AHB_Mst_In_Type;
-  SIGNAL ahbo_m_ext : soc_ahb_mst_out_vector(NB_AHB_MASTER-1+1 DOWNTO 1);-- := (OTHERS => ahbm_none);
+  SIGNAL ahbo_m_ext : soc_ahb_mst_out_vector(NB_AHB_MASTER-1+1 DOWNTO 1);  -- := (OTHERS => ahbm_none);
 
 -- Spacewire signals
   SIGNAL dtmp        : STD_LOGIC_VECTOR(1 DOWNTO 0);
@@ -171,24 +171,28 @@ ARCHITECTURE beh OF MINI_LFR_top IS
 
   SIGNAL bias_fail_sw_sig : STD_LOGIC;
 
-  SIGNAL observation_reg : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL observation_vector_0: STD_LOGIC_VECTOR(11 DOWNTO 0);
-  SIGNAL observation_vector_1: STD_LOGIC_VECTOR(11 DOWNTO 0);
+  SIGNAL observation_reg      : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL observation_vector_0 : STD_LOGIC_VECTOR(11 DOWNTO 0);
+  SIGNAL observation_vector_1 : STD_LOGIC_VECTOR(11 DOWNTO 0);
   -----------------------------------------------------------------------------
 
   SIGNAL LFR_soft_rstn : STD_LOGIC;
-  SIGNAL LFR_rstn : STD_LOGIC;
+  SIGNAL LFR_rstn      : STD_LOGIC;
 
 
   SIGNAL rstn_25    : STD_LOGIC;
   SIGNAL rstn_25_d1 : STD_LOGIC;
   SIGNAL rstn_25_d2 : STD_LOGIC;
   SIGNAL rstn_25_d3 : STD_LOGIC;
-  
+
   SIGNAL rstn_50    : STD_LOGIC;
   SIGNAL rstn_50_d1 : STD_LOGIC;
   SIGNAL rstn_50_d2 : STD_LOGIC;
   SIGNAL rstn_50_d3 : STD_LOGIC;
+
+  SIGNAL lfr_debug_vector    : STD_LOGIC_VECTOR(11 DOWNTO 0);
+  SIGNAL lfr_debug_vector_ms : STD_LOGIC_VECTOR(11 DOWNTO 0);
+  
 BEGIN  -- beh
 
   -----------------------------------------------------------------------------
@@ -215,7 +219,7 @@ BEGIN  -- beh
   --    clk_24 <= NOT clk_24;
   --  END IF;
   --END PROCESS;
-  
+
   --PROCESS(clk_25)
   --BEGIN
   --  IF clk_25'EVENT AND clk_25 = '1' THEN
@@ -232,8 +236,8 @@ BEGIN  -- beh
       rstn_50_d2 <= '0';
       rstn_50_d3 <= '0';
       
-    ELSIF clk_50'event AND clk_50 = '1' THEN  -- rising clock edge
-      clk_50_s  <= NOT clk_50_s;
+    ELSIF clk_50'EVENT AND clk_50 = '1' THEN  -- rising clock edge
+      clk_50_s   <= NOT clk_50_s;
       rstn_50_d1 <= '1';
       rstn_50_d2 <= rstn_50_d1;
       rstn_50_d3 <= rstn_50_d2;
@@ -244,12 +248,12 @@ BEGIN  -- beh
   PROCESS (clk_50_s, rstn_50)
   BEGIN  -- PROCESS
     IF rstn_50 = '0' THEN               -- asynchronous reset (active low)
-      clk_25   <= '0';
+      clk_25     <= '0';
       rstn_25    <= '0';
       rstn_25_d1 <= '0';
       rstn_25_d2 <= '0';
       rstn_25_d3 <= '0';
-    ELSIF clk_50_s'event AND clk_50_s = '1' THEN  -- rising clock edge
+    ELSIF clk_50_s'EVENT AND clk_50_s = '1' THEN  -- rising clock edge
       clk_25     <= NOT clk_25;
       rstn_25_d1 <= '1';
       rstn_25_d2 <= rstn_25_d1;
@@ -262,16 +266,16 @@ BEGIN  -- beh
   BEGIN  -- PROCESS
     IF reset = '0' THEN                 -- asynchronous reset (active low)
       clk_24 <= '0';
-    ELSIF clk_49'event AND clk_49 = '1' THEN  -- rising clock edge
-      clk_24 <= NOT clk_24;                
+    ELSIF clk_49'EVENT AND clk_49 = '1' THEN  -- rising clock edge
+      clk_24 <= NOT clk_24;
     END IF;
   END PROCESS;
-  
+
   -----------------------------------------------------------------------------
 
   PROCESS (clk_25, rstn_25)
   BEGIN  -- PROCESS
-    IF rstn_25 = '0' THEN                 -- asynchronous reset (active low)
+    IF rstn_25 = '0' THEN               -- asynchronous reset (active low)
       LED0 <= '0';
       LED1 <= '0';
       LED2 <= '0';
@@ -306,10 +310,10 @@ BEGIN  -- beh
 
   PROCESS (clk_24, rstn_25)
   BEGIN  -- PROCESS
-    IF rstn_25 = '0' THEN                 -- asynchronous reset (active low)
+    IF rstn_25 = '0' THEN               -- asynchronous reset (active low)
       I00_s <= '0';
     ELSIF clk_24'EVENT AND clk_24 = '1' THEN  -- rising clock edge
-      I00_s <= NOT I00_s ;
+      I00_s <= NOT I00_s;
     END IF;
   END PROCESS;
 --  IO0 <= I00_s;
@@ -375,20 +379,20 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
   apb_lfr_time_management_1 : apb_lfr_time_management
     GENERIC MAP (
-      pindex => 6,
-      paddr  => 6,
-      pmask  => 16#fff#,
-      FIRST_DIVISION   => 374, -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
+      pindex           => 6,
+      paddr            => 6,
+      pmask            => 16#fff#,
+      FIRST_DIVISION   => 374,  -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
       NB_SECOND_DESYNC => 60)  -- 60 secondes of desynchronization before CoarseTime's MSB is Set
     PORT MAP (
-      clk25MHz     => clk_25,
-      clk24_576MHz => clk_24,           -- 49.152MHz/2
-      resetn       => rstn_25,
-      grspw_tick   => swno.tickout,
-      apbi         => apbi_ext,
-      apbo         => apbo_ext(6),
-      coarse_time  => coarse_time,
-      fine_time    => fine_time,
+      clk25MHz      => clk_25,
+      clk24_576MHz  => clk_24,          -- 49.152MHz/2
+      resetn        => rstn_25,
+      grspw_tick    => swno.tickout,
+      apbi          => apbi_ext,
+      apbo          => apbo_ext(6),
+      coarse_time   => coarse_time,
+      fine_time     => fine_time,
       LFR_soft_rstn => LFR_soft_rstn
       );
 
@@ -439,7 +443,7 @@ BEGIN  -- beh
         dconnect => swni.dconnect(j*2+1 DOWNTO j*2));
   END GENERATE spw_inputloop;
 
-  swni.rmapnodeaddr <= (others => '0');
+  swni.rmapnodeaddr <= (OTHERS => '0');
 
   -- SPW core
   sw0 : grspwm GENERIC MAP(
@@ -485,23 +489,23 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
 
 
-  --LFR_rstn <= LFR_soft_rstn AND rstn_25;
-  LFR_rstn <= rstn_25;
-  
+  LFR_rstn <= LFR_soft_rstn AND rstn_25;
+  --LFR_rstn <= rstn_25;
+
   lpp_lfr_1 : lpp_lfr
     GENERIC MAP (
       Mem_use                => use_RAM,
       nb_data_by_buffer_size => 32,
       nb_snapshot_param_size => 32,
       delta_vector_size      => 32,
-      delta_vector_size_f0_2 => 7,      -- log2(96)
+      delta_vector_size_f0_2 => 7,          -- log2(96)
       pindex                 => 15,
       paddr                  => 15,
       pmask                  => 16#fff#,
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000122")  -- aa.bb.cc version
+      top_lfr_version        => X"000123")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
@@ -514,13 +518,25 @@ BEGIN  -- beh
       ahbo            => ahbo_m_ext(2),
       coarse_time     => coarse_time,
       fine_time       => fine_time,
-      data_shaping_BW => bias_fail_sw_sig);
+      data_shaping_BW => bias_fail_sw_sig,
+      debug_vector    => lfr_debug_vector,
+      debug_vector_ms => lfr_debug_vector_ms
+      );
 
-  observation_reg      <= (others => '0');
-  observation_vector_0 <= (others => '0');
-  observation_vector_1 <= (others => '0');
+  observation_reg(11 DOWNTO 0)      <= lfr_debug_vector;
+  observation_reg(31 DOWNTO 12)     <= (OTHERS => '0');
+  observation_vector_0(11 DOWNTO 0) <= lfr_debug_vector;
+  observation_vector_1(11 DOWNTO 0) <= lfr_debug_vector;
+  IO0                               <= rstn_25;
+  IO1                               <= lfr_debug_vector_ms(0);  -- LFR MS FFT data_valid
+  IO2                               <= lfr_debug_vector_ms(0);  -- LFR MS FFT ready
+  IO3                               <= lfr_debug_vector(0);  -- LFR APBREG error_buffer_full
+  IO4                               <= lfr_debug_vector(1);  -- LFR APBREG reg_sp.status_error_buffer_full
+  IO5                               <= lfr_debug_vector(8);  -- LFR APBREG  ready_matrix_f2
+  IO6                               <= lfr_debug_vector(9);  -- LFR APBREG reg0_ready_matrix_f2
+  IO7                               <= lfr_debug_vector(10);  -- LFR APBREG reg0_ready_matrix_f2
 
-  all_sample: FOR I IN 7 DOWNTO 0 GENERATE
+  all_sample : FOR I IN 7 DOWNTO 0 GENERATE
     sample_s(I) <= sample(I)(11 DOWNTO 0) & '0' & '0' & '0' & '0';
   END GENERATE all_sample;
 
@@ -529,7 +545,7 @@ BEGIN  -- beh
       ChannelCount    => 8,
       SampleNbBits    => 14,
       ncycle_cnv_high => 40,  -- at least 32 cycles at 25 MHz, 32 * 49.152 / 25 /2 = 31.5
-      ncycle_cnv      => 249) -- 49 152 000 / 98304 /2
+      ncycle_cnv      => 249)           -- 49 152 000 / 98304 /2
     PORT MAP (
       -- CONV
       cnv_clk    => clk_24,
@@ -560,9 +576,9 @@ BEGIN  -- beh
     GENERIC MAP(pindex => 11, paddr => 11, imask => 16#0000#, nbits => 8)
     PORT MAP(rstn_25, clk_25, apbi_ext, apbo_ext(11), gpioi, gpioo);
   
-  gpioi.sig_en <= (others => '0');
-  gpioi.sig_in <= (others => '0');
-  gpioi.din    <= (others => '0');
+  gpioi.sig_en <= (OTHERS => '0');
+  gpioi.sig_in <= (OTHERS => '0');
+  gpioi.din    <= (OTHERS => '0');
   --pio_pad_0 : iopad
   --  GENERIC MAP (tech => CFG_PADTECH)
   --  PORT MAP (IO0, gpioo.dout(0), gpioo.oen(0), gpioi.din(0));
@@ -590,84 +606,84 @@ BEGIN  -- beh
 
   PROCESS (clk_25, rstn_25)
   BEGIN  -- PROCESS
-    IF rstn_25 = '0' THEN                  -- asynchronous reset (active low)
-      IO0  <= '0';
-      IO1  <= '0';
-      IO2  <= '0';  
-      IO3  <= '0';
-      IO4  <= '0';
-      IO5  <= '0';
-      IO6  <= '0';
-      IO7  <= '0';
+    IF rstn_25 = '0' THEN               -- asynchronous reset (active low)
+      --    --IO0  <= '0';
+      --    IO1  <= '0';
+      --    IO2  <= '0';  
+      --    IO3  <= '0';
+      --    IO4  <= '0';
+      --    IO5  <= '0';
+      --    IO6  <= '0';
+      --    IO7  <= '0';
       IO8  <= '0';
       IO9  <= '0';
       IO10 <= '0';
       IO11 <= '0';
-    ELSIF clk_25'event AND clk_25 = '1' THEN  -- rising clock edge
+    ELSIF clk_25'EVENT AND clk_25 = '1' THEN  -- rising clock edge
       CASE gpioo.dout(2 DOWNTO 0) IS
-        WHEN "011" => 
-          IO0  <= observation_reg(0 );
-          IO1  <= observation_reg(1 );
-          IO2  <= observation_reg(2 );  
-          IO3  <= observation_reg(3 );
-          IO4  <= observation_reg(4 );
-          IO5  <= observation_reg(5 );
-          IO6  <= observation_reg(6 );
-          IO7  <= observation_reg(7 );
-          IO8  <= observation_reg(8 );
-          IO9  <= observation_reg(9 );
+        WHEN "011" =>
+          --        --IO0  <= observation_reg(0 );
+          --        IO1  <= observation_reg(1 );
+          --        IO2  <= observation_reg(2 );  
+          --        IO3  <= observation_reg(3 );
+          --        IO4  <= observation_reg(4 );
+          --        IO5  <= observation_reg(5 );
+          --        IO6  <= observation_reg(6 );
+          --        IO7  <= observation_reg(7 );
+          IO8  <= observation_reg(8);
+          IO9  <= observation_reg(9);
           IO10 <= observation_reg(10);
           IO11 <= observation_reg(11);
-        WHEN "001" => 
-          IO0  <= observation_reg(0  + 12);
-          IO1  <= observation_reg(1  + 12);
-          IO2  <= observation_reg(2  + 12);  
-          IO3  <= observation_reg(3  + 12);
-          IO4  <= observation_reg(4  + 12);
-          IO5  <= observation_reg(5  + 12);
-          IO6  <= observation_reg(6  + 12);
-          IO7  <= observation_reg(7  + 12);
-          IO8  <= observation_reg(8  + 12);
-          IO9  <= observation_reg(9  + 12);
+        WHEN "001" =>
+          --        --IO0  <= observation_reg(0  + 12);
+          --        IO1  <= observation_reg(1  + 12);
+          --        IO2  <= observation_reg(2  + 12);  
+          --        IO3  <= observation_reg(3  + 12);
+          --        IO4  <= observation_reg(4  + 12);
+          --        IO5  <= observation_reg(5  + 12);
+          --        IO6  <= observation_reg(6  + 12);
+          --        IO7  <= observation_reg(7  + 12);
+          IO8  <= observation_reg(8 + 12);
+          IO9  <= observation_reg(9 + 12);
           IO10 <= observation_reg(10 + 12);
           IO11 <= observation_reg(11 + 12);
-        WHEN "010" => 
-          IO0  <= observation_reg(0  + 12 + 12);
-          IO1  <= observation_reg(1  + 12 + 12);
-          IO2  <= observation_reg(2  + 12 + 12);  
-          IO3  <= observation_reg(3  + 12 + 12);
-          IO4  <= observation_reg(4  + 12 + 12);
-          IO5  <= observation_reg(5  + 12 + 12);
-          IO6  <= observation_reg(6  + 12 + 12);
-          IO7  <= observation_reg(7  + 12 + 12);
+        WHEN "010" =>
+          --        --IO0  <= observation_reg(0  + 12 + 12);
+          --        IO1  <= observation_reg(1  + 12 + 12);
+          --        IO2  <= observation_reg(2  + 12 + 12);  
+          --        IO3  <= observation_reg(3  + 12 + 12);
+          --        IO4  <= observation_reg(4  + 12 + 12);
+          --        IO5  <= observation_reg(5  + 12 + 12);
+          --        IO6  <= observation_reg(6  + 12 + 12);
+          --        IO7  <= observation_reg(7  + 12 + 12);
           IO8  <= '0';
           IO9  <= '0';
           IO10 <= '0';
           IO11 <= '0';
-        WHEN "000" => 
-          IO0  <= observation_vector_0(0 );
-          IO1  <= observation_vector_0(1 );
-          IO2  <= observation_vector_0(2 );  
-          IO3  <= observation_vector_0(3 );
-          IO4  <= observation_vector_0(4 );
-          IO5  <= observation_vector_0(5 );
-          IO6  <= observation_vector_0(6 );
-          IO7  <= observation_vector_0(7 );
-          IO8  <= observation_vector_0(8 );
-          IO9  <= observation_vector_0(9 );
+        WHEN "000" =>
+          --        --IO0  <= observation_vector_0(0 );
+          --        IO1  <= observation_vector_0(1 );
+          --        IO2  <= observation_vector_0(2 );  
+          --        IO3  <= observation_vector_0(3 );
+          --        IO4  <= observation_vector_0(4 );
+          --        IO5  <= observation_vector_0(5 );
+          --        IO6  <= observation_vector_0(6 );
+          --        IO7  <= observation_vector_0(7 );
+          IO8  <= observation_vector_0(8);
+          IO9  <= observation_vector_0(9);
           IO10 <= observation_vector_0(10);
           IO11 <= observation_vector_0(11);
-        WHEN "100" => 
-          IO0  <= observation_vector_1(0 );
-          IO1  <= observation_vector_1(1 );
-          IO2  <= observation_vector_1(2 );  
-          IO3  <= observation_vector_1(3 );
-          IO4  <= observation_vector_1(4 );
-          IO5  <= observation_vector_1(5 );
-          IO6  <= observation_vector_1(6 );
-          IO7  <= observation_vector_1(7 );
-          IO8  <= observation_vector_1(8 );
-          IO9  <= observation_vector_1(9 );
+        WHEN "100" =>
+          --        --IO0  <= observation_vector_1(0 );
+          --        IO1  <= observation_vector_1(1 );
+          --        IO2  <= observation_vector_1(2 );  
+          --        IO3  <= observation_vector_1(3 );
+          --        IO4  <= observation_vector_1(4 );
+          --        IO5  <= observation_vector_1(5 );
+          --        IO6  <= observation_vector_1(6 );
+          --        IO7  <= observation_vector_1(7 );
+          IO8  <= observation_vector_1(8);
+          IO9  <= observation_vector_1(9);
           IO10 <= observation_vector_1(10);
           IO11 <= observation_vector_1(11);
         WHEN OTHERS => NULL;
@@ -678,19 +694,19 @@ BEGIN  -- beh
   -----------------------------------------------------------------------------
   -- 
   -----------------------------------------------------------------------------
-  all_apbo_ext: FOR I IN NB_APB_SLAVE-1+5 DOWNTO 5 GENERATE
-    apbo_ext_not_used: IF I /= 5 AND I /= 6 AND I /= 11 AND I /= 15 GENERATE
+  all_apbo_ext : FOR I IN NB_APB_SLAVE-1+5 DOWNTO 5 GENERATE
+    apbo_ext_not_used : IF I /= 5 AND I /= 6 AND I /= 11 AND I /= 15 GENERATE
       apbo_ext(I) <= apb_none;
     END GENERATE apbo_ext_not_used;
   END GENERATE all_apbo_ext;
-  
 
-  all_ahbo_ext: FOR I IN NB_AHB_SLAVE-1+3 DOWNTO 3 GENERATE
+
+  all_ahbo_ext : FOR I IN NB_AHB_SLAVE-1+3 DOWNTO 3 GENERATE
     ahbo_s_ext(I) <= ahbs_none;
   END GENERATE all_ahbo_ext;
-  
-  all_ahbo_m_ext: FOR I IN NB_AHB_MASTER-1+1 DOWNTO 1 GENERATE
-    ahbo_m_ext_not_used: IF I /=1 AND I /= 2 GENERATE
+
+  all_ahbo_m_ext : FOR I IN NB_AHB_MASTER-1+1 DOWNTO 1 GENERATE
+    ahbo_m_ext_not_used : IF I /= 1 AND I /= 2 GENERATE
       ahbo_m_ext(I) <= ahbm_none;
     END GENERATE ahbo_m_ext_not_used;
   END GENERATE all_ahbo_m_ext;
