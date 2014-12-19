@@ -171,7 +171,24 @@ BEGIN
     --UART_WRITE(TXD1,txp,ADDR_BASE_TIME_MANAGMENT & ADDR_LFR_TM_TIME_LOAD , X"00000000");
     --
     message_simu <= "3 - LFR CONFIG ";
-    UART_WRITE(TXD1,txp,ADDR_BASE_LFR & ADDR_LFR_SM_F0_0_ADDR , X"00000B0B");
+    --UART_WRITE(TXD1,txp,ADDR_BASE_LFR & ADDR_LFR_SM_F0_0_ADDR , X"00000B0B");
+    LAUNCH_SPECTRAL_MATRIX(TXD1,RXD1,txp,ADDR_BASE_LFR,
+                           X"40000000",
+                           X"40001000",
+                           X"40002000",
+                           X"40003000",
+                           X"40004000",
+                           X"40005000");
+    message_simu <= "4 - GO GO GO !!";
+    UART_WRITE            (TXD1 ,txp,ADDR_BASE_LFR & ADDR_LFR_WP_START_DATE,X"00000000");
+
+    READ_STATUS: LOOP
+      WAIT FOR 2 ms;
+      UART_READ(TXD1,RXD1,txp,ADDR_BASE_LFR & ADDR_LFR_SM_STATUS,data_read_v);
+      data_read    <= data_read_v;
+      data_message <= "READ_NEW_STATUS";
+      UART_WRITE(TXD1,    txp,ADDR_BASE_LFR & ADDR_LFR_SM_STATUS,data_read_v);
+    END LOOP READ_STATUS;
     
     WAIT;
   END PROCESS;
