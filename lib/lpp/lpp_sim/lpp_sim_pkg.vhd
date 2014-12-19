@@ -50,7 +50,15 @@ PACKAGE lpp_sim_pkg IS
     CONSTANT ADDR      : IN  STD_LOGIC_VECTOR(31 DOWNTO 2);
     CONSTANT DATA      : IN  STD_LOGIC_VECTOR(31 DOWNTO 0)
     );
-
+  PROCEDURE UART_READ (
+    SIGNAL   TX        : OUT STD_LOGIC;
+    SIGNAL   RX        : IN  STD_LOGIC;
+    CONSTANT tx_period : IN  TIME;
+    CONSTANT ADDR      : IN  STD_LOGIC_VECTOR(31 DOWNTO 2);
+    DATA      : OUT  STD_LOGIC_VECTOR
+    );
+  
+  
 END lpp_sim_pkg;
 
 PACKAGE BODY lpp_sim_pkg IS
@@ -99,6 +107,33 @@ PACKAGE BODY lpp_sim_pkg IS
         to_integer(UNSIGNED(DATA(15 DOWNTO 8))),
         to_integer(UNSIGNED(DATA(7 DOWNTO 0))),
         tx_period);
+  END;
+  
+  PROCEDURE UART_READ (
+    SIGNAL   TX        : OUT STD_LOGIC;
+    SIGNAL   RX        : IN  STD_LOGIC;
+    CONSTANT tx_period : IN  TIME;
+    CONSTANT ADDR      : IN  STD_LOGIC_VECTOR(31 DOWNTO 2);
+    DATA      : OUT  STD_LOGIC_VECTOR )
+  IS
+    VARIABLE V_DATA : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    CONSTANT ADDR_last : STD_LOGIC_VECTOR(7 DOWNTO 0) := ADDR(7 DOWNTO 2) & "00";
+  BEGIN
+    txc(TX, 16#80#, tx_period);
+    txa(TX,
+        to_integer(UNSIGNED(ADDR(31 DOWNTO 24))),
+        to_integer(UNSIGNED(ADDR(23 DOWNTO 16))),
+        to_integer(UNSIGNED(ADDR(15 DOWNTO 8))),
+        to_integer(UNSIGNED(ADDR_last)),
+        tx_period);
+    rxc(RX,V_DATA,tx_period);
+    DATA(31 DOWNTO 24) := V_DATA;
+    rxc(RX,V_DATA,tx_period);   
+    DATA(23 DOWNTO 16) := V_DATA;
+    rxc(RX,V_DATA,tx_period);   
+    DATA(15 DOWNTO 8) := V_DATA;
+    rxc(RX,V_DATA,tx_period);  
+    DATA(7 DOWNTO 0) := V_DATA;
   END;
   
 END lpp_sim_pkg;

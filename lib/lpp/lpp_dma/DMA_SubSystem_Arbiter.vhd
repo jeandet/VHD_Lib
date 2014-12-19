@@ -7,10 +7,10 @@ USE lpp.lpp_ad_conv.ALL;
 USE lpp.iir_filter.ALL;
 USE lpp.FILTERcfg.ALL;
 USE lpp.lpp_memory.ALL;
-USE lpp.lpp_waveform_pkg.ALL;
+--USE lpp.lpp_waveform_pkg.ALL;
 USE lpp.lpp_dma_pkg.ALL;
-USE lpp.lpp_top_lfr_pkg.ALL;
-USE lpp.lpp_lfr_pkg.ALL;
+--USE lpp.lpp_top_lfr_pkg.ALL;
+--USE lpp.lpp_lfr_pkg.ALL;
 USE lpp.general_purpose.ALL;
 
 LIBRARY techmap;

@@ -37,7 +37,7 @@ USE lpp.lpp_amba.ALL;
 USE lpp.apb_devices_list.ALL;
 USE lpp.lpp_memory.ALL;
 USE lpp.lpp_dma_pkg.ALL;
-USE lpp.lpp_waveform_pkg.ALL;
+--USE lpp.lpp_waveform_pkg.ALL;
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
 

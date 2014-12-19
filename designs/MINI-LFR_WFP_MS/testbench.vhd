@@ -16,6 +16,7 @@ USE techmap.gencomp.ALL;
 
 LIBRARY lpp;
 USE lpp.lpp_sim_pkg.ALL;
+USE lpp.lpp_lfr_sim_pkg.ALL;
 USE lpp.lpp_lfr_apbreg_pkg.ALL;
 USE lpp.lpp_lfr_time_management_apbreg_pkg.ALL;
 
@@ -134,6 +135,9 @@ ARCHITECTURE behav OF testbench IS
 
 
   SIGNAL message_simu : STRING(1 TO 15) := "---------------";
+
+  SIGNAL data_message : STRING(1 TO 15) := "---------------";
+  SIGNAL data_read    : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
   
 BEGIN
 
@@ -142,6 +146,7 @@ BEGIN
   -----------------------------------------------------------------------------
   PROCESS
     CONSTANT txp : TIME := 320 ns;
+    VARIABLE data_read_v : STD_LOGIC_VECTOR(31 DOWNTO 0);
   BEGIN  -- PROCESS
     TXD1  <= '1';
     reset <= '0';
@@ -155,11 +160,15 @@ BEGIN
     UART_WRITE(TXD1,txp,ADDR_BASE_GPIO & "000010",X"0000FFFF");
     UART_WRITE(TXD1,txp,ADDR_BASE_GPIO & "000001",X"00000A0A");
     UART_WRITE(TXD1,txp,ADDR_BASE_GPIO & "000001",X"00000B0B");
-
+    UART_READ(TXD1,RXD1,txp,ADDR_BASE_GPIO & "000001",data_read_v);
+    data_read    <= data_read_v;
+    data_message <= "GPIO_data_write";
+    
     -- UNSET the LFR reset
     message_simu <= "2 - LFR UNRESET";
-    UART_WRITE(TXD1,txp,ADDR_BASE_TIME_MANAGMENT & ADDR_LFR_TM_CONTROL   , X"00000000");
-    UART_WRITE(TXD1,txp,ADDR_BASE_TIME_MANAGMENT & ADDR_LFR_TM_TIME_LOAD , X"00000000");
+    UNRESET_LFR(TXD1,txp,ADDR_BASE_TIME_MANAGMENT);
+    --UART_WRITE(TXD1,txp,ADDR_BASE_TIME_MANAGMENT & ADDR_LFR_TM_CONTROL   , X"00000000");
+    --UART_WRITE(TXD1,txp,ADDR_BASE_TIME_MANAGMENT & ADDR_LFR_TM_TIME_LOAD , X"00000000");
     --
     message_simu <= "3 - LFR CONFIG ";
     UART_WRITE(TXD1,txp,ADDR_BASE_LFR & ADDR_LFR_SM_F0_0_ADDR , X"00000B0B");
