@@ -7,4 +7,4 @@ log -r *
 
 do wave.do
 
-run 250 us
+run 65 ms

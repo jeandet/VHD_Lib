@@ -11,6 +11,8 @@ ENTITY lpp_lfr_ms_reg_head IS
     in_data  : IN STD_LOGIC_VECTOR(5*16-1 DOWNTO 0);
     in_full  : IN STD_LOGIC;
     in_empty : IN STD_LOGIC;
+
+    out_write_error : OUT STD_LOGIC;
     
     out_wen  : OUT STD_LOGIC;
     out_data : OUT STD_LOGIC_VECTOR(5*16-1 DOWNTO 0);
@@ -33,9 +35,10 @@ BEGIN  -- Beh
       fsm_state <= REG_EMPTY;
       reg_data  <= (OTHERS => '0');
       out_wen_s <= '1';
+      out_write_error <= '0';
     ELSIF clk'event AND clk = '1' THEN
       out_wen_s <= '1';
-
+      out_write_error <= '0';      
       CASE fsm_state IS
         WHEN REG_EMPTY =>
           reg_data <= in_data;
@@ -49,6 +52,10 @@ BEGIN  -- Beh
               reg_data <= in_data;
             ELSE
               fsm_state <= REG_EMPTY;              
+            END IF;
+          ELSE
+            IF in_wen = '0' THEN
+              out_write_error <= '1';
             END IF;
           END IF;
         WHEN OTHERS => NULL;

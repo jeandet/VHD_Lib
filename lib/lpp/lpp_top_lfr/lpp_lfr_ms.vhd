@@ -379,6 +379,7 @@ BEGIN
       in_data  => sample_f1_wdata,
       in_full  => sample_f1_full_head_in,
       in_empty => sample_f1_empty_head_in,
+      out_write_error => error_wen_f1,
       out_wen  => sample_f1_wen_head_out,
       out_data => sample_f1_wdata_head,
       out_full => sample_f1_full_head_out);
@@ -409,20 +410,20 @@ BEGIN
       almost_full => sample_f1_almost_full); 
 
 
-  one_sample_f1_wen <= '0' WHEN sample_f1_wen_s = "11111" ELSE '1';
+  one_sample_f1_wen <= '0' WHEN sample_f1_wen_head = "11111" ELSE '1';
 
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
       one_sample_f1_full <= '0';
-      error_wen_f1       <= '0';
+      --error_wen_f1       <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
       IF sample_f1_full_head_out = '0' THEN
         one_sample_f1_full <= '0';
       ELSE
         one_sample_f1_full <= '1';
       END IF;
-      error_wen_f1 <= one_sample_f1_wen AND one_sample_f1_full;
+      --error_wen_f1 <= one_sample_f1_wen AND one_sample_f1_full;
     END IF;
   END PROCESS;
 
