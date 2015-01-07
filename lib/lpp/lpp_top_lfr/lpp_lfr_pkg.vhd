@@ -319,6 +319,10 @@ PACKAGE lpp_lfr_pkg IS
       wfp_ready_buffer        : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
       wfp_buffer_time         : IN  STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
       wfp_error_buffer_full   : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      sample_f3_v             : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+      sample_f3_e1            : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+      sample_f3_e2            : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+      sample_f3_valid         : IN  STD_LOGIC;
       debug_vector : OUT STD_LOGIC_VECTOR(11 DOWNTO 0));
   END COMPONENT;
   

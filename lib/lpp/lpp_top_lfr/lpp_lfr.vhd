@@ -342,6 +342,11 @@ BEGIN
       wfp_ready_buffer        => wfp_ready_buffer,-- TODO
       wfp_buffer_time         => wfp_buffer_time,-- TODO
       wfp_error_buffer_full   => wfp_error_buffer_full, -- TODO
+      -------------------------------------------------------------------------
+      sample_f3_v     => sample_f3_data(1*16-1 DOWNTO 0*16),
+      sample_f3_e1    => sample_f3_data(2*16-1 DOWNTO 1*16),
+      sample_f3_e2    => sample_f3_data(3*16-1 DOWNTO 2*16),
+      sample_f3_valid => sample_f3_val,
       debug_vector => apb_reg_debug_vector
       );
 

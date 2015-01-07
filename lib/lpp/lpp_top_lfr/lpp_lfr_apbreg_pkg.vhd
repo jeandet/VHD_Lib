@@ -80,7 +80,11 @@ PACKAGE lpp_lfr_apbreg_pkg IS
   CONSTANT ADDR_LFR_WP_F3_1_TIME_COARSE : STD_LOGIC_VECTOR(7 DOWNTO 2) := "110110";
   CONSTANT ADDR_LFR_WP_F3_1_TIME_FINE   : STD_LOGIC_VECTOR(7 DOWNTO 2) := "110111";
 
-  CONSTANT ADDR_LFR_WP_LENGTH           : STD_LOGIC_VECTOR(7 DOWNTO 2) := "111000";  
+  CONSTANT ADDR_LFR_WP_LENGTH           : STD_LOGIC_VECTOR(7 DOWNTO 2) := "111000"; 
+  
+  CONSTANT ADDR_LFR_WP_F3_V             : STD_LOGIC_VECTOR(7 DOWNTO 2) := "111001";
+  CONSTANT ADDR_LFR_WP_F3_E1            : STD_LOGIC_VECTOR(7 DOWNTO 2) := "111010"; 
+  CONSTANT ADDR_LFR_WP_F3_E2            : STD_LOGIC_VECTOR(7 DOWNTO 2) := "111011";  
   -----------------------------------------------------------------------------
   -- LFR
   -----------------------------------------------------------------------------

@@ -139,6 +139,11 @@ ENTITY lpp_lfr_apbreg IS
     wfp_buffer_time         : IN STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
     wfp_error_buffer_full   : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
     ---------------------------------------------------------------------------
+    sample_f3_v  : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    sample_f3_e1 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    sample_f3_e2 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    sample_f3_valid : IN STD_LOGIC;       
+    ---------------------------------------------------------------------------
     debug_vector : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
     
     );
@@ -269,6 +274,10 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
 
   SIGNAL pirq_temp  : STD_LOGIC_VECTOR(31 DOWNTO 0);
   
+  SIGNAL  sample_f3_v_reg  : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL  sample_f3_e1_reg : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL  sample_f3_e2_reg : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  
 BEGIN  -- beh
 
   debug_vector(0)          <= error_buffer_full;
@@ -330,6 +339,23 @@ BEGIN  -- beh
   length_matrix_f1 <= reg_sp.length_matrix;
   length_matrix_f2 <= reg_sp.length_matrix;
   wfp_length_buffer <= reg_wp.length_buffer;
+
+
+  
+  PROCESS (HCLK, HRESETn)
+  BEGIN  -- PROCESS
+    IF HRESETn = '0' THEN               -- asynchronous reset (active low)
+      sample_f3_v_reg  <= (OTHERS => '0');
+      sample_f3_e1_reg <= (OTHERS => '0');
+      sample_f3_e2_reg <= (OTHERS => '0');
+    ELSIF HCLK'event AND HCLK = '1' THEN  -- rising clock edge
+      IF sample_f3_valid = '1' THEN
+        sample_f3_v_reg  <= sample_f3_v;
+        sample_f3_e1_reg <= sample_f3_e1;
+        sample_f3_e2_reg <= sample_f3_e2;
+      END IF;
+    END IF;
+  END PROCESS;
   
 
   lpp_lfr_apbreg : PROCESS (HCLK, HRESETn)
@@ -542,7 +568,14 @@ BEGIN  -- beh
           WHEN ADDR_LFR_WP_F3_1_TIME_COARSE => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*7 + 31 DOWNTO 48*7);
           WHEN ADDR_LFR_WP_F3_1_TIME_FINE   => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*7 + 47 DOWNTO 48*7 + 32);
 
-          WHEN ADDR_LFR_WP_LENGTH => prdata(25 DOWNTO 0) <= reg_wp.length_buffer;   
+          WHEN ADDR_LFR_WP_LENGTH => prdata(25 DOWNTO 0) <= reg_wp.length_buffer;
+                                     
+          WHEN ADDR_LFR_WP_F3_V   => prdata(15 DOWNTO  0) <= sample_f3_v_reg; 
+                                     prdata(31 DOWNTO 16) <= (OTHERS => '0');  
+          WHEN ADDR_LFR_WP_F3_E1  => prdata(15 DOWNTO  0) <= sample_f3_e1_reg; 
+                                     prdata(31 DOWNTO 16) <= (OTHERS => '0');   
+          WHEN ADDR_LFR_WP_F3_E2  => prdata(15 DOWNTO  0) <= sample_f3_e2_reg; 
+                                     prdata(31 DOWNTO 16) <= (OTHERS => '0');   
           ---------------------------------------------------------------------            
           WHEN ADDR_LFR_VERSION   => prdata(23 DOWNTO 0)                       <= top_lfr_version(23 DOWNTO 0);
           WHEN OTHERS   => NULL;
