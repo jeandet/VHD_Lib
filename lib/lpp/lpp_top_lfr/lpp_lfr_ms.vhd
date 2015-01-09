@@ -367,7 +367,7 @@ BEGIN
   -- sample_f1_wdata in
   -- sample_f1_full  OUT
 
-  sample_f1_wen_head_in   <= '0' WHEN sample_f1_wen_s   = "00000" ELSE '1';
+  sample_f1_wen_head_in   <= '0' WHEN sample_f1_wen_s = "00000" ELSE '1';
   sample_f1_full_head_in  <= '0' WHEN sample_f1_full  = "00000" ELSE '1';
   sample_f1_empty_head_in <= '1' WHEN sample_f1_empty = "11111" ELSE '0';
   

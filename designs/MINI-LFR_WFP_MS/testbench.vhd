@@ -135,7 +135,6 @@ ARCHITECTURE behav OF testbench IS
 
 
   SIGNAL message_simu : STRING(1 TO 15) := "---------------";
-
   SIGNAL data_message : STRING(1 TO 15) := "---------------";
   SIGNAL data_read    : STD_LOGIC_VECTOR(31 DOWNTO 0) := (OTHERS => '0');
   

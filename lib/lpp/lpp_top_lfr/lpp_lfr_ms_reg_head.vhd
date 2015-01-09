@@ -28,6 +28,8 @@ ARCHITECTURE Beh OF lpp_lfr_ms_reg_head IS
   SIGNAL reg_data2 : STD_LOGIC_VECTOR(5*16-1 DOWNTO 0);
   SIGNAL reg_data  : STD_LOGIC_VECTOR(5*16-1 DOWNTO 0);
   SIGNAL out_wen_s : STD_LOGIC;
+
+  SIGNAL in_full_s : STD_LOGIC;
 BEGIN  -- Beh
 
   PROCESS (clk, rstn)
@@ -38,19 +40,22 @@ BEGIN  -- Beh
       reg_data2       <= (OTHERS => '0');
       out_wen_s       <= '1';
       out_write_error <= '0';
+      in_full_s <= '0';
     ELSIF clk'event AND clk = '1' THEN
+      in_full_s <= in_full;
+      
       out_wen_s <= '1';
       out_write_error <= '0';      
       CASE fsm_state IS
         WHEN REG_EMPTY =>
           reg_data <= in_data;
-          IF in_wen = '0' AND in_full = '1' THEN
+          IF in_wen = '0' AND in_full_s = '1' THEN
             fsm_state <= REG_ONE_DATA;
           END IF;
           
         WHEN REG_ONE_DATA =>
           reg_data2 <= in_data;
-          IF in_wen = '0' AND in_full = '1' THEN
+          IF in_wen = '0' AND in_full_s = '1' THEN
             fsm_state <= REG_FULL;
           ELSIF in_empty = '1' THEN
             out_wen_s <= '0';
@@ -85,7 +90,7 @@ BEGIN  -- Beh
     END IF;
   END PROCESS;
 
-  out_full <= '1' WHEN fsm_state = REG_FULL ELSE in_full;
+  out_full <= '1' WHEN fsm_state = REG_FULL ELSE in_full_s;
   
   out_data <= reg_data2 WHEN fsm_state = REG_FULL     ELSE
               reg_data  WHEN fsm_state = REG_ONE_DATA ELSE
@@ -95,6 +100,7 @@ BEGIN  -- Beh
   out_wen  <= '0' WHEN out_wen_s = '0'          ELSE
               '1' WHEN fsm_state = REG_ONE_DATA ELSE
               '1' WHEN fsm_state = REG_FULL     ELSE
-              in_wen;  
+              '1' WHEN in_full_s = '1'          ELSE
+              in_wen;
 
 END Beh;
