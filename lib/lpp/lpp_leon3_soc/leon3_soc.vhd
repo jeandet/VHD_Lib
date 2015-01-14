@@ -41,6 +41,9 @@ USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
 USE lpp.lpp_lfr_time_management.ALL;
 USE lpp.lpp_leon3_soc_pkg.ALL;
+LIBRARY iap;
+USE iap.memctrl.all;
+
 
 ENTITY leon3_soc IS
   GENERIC (
@@ -67,7 +70,9 @@ ENTITY leon3_soc IS
     NB_AHB_SLAVE  : INTEGER := 0;
     NB_APB_SLAVE  : INTEGER := 0;
     --
-    ADDRESS_SIZE  : INTEGER := 20
+    ADDRESS_SIZE      : INTEGER := 20;
+    USES_IAP_MEMCTRLR : INTEGER := 0
+
     );
   PORT (
     clk    : IN STD_ULOGIC;
@@ -84,16 +89,17 @@ ENTITY leon3_soc IS
     utxd1 : OUT STD_ULOGIC;             -- UART1 tx data    
 
     -- RAM --------------------------------------------------------------------
-    address   : OUT   STD_LOGIC_VECTOR(ADDRESS_SIZE-1 DOWNTO 0);
-    data      : INOUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    nSRAM_BE0 : OUT   STD_LOGIC;
-    nSRAM_BE1 : OUT   STD_LOGIC;
-    nSRAM_BE2 : OUT   STD_LOGIC;
-    nSRAM_BE3 : OUT   STD_LOGIC;
-    nSRAM_WE  : OUT   STD_LOGIC;
-    nSRAM_CE  : OUT   STD_LOGIC;
-    nSRAM_OE  : OUT   STD_LOGIC;
-
+    address     : OUT   STD_LOGIC_VECTOR(ADDRESS_SIZE-1 DOWNTO 0);
+    data        : INOUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    nSRAM_BE0   : OUT   STD_LOGIC;
+    nSRAM_BE1   : OUT   STD_LOGIC;
+    nSRAM_BE2   : OUT   STD_LOGIC;
+    nSRAM_BE3   : OUT   STD_LOGIC;
+    nSRAM_WE    : OUT   STD_LOGIC;
+    nSRAM_CE    : OUT   STD_LOGIC_VECTOR(1 downto 0);
+    nSRAM_OE    : OUT   STD_LOGIC;
+    nSRAM_READY : IN    STD_LOGIC;
+    SRAM_MBE    : INOUT STD_LOGIC;
     -- APB --------------------------------------------------------------------
     apbi_ext    : OUT apb_slv_in_type;
     apbo_ext    : IN  soc_apb_slv_out_vector(NB_APB_SLAVE-1+5  DOWNTO 5);
@@ -225,6 +231,9 @@ ARCHITECTURE Behavioral OF leon3_soc IS
   SIGNAL memo       : memory_out_type;
   SIGNAL wpo        : wprot_out_type;
   SIGNAL sdo        : sdram_out_type;
+  SIGNAl mbe        : std_logic;        -- enable memory programming
+  SIGNAL mbe_drive  : std_logic;       -- drive the MBE memory signal
+  SIGNAL nSRAM_CE_s  : STD_LOGIC_VECTOR(1 downto 0);
   --IRQ
   SIGNAL irqi       : irq_in_vector(0 TO CFG_NCPU-1);
   SIGNAL irqo       : irq_out_vector(0 TO CFG_NCPU-1);
@@ -238,7 +247,7 @@ ARCHITECTURE Behavioral OF leon3_soc IS
   SIGNAL dsuo       : dsu_out_type;
   -----------------------------------------------------------------------------
   
-  SIGNAL nSRAM_CE_s  : STD_LOGIC;
+
 BEGIN
 
 
@@ -305,6 +314,7 @@ BEGIN
 ----------------------------------------------------------------------
 ---  Memory controllers  ---------------------------------------------
 ----------------------------------------------------------------------
+ESAMEMCT: IF USES_IAP_MEMCTRLR =0 GENERATE
   memctrlr : mctrl GENERIC MAP (
     hindex  => 0,
     pindex  => 0,
@@ -312,15 +322,59 @@ BEGIN
     srbanks => 1
     )
     PORT MAP (rstn, clkm, memi, memo, ahbsi, ahbso(0), apbi, apbo(0), wpo, sdo);
+   memi.bexcn  <= '1';
+   memi.brdyn  <= '1';
+END GENERATE;
 
-  memi.brdyn  <= '1';
-  memi.bexcn  <= '1';
+IAPMEMCT: IF USES_IAP_MEMCTRLR =1 GENERATE
+  memctrlr : srctrle_0ws
+  GENERIC MAP(
+    hindex  => 0,
+    pindex  => 0,
+    paddr   => 0,
+    srbanks => 2,
+    banksz  => 8, --512k * 32
+    rmw     => 1,
+    --Aeroflex memory generics:
+    mprog   => 1,   -- program memory by default values after reset
+    mpsrate => 12,  -- default scrub rate period
+    mpb2s   => 4,   -- default busy to scrub delay
+    mpapb   => 1,   -- instantiate apb register
+    mchipcnt => 2,
+    mpenall => 1    -- when 0 program only E1 chip, else program all dies
+  )
+  PORT MAP (
+    rst     => rstn,
+    clk     => clkm,
+    ahbsi   => ahbsi,
+    ahbso   => ahbso(0),
+    apbi    => apbi,
+    apbo    => apbo(0),
+    sri     => memi,
+    sro     => memo,
+    --Aeroflex memory signals:
+    ucerr   => open,        -- uncorrectable error signal
+    mbe     => mbe,        -- enable memory programming
+    mbe_drive => mbe_drive      -- drive the MBE memory signal
+  );
+
+  memi.brdyn  <= nSRAM_READY;
+
+  mbe_pad : iopad
+  GENERIC MAP(tech => padtech)
+  PORT MAP(pad => SRAM_MBE, 
+           i   => mbe,
+           en  => mbe_drive, 
+           o   => memi.bexcn );
+END GENERATE;
+
+
   memi.writen <= '1';
   memi.wrn    <= "1111";
   memi.bwidth <= "10";
 
   bdr : FOR i IN 0 TO 3 GENERATE
-    data_pad : iopadv GENERIC MAP (tech => padtech, width => 8)
+    data_pad : iopadv GENERIC MAP (tech => padtech, width => 8,oepol=> USES_IAP_MEMCTRLR)
       PORT MAP (
         data(31-i*8 DOWNTO 24-i*8),
         memo.data(31-i*8 DOWNTO 24-i*8),
@@ -330,14 +384,16 @@ BEGIN
 
   addr_pad : outpadv GENERIC MAP (width => ADDRESS_SIZE, tech => padtech)
     PORT MAP (address, memo.address(ADDRESS_SIZE+1 DOWNTO 2));
-  nSRAM_CE_s <= NOT(memo.ramsn(0));
-  rams_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_CE, nSRAM_CE_s);
-  oen_pad  : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_OE, memo.ramoen(0));
+  nSRAM_CE_s <= (memo.ramsn(1 downto 0));
+  rams_pad : outpadv GENERIC MAP (tech => padtech,width => 2) PORT MAP (nSRAM_CE, nSRAM_CE_s);
+  oen_pad  : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_OE, memo.oen);
   nBWE_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_WE, memo.writen);
   nBWa_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE0, memo.mben(3));
   nBWb_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE1, memo.mben(2));
   nBWc_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE2, memo.mben(1));
   nBWd_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE3, memo.mben(0));
+
+
 
 ----------------------------------------------------------------------
 ---  AHB CONTROLLER  -------------------------------------------------
@@ -418,7 +474,7 @@ BEGIN
   -- AHB_Master -------------------------------------------------------------
   ahbi_m_ext <= ahbmi;
   all_ahbm: FOR I IN 0 TO NB_AHB_MASTER-1 GENERATE
-  max_16_ahbm: IF I + CFG_NCPU + CFG_AHB_UART < 16 GENERATE
+    max_16_ahbm: IF I + CFG_NCPU + CFG_AHB_UART < 16 GENERATE
       ahbmo(I + CFG_NCPU) <= ahbo_m_ext(I+CFG_NCPU);
     END GENERATE max_16_ahbm;
   END GENERATE all_ahbm;
