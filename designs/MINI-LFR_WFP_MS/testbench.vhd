@@ -178,15 +178,44 @@ BEGIN
                            X"40003000",
                            X"40004000",
                            X"40005000");
+
+    
+    LAUNCH_WAVEFORM_PICKER(TXD1,RXD1,txp,
+                           LFR_MODE_SBM1,
+                           X"7FFFFFFF",  -- START DATE
+    
+                           "00000",--DATA_SHAPING  ( 4 DOWNTO 0)
+                           X"00012BFF",--DELTA_SNAPSHOT(31 DOWNTO 0)
+                           X"0001280A",--DELTA_F0      (31 DOWNTO 0)
+                           X"00000007",--DELTA_F0_2    (31 DOWNTO 0)
+                           X"0001283F",--DELTA_F1      (31 DOWNTO 0)
+                           X"000127FF",--DELTA_F2      (31 DOWNTO 0)
+                          
+                           ADDR_BASE_LFR,
+                           X"40006000",
+                           X"40007000",
+                           X"40008000",
+                           X"40009000",
+                           X"4000A000",
+                           X"4000B000",
+                           X"4000C000",
+                           X"4000D000");
+
+    UART_WRITE(TXD1   ,txp,ADDR_BASE_LFR & ADDR_LFR_WP_LENGTH,         X"0000000F");
+        
     message_simu <= "4 - GO GO GO !!";
     UART_WRITE            (TXD1 ,txp,ADDR_BASE_LFR & ADDR_LFR_WP_START_DATE,X"00000000");
 
     READ_STATUS: LOOP
       WAIT FOR 2 ms;
+      data_message <= "READ_NEW_STATUS";
       UART_READ(TXD1,RXD1,txp,ADDR_BASE_LFR & ADDR_LFR_SM_STATUS,data_read_v);
       data_read    <= data_read_v;
-      data_message <= "READ_NEW_STATUS";
       UART_WRITE(TXD1,    txp,ADDR_BASE_LFR & ADDR_LFR_SM_STATUS,data_read_v);
+      
+      UART_READ(TXD1,RXD1,txp,ADDR_BASE_LFR & ADDR_LFR_WP_STATUS,data_read_v);
+      data_read    <= data_read_v;
+      UART_WRITE(TXD1,    txp,ADDR_BASE_LFR & ADDR_LFR_WP_STATUS,data_read_v);
     END LOOP READ_STATUS;
     
     WAIT;
