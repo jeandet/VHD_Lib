@@ -202,6 +202,7 @@ BEGIN
                            X"4000D000");
 
     UART_WRITE(TXD1   ,txp,ADDR_BASE_LFR & ADDR_LFR_WP_LENGTH,         X"0000000F");
+    UART_WRITE(TXD1   ,txp,ADDR_BASE_LFR & ADDR_LFR_WP_DATA_IN_BUFFER, X"00000050");
         
     message_simu <= "4 - GO GO GO !!";
     UART_WRITE            (TXD1 ,txp,ADDR_BASE_LFR & ADDR_LFR_WP_START_DATE,X"00000000");

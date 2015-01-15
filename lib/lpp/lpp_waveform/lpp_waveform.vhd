@@ -188,6 +188,8 @@ ARCHITECTURE beh OF lpp_waveform IS
 
   SIGNAL fifo_buffer_time : STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
   
+  SIGNAL fifo_buffer_time_s : STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
+  
 BEGIN  -- beh
 
   -----------------------------------------------------------------------------
@@ -429,12 +431,15 @@ BEGIN  -- beh
         IF run = '0' THEN
           fifo_buffer_time(48*(I+1)-1 DOWNTO 48*I) <= (OTHERS => '0');
         ELSE
-          IF arbiter_time_out_new(I) = '0' THEN
+          IF arbiter_time_out_new(I) = '1' THEN  -- modif JC 15-01-2015
             fifo_buffer_time(48*(I+1)-1 DOWNTO 48*I) <= arbiter_time_out;
           END IF;
         END IF;
       END IF;
     END PROCESS;
+
+    fifo_buffer_time_s(48*(I+1)-1 DOWNTO 48*I) <= arbiter_time_out WHEN arbiter_time_out_new(I) = '1' ELSE
+                                                  fifo_buffer_time(48*(I+1)-1 DOWNTO 48*I);
         
     lpp_waveform_fsmdma_I: lpp_waveform_fsmdma
       PORT MAP (
@@ -442,7 +447,7 @@ BEGIN  -- beh
         rstn                 => rstn,
         run                  => run,
         
-        fifo_buffer_time     => fifo_buffer_time(48*(I+1)-1 DOWNTO 48*I),
+        fifo_buffer_time     => fifo_buffer_time_s(48*(I+1)-1 DOWNTO 48*I),
         
         fifo_data            => s_rdata_v(32*(I+1)-1 DOWNTO 32*I),             
         fifo_empty           => empty(I),
