@@ -467,8 +467,10 @@ BEGIN  -- beh
         addr_buffer          => addr_buffer(32*(I+1)-1 DOWNTO 32*I),    -- TODO
         length_buffer        => length_buffer,--(26*(I+1)-1 DOWNTO 26*I),  -- TODO
         ready_buffer         => ready_buffer(I),                        -- TODO
-        buffer_time          => buffer_time(48*(I+1)-1 DOWNTO 48*I),    -- TODO
+        buffer_time          => OPEN,--buffer_time(48*(I+1)-1 DOWNTO 48*I),    -- TODO
         error_buffer_full    => error_buffer_full(I));                  -- TODO
+
+    buffer_time(48*(I+1)-1 DOWNTO 48*I) <= fifo_buffer_time(48*(I+1)-1 DOWNTO 48*I);
     
   END GENERATE all_channel;
 
