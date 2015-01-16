@@ -192,6 +192,9 @@ ARCHITECTURE beh OF MINI_LFR_top IS
 
   SIGNAL lfr_debug_vector    : STD_LOGIC_VECTOR(11 DOWNTO 0);
   SIGNAL lfr_debug_vector_ms : STD_LOGIC_VECTOR(11 DOWNTO 0);
+
+  --
+  SIGNAL SRAM_CE_s : STD_LOGIC_VECTOR(1 DOWNTO 0);
   
 BEGIN  -- beh
 
@@ -348,7 +351,8 @@ BEGIN  -- beh
       NB_AHB_MASTER   => NB_AHB_MASTER,
       NB_AHB_SLAVE    => NB_AHB_SLAVE,
       NB_APB_SLAVE    => NB_APB_SLAVE,
-      ADDRESS_SIZE    => 20)
+      ADDRESS_SIZE    => 20,
+      USES_IAP_MEMCTRLR => 0)
     PORT MAP (
       clk       => clk_25,
       reset     => rstn_25,
@@ -364,9 +368,10 @@ BEGIN  -- beh
       nSRAM_BE2 => SRAM_nBE(2),
       nSRAM_BE3 => SRAM_nBE(3),
       nSRAM_WE  => SRAM_nWE,
-      nSRAM_CE  => SRAM_CE,
+      nSRAM_CE  => SRAM_CE_s,
       nSRAM_OE  => SRAM_nOE,
-
+      nSRAM_READY => '0',
+      SRAM_MBE    => OPEN,
       apbi_ext   => apbi_ext,
       apbo_ext   => apbo_ext,
       ahbi_s_ext => ahbi_s_ext,
@@ -374,6 +379,7 @@ BEGIN  -- beh
       ahbi_m_ext => ahbi_m_ext,
       ahbo_m_ext => ahbo_m_ext);
 
+  SRAM_CE <= SRAM_CE_s(0);
 -------------------------------------------------------------------------------
 -- APB_LFR_TIME_MANAGEMENT ----------------------------------------------------
 -------------------------------------------------------------------------------
