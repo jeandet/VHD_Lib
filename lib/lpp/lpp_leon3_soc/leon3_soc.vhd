@@ -234,6 +234,7 @@ ARCHITECTURE Behavioral OF leon3_soc IS
   SIGNAl mbe        : std_logic;        -- enable memory programming
   SIGNAL mbe_drive  : std_logic;       -- drive the MBE memory signal
   SIGNAL nSRAM_CE_s  : STD_LOGIC_VECTOR(1 downto 0);
+  SIGNAL nSRAM_OE_s    : STD_LOGIC;
   --IRQ
   SIGNAL irqi       : irq_in_vector(0 TO CFG_NCPU-1);
   SIGNAL irqo       : irq_out_vector(0 TO CFG_NCPU-1);
@@ -324,6 +325,9 @@ ESAMEMCT: IF USES_IAP_MEMCTRLR =0 GENERATE
     PORT MAP (rstn, clkm, memi, memo, ahbsi, ahbso(0), apbi, apbo(0), wpo, sdo);
    memi.bexcn  <= '1';
    memi.brdyn  <= '1';
+
+  nSRAM_CE_s <= NOT (memo.ramsn(1 downto 0));
+  nSRAM_OE_s <= memo.ramoen(0);
 END GENERATE;
 
 IAPMEMCT: IF USES_IAP_MEMCTRLR =1 GENERATE
@@ -366,6 +370,10 @@ IAPMEMCT: IF USES_IAP_MEMCTRLR =1 GENERATE
            i   => mbe,
            en  => mbe_drive, 
            o   => memi.bexcn );
+
+  nSRAM_CE_s <= (memo.ramsn(1 downto 0));
+  nSRAM_OE_s <= memo.oen;
+  
 END GENERATE;
 
 
@@ -384,9 +392,8 @@ END GENERATE;
 
   addr_pad : outpadv GENERIC MAP (width => ADDRESS_SIZE, tech => padtech)
     PORT MAP (address, memo.address(ADDRESS_SIZE+1 DOWNTO 2));
-  nSRAM_CE_s <= (memo.ramsn(1 downto 0));
   rams_pad : outpadv GENERIC MAP (tech => padtech,width => 2) PORT MAP (nSRAM_CE, nSRAM_CE_s);
-  oen_pad  : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_OE, memo.oen);
+  oen_pad  : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_OE, nSRAM_OE_s);
   nBWE_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_WE, memo.writen);
   nBWa_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE0, memo.mben(3));
   nBWb_pad : outpad GENERIC MAP (tech => padtech) PORT MAP (nSRAM_BE1, memo.mben(2));
