@@ -126,8 +126,15 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
   SIGNAL sample_f1_s                     : samplT(5 DOWNTO 0, 15 DOWNTO 0);
   --
 --  SIGNAL sample_f2_val                   : STD_LOGIC;
-  SIGNAL sample_f2                       : sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
-  SIGNAL sample_f3                       : sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f2                       : samplT(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f2_cic_s                 : samplT(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f2_cic                   : sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f2_cic_val               : STD_LOGIC;
+  
+  SIGNAL sample_f3                       : samplT(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f3_cic_s                 : samplT(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f3_cic                   : sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f3_cic_val               : STD_LOGIC;
 
   -----------------------------------------------------------------------------
   --SIGNAL data_f0_in_valid : STD_LOGIC_VECTOR(159 DOWNTO 0) := (OTHERS => '0');
@@ -341,29 +348,65 @@ BEGIN
       data_in            => sample_f0_s,
       data_in_valid      => sample_f0_val_s,
       
-      data_out_16        => sample_f2,
-      data_out_16_valid  => sample_f2_val,
+      data_out_16        => sample_f2_cic,
+      data_out_16_valid  => sample_f2_cic_val,
       
-      data_out_256       => sample_f3,
-      data_out_256_valid => sample_f3_val);
+      data_out_256       => sample_f3_cic,
+      data_out_256_valid => sample_f3_cic_val);
+
+  -----------------------------------------------------------------------------
+  
+  all_bit_sample_f2_cic : FOR I IN 15 DOWNTO 0 GENERATE
+    all_channel_sample_f2_cic : FOR J IN 5 DOWNTO 0 GENERATE
+      sample_f2_cic_s(J,I) <= sample_f2_cic(J,I);
+    END GENERATE all_channel_sample_f2_cic;
+  END GENERATE all_bit_sample_f2_cic;
+  
+  Downsampling_f2 : Downsampling
+    GENERIC MAP (
+      ChanelCount => 6,
+      SampleSize  => 16,
+      DivideParam => 6)
+    PORT MAP (
+      clk            => clk,
+      rstn           => rstn,
+      sample_in_val  => sample_f2_cic_val ,
+      sample_in      => sample_f2_cic_s,
+      sample_out_val => sample_f2_val,
+      sample_out     => sample_f2);  
   
   all_bit_sample_f2 : FOR I IN 15 DOWNTO 0 GENERATE
-    sample_f2_wdata_s(I)      <= sample_f2(0, I);
-    sample_f2_wdata_s(16*1+I) <= sample_f2(1, I);
-    sample_f2_wdata_s(16*2+I) <= sample_f2(2, I);
-    sample_f2_wdata_s(16*3+I) <= sample_f2(3, I);
-    sample_f2_wdata_s(16*4+I) <= sample_f2(4, I);
-    sample_f2_wdata_s(16*5+I) <= sample_f2(5, I);
+    all_channel_sample_f2 : FOR J IN 5 DOWNTO 0 GENERATE
+      sample_f2_wdata_s(16*J+I) <= sample_f2(J,I);
+    END GENERATE all_channel_sample_f2;
   END GENERATE all_bit_sample_f2;
-
+    
+  -----------------------------------------------------------------------------
+ 
   all_bit_sample_f3 : FOR I IN 15 DOWNTO 0 GENERATE
-    sample_f3_wdata_s(I)      <= sample_f3(0, I);
-    sample_f3_wdata_s(16*1+I) <= sample_f3(1, I);
-    sample_f3_wdata_s(16*2+I) <= sample_f3(2, I);
-    sample_f3_wdata_s(16*3+I) <= sample_f3(3, I);
-    sample_f3_wdata_s(16*4+I) <= sample_f3(4, I);
-    sample_f3_wdata_s(16*5+I) <= sample_f3(5, I);
+    all_channel_sample_f3 : FOR J IN 5 DOWNTO 0 GENERATE
+      sample_f3_cic_s(J,I) <= sample_f3_cic(J,I);
+    END GENERATE all_channel_sample_f3;
   END GENERATE all_bit_sample_f3;
+  
+  Downsampling_f3 : Downsampling
+    GENERIC MAP (
+      ChanelCount => 6,
+      SampleSize  => 16,
+      DivideParam => 6)
+    PORT MAP (
+      clk            => clk,
+      rstn           => rstn,
+      sample_in_val  => sample_f3_cic_val ,
+      sample_in      => sample_f3_cic_s,
+      sample_out_val => sample_f3_val,
+      sample_out     => sample_f3);
+  
+  all_bit_sample_f3 : FOR I IN 15 DOWNTO 0 GENERATE
+    all_channel_sample_f3 : FOR J IN 5 DOWNTO 0 GENERATE
+      sample_f3_wdata_s(16*J+I) <= sample_f3(J,I);
+    END GENERATE all_channel_sample_f3;
+  END GENERATE all_bit_sample_f3; 
 
   -----------------------------------------------------------------------------
   -- 
