@@ -511,7 +511,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000127")  -- aa.bb.cc version
+      top_lfr_version        => X"000128")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,

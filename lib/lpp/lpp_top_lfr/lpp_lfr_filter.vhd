@@ -1,3 +1,25 @@
+------------------------------------------------------------------------------
+--  This file is a part of the LPP VHDL IP LIBRARY
+--  Copyright (C) 2009 - 2010, Laboratory of Plasmas Physic - CNRS
+--
+--  This program is free software; you can redistribute it and/or modify
+--  it under the terms of the GNU General Public License as published by
+--  the Free Software Foundation; either version 3 of the License, or
+--  (at your option) any later version.
+--
+--  This program is distributed in the hope that it will be useful,
+--  but WITHOUT ANY WARRANTY; without even the implied warranty of
+--  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--  GNU General Public License for more details.
+--
+--  You should have received a copy of the GNU General Public License
+--  along with this program; if not, write to the Free Software
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+-------------------------------------------------------------------------------
+--                    Author : Jean-christophe Pellion
+--                    Mail   : jean-christophe.pellion@lpp.polytechnique.fr
+--                             jean-christophe.pellion@easii-ic.com
+----------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
@@ -8,6 +30,8 @@ USE lpp.iir_filter.ALL;
 USE lpp.FILTERcfg.ALL;
 USE lpp.lpp_memory.ALL;
 USE lpp.lpp_waveform_pkg.ALL;
+USE lpp.cic_pkg.ALL;
+USE data_type_pkg.ALL;
 
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
@@ -95,17 +119,15 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
   -----------------------------------------------------------------------------
 --  SIGNAL sample_f0_val                   : STD_LOGIC;
   SIGNAL sample_f0                       : samplT(ChanelCount-1 DOWNTO 0, 15 DOWNTO 0);
-  SIGNAL sample_f0_s                     : samplT(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f0_s                     : sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
   --
 --  SIGNAL sample_f1_val                   : STD_LOGIC;
   SIGNAL sample_f1                       : samplT(ChanelCount-1 DOWNTO 0, 15 DOWNTO 0);
   SIGNAL sample_f1_s                     : samplT(5 DOWNTO 0, 15 DOWNTO 0);
   --
 --  SIGNAL sample_f2_val                   : STD_LOGIC;
-  SIGNAL sample_f2                       : samplT(5 DOWNTO 0, 15 DOWNTO 0);
-  --
---  SIGNAL sample_f3_val                   : STD_LOGIC;
-  SIGNAL sample_f3                       : samplT(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f2                       : sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f3                       : sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
 
   -----------------------------------------------------------------------------
   --SIGNAL data_f0_in_valid : STD_LOGIC_VECTOR(159 DOWNTO 0) := (OTHERS => '0');
@@ -295,6 +317,7 @@ BEGIN
 
   -----------------------------------------------------------------------------
   -- F2 -- @256 Hz
+  -- F3 -- @16 Hz
   -----------------------------------------------------------------------------
   all_bit_sample_f0_s : FOR I IN 15 DOWNTO 0 GENERATE
     sample_f0_s(0, I) <= sample_f0(0, I);  -- V
@@ -305,67 +328,34 @@ BEGIN
     sample_f0_s(5, I) <= sample_f0(7, I);  -- B3
   END GENERATE all_bit_sample_f0_s;
 
-  Downsampling_f2 : Downsampling
+  
+  cic_lfr_1: cic_lfr
     GENERIC MAP (
-      ChanelCount => 6,
-      SampleSize  => 16,
-      DivideParam => 96)
+      tech         => 0,
+      use_RAM_nCEL => Mem_use)
     PORT MAP (
-      clk            => clk,
-      rstn           => rstn,
-      sample_in_val  => sample_f0_val_s ,
-      sample_in      => sample_f0_s,
-      sample_out_val => sample_f2_val,
-      sample_out     => sample_f2);
-
-  --sample_f2_wen <= NOT(sample_f2_val) &
-  --                 NOT(sample_f2_val) &
-  --                 NOT(sample_f2_val) &
-  --                 NOT(sample_f2_val) &
-  --                 NOT(sample_f2_val) &
-  --                 NOT(sample_f2_val);
+      clk                => clk,
+      rstn               => rstn,
+      run                => '1',
+      
+      data_in            => sample_f0_s,
+      data_in_valid      => sample_f0_val_s,
+      
+      data_out_16        => sample_f2,
+      data_out_16_valid  => sample_f2_val,
+      
+      data_out_256       => sample_f3,
+      data_out_256_valid => sample_f3_val);
   
   all_bit_sample_f2 : FOR I IN 15 DOWNTO 0 GENERATE
     sample_f2_wdata_s(I)      <= sample_f2(0, I);
-    sample_f2_wdata_s(16*1+I) <= sample_f2(1, I) WHEN data_shaping_R2 = '1' ELSE sample_f1(3, I);
-    sample_f2_wdata_s(16*2+I) <= sample_f2(2, I) WHEN data_shaping_R2 = '1' ELSE sample_f1(4, I);
+    sample_f2_wdata_s(16*1+I) <= sample_f2(1, I);
+    sample_f2_wdata_s(16*2+I) <= sample_f2(2, I);
     sample_f2_wdata_s(16*3+I) <= sample_f2(3, I);
     sample_f2_wdata_s(16*4+I) <= sample_f2(4, I);
     sample_f2_wdata_s(16*5+I) <= sample_f2(5, I);
   END GENERATE all_bit_sample_f2;
 
-  -----------------------------------------------------------------------------
-  -- F3 -- @16 Hz
-  -----------------------------------------------------------------------------
-  all_bit_sample_f1_s : FOR I IN 15 DOWNTO 0 GENERATE
-    sample_f1_s(0, I) <= sample_f1(0, I);  -- V
-    sample_f1_s(1, I) <= sample_f1(1, I);  -- E1
-    sample_f1_s(2, I) <= sample_f1(2, I);  -- E2
-    sample_f1_s(3, I) <= sample_f1(5, I);  -- B1
-    sample_f1_s(4, I) <= sample_f1(6, I);  -- B2
-    sample_f1_s(5, I) <= sample_f1(7, I);  -- B3
-  END GENERATE all_bit_sample_f1_s;
-
-  Downsampling_f3 : Downsampling
-    GENERIC MAP (
-      ChanelCount => 6,
-      SampleSize  => 16,
-      DivideParam => 256)
-    PORT MAP (
-      clk            => clk,
-      rstn           => rstn,
-      sample_in_val  => sample_f1_val_s ,
-      sample_in      => sample_f1_s,
-      sample_out_val => sample_f3_val,
-      sample_out     => sample_f3);
-
-  --sample_f3_wen <= (NOT sample_f3_val) &
-  --                 (NOT sample_f3_val) &
-  --                 (NOT sample_f3_val) &
-  --                 (NOT sample_f3_val) &
-  --                 (NOT sample_f3_val) &
-  --                 (NOT sample_f3_val);
-  
   all_bit_sample_f3 : FOR I IN 15 DOWNTO 0 GENERATE
     sample_f3_wdata_s(I)      <= sample_f3(0, I);
     sample_f3_wdata_s(16*1+I) <= sample_f3(1, I);
