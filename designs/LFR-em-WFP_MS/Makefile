@@ -14,11 +14,11 @@ SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_const
 #VHDLSYNFILES=config.vhd ahbrom.vhd leon3mp.vhd
 #VHDLSYNFILES=config.vhd leon3mp.vhd
 VHDLSYNFILES=LFR-em.vhd
-#VHDLSIMFILES=testbench.vhd
+VHDLSIMFILES=testbench.vhd
 #SIMTOP=testbench
 #SDCFILE=$(GRLIB)/boards/$(BOARD)/synplify.sdc
 #SDC=$(GRLIB)/boards/$(BOARD)/leon3mp.sdc
-PDC=$(VHDLIB)/boards/$(BOARD)/em-LeonLPP-A3PE3kL.pdc
+PDC=$(VHDLIB)/boards/$(BOARD)/em-LeonLPP-A3PE3kL_withHK.pdc
 
 #SDCFILE=$(VHDLIB)/boards/$(BOARD)/LFR_EM_synthesis.sdc
 SDC=$(VHDLIB)/boards/$(BOARD)/LFR_EM_place_and_route.sdc
@@ -42,12 +42,15 @@ DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	./dsp/lpp_fft_rtax \
 	./lpp_uart \
 	./lpp_usb \
+	./lpp_sim/CY7C1061DV33 \
 
 FILESKIP = i2cmst.vhd \
 	APB_MULTI_DIODE.vhd \
 	APB_MULTI_DIODE.vhd \
 	Top_MatrixSpec.vhd \
-	APB_FFT.vhd
+	APB_FFT.vhd\
+	CoreFFT_simu.vhd \
+	lpp_lfr_apbreg_simu.vhd
 
 include $(GRLIB)/bin/Makefile
 include $(GRLIB)/software/leon3/Makefile

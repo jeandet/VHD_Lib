@@ -348,7 +348,8 @@ COMPONENT top_ad_conv_RHF1401_withFilter
   GENERIC (
     ChanelCount     : INTEGER;
     ncycle_cnv_high : INTEGER;
-    ncycle_cnv      : INTEGER);
+    ncycle_cnv      : INTEGER;
+    FILTER_ENABLED  : INTEGER := 16#FF#);
   PORT (
     cnv_clk    : IN  STD_LOGIC;
     cnv_rstn   : IN  STD_LOGIC;
@@ -359,6 +360,21 @@ COMPONENT top_ad_conv_RHF1401_withFilter
     ADC_nOE    : OUT STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
     sample     : OUT Samples14v(ChanelCount-1 DOWNTO 0);
     sample_val : OUT STD_LOGIC);
+END COMPONENT;
+
+COMPONENT lpp_lfr_hk
+  GENERIC (
+    pindex : INTEGER;
+    paddr  : INTEGER;
+    pmask  : INTEGER);
+  PORT (
+    clk        : IN  STD_LOGIC;
+    rstn       : IN  STD_LOGIC;
+    apbi       : IN  apb_slv_in_type;
+    apbo       : OUT apb_slv_out_type;
+    sample_val : IN  STD_LOGIC;
+    sample     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+    HK_SEL     : OUT STD_LOGIC_VECTOR(1 DOWNTO 0));
 END COMPONENT;
 
   

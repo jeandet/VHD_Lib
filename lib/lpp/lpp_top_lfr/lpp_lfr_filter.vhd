@@ -31,7 +31,7 @@ USE lpp.FILTERcfg.ALL;
 USE lpp.lpp_memory.ALL;
 USE lpp.lpp_waveform_pkg.ALL;
 USE lpp.cic_pkg.ALL;
-USE data_type_pkg.ALL;
+USE lpp.data_type_pkg.ALL;
 
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
@@ -383,11 +383,11 @@ BEGIN
     
   -----------------------------------------------------------------------------
  
-  all_bit_sample_f3 : FOR I IN 15 DOWNTO 0 GENERATE
-    all_channel_sample_f3 : FOR J IN 5 DOWNTO 0 GENERATE
+  all_bit_sample_f3_cic : FOR I IN 15 DOWNTO 0 GENERATE
+    all_channel_sample_f3_cic : FOR J IN 5 DOWNTO 0 GENERATE
       sample_f3_cic_s(J,I) <= sample_f3_cic(J,I);
-    END GENERATE all_channel_sample_f3;
-  END GENERATE all_bit_sample_f3;
+    END GENERATE all_channel_sample_f3_cic;
+  END GENERATE all_bit_sample_f3_cic;
   
   Downsampling_f3 : Downsampling
     GENERIC MAP (

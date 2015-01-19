@@ -5,3 +5,4 @@ top_ad_conv_RHF1401_withFilter.vhd
 TestModule_RHF1401.vhd
 top_ad_conv_ADS7886_v2.vhd
 ADS7886_drvr_v2.vhd
+lpp_lfr_hk.vhd

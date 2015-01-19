@@ -66,9 +66,9 @@ ENTITY leon3_soc IS
     ENABLE_IRQMP : INTEGER := 1;
     ENABLE_GPT : INTEGER := 1;
     --
-    NB_AHB_MASTER : INTEGER := 0;
-    NB_AHB_SLAVE  : INTEGER := 0;
-    NB_APB_SLAVE  : INTEGER := 0;
+    NB_AHB_MASTER : INTEGER := 1;
+    NB_AHB_SLAVE  : INTEGER := 1;
+    NB_APB_SLAVE  : INTEGER := 1;
     --
     ADDRESS_SIZE      : INTEGER := 20;
     USES_IAP_MEMCTRLR : INTEGER := 0

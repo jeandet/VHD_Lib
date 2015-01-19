@@ -375,12 +375,10 @@ BEGIN
   
   all_channel_out_v: FOR I IN 5 DOWNTO 0 GENERATE
     all_bits: FOR J IN 15 DOWNTO 0 GENERATE
-      data_out_256(I,J) <= sample_out_reg256_s(I,J);
-      
+      data_out_256(I,J) <= sample_out_reg256_s(I,J+16*2-1);
+      data_out_16(I,J)  <= sample_out_reg16_s (I,J+16  -1);
     END GENERATE all_bits;    
   END GENERATE all_channel_out_v;
- 
---  data_out_16  <= sample_out_reg16;
   
 END beh;
 

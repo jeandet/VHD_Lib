@@ -10,7 +10,9 @@ ENTITY top_ad_conv_RHF1401_withFilter IS
   GENERIC(
     ChanelCount     : INTEGER := 8;
     ncycle_cnv_high : INTEGER := 13;
-    ncycle_cnv      : INTEGER := 25);
+    ncycle_cnv      : INTEGER := 25;
+    FILTER_ENABLED  : INTEGER := 16#FF#
+    );
   PORT (
     cnv_clk  : IN STD_LOGIC;            -- 24Mhz
     cnv_rstn : IN STD_LOGIC;
@@ -46,6 +48,9 @@ ARCHITECTURE ar_top_ad_conv_RHF1401 OF top_ad_conv_RHF1401_withFilter IS
   SIGNAL ADC_data_result   : Samples15;
 
   SIGNAL sample_counter : INTEGER;
+  CONSTANT MAX_SAMPLE_COUNTER : INTEGER := 9;
+
+  CONSTANT FILTER_ENABLED_STDLOGIC : STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0) := STD_LOGIC_VECTOR(to_unsigned(FILTER_ENABLED,ChanelCount));
   
 BEGIN
 
@@ -124,15 +129,11 @@ BEGIN
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
       channel_counter <= MAX_COUNTER;
-      sample_reg(0) <= (OTHERS => '0');
-      sample_reg(1) <= (OTHERS => '0');
-      sample_reg(2) <= (OTHERS => '0');
-      sample_reg(3) <= (OTHERS => '0');
-      sample_reg(4) <= (OTHERS => '0');
-      sample_reg(5) <= (OTHERS => '0');
-      sample_reg(6) <= (OTHERS => '0');
-      sample_reg(7) <= (OTHERS => '0');
 
+      all_sample_reg_init: FOR I IN ChanelCount-1 DOWNTO 0 LOOP
+        sample_reg(I) <= (OTHERS => '0');
+      END LOOP all_sample_reg_init;
+      
       sample_val     <= '0';
       sample_counter <= 0;
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
@@ -145,28 +146,40 @@ BEGIN
       END IF;      
       sample_val     <= '0';
 
-      CASE channel_counter IS
-        WHEN 0*2 => sample_reg(0) <= ADC_data_result(14 DOWNTO 1);
-        WHEN 1*2 => sample_reg(1) <= ADC_data_result(14 DOWNTO 1);
-        WHEN 2*2 => sample_reg(2) <= ADC_data_result(14 DOWNTO 1);
-        WHEN 3*2 => sample_reg(3) <= ADC_data_result(14 DOWNTO 1);
-        WHEN 4*2 => sample_reg(4) <= ADC_data_result(14 DOWNTO 1);
-        WHEN 5*2 => sample_reg(5) <= ADC_data_result(14 DOWNTO 1);
-        WHEN 6*2 => sample_reg(6) <= ADC_data_result(14 DOWNTO 1);
-        WHEN 7*2 => sample_reg(7) <= ADC_data_result(14 DOWNTO 1);
-          IF sample_counter = 9 THEN
-            sample_counter <= 0 ;
-            sample_val     <= '1';
+      all_sample_reg: FOR I IN ChanelCount-1 DOWNTO 0 LOOP
+        IF channel_counter = I*2 THEN
+          IF FILTER_ENABLED_STDLOGIC(I) = '1'  THEN
+            sample_reg(I) <= ADC_data_result(14 DOWNTO 1);
           ELSE
-            sample_counter <= sample_counter +1;
+            sample_reg(I) <= ADC_data;
           END IF;
-                      
-        WHEN OTHERS => NULL;
-      END CASE;
+        END IF;
+      END LOOP all_sample_reg;
       
+      IF channel_counter = (ChanelCount-1)*2 THEN
+
+        IF sample_counter = MAX_SAMPLE_COUNTER THEN
+          sample_counter <= 0 ;
+          sample_val     <= '1';
+        ELSE
+          sample_counter <= sample_counter +1;
+        END IF;
+        
+      END IF;      
     END IF;
   END PROCESS;
 
+--  mux_adc: PROCESS (sample_reg)-- (channel_counter, sample_reg)
+--  BEGIN  -- PROCESS mux_adc
+--    CASE channel_counter IS
+--      WHEN OTHERS => ADC_data_selected <= sample_reg(channel_counter/2);
+--    END CASE;
+--  END PROCESS mux_adc;
+
+  
+   -----------------------------------------------------------------------------
+  -- \/\/\/\/\/\/\/ TODO : this part is not GENERIC !!! \/\/\/\/\/\/\/
+  -----------------------------------------------------------------------------
 
   WITH channel_counter SELECT
     ADC_data_selected <= sample_reg(0) WHEN 0*2,
@@ -176,34 +189,18 @@ BEGIN
                          sample_reg(4) WHEN 4*2,
                          sample_reg(5) WHEN 5*2,
                          sample_reg(6) WHEN 6*2,
-                         sample_reg(7) WHEN OTHERS ;
+                         sample_reg(7) WHEN 7*2,
+                         sample_reg(8) WHEN OTHERS ;
     
+  -----------------------------------------------------------------------------
+  -- /\/\/\/\/\/\/\ ----------------------------------- /\/\/\/\/\/\/\
+  -----------------------------------------------------------------------------
   
   ADC_data_result <= std_logic_vector( (signed( ADC_data_selected(13) & ADC_data_selected) + signed( ADC_data(13) & ADC_data)) );
 
   sample <= sample_reg;
-
-  
-
-  
-  --RHF1401_drvr_1: RHF1401_drvr
-  --  GENERIC MAP (
-  --    ChanelCount => ChanelCount)
-  --  PORT MAP (
-  --    cnv_clk    => cnv_sync,
-  --    clk        => clk,
-  --    rstn       => rstn,
-  --    ADC_data   => ADC_data,
-  --    --ADC_smpclk => OPEN,
-  --    ADC_nOE    => ADC_nOE,
-  --    sample     => sample,
-  --    sample_val => sample_val);
-
-  
-
   
 END ar_top_ad_conv_RHF1401;
-
 
 
 
