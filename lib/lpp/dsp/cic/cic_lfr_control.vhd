@@ -120,7 +120,7 @@ BEGIN
   OPERATION(8)            <= PROG(current_cmd)(5);                                                                --@_init
   OPERATION(9)            <= PROG(current_cmd)(6);                                                                --@_add_1
 
-  OPERATION(10)           <= PROG(current_cmd)(7) AND PROG(current_cmd)(9) AND sample_256_odd WHEN STATE_CIC_LFR = RUN_PROG_C256 ELSE
+  OPERATION(10)           <= PROG(current_cmd)(7)  AND sample_256_odd WHEN STATE_CIC_LFR = RUN_PROG_C256  AND PROG(current_cmd)(9) = '1' ELSE
                              PROG(current_cmd)(7);                        --@_sel(1..0)
   OPERATION(11)           <= PROG(current_cmd)(8);
   OPERATION(12)           <= PROG(current_cmd)(9) AND sample_16_odd  WHEN STATE_CIC_LFR = RUN_PROG_C16  ELSE
