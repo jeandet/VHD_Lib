@@ -374,7 +374,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"01012D")  -- aa.bb.cc version
+      top_lfr_version        => X"01012F")  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             --      0 => MINI_LFR
                                             --      1 => EM

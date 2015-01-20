@@ -195,6 +195,10 @@ ARCHITECTURE beh OF MINI_LFR_top IS
 
   --
   SIGNAL SRAM_CE_s : STD_LOGIC_VECTOR(1 DOWNTO 0);
+
+  --
+  SIGNAL sample_hk : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL HK_SEL    : STD_LOGIC_VECTOR( 1 DOWNTO 0);
   
 BEGIN  -- beh
 
@@ -511,7 +515,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"00012C")  -- aa.bb.cc version
+      top_lfr_version        => X"00012E")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
@@ -573,6 +577,28 @@ BEGIN  -- beh
   ADC_nCS     <= ADC_nCS_sig;
   ADC_CLK     <= ADC_CLK_sig;
   ADC_SDO_sig <= ADC_SDO;
+
+  lpp_lfr_hk_1: lpp_lfr_hk
+    GENERIC MAP (
+      pindex => 7,        
+      paddr  => 7,                
+      pmask  => 16#fff#)                 
+    PORT MAP (
+      clk        => clk_25,
+      rstn       => rstn_25,
+      
+      apbi       => apbi_ext,              
+      apbo       => apbo_ext(7),             
+      
+      sample_val => sample_val,
+      sample     => sample_hk,
+      HK_SEL     => HK_SEL);
+
+  sample_hk <= "0001000100010001" WHEN HK_SEL = "00" ELSE
+               "0010001000100010" WHEN HK_SEL = "10" ELSE
+               "0100010001000100" WHEN HK_SEL = "10" ELSE
+               (OTHERS => '0');
+  
 
 ----------------------------------------------------------------------
 ---  GPIO  -----------------------------------------------------------
@@ -701,7 +727,7 @@ BEGIN  -- beh
   -- 
   -----------------------------------------------------------------------------
   all_apbo_ext : FOR I IN NB_APB_SLAVE-1+5 DOWNTO 5 GENERATE
-    apbo_ext_not_used : IF I /= 5 AND I /= 6 AND I /= 11 AND I /= 15 GENERATE
+    apbo_ext_not_used : IF I /= 5 AND I /= 6 AND I /= 7 AND I /= 11 AND I /= 15 GENERATE
       apbo_ext(I) <= apb_none;
     END GENERATE apbo_ext_not_used;
   END GENERATE all_apbo_ext;
