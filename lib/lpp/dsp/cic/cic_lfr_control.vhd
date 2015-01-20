@@ -90,17 +90,17 @@ ARCHITECTURE beh OF cic_lfr_control IS
       "1010" & "10010" & "11101",                     --16
     --PROG_C256                
       "1001" & "00100" & "10010",                     --17
-      "1001" & "10010" & "10101",                     --18
-      "1001" & "10010" & "10101",                     --19
-      "1010" & "10010" & "10101",                     --20
+      "1001" & "10110" & "10101",                     --18
+      "1001" & "10110" & "10101",                     --19
+      "1010" & "10110" & "10101",                     --20
       "1001" & "01000" & "10010",                     --21
-      "1001" & "10010" & "11101",                     --22
-      "1001" & "10010" & "11101",                     --23
-      "1010" & "10010" & "11101",                     --24
+      "1001" & "10110" & "11101",                     --22
+      "1001" & "10110" & "11101",                     --23
+      "1010" & "10110" & "11101",                     --24
       "1001" & "01100" & "10010",                     --25
-      "1001" & "10010" & "11101",                     --26
-      "1001" & "10010" & "11101",                     --27
-      "1010" & "10010" & "11101"                      --28
+      "1001" & "10110" & "11101",                     --26
+      "1001" & "10110" & "11101",                     --27
+      "1010" & "10110" & "11101"                      --28
       );
 
   
@@ -119,9 +119,16 @@ BEGIN
   OPERATION(7)            <= '0'  WHEN STATE_CIC_LFR = IDLE ELSE PROG(current_cmd)(4);                                                                --CARRY_PUSH
   OPERATION(8)            <= PROG(current_cmd)(5);                                                                --@_init
   OPERATION(9)            <= PROG(current_cmd)(6);                                                                --@_add_1
-  OPERATION(11 DOWNTO 10) <= PROG(current_cmd)(8 DOWNTO 7);                                                       --@_sel(1..0)
-  OPERATION(12)           <= PROG(current_cmd)(9) AND sample_16_odd  WHEN STATE_CIC_LFR = RUN_PROG_C16 ELSE
-                             PROG(current_cmd)(9) AND sample_256_odd WHEN STATE_CIC_LFR = RUN_PROG_C256 ELSE '0'; --@_sel(2)
+
+  OPERATION(10)           <= PROG(current_cmd)(7) AND PROG(current_cmd)(9) AND sample_256_odd WHEN STATE_CIC_LFR = RUN_PROG_C256 ELSE
+                             PROG(current_cmd)(7);                        --@_sel(1..0)
+  OPERATION(11)           <= PROG(current_cmd)(8);
+  OPERATION(12)           <= PROG(current_cmd)(9) AND sample_16_odd  WHEN STATE_CIC_LFR = RUN_PROG_C16  ELSE
+                             --PROG(current_cmd)(9) AND sample_256_odd WHEN STATE_CIC_LFR = RUN_PROG_C256 ELSE
+                             PROG(current_cmd)(9)                    WHEN STATE_CIC_LFR = RUN_PROG_C256 ELSE
+                             '0'; --@_sel(2)
+
+  
   OPERATION(13)           <= '0' WHEN STATE_CIC_LFR = IDLE ELSE PROG(current_cmd)(10);                            --WE
   OPERATION(14)           <= PROG(current_cmd)(12);  -- SEL_DATA_A = data_b_reg
   OPERATION(15)           <= PROG(current_cmd)(13);  -- WRITE_ADDR_sel
