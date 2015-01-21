@@ -36,7 +36,7 @@ USE techmap.gencomp.ALL;
 ENTITY cic_lfr IS
   GENERIC(
     tech         : INTEGER := 0;
-    use_RAM_nCEL : INTEGER := 0         -- 1 => RAM(tech) , 0 => RAM_CEL
+    use_RAM_nCEL : INTEGER := 1         -- 1 => RAM(tech) , 0 => RAM_CEL
     );    
   PORT (
     clk            : IN  STD_LOGIC;
@@ -382,4 +382,3 @@ BEGIN
   END GENERATE all_channel_out_v;
   
 END beh;
-
