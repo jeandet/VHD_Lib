@@ -21,7 +21,7 @@ LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 LIBRARY lpp;
-USE lpp.lpp_lfr_time_management.ALL;
+USE lpp.lpp_lfr_management.ALL;
 
 ENTITY lfr_time_management IS
   GENERIC (

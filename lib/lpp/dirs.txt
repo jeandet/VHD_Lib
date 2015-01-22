@@ -11,7 +11,7 @@
 ./dsp/lpp_fft_rtax
 ./lpp_memory
 ./dsp/lpp_fft
-./lfr_time_management
+./lfr_management
 ./lpp_ad_Conv
 ./lpp_bootloader
 ./lpp_cna

@@ -42,7 +42,7 @@ USE lpp.lpp_lfr_pkg.ALL;  -- contains lpp_lfr, not in the 206 rev of the VHD_Lib
 USE lpp.lpp_top_lfr_pkg.ALL;            -- contains top_wf_picker
 USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
-USE lpp.lpp_lfr_time_management.ALL;
+USE lpp.lpp_lfr_management.ALL;
 USE lpp.lpp_leon3_soc_pkg.ALL;
 
 ENTITY MINI_LFR_top IS
@@ -385,9 +385,9 @@ BEGIN  -- beh
 
   SRAM_CE <= SRAM_CE_s(0);
 -------------------------------------------------------------------------------
--- APB_LFR_TIME_MANAGEMENT ----------------------------------------------------
+-- APB_LFR_MANAGEMENT ---------------------------------------------------------
 -------------------------------------------------------------------------------
-  apb_lfr_time_management_1 : apb_lfr_time_management
+  apb_lfr_management_1 : apb_lfr_management
     GENERIC MAP (
       pindex           => 6,
       paddr            => 6,
@@ -401,6 +401,9 @@ BEGIN  -- beh
       grspw_tick    => swno.tickout,
       apbi          => apbi_ext,
       apbo          => apbo_ext(6),
+      HK_sample     => sample_hk,
+      HK_val        => sample_val,
+      HK_sel        => HK_SEL, 
       coarse_time   => coarse_time,
       fine_time     => fine_time,
       LFR_soft_rstn => LFR_soft_rstn
@@ -515,7 +518,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"00012E")  -- aa.bb.cc version
+      top_lfr_version        => X"000131")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
@@ -577,22 +580,6 @@ BEGIN  -- beh
   ADC_nCS     <= ADC_nCS_sig;
   ADC_CLK     <= ADC_CLK_sig;
   ADC_SDO_sig <= ADC_SDO;
-
-  lpp_lfr_hk_1: lpp_lfr_hk
-    GENERIC MAP (
-      pindex => 7,        
-      paddr  => 7,                
-      pmask  => 16#fff#)                 
-    PORT MAP (
-      clk        => clk_25,
-      rstn       => rstn_25,
-      
-      apbi       => apbi_ext,              
-      apbo       => apbo_ext(7),             
-      
-      sample_val => sample_val,
-      sample     => sample_hk,
-      HK_SEL     => HK_SEL);
 
   sample_hk <= "0001000100010001" WHEN HK_SEL = "00" ELSE
                "0010001000100010" WHEN HK_SEL = "10" ELSE
@@ -727,7 +714,7 @@ BEGIN  -- beh
   -- 
   -----------------------------------------------------------------------------
   all_apbo_ext : FOR I IN NB_APB_SLAVE-1+5 DOWNTO 5 GENERATE
-    apbo_ext_not_used : IF I /= 5 AND I /= 6 AND I /= 7 AND I /= 11 AND I /= 15 GENERATE
+    apbo_ext_not_used : IF I /= 5 AND I /= 6 AND I /= 11 AND I /= 15 GENERATE
       apbo_ext(I) <= apb_none;
     END GENERATE apbo_ext_not_used;
   END GENERATE all_apbo_ext;

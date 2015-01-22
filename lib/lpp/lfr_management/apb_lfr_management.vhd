@@ -27,11 +27,11 @@ USE grlib.devices.ALL;
 LIBRARY lpp;
 USE lpp.apb_devices_list.ALL;
 USE lpp.general_purpose.ALL;
-USE lpp.lpp_lfr_time_management.ALL;
-USE lpp.lpp_lfr_time_management_apbreg_pkg.ALL;
+USE lpp.lpp_lfr_management.ALL;
+USE lpp.lpp_lfr_management_apbreg_pkg.ALL;
 
 
-ENTITY apb_lfr_time_management IS
+ENTITY apb_lfr_management IS
 
   GENERIC(
     pindex         : INTEGER := 0;        --! APB slave index
@@ -50,16 +50,20 @@ ENTITY apb_lfr_time_management IS
 
     apbi : IN  apb_slv_in_type;         --! APB slave input signals
     apbo : OUT apb_slv_out_type;        --! APB slave output signals
-
+    ---------------------------------------------------------------------------
+    HK_sample : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+    HK_val    : IN  STD_LOGIC;
+    HK_sel    : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+    ---------------------------------------------------------------------------
     coarse_time : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --! coarse time
     fine_time   : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);   --! fine TIME
     ---------------------------------------------------------------------------
     LFR_soft_rstn : OUT STD_LOGIC
     );
 
-END apb_lfr_time_management;
+END apb_lfr_management;
 
-ARCHITECTURE Behavioral OF apb_lfr_time_management IS
+ARCHITECTURE Behavioral OF apb_lfr_management IS
 
   CONSTANT REVISION : INTEGER := 1;
   CONSTANT pconfig : apb_config_type := (
@@ -74,6 +78,9 @@ ARCHITECTURE Behavioral OF apb_lfr_time_management IS
     coarse_time      : STD_LOGIC_VECTOR(31 DOWNTO 0);
     fine_time        : STD_LOGIC_VECTOR(15 DOWNTO 0);
     LFR_soft_reset   : STD_LOGIC;
+    HK_temp_0 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+    HK_temp_1 : STD_LOGIC_VECTOR(15 DOWNTO 0);
+    HK_temp_2 : STD_LOGIC_VECTOR(15 DOWNTO 0);
   END RECORD;
   SIGNAL r                   : apb_lfr_time_management_Reg;
   
@@ -108,6 +115,10 @@ ARCHITECTURE Behavioral OF apb_lfr_time_management IS
   SIGNAL soft_reset           : STD_LOGIC;  
   SIGNAL soft_reset_sync      : STD_LOGIC;  
   -----------------------------------------------------------------------------
+  SIGNAL  HK_temp_0_s : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL  HK_temp_1_s : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL  HK_temp_2_s : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL  HK_sel_s    : STD_LOGIC_VECTOR( 1 DOWNTO 0);
 
   SIGNAL rstn_LFR_TM : STD_LOGIC;
   
@@ -153,11 +164,11 @@ BEGIN
 --APB Write OP
       IF (apbi.psel(pindex) AND apbi.penable AND apbi.pwrite) = '1' THEN
         CASE apbi.paddr(7 DOWNTO 2) IS
-          WHEN ADDR_LFR_TM_CONTROL =>
+          WHEN ADDR_LFR_MANAGMENT_CONTROL =>
             r.ctrl              <= apbi.pwdata(0);
             r.soft_reset        <= apbi.pwdata(1);
             r.LFR_soft_reset    <= apbi.pwdata(2);
-          WHEN ADDR_LFR_TM_TIME_LOAD =>
+          WHEN ADDR_LFR_MANAGMENT_TIME_LOAD =>
             r.coarse_time_load     <= apbi.pwdata(30 DOWNTO 0);
             coarsetime_reg_updated <= '1';
           WHEN OTHERS =>
@@ -175,18 +186,27 @@ BEGIN
 --APB READ OP
       IF (apbi.psel(pindex) AND (NOT apbi.pwrite)) = '1' THEN
         CASE apbi.paddr(7 DOWNTO 2) IS
-          WHEN ADDR_LFR_TM_CONTROL =>
+          WHEN ADDR_LFR_MANAGMENT_CONTROL =>
             Rdata(0)            <= r.ctrl;
             Rdata(1)            <= r.soft_reset;
             Rdata(2)            <= r.LFR_soft_reset;
             Rdata(31 DOWNTO 3)  <= (others => '0');
-          WHEN ADDR_LFR_TM_TIME_LOAD =>
+          WHEN ADDR_LFR_MANAGMENT_TIME_LOAD =>
             Rdata(30 DOWNTO 0)  <= r.coarse_time_load(30 DOWNTO 0);
-          WHEN ADDR_LFR_TM_TIME_COARSE =>
+          WHEN ADDR_LFR_MANAGMENT_TIME_COARSE =>
             Rdata(31 DOWNTO 0)  <= r.coarse_time(31 DOWNTO 0);
-          WHEN ADDR_LFR_TM_TIME_FINE =>
+          WHEN ADDR_LFR_MANAGMENT_TIME_FINE =>
             Rdata(31 DOWNTO 16) <= (OTHERS => '0');
             Rdata(15 DOWNTO 0)  <= r.fine_time(15 DOWNTO 0);
+          WHEN ADDR_LFR_MANAGMENT_HK_TEMP_0 =>            
+            Rdata(31 DOWNTO 16) <= (OTHERS => '0');
+            Rdata(15 DOWNTO 0)  <= r.HK_temp_0;
+          WHEN ADDR_LFR_MANAGMENT_HK_TEMP_1 =>            
+            Rdata(31 DOWNTO 16) <= (OTHERS => '0');
+            Rdata(15 DOWNTO 0)  <= r.HK_temp_1;
+          WHEN ADDR_LFR_MANAGMENT_HK_TEMP_2 =>            
+            Rdata(31 DOWNTO 16) <= (OTHERS => '0');
+            Rdata(15 DOWNTO 0)  <= r.HK_temp_2;
           WHEN OTHERS =>
             Rdata(31 DOWNTO 0)  <= (others => '0');
         END CASE;
@@ -326,4 +346,35 @@ BEGIN
       coarse_time     => coarse_time_49,
       coarse_time_new => coarse_time_new_49);
 
+  -----------------------------------------------------------------------------
+  -- HK
+  -----------------------------------------------------------------------------
+
+  PROCESS (clk25MHz, resetn)
+  BEGIN  -- PROCESS
+    IF resetn = '0' THEN                  -- asynchronous reset (active low)
+
+      r.HK_temp_0 <= (OTHERS => '0');
+      r.HK_temp_1 <= (OTHERS => '0');
+      r.HK_temp_2 <= (OTHERS => '0');
+      
+      HK_sel_s <= "00";
+      
+    ELSIF clk25MHz'event AND clk25MHz = '1' THEN  -- rising clock edge
+
+      IF HK_val = '1' THEN
+        CASE HK_sel_s IS
+          WHEN "00" => r.HK_temp_0 <= HK_sample; HK_sel_s <= "01";
+          WHEN "01" => r.HK_temp_1 <= HK_sample; HK_sel_s <= "10";
+          WHEN "10" => r.HK_temp_2 <= HK_sample; HK_sel_s <= "00";
+          WHEN OTHERS => NULL;
+        END CASE;
+        
+      END IF;
+      
+    END IF;
+  END PROCESS;  
+
+  HK_sel <= HK_sel_s;
+  
 END Behavioral;

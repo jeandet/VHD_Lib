@@ -42,7 +42,7 @@ USE lpp.lpp_lfr_pkg.ALL;  -- contains lpp_lfr, not in the 206 rev of the VHD_Lib
 USE lpp.lpp_top_lfr_pkg.ALL;            -- contains top_wf_picker
 USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
-USE lpp.lpp_lfr_time_management.ALL;
+USE lpp.lpp_lfr_management.ALL;
 USE lpp.lpp_leon3_soc_pkg.ALL;
 
 ENTITY LFR_em IS
@@ -250,7 +250,7 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
 -- APB_LFR_TIME_MANAGEMENT ----------------------------------------------------
 -------------------------------------------------------------------------------
-  apb_lfr_time_management_1 : apb_lfr_time_management
+  apb_lfr_management_1 : apb_lfr_management
     GENERIC MAP (
       pindex           => 6,
       paddr            => 6,
@@ -264,6 +264,11 @@ BEGIN  -- beh
       grspw_tick    => swno.tickout,
       apbi          => apbi_ext,
       apbo          => apbo_ext(6),
+      
+      HK_sample     => sample_s(8),
+      HK_val        => sample_val,
+      HK_sel        => HK_SEL, 
+      
       coarse_time   => coarse_time,
       fine_time     => fine_time,
       LFR_soft_rstn => LFR_soft_rstn
@@ -374,7 +379,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"01012F")  -- aa.bb.cc version
+      top_lfr_version        => X"010131")  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             --      0 => MINI_LFR
                                             --      1 => EM
@@ -434,21 +439,5 @@ BEGIN  -- beh
   -- HK
   -----------------------------------------------------------------------------
   ADC_OEB_bar_HK <= ADC_OEB_bar_CH_s(8);
-
-  lpp_lfr_hk_1: lpp_lfr_hk
-    GENERIC MAP (
-      pindex => 7,        
-      paddr  => 7,                
-      pmask  => 16#fff#)                 
-    PORT MAP (
-      clk        => clk_25,
-      rstn       => rstn,
-      
-      apbi       => apbi_ext,              
-      apbo       => apbo_ext(7),             
-      
-      sample_val => sample_val,
-      sample     => sample_s(8),
-      HK_SEL     => HK_SEL);
 
 END beh;

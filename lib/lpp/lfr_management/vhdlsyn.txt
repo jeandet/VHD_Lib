@@ -1,0 +1,6 @@
+lpp_lfr_management.vhd
+lpp_lfr_management_apbreg_pkg.vhd
+apb_lfr_management.vhd
+lfr_time_management.vhd
+fine_time_counter.vhd
+coarse_time_counter.vhd

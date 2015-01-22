@@ -24,29 +24,31 @@ USE grlib.amba.ALL;
 USE grlib.stdlib.ALL;
 USE grlib.devices.ALL;
 
-PACKAGE lpp_lfr_time_management IS
+PACKAGE lpp_lfr_management IS
 
 --***************************
--- APB_LFR_TIME_MANAGEMENT
+-- APB_LFR_MANAGEMENT
 
-  COMPONENT apb_lfr_time_management IS
-    GENERIC(
-      pindex            : INTEGER := 0;            --! APB slave index
-      paddr             : INTEGER := 0;            --! ADDR field of the APB BAR
-      pmask             : INTEGER := 16#fff#;       --! MASK field of the APB BAR
-      FIRST_DIVISION    : INTEGER;
-      NB_SECOND_DESYNC  : INTEGER);
+  COMPONENT apb_lfr_management
+    GENERIC (
+      pindex           : INTEGER;
+      paddr            : INTEGER;
+      pmask            : INTEGER;
+      FIRST_DIVISION   : INTEGER;
+      NB_SECOND_DESYNC : INTEGER);
     PORT (
-      clk25MHz     : IN  STD_LOGIC;     --! Clock
-      clk24_576MHz : IN  STD_LOGIC;     --! secondary clock
-      resetn       : IN  STD_LOGIC;     --! Reset
-      grspw_tick   : IN  STD_LOGIC;  --! grspw signal asserted when a valid time-code is received
-      apbi         : IN  apb_slv_in_type;   --! APB slave input signals
-      apbo         : OUT apb_slv_out_type;  --! APB slave output signals
-      coarse_time  : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --! coarse time
-      fine_time    : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);   --! fine TIME
-      LFR_soft_rstn : OUT STD_LOGIC      
-      );
+      clk25MHz      : IN  STD_LOGIC;
+      clk24_576MHz  : IN  STD_LOGIC;
+      resetn        : IN  STD_LOGIC;
+      grspw_tick    : IN  STD_LOGIC;
+      apbi          : IN  apb_slv_in_type;
+      apbo          : OUT apb_slv_out_type;
+      HK_sample     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+      HK_val        : IN  STD_LOGIC;
+      HK_sel        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+      coarse_time   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      fine_time     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      LFR_soft_rstn : OUT STD_LOGIC);
   END COMPONENT;
 
   COMPONENT lfr_time_management
@@ -99,5 +101,5 @@ PACKAGE lpp_lfr_time_management IS
   END COMPONENT;
   
   
-END lpp_lfr_time_management;
+END lpp_lfr_management;
 

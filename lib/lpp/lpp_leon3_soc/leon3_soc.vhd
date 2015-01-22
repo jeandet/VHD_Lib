@@ -39,7 +39,6 @@ USE lpp.lpp_ad_conv.ALL;
 USE lpp.lpp_lfr_pkg.ALL;
 USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
-USE lpp.lpp_lfr_time_management.ALL;
 USE lpp.lpp_leon3_soc_pkg.ALL;
 LIBRARY iap;
 USE iap.memctrl.all;
