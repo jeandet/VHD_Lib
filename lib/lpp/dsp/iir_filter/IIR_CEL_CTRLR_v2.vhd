@@ -33,7 +33,7 @@ USE lpp.general_purpose.ALL;
 
 ENTITY IIR_CEL_CTRLR_v2 IS
   GENERIC (
-    tech         : INTEGER := apa3;
+    tech         : INTEGER := 0;
     Mem_use      : INTEGER := use_RAM;
     Sample_SZ    : INTEGER := 18;
     Coef_SZ      : INTEGER := 9;

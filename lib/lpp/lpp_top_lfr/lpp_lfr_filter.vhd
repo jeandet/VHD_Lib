@@ -32,6 +32,7 @@ USE lpp.lpp_memory.ALL;
 USE lpp.lpp_waveform_pkg.ALL;
 USE lpp.cic_pkg.ALL;
 USE lpp.data_type_pkg.ALL;
+USE lpp.lpp_lfr_filter_coeff.ALL;
 
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
@@ -122,8 +123,10 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
   SIGNAL sample_f0_s                     : sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
   --
 --  SIGNAL sample_f1_val                   : STD_LOGIC;
-  SIGNAL sample_f1                       : samplT(ChanelCount-1 DOWNTO 0, 15 DOWNTO 0);
-  SIGNAL sample_f1_s                     : samplT(5 DOWNTO 0, 15 DOWNTO 0);
+  
+  SIGNAL sample_f0_f1_s                  : samplT(5 DOWNTO 0, 17 DOWNTO 0);
+  SIGNAL sample_f1_s                     : samplT(5 DOWNTO 0, 17 DOWNTO 0);
+  SIGNAL sample_f1                       : samplT(5 DOWNTO 0, 17 DOWNTO 0);
   --
 --  SIGNAL sample_f2_val                   : STD_LOGIC;
   SIGNAL sample_f2                       : samplT(5 DOWNTO 0, 15 DOWNTO 0);
@@ -150,6 +153,35 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
   
   SIGNAL sample_f0_val_s : STD_LOGIC;
   SIGNAL sample_f1_val_s : STD_LOGIC;
+
+  -----------------------------------------------------------------------------
+  -- CONFIG FILTER IIR f0 to f1
+  -----------------------------------------------------------------------------
+  CONSTANT f0_to_f1_CEL_NUMBER           : INTEGER := 5;
+  CONSTANT f0_to_f1_COEFFICIENT_SIZE     : INTEGER := 10;
+  CONSTANT f0_to_f1_POINT_POSITION       : INTEGER := 8;
+  
+  CONSTANT f0_to_f1_sos : COEFF_CEL_ARRAY_REAL(1 TO 5) :=
+    (
+      (1.0, -1.61171504942096,  1.0, 1.0, -1.68876443778669,  0.908610171614583),
+      (1.0, -1.53324505744412,  1.0, 1.0, -1.51088513595779,  0.732564401274351),
+      (1.0, -1.30646173160060,  1.0, 1.0, -1.30571711968384,  0.546869268827102),
+      (1.0, -0.651038739239370, 1.0, 1.0, -1.08747326287406,  0.358436944718464),
+      (1.0,  1.24322747034001,  1.0, 1.0, -0.929530176676438, 0.224862726961691)
+    );
+  CONSTANT f0_to_f1_gain : COEFF_CEL_REAL :=
+    ( 0.566196896119831, 0.474937156750133, 0.347712822970540, 0.200868393871900, 0.0910613125308450, 1.0);
+
+  CONSTANT coefs_iir_cel_f0_to_f1 : STD_LOGIC_VECTOR((f0_to_f1_CEL_NUMBER*f0_to_f1_COEFFICIENT_SIZE*5)-1 DOWNTO 0)
+    :=  get_IIR_CEL_FILTER_CONFIG(
+      f0_to_f1_COEFFICIENT_SIZE,
+      f0_to_f1_POINT_POSITION,
+      f0_to_f1_CEL_NUMBER,
+      f0_to_f1_sos,
+      f0_to_f1_gain);
+  -----------------------------------------------------------------------------
+
+  
 BEGIN
   
   -----------------------------------------------------------------------------
@@ -257,6 +289,7 @@ BEGIN
   -----------------------------------------------------------------------------
   -- F0 -- @24.576 kHz
   -----------------------------------------------------------------------------
+  
   Downsampling_f0 : Downsampling
     GENERIC MAP (
       ChanelCount => 8,
@@ -270,7 +303,7 @@ BEGIN
       sample_out_val => sample_f0_val_s,
       sample_out     => sample_f0);
 
-	sample_f0_val <= sample_f0_val_s;
+  sample_f0_val <= sample_f0_val_s;
 
   all_bit_sample_f0 : FOR I IN 15 DOWNTO 0 GENERATE
     sample_f0_wdata_s(I)      <= sample_f0(0, I);  -- V
@@ -281,46 +314,68 @@ BEGIN
     sample_f0_wdata_s(16*5+I) <= sample_f0(7, I);  -- B3
   END GENERATE all_bit_sample_f0;
 
-  --sample_f0_wen <= NOT(sample_f0_val) &
-  --                 NOT(sample_f0_val) &
-  --                 NOT(sample_f0_val) &
-  --                 NOT(sample_f0_val) &
-  --                 NOT(sample_f0_val) &
-  --                 NOT(sample_f0_val);
-
   -----------------------------------------------------------------------------
   -- F1 -- @4096 Hz
   -----------------------------------------------------------------------------
+  
+  all_bit_sample_f0_f1 : FOR I IN 15 DOWNTO 0 GENERATE
+    sample_f0_f1_s(0,I) <=  sample_f0(0,I);  --V
+    sample_f0_f1_s(1,I) <=  sample_f0(1,I) WHEN data_shaping_R1 = '1' ELSE sample_f0(3,I); --E1
+    sample_f0_f1_s(2,I) <=  sample_f0(2,I) WHEN data_shaping_R1 = '1' ELSE sample_f0(4,I); --E2
+    sample_f0_f1_s(3,I) <=  sample_f0(5,I);  --B1
+    sample_f0_f1_s(4,I) <=  sample_f0(6,I);  --B2
+    sample_f0_f1_s(5,I) <=  sample_f0(7,I);  --B3
+  END GENERATE all_bit_sample_f0_f1;
+  all_bit_sample_f0_f1_extended : FOR I IN 17 DOWNTO 16 GENERATE
+    sample_f0_f1_s(0,I) <= sample_f0(0,15);
+    sample_f0_f1_s(1,I) <= sample_f0(1,15) WHEN data_shaping_R1 = '1' ELSE sample_f0(3,15); --E1
+    sample_f0_f1_s(2,I) <= sample_f0(2,15) WHEN data_shaping_R1 = '1' ELSE sample_f0(4,15); --E2
+    sample_f0_f1_s(3,I) <= sample_f0(5,15);  --B1
+    sample_f0_f1_s(4,I) <= sample_f0(6,15);  --B2
+    sample_f0_f1_s(5,I) <= sample_f0(7,15);  --B3
+  END GENERATE all_bit_sample_f0_f1_extended;
+  
+  
+  IIR_CEL_f0_to_f1 : IIR_CEL_CTRLR_v2
+    GENERIC MAP (
+      tech         => 0,
+      Mem_use      => Mem_use,          -- use_RAM
+      Sample_SZ    => 18,
+      Coef_SZ      => f0_to_f1_COEFFICIENT_SIZE,
+      Coef_Nb      => f0_to_f1_CEL_NUMBER*5,
+      Coef_sel_SZ  => 5,
+      Cels_count   => f0_to_f1_CEL_NUMBER,
+      ChanelsCount => 6)
+    PORT MAP (
+      rstn           => rstn,
+      clk            => clk,
+      virg_pos       => f0_to_f1_POINT_POSITION,
+      coefs          => coefs_iir_cel_f0_to_f1,
+      
+      sample_in_val  => sample_f0_val_s,
+      sample_in      => sample_f0_f1_s,
+      
+      sample_out_val => sample_f1_val_s,
+      sample_out     => sample_f1_s);
+  
   Downsampling_f1 : Downsampling
     GENERIC MAP (
-      ChanelCount => 8,
-      SampleSize  => 16,
+      ChanelCount => 6,
+      SampleSize  => 18,
       DivideParam => 6)
     PORT MAP (
       clk            => clk,
       rstn           => rstn,
-      sample_in_val  => sample_f0_val_s ,
-      sample_in      => sample_f0,
-      sample_out_val => sample_f1_val_s,
-      sample_out     => sample_f1);
-
-  sample_f1_val <= sample_f1_val_s;
+      sample_in_val  => sample_f1_val_s,
+      sample_in      => sample_f1_s,
+      sample_out_val => sample_f1_val,
+      sample_out     => sample_f1);  
 
   all_bit_sample_f1 : FOR I IN 15 DOWNTO 0 GENERATE
-    sample_f1_wdata_s(I)      <= sample_f1(0, I);  -- V
-    sample_f1_wdata_s(16*1+I) <= sample_f1(1, I) WHEN data_shaping_R1 = '1' ELSE sample_f1(3, I);  -- E1
-    sample_f1_wdata_s(16*2+I) <= sample_f1(2, I) WHEN data_shaping_R1 = '1' ELSE sample_f1(4, I);  -- E2
-    sample_f1_wdata_s(16*3+I) <= sample_f1(5, I);  -- B1
-    sample_f1_wdata_s(16*4+I) <= sample_f1(6, I);  -- B2
-    sample_f1_wdata_s(16*5+I) <= sample_f1(7, I);  -- B3
+    all_channel_sample_f1: FOR J IN 5 DOWNTO 0 GENERATE
+      sample_f1_wdata_s(16*J+I) <= sample_f1(J, I); 
+    END GENERATE all_channel_sample_f1;
   END GENERATE all_bit_sample_f1;
-
-  --sample_f1_wen <= NOT(sample_f1_val) &
-  --                 NOT(sample_f1_val) &
-  --                 NOT(sample_f1_val) &
-  --                 NOT(sample_f1_val) &
-  --                 NOT(sample_f1_val) &
-  --                 NOT(sample_f1_val);
 
   -----------------------------------------------------------------------------
   -- F2 -- @256 Hz
