@@ -139,8 +139,35 @@ PACKAGE iir_filter IS
       sample_out_val : OUT  STD_LOGIC;
       sample_out     : OUT samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0));
   END COMPONENT;
+
+  COMPONENT IIR_CEL_CTRLR_v3
+    GENERIC (
+      tech         : INTEGER;
+      Mem_use      : INTEGER;
+      Sample_SZ    : INTEGER;
+      Coef_SZ      : INTEGER;
+      Coef_Nb      : INTEGER;
+      Coef_sel_SZ  : INTEGER;
+      Cels_count   : INTEGER;
+      ChanelsCount : INTEGER);
+    PORT (
+      rstn            : IN  STD_LOGIC;
+      clk             : IN  STD_LOGIC;
+      virg_pos        : IN  INTEGER;
+      coefs           : IN  STD_LOGIC_VECTOR((Coef_SZ*Coef_Nb)-1 DOWNTO 0);
+      sample_in1_val  : IN  STD_LOGIC;
+      sample_in1      : IN  samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0);
+      sample_in2_val  : IN  STD_LOGIC;
+      sample_in2      : IN  samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0);
+      sample_out1_val : OUT STD_LOGIC;
+      sample_out1     : OUT samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0);
+      sample_out2_val : OUT STD_LOGIC;
+      sample_out2     : OUT samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0));
+  END COMPONENT;
   
 
+
+  
 --component  FilterCTRLR is
 --port(
 --    reset       :   in  std_logic;

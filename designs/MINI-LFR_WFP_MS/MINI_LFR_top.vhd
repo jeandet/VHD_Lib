@@ -582,8 +582,8 @@ BEGIN  -- beh
   ADC_SDO_sig <= ADC_SDO;
 
   sample_hk <= "0001000100010001" WHEN HK_SEL = "00" ELSE
-               "0010001000100010" WHEN HK_SEL = "10" ELSE
-               "0100010001000100" WHEN HK_SEL = "11" ELSE
+               "0010001000100010" WHEN HK_SEL = "01" ELSE
+               "0100010001000100" WHEN HK_SEL = "10" ELSE
                (OTHERS => '0');
   
 

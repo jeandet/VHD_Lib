@@ -69,8 +69,8 @@ ENTITY lpp_lfr_apbreg IS
     ready_matrix_f2 : IN  STD_LOGIC;
 
 --    error_bad_component_error : IN STD_LOGIC;
-    error_buffer_full         : IN STD_LOGIC;                     --  TODO
-    error_input_fifo_write    : IN STD_LOGIC_VECTOR(2 DOWNTO 0);  --  TODO
+    error_buffer_full      : IN STD_LOGIC;                     --  TODO
+    error_input_fifo_write : IN STD_LOGIC_VECTOR(2 DOWNTO 0);  --  TODO
 
 --    debug_reg : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 
@@ -100,8 +100,8 @@ ENTITY lpp_lfr_apbreg IS
     --status_full     : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
     --status_full_ack : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
     --status_full_err : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    status_new_err  : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-   
+    status_new_err : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+
     -- OUT
     data_shaping_BW  : OUT STD_LOGIC;
     data_shaping_SP0 : OUT STD_LOGIC;
@@ -130,22 +130,22 @@ ENTITY lpp_lfr_apbreg IS
 
     run : OUT STD_LOGIC;
 
-    start_date   : OUT STD_LOGIC_VECTOR(30 DOWNTO 0);
-    
+    start_date : OUT STD_LOGIC_VECTOR(30 DOWNTO 0);
+
     wfp_status_buffer_ready : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
     wfp_addr_buffer         : OUT STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
     wfp_length_buffer       : OUT STD_LOGIC_VECTOR(25 DOWNTO 0);
-    wfp_ready_buffer        : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-    wfp_buffer_time         : IN STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
-    wfp_error_buffer_full   : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+    wfp_ready_buffer        : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    wfp_buffer_time         : IN  STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
+    wfp_error_buffer_full   : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
     ---------------------------------------------------------------------------
-    sample_f3_v  : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-    sample_f3_e1 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-    sample_f3_e2 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-    sample_f3_valid : IN STD_LOGIC;       
+    sample_f3_v             : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+    sample_f3_e1            : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+    sample_f3_e2            : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+    sample_f3_valid         : IN  STD_LOGIC;
     ---------------------------------------------------------------------------
-    debug_vector : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
-    
+    debug_vector            : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
+
     );
 
 END lpp_lfr_apbreg;
@@ -197,35 +197,35 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
   TYPE lpp_WaveformPicker_regs IS RECORD
 --    status_full       : STD_LOGIC_VECTOR(3 DOWNTO 0);
 --    status_full_err   : STD_LOGIC_VECTOR(3 DOWNTO 0);
-    status_new_err    : STD_LOGIC_VECTOR(3 DOWNTO 0);
-    data_shaping_BW   : STD_LOGIC;
-    data_shaping_SP0  : STD_LOGIC;
-    data_shaping_SP1  : STD_LOGIC;
-    data_shaping_R0   : STD_LOGIC;
-    data_shaping_R1   : STD_LOGIC;
-    data_shaping_R2   : STD_LOGIC;
-    delta_snapshot    : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
-    delta_f0          : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
-    delta_f0_2        : STD_LOGIC_VECTOR(delta_vector_size_f0_2-1 DOWNTO 0);
-    delta_f1          : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
-    delta_f2          : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
-    nb_data_by_buffer : STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
+    status_new_err        : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    data_shaping_BW       : STD_LOGIC;
+    data_shaping_SP0      : STD_LOGIC;
+    data_shaping_SP1      : STD_LOGIC;
+    data_shaping_R0       : STD_LOGIC;
+    data_shaping_R1       : STD_LOGIC;
+    data_shaping_R2       : STD_LOGIC;
+    delta_snapshot        : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
+    delta_f0              : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
+    delta_f0_2            : STD_LOGIC_VECTOR(delta_vector_size_f0_2-1 DOWNTO 0);
+    delta_f1              : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
+    delta_f2              : STD_LOGIC_VECTOR(delta_vector_size-1 DOWNTO 0);
+    nb_data_by_buffer     : STD_LOGIC_VECTOR(nb_data_by_buffer_size-1 DOWNTO 0);
 --    nb_word_by_buffer : STD_LOGIC_VECTOR(nb_word_by_buffer_size-1 DOWNTO 0);
-    nb_snapshot_param : STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
-    enable_f0         : STD_LOGIC;
-    enable_f1         : STD_LOGIC;
-    enable_f2         : STD_LOGIC;
-    enable_f3         : STD_LOGIC;
-    burst_f0          : STD_LOGIC;
-    burst_f1          : STD_LOGIC;
-    burst_f2          : STD_LOGIC;
-    run               : STD_LOGIC;
-    status_ready_buffer_f : STD_LOGIC_VECTOR(4*2-1 DOWNTO 0);     
-    addr_buffer_f         : STD_LOGIC_VECTOR(4*2*32-1 DOWNTO 0);  
-    time_buffer_f         : STD_LOGIC_VECTOR(4*2*48-1 DOWNTO 0); 
+    nb_snapshot_param     : STD_LOGIC_VECTOR(nb_snapshot_param_size-1 DOWNTO 0);
+    enable_f0             : STD_LOGIC;
+    enable_f1             : STD_LOGIC;
+    enable_f2             : STD_LOGIC;
+    enable_f3             : STD_LOGIC;
+    burst_f0              : STD_LOGIC;
+    burst_f1              : STD_LOGIC;
+    burst_f2              : STD_LOGIC;
+    run                   : STD_LOGIC;
+    status_ready_buffer_f : STD_LOGIC_VECTOR(4*2-1 DOWNTO 0);
+    addr_buffer_f         : STD_LOGIC_VECTOR(4*2*32-1 DOWNTO 0);
+    time_buffer_f         : STD_LOGIC_VECTOR(4*2*48-1 DOWNTO 0);
     length_buffer         : STD_LOGIC_VECTOR(25 DOWNTO 0);
-    error_buffer_full   :  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    start_date        : STD_LOGIC_VECTOR(30 DOWNTO 0);
+    error_buffer_full     : STD_LOGIC_VECTOR(3 DOWNTO 0);
+    start_date            : STD_LOGIC_VECTOR(30 DOWNTO 0);
   END RECORD;
   SIGNAL reg_wp : lpp_WaveformPicker_regs;
 
@@ -267,16 +267,16 @@ ARCHITECTURE beh OF lpp_lfr_apbreg IS
   SIGNAL reg1_ready_matrix_f2 : STD_LOGIC;
 --  SIGNAL reg1_addr_matrix_f2  : STD_LOGIC_VECTOR(31 DOWNTO 0);
 --  SIGNAL reg1_matrix_time_f2  : STD_LOGIC_VECTOR(47 DOWNTO 0);
-  SIGNAL apbo_irq_ms : STD_LOGIC;
-  SIGNAL apbo_irq_wfp : STD_LOGIC;
+  SIGNAL apbo_irq_ms          : STD_LOGIC;
+  SIGNAL apbo_irq_wfp         : STD_LOGIC;
   -----------------------------------------------------------------------------
-  SIGNAL reg_ready_buffer_f : STD_LOGIC_VECTOR( 2*4-1 DOWNTO 0);
+  SIGNAL reg_ready_buffer_f   : STD_LOGIC_VECTOR(2*4-1 DOWNTO 0);
 
-  SIGNAL pirq_temp  : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  
-  SIGNAL  sample_f3_v_reg  : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL  sample_f3_e1_reg : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL  sample_f3_e2_reg : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL pirq_temp : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+  SIGNAL sample_f3_v_reg  : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL sample_f3_e1_reg : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL sample_f3_e2_reg : STD_LOGIC_VECTOR(15 DOWNTO 0);
   
 BEGIN  -- beh
 
@@ -288,7 +288,7 @@ BEGIN  -- beh
   debug_vector(9)          <= reg0_ready_matrix_f2;
   debug_vector(10)         <= reg1_ready_matrix_f2;
   debug_vector(11)         <= HRESETn;
-  
+
 --  status_ready_matrix_f0 <= reg_sp.status_ready_matrix_f0;
 --  status_ready_matrix_f1 <= reg_sp.status_ready_matrix_f1;
 --  status_ready_matrix_f2 <= reg_sp.status_ready_matrix_f2;
@@ -335,20 +335,20 @@ BEGIN  -- beh
 
   start_date <= reg_wp.start_date;
 
-  length_matrix_f0 <= reg_sp.length_matrix;
-  length_matrix_f1 <= reg_sp.length_matrix;
-  length_matrix_f2 <= reg_sp.length_matrix;
+  length_matrix_f0  <= reg_sp.length_matrix;
+  length_matrix_f1  <= reg_sp.length_matrix;
+  length_matrix_f2  <= reg_sp.length_matrix;
   wfp_length_buffer <= reg_wp.length_buffer;
 
 
-  
+
   PROCESS (HCLK, HRESETn)
   BEGIN  -- PROCESS
-    IF HRESETn = '0' THEN               -- asynchronous reset (active low)
+    IF HRESETn = '0' THEN                 -- asynchronous reset (active low)
       sample_f3_v_reg  <= (OTHERS => '0');
       sample_f3_e1_reg <= (OTHERS => '0');
       sample_f3_e2_reg <= (OTHERS => '0');
-    ELSIF HCLK'event AND HCLK = '1' THEN  -- rising clock edge
+    ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
       IF sample_f3_valid = '1' THEN
         sample_f3_v_reg  <= sample_f3_v;
         sample_f3_e1_reg <= sample_f3_e1;
@@ -356,7 +356,7 @@ BEGIN  -- beh
       END IF;
     END IF;
   END PROCESS;
-  
+
 
   lpp_lfr_apbreg : PROCESS (HCLK, HRESETn)
     VARIABLE paddr : STD_LOGIC_VECTOR(7 DOWNTO 2);
@@ -383,7 +383,7 @@ BEGIN  -- beh
       reg_sp.addr_matrix_f2_1 <= (OTHERS => '0');
 
       reg_sp.length_matrix <= (OTHERS => '0');
-      
+
 --      reg_sp.time_matrix_f0_0 <= (OTHERS => '0');  -- ok
 --      reg_sp.time_matrix_f1_0 <= (OTHERS => '0');  -- ok
 --      reg_sp.time_matrix_f2_0 <= (OTHERS => '0');  -- ok
@@ -394,10 +394,10 @@ BEGIN  -- beh
 
       prdata <= (OTHERS => '0');
 
-      
-      apbo_irq_ms <= '0';
+
+      apbo_irq_ms  <= '0';
       apbo_irq_wfp <= '0';
-      
+
 
 --      status_full_ack <= (OTHERS => '0');
 
@@ -427,14 +427,14 @@ BEGIN  -- beh
       reg_wp.nb_data_by_buffer <= (OTHERS => '0');
       reg_wp.nb_snapshot_param <= (OTHERS => '0');
       reg_wp.start_date        <= (OTHERS => '1');
-      
+
       reg_wp.status_ready_buffer_f <= (OTHERS => '0');
-      reg_wp.length_buffer <= (OTHERS => '0');
+      reg_wp.length_buffer         <= (OTHERS => '0');
 
       pirq_temp <= (OTHERS => '0');
-      
+
       reg_wp.addr_buffer_f <= (OTHERS => '0');
-                     
+      
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
 
 --      status_full_ack <= (OTHERS => '0');
@@ -447,7 +447,7 @@ BEGIN  -- beh
       reg_sp.status_ready_matrix_f1_1 <= reg_sp.status_ready_matrix_f1_1 OR reg1_ready_matrix_f1;
       reg_sp.status_ready_matrix_f2_1 <= reg_sp.status_ready_matrix_f2_1 OR reg1_ready_matrix_f2;
 
-      all_status_ready_buffer_bit: FOR I IN 4*2-1 DOWNTO 0 LOOP
+      all_status_ready_buffer_bit : FOR I IN 4*2-1 DOWNTO 0 LOOP
         reg_wp.status_ready_buffer_f(I) <= reg_wp.status_ready_buffer_f(I) OR reg_ready_buffer_f(I);
       END LOOP all_status_ready_buffer_bit;
 
@@ -460,8 +460,8 @@ BEGIN  -- beh
 
 
       all_status : FOR I IN 3 DOWNTO 0 LOOP
-        reg_wp.error_buffer_full(I) <=  reg_wp.error_buffer_full(I) OR wfp_error_buffer_full(I);
-        reg_wp.status_new_err(I)    <=  reg_wp.status_new_err(I) OR status_new_err(I);
+        reg_wp.error_buffer_full(I) <= reg_wp.error_buffer_full(I) OR wfp_error_buffer_full(I);
+        reg_wp.status_new_err(I)    <= reg_wp.status_new_err(I) OR status_new_err(I);
       END LOOP all_status;
 
       paddr             := "000000";
@@ -477,7 +477,7 @@ BEGIN  -- beh
             prdata(2) <= reg_sp.config_ms_run;
 
           WHEN ADDR_LFR_SM_STATUS =>
-            prdata(0) <= reg_sp.status_ready_matrix_f0_0;
+            prdata(0)  <= reg_sp.status_ready_matrix_f0_0;
             prdata(1)  <= reg_sp.status_ready_matrix_f0_1;
             prdata(2)  <= reg_sp.status_ready_matrix_f1_0;
             prdata(3)  <= reg_sp.status_ready_matrix_f1_1;
@@ -508,8 +508,8 @@ BEGIN  -- beh
           WHEN ADDR_LFR_SM_F2_1_TIME_COARSE => prdata              <= reg_sp.time_matrix_f2_1(47 DOWNTO 16);
           WHEN ADDR_LFR_SM_F2_1_TIME_FINE   => prdata(15 DOWNTO 0) <= reg_sp.time_matrix_f2_1(15 DOWNTO 0);
           WHEN ADDR_LFR_SM_LENGTH           => prdata(25 DOWNTO 0) <= reg_sp.length_matrix;
-          ---------------------------------------------------------------------
-          WHEN ADDR_LFR_WP_DATASHAPING =>
+                                                                                             ---------------------------------------------------------------------
+          WHEN ADDR_LFR_WP_DATASHAPING      =>
             prdata(0) <= reg_wp.data_shaping_BW;
             prdata(1) <= reg_wp.data_shaping_SP0;
             prdata(2) <= reg_wp.data_shaping_SP1;
@@ -525,60 +525,60 @@ BEGIN  -- beh
             prdata(5) <= reg_wp.burst_f1;
             prdata(6) <= reg_wp.burst_f2;
             prdata(7) <= reg_wp.run;
-          WHEN ADDR_LFR_WP_F0_0_ADDR => prdata             <= reg_wp.addr_buffer_f(32*1-1 DOWNTO 32*0);--0
-          WHEN ADDR_LFR_WP_F0_1_ADDR => prdata             <= reg_wp.addr_buffer_f(32*2-1 DOWNTO 32*1);
-          WHEN ADDR_LFR_WP_F1_0_ADDR => prdata             <= reg_wp.addr_buffer_f(32*3-1 DOWNTO 32*2);--1
-          WHEN ADDR_LFR_WP_F1_1_ADDR => prdata             <= reg_wp.addr_buffer_f(32*4-1 DOWNTO 32*3);
-          WHEN ADDR_LFR_WP_F2_0_ADDR => prdata             <= reg_wp.addr_buffer_f(32*5-1 DOWNTO 32*4);--2
-          WHEN ADDR_LFR_WP_F2_1_ADDR => prdata             <= reg_wp.addr_buffer_f(32*6-1 DOWNTO 32*5);
-          WHEN ADDR_LFR_WP_F3_0_ADDR => prdata             <= reg_wp.addr_buffer_f(32*7-1 DOWNTO 32*6);--3
-          WHEN ADDR_LFR_WP_F3_1_ADDR => prdata             <= reg_wp.addr_buffer_f(32*8-1 DOWNTO 32*7);
-          
+          WHEN ADDR_LFR_WP_F0_0_ADDR => prdata <= reg_wp.addr_buffer_f(32*1-1 DOWNTO 32*0);  --0
+          WHEN ADDR_LFR_WP_F0_1_ADDR => prdata <= reg_wp.addr_buffer_f(32*2-1 DOWNTO 32*1);
+          WHEN ADDR_LFR_WP_F1_0_ADDR => prdata <= reg_wp.addr_buffer_f(32*3-1 DOWNTO 32*2);  --1
+          WHEN ADDR_LFR_WP_F1_1_ADDR => prdata <= reg_wp.addr_buffer_f(32*4-1 DOWNTO 32*3);
+          WHEN ADDR_LFR_WP_F2_0_ADDR => prdata <= reg_wp.addr_buffer_f(32*5-1 DOWNTO 32*4);  --2
+          WHEN ADDR_LFR_WP_F2_1_ADDR => prdata <= reg_wp.addr_buffer_f(32*6-1 DOWNTO 32*5);
+          WHEN ADDR_LFR_WP_F3_0_ADDR => prdata <= reg_wp.addr_buffer_f(32*7-1 DOWNTO 32*6);  --3
+          WHEN ADDR_LFR_WP_F3_1_ADDR => prdata <= reg_wp.addr_buffer_f(32*8-1 DOWNTO 32*7);
+
           WHEN ADDR_LFR_WP_STATUS =>
-            prdata(7  DOWNTO  0) <= reg_wp.status_ready_buffer_f;
-            prdata(11 DOWNTO  8) <= reg_wp.error_buffer_full;
+            prdata(7 DOWNTO 0)   <= reg_wp.status_ready_buffer_f;
+            prdata(11 DOWNTO 8)  <= reg_wp.error_buffer_full;
             prdata(15 DOWNTO 12) <= reg_wp.status_new_err;
             
-          WHEN ADDR_LFR_WP_DELTASNAPSHOT => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_snapshot;
-          WHEN ADDR_LFR_WP_DELTA_F0      => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_f0;
-          WHEN ADDR_LFR_WP_DELTA_F0_2    => prdata(delta_vector_size_f0_2-1 DOWNTO 0) <= reg_wp.delta_f0_2;
-          WHEN ADDR_LFR_WP_DELTA_F1      => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_f1;
-          WHEN ADDR_LFR_WP_DELTA_F2      => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_f2;
+          WHEN ADDR_LFR_WP_DELTASNAPSHOT  => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_snapshot;
+          WHEN ADDR_LFR_WP_DELTA_F0       => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_f0;
+          WHEN ADDR_LFR_WP_DELTA_F0_2     => prdata(delta_vector_size_f0_2-1 DOWNTO 0) <= reg_wp.delta_f0_2;
+          WHEN ADDR_LFR_WP_DELTA_F1       => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_f1;
+          WHEN ADDR_LFR_WP_DELTA_F2       => prdata(delta_vector_size-1 DOWNTO 0)      <= reg_wp.delta_f2;
           WHEN ADDR_LFR_WP_DATA_IN_BUFFER => prdata(nb_data_by_buffer_size-1 DOWNTO 0) <= reg_wp.nb_data_by_buffer;
           WHEN ADDR_LFR_WP_NBSNAPSHOT     => prdata(nb_snapshot_param_size-1 DOWNTO 0) <= reg_wp.nb_snapshot_param;
           WHEN ADDR_LFR_WP_START_DATE     => prdata(30 DOWNTO 0)                       <= reg_wp.start_date;
 
-          WHEN ADDR_LFR_WP_F0_0_TIME_COARSE => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*0 + 31 DOWNTO 48*0);  
+          WHEN ADDR_LFR_WP_F0_0_TIME_COARSE => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*0 + 31 DOWNTO 48*0);
           WHEN ADDR_LFR_WP_F0_0_TIME_FINE   => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*0 + 47 DOWNTO 48*0 + 32);
           WHEN ADDR_LFR_WP_F0_1_TIME_COARSE => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*1 + 31 DOWNTO 48*1);
           WHEN ADDR_LFR_WP_F0_1_TIME_FINE   => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*1 + 47 DOWNTO 48*1 + 32);
-                           
+
           WHEN ADDR_LFR_WP_F1_0_TIME_COARSE => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*2 + 31 DOWNTO 48*2);
           WHEN ADDR_LFR_WP_F1_0_TIME_FINE   => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*2 + 47 DOWNTO 48*2 + 32);
           WHEN ADDR_LFR_WP_F1_1_TIME_COARSE => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*3 + 31 DOWNTO 48*3);
           WHEN ADDR_LFR_WP_F1_1_TIME_FINE   => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*3 + 47 DOWNTO 48*3 + 32);
-                           
+
           WHEN ADDR_LFR_WP_F2_0_TIME_COARSE => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*4 + 31 DOWNTO 48*4);
           WHEN ADDR_LFR_WP_F2_0_TIME_FINE   => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*4 + 47 DOWNTO 48*4 + 32);
           WHEN ADDR_LFR_WP_F2_1_TIME_COARSE => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*5 + 31 DOWNTO 48*5);
           WHEN ADDR_LFR_WP_F2_1_TIME_FINE   => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*5 + 47 DOWNTO 48*5 + 32);
-                           
+
           WHEN ADDR_LFR_WP_F3_0_TIME_COARSE => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*6 + 31 DOWNTO 48*6);
           WHEN ADDR_LFR_WP_F3_0_TIME_FINE   => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*6 + 47 DOWNTO 48*6 + 32);
           WHEN ADDR_LFR_WP_F3_1_TIME_COARSE => prdata(31 DOWNTO 0) <= reg_wp.time_buffer_f(48*7 + 31 DOWNTO 48*7);
           WHEN ADDR_LFR_WP_F3_1_TIME_FINE   => prdata(15 DOWNTO 0) <= reg_wp.time_buffer_f(48*7 + 47 DOWNTO 48*7 + 32);
 
           WHEN ADDR_LFR_WP_LENGTH => prdata(25 DOWNTO 0) <= reg_wp.length_buffer;
-                                     
-          WHEN ADDR_LFR_WP_F3_V   => prdata(15 DOWNTO  0) <= sample_f3_v_reg; 
-                                     prdata(31 DOWNTO 16) <= (OTHERS => '0');  
-          WHEN ADDR_LFR_WP_F3_E1  => prdata(15 DOWNTO  0) <= sample_f3_e1_reg; 
-                                     prdata(31 DOWNTO 16) <= (OTHERS => '0');   
-          WHEN ADDR_LFR_WP_F3_E2  => prdata(15 DOWNTO  0) <= sample_f3_e2_reg; 
-                                     prdata(31 DOWNTO 16) <= (OTHERS => '0');   
-          ---------------------------------------------------------------------            
-          WHEN ADDR_LFR_VERSION   => prdata(23 DOWNTO 0)                       <= top_lfr_version(23 DOWNTO 0);
-          WHEN OTHERS   => NULL;
+
+          WHEN ADDR_LFR_WP_F3_V => prdata(15 DOWNTO 0) <= sample_f3_v_reg;
+                                     prdata(31 DOWNTO 16) <= (OTHERS => '0');
+          WHEN ADDR_LFR_WP_F3_E1 => prdata(15 DOWNTO 0) <= sample_f3_e1_reg;
+                                     prdata(31 DOWNTO 16) <= (OTHERS => '0');
+          WHEN ADDR_LFR_WP_F3_E2 => prdata(15 DOWNTO 0) <= sample_f3_e2_reg;
+                                     prdata(31 DOWNTO 16) <= (OTHERS => '0');
+                                     ---------------------------------------------------------------------            
+          WHEN ADDR_LFR_VERSION => prdata(23 DOWNTO 0) <= top_lfr_version(23 DOWNTO 0);
+          WHEN OTHERS           => NULL;
                            
         END CASE;
         IF (apbi.pwrite AND apbi.penable) = '1' THEN
@@ -589,17 +589,17 @@ BEGIN  -- beh
               reg_sp.config_active_interruption_onNewMatrix <= apbi.pwdata(0);
               reg_sp.config_active_interruption_onError     <= apbi.pwdata(1);
               reg_sp.config_ms_run                          <= apbi.pwdata(2);
-                             
+              
             WHEN ADDR_LFR_SM_STATUS =>
-              reg_sp.status_ready_matrix_f0_0         <= ((NOT apbi.pwdata(0) ) AND reg_sp.status_ready_matrix_f0_0        ) OR reg0_ready_matrix_f0;
-              reg_sp.status_ready_matrix_f0_1         <= ((NOT apbi.pwdata(1) ) AND reg_sp.status_ready_matrix_f0_1        ) OR reg1_ready_matrix_f0;
-              reg_sp.status_ready_matrix_f1_0         <= ((NOT apbi.pwdata(2) ) AND reg_sp.status_ready_matrix_f1_0        ) OR reg0_ready_matrix_f1;
-              reg_sp.status_ready_matrix_f1_1         <= ((NOT apbi.pwdata(3) ) AND reg_sp.status_ready_matrix_f1_1        ) OR reg1_ready_matrix_f1;
-              reg_sp.status_ready_matrix_f2_0         <= ((NOT apbi.pwdata(4) ) AND reg_sp.status_ready_matrix_f2_0        ) OR reg0_ready_matrix_f2;
-              reg_sp.status_ready_matrix_f2_1         <= ((NOT apbi.pwdata(5) ) AND reg_sp.status_ready_matrix_f2_1        ) OR reg1_ready_matrix_f2;
-              reg_sp.status_error_buffer_full         <= ((NOT apbi.pwdata(7) ) AND reg_sp.status_error_buffer_full        ) OR error_buffer_full;
-              reg_sp.status_error_input_fifo_write(0) <= ((NOT apbi.pwdata(8) ) AND reg_sp.status_error_input_fifo_write(0)) OR error_input_fifo_write(0);
-              reg_sp.status_error_input_fifo_write(1) <= ((NOT apbi.pwdata(9) ) AND reg_sp.status_error_input_fifo_write(1)) OR error_input_fifo_write(1);
+              reg_sp.status_ready_matrix_f0_0         <= ((NOT apbi.pwdata(0)) AND reg_sp.status_ready_matrix_f0_0) OR reg0_ready_matrix_f0;
+              reg_sp.status_ready_matrix_f0_1         <= ((NOT apbi.pwdata(1)) AND reg_sp.status_ready_matrix_f0_1) OR reg1_ready_matrix_f0;
+              reg_sp.status_ready_matrix_f1_0         <= ((NOT apbi.pwdata(2)) AND reg_sp.status_ready_matrix_f1_0) OR reg0_ready_matrix_f1;
+              reg_sp.status_ready_matrix_f1_1         <= ((NOT apbi.pwdata(3)) AND reg_sp.status_ready_matrix_f1_1) OR reg1_ready_matrix_f1;
+              reg_sp.status_ready_matrix_f2_0         <= ((NOT apbi.pwdata(4)) AND reg_sp.status_ready_matrix_f2_0) OR reg0_ready_matrix_f2;
+              reg_sp.status_ready_matrix_f2_1         <= ((NOT apbi.pwdata(5)) AND reg_sp.status_ready_matrix_f2_1) OR reg1_ready_matrix_f2;
+              reg_sp.status_error_buffer_full         <= ((NOT apbi.pwdata(7)) AND reg_sp.status_error_buffer_full) OR error_buffer_full;
+              reg_sp.status_error_input_fifo_write(0) <= ((NOT apbi.pwdata(8)) AND reg_sp.status_error_input_fifo_write(0)) OR error_input_fifo_write(0);
+              reg_sp.status_error_input_fifo_write(1) <= ((NOT apbi.pwdata(9)) AND reg_sp.status_error_input_fifo_write(1)) OR error_input_fifo_write(1);
               reg_sp.status_error_input_fifo_write(2) <= ((NOT apbi.pwdata(10)) AND reg_sp.status_error_input_fifo_write(2)) OR error_input_fifo_write(2);
             WHEN ADDR_LFR_SM_F0_0_ADDR => reg_sp.addr_matrix_f0_0 <= apbi.pwdata;
             WHEN ADDR_LFR_SM_F0_1_ADDR => reg_sp.addr_matrix_f0_1 <= apbi.pwdata;
@@ -608,8 +608,8 @@ BEGIN  -- beh
             WHEN ADDR_LFR_SM_F2_0_ADDR => reg_sp.addr_matrix_f2_0 <= apbi.pwdata;
             WHEN ADDR_LFR_SM_F2_1_ADDR => reg_sp.addr_matrix_f2_1 <= apbi.pwdata;
 
-            WHEN ADDR_LFR_SM_LENGTH => reg_sp.length_matrix <=  apbi.pwdata(25 DOWNTO 0); 
-            ---------------------------------------------------------------------     
+            WHEN ADDR_LFR_SM_LENGTH      => reg_sp.length_matrix <= apbi.pwdata(25 DOWNTO 0);
+                                       ---------------------------------------------------------------------     
             WHEN ADDR_LFR_WP_DATASHAPING =>
               reg_wp.data_shaping_BW  <= apbi.pwdata(0);
               reg_wp.data_shaping_SP0 <= apbi.pwdata(1);
@@ -617,7 +617,7 @@ BEGIN  -- beh
               reg_wp.data_shaping_R0  <= apbi.pwdata(3);
               reg_wp.data_shaping_R1  <= apbi.pwdata(4);
               reg_wp.data_shaping_R2  <= apbi.pwdata(5);
-            WHEN  ADDR_LFR_WP_CONTROL =>
+            WHEN ADDR_LFR_WP_CONTROL =>
               reg_wp.enable_f0 <= apbi.pwdata(0);
               reg_wp.enable_f1 <= apbi.pwdata(1);
               reg_wp.enable_f2 <= apbi.pwdata(2);
@@ -634,12 +634,12 @@ BEGIN  -- beh
             WHEN ADDR_LFR_WP_F2_1_ADDR => reg_wp.addr_buffer_f(32*6-1 DOWNTO 32*5) <= apbi.pwdata;
             WHEN ADDR_LFR_WP_F3_0_ADDR => reg_wp.addr_buffer_f(32*7-1 DOWNTO 32*6) <= apbi.pwdata;
             WHEN ADDR_LFR_WP_F3_1_ADDR => reg_wp.addr_buffer_f(32*8-1 DOWNTO 32*7) <= apbi.pwdata;
-            WHEN ADDR_LFR_WP_STATUS =>
-              all_reg_wp_status_bit: FOR I IN 3 DOWNTO 0 LOOP
-                reg_wp.status_ready_buffer_f(I*2)   <= ((NOT apbi.pwdata(I*2)  ) AND reg_wp.status_ready_buffer_f(I*2)  ) OR reg_ready_buffer_f(I*2);
+            WHEN ADDR_LFR_WP_STATUS    =>
+              all_reg_wp_status_bit : FOR I IN 3 DOWNTO 0 LOOP
+                reg_wp.status_ready_buffer_f(I*2)   <= ((NOT apbi.pwdata(I*2)) AND reg_wp.status_ready_buffer_f(I*2)) OR reg_ready_buffer_f(I*2);
                 reg_wp.status_ready_buffer_f(I*2+1) <= ((NOT apbi.pwdata(I*2+1)) AND reg_wp.status_ready_buffer_f(I*2+1)) OR reg_ready_buffer_f(I*2+1);
-                reg_wp.error_buffer_full(I)         <= ((NOT apbi.pwdata(I+8)  ) AND reg_wp.error_buffer_full(I)        ) OR wfp_error_buffer_full(I); 
-                reg_wp.status_new_err(I)            <= ((NOT apbi.pwdata(I+12) ) AND reg_wp.status_new_err(I)           ) OR status_new_err(I);
+                reg_wp.error_buffer_full(I)         <= ((NOT apbi.pwdata(I+8)) AND reg_wp.error_buffer_full(I)) OR wfp_error_buffer_full(I);
+                reg_wp.status_new_err(I)            <= ((NOT apbi.pwdata(I+12)) AND reg_wp.status_new_err(I)) OR status_new_err(I);
               END LOOP all_reg_wp_status_bit;
 
             WHEN ADDR_LFR_WP_DELTASNAPSHOT  => reg_wp.delta_snapshot    <= apbi.pwdata(delta_vector_size-1 DOWNTO 0);
@@ -650,37 +650,37 @@ BEGIN  -- beh
             WHEN ADDR_LFR_WP_DATA_IN_BUFFER => reg_wp.nb_data_by_buffer <= apbi.pwdata(nb_data_by_buffer_size-1 DOWNTO 0);
             WHEN ADDR_LFR_WP_NBSNAPSHOT     => reg_wp.nb_snapshot_param <= apbi.pwdata(nb_snapshot_param_size-1 DOWNTO 0);
             WHEN ADDR_LFR_WP_START_DATE     => reg_wp.start_date        <= apbi.pwdata(30 DOWNTO 0);
-                             
-            WHEN ADDR_LFR_WP_LENGTH         => reg_wp.length_buffer    <=  apbi.pwdata(25 DOWNTO 0);                         
 
-            WHEN OTHERS   => NULL;
+            WHEN ADDR_LFR_WP_LENGTH => reg_wp.length_buffer <= apbi.pwdata(25 DOWNTO 0);
+
+            WHEN OTHERS => NULL;
           END CASE;
         END IF;
       END IF;
       --apbo.pirq(pirq_ms) <=
-      pirq_temp( pirq_ms) <= apbo_irq_ms;
+      pirq_temp(pirq_ms)  <= apbo_irq_ms;
       pirq_temp(pirq_wfp) <= apbo_irq_wfp;
       apbo_irq_ms <= ((reg_sp.config_active_interruption_onNewMatrix AND (ready_matrix_f0 OR
-                                                                                 ready_matrix_f1 OR
-                                                                                 ready_matrix_f2)
-                              )
-                             OR
-                             (reg_sp.config_active_interruption_onError AND (
+                                                                          ready_matrix_f1 OR
+                                                                          ready_matrix_f2)
+                       )
+                      OR
+                      (reg_sp.config_active_interruption_onError AND (
 --                               error_bad_component_error OR
-                               error_buffer_full
-                               OR error_input_fifo_write(0)
-                               OR error_input_fifo_write(1)
-                               OR error_input_fifo_write(2))
-                              ));
+                        error_buffer_full
+                        OR error_input_fifo_write(0)
+                        OR error_input_fifo_write(1)
+                        OR error_input_fifo_write(2))
+                       ));
       -- apbo.pirq(pirq_wfp)
-      apbo_irq_wfp<= ored_irq_wfp;
+      apbo_irq_wfp <= ored_irq_wfp;
       
     END IF;
   END PROCESS lpp_lfr_apbreg;
 
   apbo.pirq <= pirq_temp;
 
-  
+
   --all_irq: FOR I IN 31 DOWNTO 0 GENERATE
   --  IRQ_is_PIRQ_MS: IF I = pirq_ms GENERATE
   --    apbo.pirq(I)  <= apbo_irq_ms;
@@ -691,11 +691,11 @@ BEGIN  -- beh
   --  IRQ_OTHERS: IF I /= pirq_ms AND pirq_wfp /= pirq_wfp GENERATE
   --    apbo.pirq(I) <= '0';
   --  END GENERATE IRQ_OTHERS;
-    
-  --END GENERATE all_irq;
-  
 
-  
+  --END GENERATE all_irq;
+
+
+
   apbo.pindex  <= pindex;
   apbo.pconfig <= pconfig;
   apbo.prdata  <= prdata;
@@ -731,8 +731,8 @@ BEGIN  -- beh
       clk  => HCLK,
       rstn => HRESETn,
 
-      run  => '1',--reg_sp.config_ms_run,
-      
+      run => '1',                       --reg_sp.config_ms_run,
+
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f0_0,
       reg0_ready_matrix        => reg0_ready_matrix_f0,
       reg0_addr_matrix         => reg_sp.addr_matrix_f0_0,  --reg0_addr_matrix_f0,            
@@ -753,7 +753,7 @@ BEGIN  -- beh
       clk  => HCLK,
       rstn => HRESETn,
 
-      run  => '1',--reg_sp.config_ms_run,
+      run => '1',                       --reg_sp.config_ms_run,
 
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f1_0,
       reg0_ready_matrix        => reg0_ready_matrix_f1,
@@ -775,7 +775,7 @@ BEGIN  -- beh
       clk  => HCLK,
       rstn => HRESETn,
 
-      run  => '1',--reg_sp.config_ms_run,
+      run => '1',                       --reg_sp.config_ms_run,
 
       reg0_status_ready_matrix => reg_sp.status_ready_matrix_f2_0,
       reg0_ready_matrix        => reg0_ready_matrix_f2,
@@ -793,33 +793,33 @@ BEGIN  -- beh
       matrix_time         => matrix_time_f2);
 
   -----------------------------------------------------------------------------
-  all_wfp_pointer: FOR I IN 3 DOWNTO 0 GENERATE
+  all_wfp_pointer : FOR I IN 3 DOWNTO 0 GENERATE
     lpp_apbreg_wfp_pointer_fi : lpp_apbreg_ms_pointer
       PORT MAP (
         clk  => HCLK,
         rstn => HRESETn,
 
-        run  => '1',--reg_wp.run,
+        run => '1',                     --reg_wp.run,
 
         reg0_status_ready_matrix => reg_wp.status_ready_buffer_f(2*I),
         reg0_ready_matrix        => reg_ready_buffer_f(2*I),
         reg0_addr_matrix         => reg_wp.addr_buffer_f((2*I+1)*32-1 DOWNTO (2*I)*32),
-        reg0_matrix_time         => reg_wp.time_buffer_f((2*I+1)*48-1 DOWNTO (2*I)*48), 
+        reg0_matrix_time         => reg_wp.time_buffer_f((2*I+1)*48-1 DOWNTO (2*I)*48),
 
         reg1_status_ready_matrix => reg_wp.status_ready_buffer_f(2*I+1),
         reg1_ready_matrix        => reg_ready_buffer_f(2*I+1),
         reg1_addr_matrix         => reg_wp.addr_buffer_f((2*I+2)*32-1 DOWNTO (2*I+1)*32),
-        reg1_matrix_time         => reg_wp.time_buffer_f((2*I+2)*48-1 DOWNTO (2*I+1)*48),  
+        reg1_matrix_time         => reg_wp.time_buffer_f((2*I+2)*48-1 DOWNTO (2*I+1)*48),
 
         ready_matrix        => wfp_ready_buffer(I),
         status_ready_matrix => wfp_status_buffer_ready(I),
         addr_matrix         => wfp_addr_buffer((I+1)*32-1 DOWNTO I*32),
         matrix_time         => wfp_buffer_time((I+1)*48-1 DOWNTO I*48)
         );
-      
-  END GENERATE all_wfp_pointer; 
+
+  END GENERATE all_wfp_pointer;
   -----------------------------------------------------------------------------
-        
+  
 END beh;
 
 ------------------------------------------------------------------------------
