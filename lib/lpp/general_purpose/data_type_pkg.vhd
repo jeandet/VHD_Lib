@@ -26,6 +26,8 @@ USE ieee.std_logic_1164.ALL;
 
 PACKAGE data_type_pkg IS
 
+  TYPE array_integer IS ARRAY (NATURAL RANGE <>) OF INTEGER;
+  
   TYPE sample_vector IS ARRAY(NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
   
 END data_type_pkg;

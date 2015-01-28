@@ -518,7 +518,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000134")  -- aa.bb.cc version
+      top_lfr_version        => X"000135")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
@@ -583,7 +583,7 @@ BEGIN  -- beh
 
   sample_hk <= "0001000100010001" WHEN HK_SEL = "00" ELSE
                "0010001000100010" WHEN HK_SEL = "10" ELSE
-               "0100010001000100" WHEN HK_SEL = "10" ELSE
+               "0100010001000100" WHEN HK_SEL = "11" ELSE
                (OTHERS => '0');
   
 
