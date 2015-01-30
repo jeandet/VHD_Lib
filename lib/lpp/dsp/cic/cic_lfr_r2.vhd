@@ -33,7 +33,7 @@ USE lpp.iir_filter.ALL;
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
 
-ENTITY cic_lfr IS
+ENTITY cic_lfr_r2 IS
   GENERIC(
     tech         : INTEGER := 0;
     use_RAM_nCEL : INTEGER := 0         -- 1 => RAM(tech) , 0 => RAM_CEL
@@ -42,8 +42,10 @@ ENTITY cic_lfr IS
     clk            : IN  STD_LOGIC;
     rstn           : IN  STD_LOGIC;
     run            : IN  STD_LOGIC;
+
+    param_r2       : IN  STD_LOGIC;
     
-    data_in        : IN  sample_vector(5 DOWNTO 0,15 DOWNTO 0);
+    data_in        : IN  sample_vector(7 DOWNTO 0,15 DOWNTO 0);
     data_in_valid  : IN  STD_LOGIC;
 
     data_out_16        : OUT sample_vector(5 DOWNTO 0,15 DOWNTO 0);
@@ -52,9 +54,9 @@ ENTITY cic_lfr IS
     data_out_256_valid : OUT STD_LOGIC
     );
 
-END cic_lfr;
+END cic_lfr_r2;
 
-ARCHITECTURE beh OF cic_lfr IS
+ARCHITECTURE beh OF cic_lfr_r2 IS
   --
   SIGNAL sel_sample  : STD_LOGIC_VECTOR(2 DOWNTO 0);
   SIGNAL sample_temp : sample_vector(5 DOWNTO 0,15 DOWNTO 0);
@@ -82,15 +84,15 @@ ARCHITECTURE beh OF cic_lfr IS
   SIGNAL OPERATION_reg2: STD_LOGIC_VECTOR(15 DOWNTO 0);
 
   -----------------------------------------------------------------------------
-  TYPE ARRAY_OF_ADDR IS ARRAY (5 DOWNTO 0) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
+  TYPE ARRAY_OF_ADDR IS ARRAY (7 DOWNTO 0) OF STD_LOGIC_VECTOR(8 DOWNTO 0);
   SIGNAL   base_addr_INT   : ARRAY_OF_ADDR;
   CONSTANT base_addr_delta : INTEGER := 40;
-  SIGNAL addr_base_sel : STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL addr_gen: STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL addr_read: STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL addr_write: STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL addr_write_mux: STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL addr_write_s: STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL addr_base_sel : STD_LOGIC_VECTOR(8 DOWNTO 0);
+  SIGNAL addr_gen: STD_LOGIC_VECTOR(8 DOWNTO 0);
+  SIGNAL addr_read: STD_LOGIC_VECTOR(8 DOWNTO 0);
+  SIGNAL addr_write: STD_LOGIC_VECTOR(8 DOWNTO 0);
+  SIGNAL addr_write_mux: STD_LOGIC_VECTOR(8 DOWNTO 0);
+  SIGNAL addr_write_s: STD_LOGIC_VECTOR(8 DOWNTO 0);
   SIGNAL data_we: STD_LOGIC;
   SIGNAL data_we_s: STD_LOGIC;
   SIGNAL data_wen       : STD_LOGIC;
@@ -98,9 +100,9 @@ ARCHITECTURE beh OF cic_lfr IS
 --  SIGNAL data_read      : STD_LOGIC_VECTOR(15 DOWNTO 0);
 --  SIGNAL data_read_pre      : STD_LOGIC_VECTOR(15 DOWNTO 0);
   -----------------------------------------------------------------------------
-  SIGNAL sample_out_reg16   : sample_vector(6*2-1 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_out_reg16   : sample_vector(8*2-1 DOWNTO 0, 15 DOWNTO 0);
   SIGNAL sample_out_reg256  : sample_vector(6*3-1 DOWNTO 0, 15 DOWNTO 0);
-  SIGNAL sample_valid_reg16 : STD_LOGIC_VECTOR(6*2 DOWNTO 0);
+  SIGNAL sample_valid_reg16 : STD_LOGIC_VECTOR(8*2 DOWNTO 0);
   SIGNAL sample_valid_reg256: STD_LOGIC_VECTOR(6*3 DOWNTO 0);
   SIGNAL  data_out_16_valid_s  : STD_LOGIC;
   SIGNAL  data_out_256_valid_s : STD_LOGIC;
@@ -140,9 +142,10 @@ BEGIN
     sample_temp(0,I) <= data_in(0,I)     WHEN sel_sample(0) = '0' ELSE data_in(1,I);
     sample_temp(1,I) <= data_in(2,I)     WHEN sel_sample(0) = '0' ELSE data_in(3,I);
     sample_temp(2,I) <= data_in(4,I)     WHEN sel_sample(0) = '0' ELSE data_in(5,I);
+    sample_temp(3,I) <= data_in(6,I)     WHEN sel_sample(0) = '0' ELSE data_in(7,I);
 
     sample_temp(4,I) <= sample_temp(0,I) WHEN sel_sample(1) = '0' ELSE sample_temp(1,I);
-    sample_temp(5,I) <= sample_temp(2,I) WHEN sel_sample(1) = '0' ELSE '0';
+    sample_temp(5,I) <= sample_temp(2,I) WHEN sel_sample(1) = '0' ELSE sample_temp(3,I);
 
     sample(I)        <= sample_temp(4,I) WHEN sel_sample(2) = '0' ELSE sample_temp(5,I);
   END GENERATE all_bit;  
@@ -204,33 +207,35 @@ BEGIN
   -----------------------------------------------------------------------------
   -- MEMORY
   -----------------------------------------------------------------------------
-  all_channel: FOR I IN 5 DOWNTO 0 GENERATE
-    all_bit: FOR J IN 7 DOWNTO 0 GENERATE
+  all_bit_base_ADDR: FOR J IN 8 DOWNTO 0 GENERATE
+    all_channel: FOR I IN 7 DOWNTO 0 GENERATE
       base_addr_INT(I)(J) <= '1' WHEN (base_addr_delta * I/(2**J)) MOD 2 = 1 ELSE '0';
-    END GENERATE all_bit;
-  END GENERATE all_channel;
+    END GENERATE all_channel;
+  END GENERATE all_bit_base_ADDR;
+  
+  
   addr_base_sel <= base_addr_INT(to_integer(UNSIGNED(OPERATION(2 DOWNTO 0))));
   
-cic_lfr_address_gen_1: cic_lfr_address_gen
-  GENERIC MAP (
-    ADDR_SIZE => 8 )
-  PORT MAP (
-    clk               => clk,
-    rstn              => rstn,
-    run               => run,
-    
-    addr_base         => addr_base_sel,
-    addr_init         => OPERATION(8),
-    addr_add_1        => OPERATION(9),
-    addr              => addr_gen);
+  cic_lfr_address_gen_1: cic_lfr_address_gen
+    GENERIC MAP (
+      ADDR_SIZE => 9)
+    PORT MAP (
+      clk               => clk,
+      rstn              => rstn,
+      run               => run,
+      
+      addr_base         => addr_base_sel,
+      addr_init         => OPERATION(8),
+      addr_add_1        => OPERATION(9),
+      addr              => addr_gen);
 
     
   addr_read <= addr_gen                                                               WHEN OPERATION(12 DOWNTO 10) = "000" ELSE
-               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_base_sel))+2,8)) WHEN OPERATION(12 DOWNTO 10) = "001" ELSE
-               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_base_sel))+5,8)) WHEN OPERATION(12 DOWNTO 10) = "010" ELSE
-               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_base_sel))+8,8)) WHEN OPERATION(12 DOWNTO 10) = "011" ELSE
-               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_gen     ))+6,8)) WHEN OPERATION(12 DOWNTO 10) = "100" ELSE
-               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_gen     ))+15,8));
+               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_base_sel))+2,9)) WHEN OPERATION(12 DOWNTO 10) = "001" ELSE
+               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_base_sel))+5,9)) WHEN OPERATION(12 DOWNTO 10) = "010" ELSE
+               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_base_sel))+8,9)) WHEN OPERATION(12 DOWNTO 10) = "011" ELSE
+               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_gen     ))+6,9)) WHEN OPERATION(12 DOWNTO 10) = "100" ELSE
+               STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(addr_gen     ))+15,9));
   
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
@@ -254,7 +259,7 @@ cic_lfr_address_gen_1: cic_lfr_address_gen
   memCEL : IF use_RAM_nCEL = 0 GENERATE
     data_wen <= NOT data_we;
     RAMblk : RAM_CEL
-      GENERIC MAP(16, 8)
+      GENERIC MAP(16, 9)
       PORT MAP(
         WD    => data_out,
         RD    => data_B,
@@ -269,7 +274,7 @@ cic_lfr_address_gen_1: cic_lfr_address_gen
 
   memRAM : IF use_RAM_nCEL = 1 GENERATE
     SRAM : syncram_2p
-      GENERIC MAP(tech, 8, 16)
+      GENERIC MAP(tech, 9, 16)
       PORT MAP(clk, '1', addr_read,  data_B,
                clk, data_we, addr_write, data_out);
   END GENERATE;
@@ -277,7 +282,7 @@ cic_lfr_address_gen_1: cic_lfr_address_gen
   -----------------------------------------------------------------------------
   -- CONTROL
   -----------------------------------------------------------------------------
-  cic_lfr_control_1: cic_lfr_control
+  cic_lfr_control_1: cic_lfr_control_r2
     PORT MAP (
       clk                => clk,
       rstn               => rstn,
@@ -306,15 +311,15 @@ cic_lfr_address_gen_1: cic_lfr_address_gen
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      sample_valid_reg16  <= '0' & "000000" & "000001";
+      sample_valid_reg16  <= "00000" & "000000" & "000001";
       sample_valid_reg256 <= '0' & "000000" & "000000" & "000001";
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
       IF run = '0' THEN
-        sample_valid_reg16  <= '0' & "000000" & "000001";
+        sample_valid_reg16  <= "00000" & "000000" & "000001";
         sample_valid_reg256 <= '0' & "000000" & "000000" & "000001";
       ELSE
-        IF data_out_16_valid_s2 = '1' OR sample_valid_reg16(6*2) = '1' THEN
-          sample_valid_reg16  <= sample_valid_reg16(6*2-1 DOWNTO 0)  & sample_valid_reg16(6*2);
+        IF data_out_16_valid_s2 = '1' OR sample_valid_reg16(8*2) = '1' THEN
+          sample_valid_reg16  <= sample_valid_reg16(8*2-1 DOWNTO 0)  & sample_valid_reg16(8*2);
         END IF;
         IF data_out_256_valid_s2 = '1' OR sample_valid_reg256(6*3) = '1' THEN
           sample_valid_reg256 <= sample_valid_reg256(6*3-1 DOWNTO 0) & sample_valid_reg256(6*3);
@@ -323,13 +328,13 @@ cic_lfr_address_gen_1: cic_lfr_address_gen
     END IF;
   END PROCESS;
 
-  data_out_16_valid  <= sample_valid_reg16(6*2);
+  data_out_16_valid  <= sample_valid_reg16(8*2);
   data_out_256_valid <= sample_valid_reg256(6*3);
 
   -----------------------------------------------------------------------------
   
   all_bits: FOR J IN 15 DOWNTO 0 GENERATE
-    all_channel_out16: FOR I IN 6*2-1 DOWNTO 0 GENERATE
+    all_channel_out16: FOR I IN 8*2-1 DOWNTO 0 GENERATE
       PROCESS (clk, rstn)
       BEGIN  -- PROCESS
         IF rstn = '0' THEN              -- asynchronous reset (active low)
@@ -365,16 +370,24 @@ cic_lfr_address_gen_1: cic_lfr_address_gen
   END GENERATE all_bits;
   
 
-  all_channel_out: FOR I IN 5 DOWNTO 0 GENERATE
-    all_bits: FOR J IN 15 DOWNTO 0 GENERATE
-      all_reg_16: FOR K IN 1 DOWNTO 0 GENERATE
-        sample_out_reg16_s(I,J+(K*16)) <= sample_out_reg16(2*I+K,J);
-      END GENERATE all_reg_16;
+  all_bits_16: FOR J IN 15 DOWNTO 0 GENERATE
+    all_reg_16: FOR K IN 1 DOWNTO 0 GENERATE
+      sample_out_reg16_s(0,J+(K*16)) <= sample_out_reg16(2*0+K,J);
+      sample_out_reg16_s(1,J+(K*16)) <= sample_out_reg16(2*1+K,J) WHEN param_r2 = '1' ELSE  sample_out_reg16(2*6+K,J);
+      sample_out_reg16_s(2,J+(K*16)) <= sample_out_reg16(2*2+K,J) WHEN param_r2 = '1' ELSE  sample_out_reg16(2*7+K,J);
+      sample_out_reg16_s(3,J+(K*16)) <= sample_out_reg16(2*3+K,J);
+      sample_out_reg16_s(4,J+(K*16)) <= sample_out_reg16(2*4+K,J);
+      sample_out_reg16_s(5,J+(K*16)) <= sample_out_reg16(2*5+K,J);
+    END GENERATE all_reg_16;
+  END GENERATE all_bits_16;
+  
+  all_channel_out_256: FOR I IN 5 DOWNTO 0 GENERATE
+    all_bits_256: FOR J IN 15 DOWNTO 0 GENERATE
       all_reg_256: FOR K IN 2 DOWNTO 0 GENERATE
         sample_out_reg256_s(I,J+(K*16)) <= sample_out_reg256(3*I+K,J);
       END GENERATE all_reg_256;
-    END GENERATE all_bits;
-  END GENERATE all_channel_out;
+    END GENERATE all_bits_256;
+  END GENERATE all_channel_out_256;
   
   all_channel_out_v: FOR I IN 5 DOWNTO 0 GENERATE
     all_bits: FOR J IN 15 DOWNTO 0 GENERATE

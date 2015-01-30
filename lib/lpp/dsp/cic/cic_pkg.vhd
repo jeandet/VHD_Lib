@@ -107,7 +107,35 @@ PACKAGE cic_pkg IS
       data_out_256_valid : OUT STD_LOGIC);
   END COMPONENT;
 
+  COMPONENT cic_lfr_r2
+    GENERIC (
+      tech         : INTEGER;
+      use_RAM_nCEL : INTEGER);
+    PORT (
+      clk                : IN  STD_LOGIC;
+      rstn               : IN  STD_LOGIC;
+      run                : IN  STD_LOGIC;
+      param_r2           : IN  STD_LOGIC;
+      data_in            : IN  sample_vector(7 DOWNTO 0, 15 DOWNTO 0);
+      data_in_valid      : IN  STD_LOGIC;
+      data_out_16        : OUT sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
+      data_out_16_valid  : OUT STD_LOGIC;
+      data_out_256       : OUT sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
+      data_out_256_valid : OUT STD_LOGIC);
+  END COMPONENT;
+
   COMPONENT cic_lfr_control
+    PORT (
+      clk                : IN  STD_LOGIC;
+      rstn               : IN  STD_LOGIC;
+      run                : IN  STD_LOGIC;
+      data_in_valid      : IN  STD_LOGIC;
+      data_out_16_valid  : OUT STD_LOGIC;
+      data_out_256_valid : OUT STD_LOGIC;
+      OPERATION          : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+  END COMPONENT;
+
+  COMPONENT cic_lfr_control_r2
     PORT (
       clk                : IN  STD_LOGIC;
       rstn               : IN  STD_LOGIC;
@@ -132,14 +160,16 @@ PACKAGE cic_pkg IS
   END COMPONENT;
 
   COMPONENT cic_lfr_address_gen
+    GENERIC (
+      ADDR_SIZE : INTEGER);
     PORT (
       clk        : IN  STD_LOGIC;
       rstn       : IN  STD_LOGIC;
       run        : IN  STD_LOGIC;
-      addr_base  : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-      addr_init  : IN STD_LOGIC;
-      addr_add_1 : IN STD_LOGIC;
-      addr       : OUT STD_LOGIC_VECTOR(7 DOWNTO 0));
+      addr_base  : IN  STD_LOGIC_VECTOR(ADDR_SIZE-1 DOWNTO 0);
+      addr_init  : IN  STD_LOGIC;
+      addr_add_1 : IN  STD_LOGIC;
+      addr       : OUT STD_LOGIC_VECTOR(ADDR_SIZE-1 DOWNTO 0));
   END COMPONENT;
 
   

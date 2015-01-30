@@ -20,7 +20,8 @@ ARCHITECTURE behav OF testbench IS
   SIGNAL rstn           : STD_LOGIC;
   SIGNAL run            : STD_LOGIC;
   SIGNAL data_in        : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL data_gen        : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_gen       : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_in_v_r2   : sample_vector(7 DOWNTO 0,15 DOWNTO 0);
   SIGNAL data_in_v      : sample_vector(5 DOWNTO 0,15 DOWNTO 0);
   SIGNAL data_in_valid  : STD_LOGIC;
  
@@ -47,6 +48,8 @@ ARCHITECTURE behav OF testbench IS
   SIGNAL data_in_4_temp        : STD_LOGIC_VECTOR(15 DOWNTO 0);
   SIGNAL data_in_5_temp        : STD_LOGIC_VECTOR(15 DOWNTO 0);
 
+  SIGNAL param_r2 : STD_LOGIC;
+  
 BEGIN
 
 
@@ -75,14 +78,16 @@ BEGIN
     WAIT UNTIL clk = '1';
     rstn <= '0';
     run  <= '0';
-      
+    param_r2 <= '1';  
     WAIT UNTIL clk = '1';
     rstn <= '1';
     WAIT UNTIL clk = '1';
     WAIT UNTIL clk = '1';
     run <= '1';
     WAIT UNTIL clk = '1';
-
+    
+    WAIT FOR 30 ms;
+    param_r2 <= '0';
     
     WAIT FOR 30 ms;
     REPORT "*** END simulation ***" SEVERITY failure;
@@ -103,6 +108,34 @@ BEGIN
       data_out_16_valid  => OPEN,
       data_out_256       => OPEN,
       data_out_256_valid => OPEN);
+  -----------------------------------------------------------------------------
+  cic_lfr_r2_1: cic_lfr_r2
+    GENERIC MAP (
+      tech         => 0,
+      use_RAM_nCEL => 0)
+    PORT MAP (
+      clk                => clk,
+      rstn               => rstn,
+      run                => run,
+      param_r2           => param_r2,
+      data_in            => data_in_v_r2,
+      data_in_valid      => data_in_valid,
+      data_out_16        => OPEN,
+      data_out_16_valid  => OPEN, 
+      data_out_256       => OPEN, 
+      data_out_256_valid => OPEN);
+  
+  -----------------------------------------------------------------------------
+  all_bit_r2: FOR J IN 15 DOWNTO 0 GENERATE
+    data_in_v_r2(0,J) <= data_in_0(J);
+    data_in_v_r2(1,J) <= data_in_1(J);
+    data_in_v_r2(2,J) <= data_in_2(J);
+    data_in_v_r2(3,J) <= data_in_3(J);
+    data_in_v_r2(4,J) <= data_in_4(J);
+    data_in_v_r2(5,J) <= data_in_5(J);
+    data_in_v_r2(6,J) <= data_in_0(J);
+    data_in_v_r2(7,J) <= data_in_0(J);
+  END GENERATE all_bit_r2;
   -----------------------------------------------------------------------------
   all_bit: FOR J IN 15 DOWNTO 0 GENERATE
     data_in_v(0,J) <= data_in_0(J);

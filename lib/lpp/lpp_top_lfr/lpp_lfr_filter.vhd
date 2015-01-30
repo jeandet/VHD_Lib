@@ -120,7 +120,7 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
   -----------------------------------------------------------------------------
 --  SIGNAL sample_f0_val                   : STD_LOGIC;
   SIGNAL sample_f0                       : samplT(ChanelCount-1 DOWNTO 0, 15 DOWNTO 0);
-  SIGNAL sample_f0_s                     : sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f0_s                     : sample_vector(7 DOWNTO 0, 15 DOWNTO 0);
   --
 --  SIGNAL sample_f1_val                   : STD_LOGIC;
   
@@ -131,13 +131,19 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
 --  SIGNAL sample_f2_val                   : STD_LOGIC;
   SIGNAL sample_f2                       : samplT(5 DOWNTO 0, 15 DOWNTO 0);
   SIGNAL sample_f2_cic_s                 : samplT(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f2_cic_filter            : samplT(5 DOWNTO 0, 17 DOWNTO 0);
+  SIGNAL sample_f2_filter                : samplT(5 DOWNTO 0, 17 DOWNTO 0);
   SIGNAL sample_f2_cic                   : sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
   SIGNAL sample_f2_cic_val               : STD_LOGIC;
+  SIGNAL sample_f2_filter_val            : STD_LOGIC;
   
   SIGNAL sample_f3                       : samplT(5 DOWNTO 0, 15 DOWNTO 0);
   SIGNAL sample_f3_cic_s                 : samplT(5 DOWNTO 0, 15 DOWNTO 0);
+  SIGNAL sample_f3_cic_filter            : samplT(5 DOWNTO 0, 17 DOWNTO 0);
+  SIGNAL sample_f3_filter                : samplT(5 DOWNTO 0, 17 DOWNTO 0);
   SIGNAL sample_f3_cic                   : sample_vector(5 DOWNTO 0, 15 DOWNTO 0);
   SIGNAL sample_f3_cic_val               : STD_LOGIC;
+  SIGNAL sample_f3_filter_val            : STD_LOGIC;
 
   -----------------------------------------------------------------------------
   --SIGNAL data_f0_in_valid : STD_LOGIC_VECTOR(159 DOWNTO 0) := (OTHERS => '0');
@@ -179,6 +185,33 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
       f0_to_f1_CEL_NUMBER,
       f0_to_f1_sos,
       f0_to_f1_gain);
+  -----------------------------------------------------------------------------
+
+  -----------------------------------------------------------------------------
+  -- CONFIG FILTER IIR f2 and f3
+  -----------------------------------------------------------------------------
+  CONSTANT f2_f3_CEL_NUMBER           : INTEGER := 5;
+  CONSTANT f2_f3_COEFFICIENT_SIZE     : INTEGER := 10;
+  CONSTANT f2_f3_POINT_POSITION       : INTEGER := 8;
+  
+  CONSTANT f2_f3_sos : COEFF_CEL_ARRAY_REAL(1 TO 5) :=
+    (
+      (1.0, -1.61171504942096,  1.0, 1.0, -1.68876443778669,  0.908610171614583),
+      (1.0, -1.53324505744412,  1.0, 1.0, -1.51088513595779,  0.732564401274351),
+      (1.0, -1.30646173160060,  1.0, 1.0, -1.30571711968384,  0.546869268827102),
+      (1.0, -0.651038739239370, 1.0, 1.0, -1.08747326287406,  0.358436944718464),
+      (1.0,  1.24322747034001,  1.0, 1.0, -0.929530176676438, 0.224862726961691)
+    );
+  CONSTANT f2_f3_gain : COEFF_CEL_REAL :=
+    ( 0.566196896119831, 0.474937156750133, 0.347712822970540, 0.200868393871900, 0.0910613125308450, 1.0);
+
+  CONSTANT coefs_iir_cel_f2_f3 : STD_LOGIC_VECTOR((f2_f3_CEL_NUMBER*f2_f3_COEFFICIENT_SIZE*5)-1 DOWNTO 0)
+    :=  get_IIR_CEL_FILTER_CONFIG(
+      f2_f3_COEFFICIENT_SIZE,
+      f2_f3_POINT_POSITION,
+      f2_f3_CEL_NUMBER,
+      f2_f3_sos,
+      f2_f3_gain);
   -----------------------------------------------------------------------------
 
   
@@ -388,10 +421,12 @@ BEGIN
     sample_f0_s(3, I) <= sample_f0(5, I);  -- B1
     sample_f0_s(4, I) <= sample_f0(6, I);  -- B2
     sample_f0_s(5, I) <= sample_f0(7, I);  -- B3
+    sample_f0_s(6, I) <= sample_f0(3, I);  --
+    sample_f0_s(7, I) <= sample_f0(4, I);  -- 
   END GENERATE all_bit_sample_f0_s;
 
   
-  cic_lfr_1: cic_lfr
+  cic_lfr_1: cic_lfr_r2
     GENERIC MAP (
       tech         => 0,
       use_RAM_nCEL => Mem_use)
@@ -399,6 +434,8 @@ BEGIN
       clk                => clk,
       rstn               => rstn,
       run                => '1',
+
+      param_r2           => data_shaping_R2,
       
       data_in            => sample_f0_s,
       data_in_valid      => sample_f0_val_s,
@@ -409,13 +446,58 @@ BEGIN
       data_out_256       => sample_f3_cic,
       data_out_256_valid => sample_f3_cic_val);
 
-  -----------------------------------------------------------------------------
   
-  all_bit_sample_f2_cic : FOR I IN 15 DOWNTO 0 GENERATE
-    all_channel_sample_f2_cic : FOR J IN 5 DOWNTO 0 GENERATE
-      sample_f2_cic_s(J,I) <= sample_f2_cic(J,I);
-    END GENERATE all_channel_sample_f2_cic;
-  END GENERATE all_bit_sample_f2_cic;
+  
+  all_channel_sample_f_cic : FOR J IN 5 DOWNTO 0 GENERATE
+    all_bit_sample_f_cic : FOR I IN 15 DOWNTO 0 GENERATE
+      sample_f2_cic_filter(J,I) <= sample_f2_cic(J,I);
+      sample_f3_cic_filter(J,I) <= sample_f3_cic(J,I);
+    END GENERATE all_bit_sample_f_cic;
+    sample_f2_cic_filter(J,16) <= sample_f2_cic(J,15);
+    sample_f2_cic_filter(J,17) <= sample_f2_cic(J,15);
+    
+    sample_f3_cic_filter(J,16) <= sample_f3_cic(J,15);
+    sample_f3_cic_filter(J,17) <= sample_f3_cic(J,15);
+  END GENERATE all_channel_sample_f_cic;
+
+  
+  IIR_CEL_CTRLR_v3_1:IIR_CEL_CTRLR_v3
+    GENERIC MAP (
+      tech         => 0,
+      Mem_use      => Mem_use,
+      Sample_SZ    => 18,
+      Coef_SZ      => f2_f3_COEFFICIENT_SIZE,
+      Coef_Nb      => f2_f3_CEL_NUMBER*5,
+      Coef_sel_SZ  => 5,
+      Cels_count   => f2_f3_CEL_NUMBER,
+      ChanelsCount => 6)
+    PORT MAP (
+      rstn            => rstn,
+      clk             => clk,
+      virg_pos        => f2_f3_POINT_POSITION,
+      coefs           => coefs_iir_cel_f2_f3,
+
+      sample_in1_val  => sample_f2_cic_val,
+      sample_in1      => sample_f2_cic_filter,
+      
+      sample_in2_val  => sample_f3_cic_val,
+      sample_in2      => sample_f3_cic_filter,
+      
+      sample_out1_val => sample_f2_filter_val,
+      sample_out1     => sample_f2_filter,
+      sample_out2_val => sample_f3_filter_val,
+      sample_out2     => sample_f3_filter);
+
+  
+  all_channel_sample_f_filter : FOR J IN 5 DOWNTO 0 GENERATE
+    all_bit_sample_f_filter : FOR I IN 15 DOWNTO 0 GENERATE
+      sample_f2_cic_s(J,I) <= sample_f2_filter(J,I);
+      sample_f3_cic_s(J,I) <= sample_f3_filter(J,I);
+    END GENERATE all_bit_sample_f_filter;
+  END GENERATE all_channel_sample_f_filter;
+  
+
+  -----------------------------------------------------------------------------
   
   Downsampling_f2 : Downsampling
     GENERIC MAP (
@@ -425,7 +507,7 @@ BEGIN
     PORT MAP (
       clk            => clk,
       rstn           => rstn,
-      sample_in_val  => sample_f2_cic_val ,
+      sample_in_val  => sample_f2_filter_val ,
       sample_in      => sample_f2_cic_s,
       sample_out_val => sample_f2_val,
       sample_out     => sample_f2);  
@@ -437,12 +519,6 @@ BEGIN
   END GENERATE all_bit_sample_f2;
     
   -----------------------------------------------------------------------------
- 
-  all_bit_sample_f3_cic : FOR I IN 15 DOWNTO 0 GENERATE
-    all_channel_sample_f3_cic : FOR J IN 5 DOWNTO 0 GENERATE
-      sample_f3_cic_s(J,I) <= sample_f3_cic(J,I);
-    END GENERATE all_channel_sample_f3_cic;
-  END GENERATE all_bit_sample_f3_cic;
   
   Downsampling_f3 : Downsampling
     GENERIC MAP (
@@ -452,7 +528,7 @@ BEGIN
     PORT MAP (
       clk            => clk,
       rstn           => rstn,
-      sample_in_val  => sample_f3_cic_val ,
+      sample_in_val  => sample_f3_filter_val ,
       sample_in      => sample_f3_cic_s,
       sample_out_val => sample_f3_val,
       sample_out     => sample_f3);

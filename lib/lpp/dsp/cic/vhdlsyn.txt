@@ -7,3 +7,5 @@ cic_lfr.vhd
 cic_lfr_control.vhd
 cic_lfr_add_sub.vhd
 cic_lfr_address_gen.vhd
+cic_lfr_r2.vhd
+cic_lfr_control_r2.vhd

@@ -30,7 +30,7 @@ LIBRARY lpp;
 USE lpp.cic_pkg.ALL;
 USE lpp.data_type_pkg.ALL;
 
-ENTITY cic_lfr_control IS
+ENTITY cic_lfr_control_r2 IS
   PORT (
     clk                : IN  STD_LOGIC;
     rstn               : IN  STD_LOGIC;
@@ -43,9 +43,9 @@ ENTITY cic_lfr_control IS
     OPERATION          : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
     );
 
-END cic_lfr_control;
+END cic_lfr_control_r2;
 
-ARCHITECTURE beh OF cic_lfr_control IS
+ARCHITECTURE beh OF cic_lfr_control_r2 IS
 
   TYPE STATE_CIC_LFR_TYPE IS (IDLE,
                               RUN_PROG_I,
@@ -192,14 +192,12 @@ BEGIN
                 sample_16_odd <= NOT sample_16_odd;
               END IF;
             ELSE
-              IF current_channel = 5 THEN
+              IF current_channel = 7 THEN
                 current_channel <= 0;
                 STATE_CIC_LFR   <= IDLE;
-              ELSE
-                
+              ELSE                
                 current_cmd     <= PROG_START_I;
                 current_channel <= current_channel + 1;
-                
               END IF;
             END IF;
           ELSE
@@ -208,14 +206,14 @@ BEGIN
           
         WHEN RUN_PROG_C16 =>
           IF current_cmd = PROG_END_C16 THEN
-            IF nb_data_receipt MOD 256 = 255 THEN
+            IF nb_data_receipt MOD 256 = 255 AND current_channel < 6 THEN
               STATE_CIC_LFR <= RUN_PROG_C256;
               current_cmd   <= PROG_START_C256;
               IF current_channel = 0 THEN
                 sample_256_odd <= NOT sample_256_odd;
               END IF;
             ELSE
-              IF current_channel = 5 THEN
+              IF current_channel = 7 THEN
                 current_channel <= 0;
                 STATE_CIC_LFR   <= IDLE;
               ELSE
@@ -231,14 +229,14 @@ BEGIN
         WHEN RUN_PROG_C256 =>
           IF current_cmd = PROG_END_C256 THEN
 --          data_out_256_valid  <= '1';
-            IF current_channel = 5 THEN
-              current_channel <= 0;
-              STATE_CIC_LFR   <= IDLE;
-            ELSE
-              STATE_CIC_LFR   <= RUN_PROG_I;
-              current_cmd     <= PROG_START_I;
-              current_channel <= current_channel + 1;
-            END IF;
+--            IF current_channel = 5 THEN
+--              current_channel <= 0;
+--              STATE_CIC_LFR   <= IDLE;
+--            ELSE
+            STATE_CIC_LFR   <= RUN_PROG_I;
+            current_cmd     <= PROG_START_I;
+            current_channel <= current_channel + 1;
+--            END IF;
           ELSE
             current_cmd <= current_cmd +1;
           END IF;
