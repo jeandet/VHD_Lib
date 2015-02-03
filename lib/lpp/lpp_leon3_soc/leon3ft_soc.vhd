@@ -257,76 +257,145 @@ BEGIN
 ---  LEON3 processor / DSU / IRQ  ------------------------------------
 ----------------------------------------------------------------------
 
-  l3 : IF CFG_LEON3 = 1 GENERATE
-    cpu : FOR i IN 0 TO CFG_NCPU-1 GENERATE
-      u0 : leon3ft
-        GENERIC MAP (
-          hindex     => i, --: integer;
-          fabtech    => fabtech,  
-          memtech    => memtech,  
-          nwindows   => CFG_NWIN, 
-          dsu        => CFG_DSU,  
-          fpu        => CFG_FPU,  
-          v8         => CFG_V8,   
-          cp         => 0, 
-          mac        => CFG_MAC,
-          pclow      => pclow,
-          notag      => 0,        
-          nwp        => CFG_NWP,  
-          icen       => CFG_ICEN, 
-          irepl      => CFG_IREPL,
-          isets      => CFG_ISETS,
-          ilinesize  => CFG_ILINE,
-          isetsize   => CFG_ISETSZ,    
-          isetlock   => CFG_ILOCK,     
-          dcen       => CFG_DCEN,      
-          drepl      => CFG_DREPL,     
-          dsets      => CFG_DSETS,     
-          dlinesize  => CFG_DLINE,     
-          dsetsize   => CFG_DSETSZ,    
-          dsetlock   => CFG_DLOCK,     
-          dsnoop     => CFG_DSNOOP,    
-          ilram      => CFG_ILRAMEN,   
-          ilramsize  => CFG_ILRAMSZ,   
-          ilramstart => CFG_ILRAMADDR, 
-          dlram      => CFG_DLRAMEN,   
-          dlramsize  => CFG_DLRAMSZ,   
-          dlramstart => CFG_DLRAMADDR, 
-          mmuen      => CFG_MMUEN,     
-          itlbnum    => CFG_ITLBNUM,   
-          dtlbnum    => CFG_DTLBNUM,   
-          tlb_type   => CFG_TLB_TYPE,  
-          tlb_rep    => CFG_TLB_REP,   
-          lddel      => CFG_LDDEL,     
-          disas      => disas,         
-          tbuf       => CFG_ITBSZ,     
-          pwd        => CFG_PWD,       
-          svt        => CFG_SVT,       
-          rstaddr    => CFG_RSTADDR,   
-          smp        => CFG_NCPU-1,    
-          iuft       => 2, --: integer range 0 to 4;
-          fpft       => 1, --: integer range 0 to 4;
-          cmft       => 1, --: integer range 0 to 1;
-          iuinj      => 0, --: integer;
-          ceinj      => 0, --: integer range 0 to 3;
-          cached     => 0, --: integer;
-          netlist    => 0, --: integer;
-          scantest   => 0, --: integer;
-          mmupgsz    => 0, --: integer range 0 to 5;
-          bp         => 1)   --: integer);                 
-        PORT MAP (
-          clk   => clkm,
-          rstn  => rstn,
-          ahbi  => ahbmi,
-          ahbo  => ahbmo(i),
-          ahbsi => ahbsi,
-          ahbso => ahbso,
-          irqi  => irqi(i),
-          irqo  => irqo(i),
-          dbgi  => dbgi(i),
-          dbgo  => dbgo(i),
-          gclk  => clkm
-          ); 
+  l3 : IF CFG_LEON3 = 1 GENERATE 
+    cpu: entity gaisler.leon3ft
+      generic map (
+        HINDEX          =>  i, --: integer;             --CPU_HINDEX,
+        FABTECH         =>  fabtech,                    --CFG_TECH,
+        MEMTECH         =>  memtech,                    --CFG_TECH,
+        NWINDOWS        =>  CFG_NWIN,                   --CFG_NWIN,
+        DSU             =>  CFG_DSU,                    --condSel (HAS_DEBUG, 1, 0),
+        FPU             =>  CFG_FPU,                    --CFG_FPU,
+        V8              =>  CFG_V8,                     --CFG_V8,
+        CP              =>  0,                          --CFG_CP,
+        MAC             =>  CFG_MAC,                    --CFG_MAC,
+        PCLOW           =>  pclow,                      --CFG_PCLOW,
+        NOTAG           =>  0,                          --CFG_NOTAG,             
+        NWP             =>  CFG_NWP,                    --CFG_NWP,
+        ICEN            =>  CFG_ICEN,                   --CFG_ICEN,
+        IREPL           =>  CFG_IREPL,                  --CFG_IREPL,
+        ISETS           =>  CFG_ISETS,                  --CFG_ISETS,
+        ILINESIZE       =>  CFG_ILINE,                  --CFG_ILINE,
+        ISETSIZE        =>  CFG_ISETSZ,                 --CFG_ISETSZ,
+        ISETLOCK        =>  CFG_ILOCK,                  --CFG_ILOCK,
+        DCEN            =>  CFG_DCEN,                   --CFG_DCEN,
+        DREPL           =>  CFG_DREPL,                  --CFG_DREPL,
+        DSETS           =>  CFG_DSETS,                  --CFG_DSETS,
+        DLINESIZE       =>  CFG_DLINE,                  --CFG_DLINE,
+        DSETSIZE        =>  CFG_DSETSZ,                 --CFG_DSETSZ,
+        DSETLOCK        =>  CFG_DLOCK,                  --CFG_DLOCK,
+        DSNOOP          =>  CFG_DSNOOP,                 --CFG_DSNOOP,
+        ILRAM           =>  CFG_ILRAMEN,                --CFG_ILRAMEN,
+        ILRAMSIZE       =>  CFG_ILRAMSZ,                --CFG_ILRAMSZ,
+        ILRAMSTART      =>  CFG_ILRAMADDR,              --CFG_ILRAMADDR,
+        DLRAM           =>  CFG_DLRAMEN,                --CFG_DLRAMEN,
+        DLRAMSIZE       =>  CFG_DLRAMSZ,                --CFG_DLRAMSZ,
+        DLRAMSTART      =>  CFG_DLRAMADDR,              --CFG_DLRAMADDR,
+        MMUEN           =>  CFG_MMUEN,                  --CFG_MMUEN,
+        ITLBNUM         =>  CFG_ITLBNUM,                --CFG_ITLBNUM,
+        DTLBNUM         =>  CFG_DTLBNUM,                --CFG_DTLBNUM,
+        TLB_TYPE        =>  CFG_TLB_TYPE,               --CFG_TLB_TYPE,
+        TLB_REP         =>  CFG_TLB_REP,                --CFG_TLB_REP,
+        LDDEL           =>  CFG_LDDEL,                  --CFG_LDDEL,
+        DISAS           =>  disas,                      --condSel (SIM_ENABLED, 1, 0),
+        TBUF            =>  CFG_ITBSZ,                  --CFG_ITBSZ,
+        PWD             =>  CFG_PWD,                    --CFG_PWD,
+        SVT             =>  CFG_SVT,                    --CFG_SVT,
+        RSTADDR         =>  CFG_RSTADDR,                --CFG_RSTADDR,
+        SMP             =>  CFG_NCPU-1,                 --CFG_NCPU-1,
+        IUFT		=>  2, --: integer range 0 to 4;--CFG_IUFT_EN,
+        FPFT		=>  1, --: integer range 0 to 4;--CFG_FPUFT_EN,
+        CMFT		=>  1, --: integer range 0 to 1;--CFG_CACHE_FT_EN,
+        IUINJ		=>  0, --: integer;             --CFG_RF_ERRINJ,
+        CEINJ		=>  0, --: integer range 0 to 3;--CFG_CACHE_ERRINJ,
+        CACHED          =>  0, --: integer;             --CFG_DFIXED,
+        NETLIST		=>  0, --: integer;             --CFG_LEON3_NETLIST,            
+        SCANTEST        =>  0, --: integer;             --CFG_SCANTEST,
+        MMUPGSZ         =>  0, --: integer range 0 to 5;--CFG_MMU_PAGE,
+        BP              =>  1)--CFG_BP
+        )                   --
+      port map (            --
+        rstn            =>  clkm,   --rst_n,
+        clk             =>  rstn,   --clk,
+        ahbi            =>  ahbmi,  --ahbmi,
+        ahbo            =>  ahbmo(i)--ahbmo(CPU_HINDEX),
+        ahbsi           =>  ahbsi,  --ahbsi,
+        ahbso           =>  ahbso,  --ahbso,
+        irqi            =>  irqi(i),--irqi(CPU_HINDEX),
+        irqo            =>  irqo(i),--irqo(CPU_HINDEX),
+        dbgi            =>  dbgi(i),--dbgi(CPU_HINDEX),
+        dbgo            =>  dbgo(i),--dbgo(CPU_HINDEX),
+        gclk            =>  clkm--clk
+        );
+    --cpu : FOR i IN 0 TO CFG_NCPU-1 GENERATE
+    --  u0 : leon3ft
+    --    GENERIC MAP (
+    --      hindex     => i, --: integer;
+    --      fabtech    => fabtech,  
+    --      memtech    => memtech,  
+    --      nwindows   => CFG_NWIN, 
+    --      dsu        => CFG_DSU,  
+    --      fpu        => CFG_FPU,  
+    --      v8         => CFG_V8,   
+    --      cp         => 0, 
+    --      mac        => CFG_MAC,
+    --      pclow      => pclow,
+    --      notag      => 0,        
+    --      nwp        => CFG_NWP,  
+    --      icen       => CFG_ICEN, 
+    --      irepl      => CFG_IREPL,
+    --      isets      => CFG_ISETS,
+    --      ilinesize  => CFG_ILINE,
+    --      isetsize   => CFG_ISETSZ,    
+    --      isetlock   => CFG_ILOCK,     
+    --      dcen       => CFG_DCEN,      
+    --      drepl      => CFG_DREPL,     
+    --      dsets      => CFG_DSETS,     
+    --      dlinesize  => CFG_DLINE,     
+    --      dsetsize   => CFG_DSETSZ,    
+    --      dsetlock   => CFG_DLOCK,     
+    --      dsnoop     => CFG_DSNOOP,    
+    --      ilram      => CFG_ILRAMEN,   
+    --      ilramsize  => CFG_ILRAMSZ,   
+    --      ilramstart => CFG_ILRAMADDR, 
+    --      dlram      => CFG_DLRAMEN,   
+    --      dlramsize  => CFG_DLRAMSZ,   
+    --      dlramstart => CFG_DLRAMADDR, 
+    --      mmuen      => CFG_MMUEN,     
+    --      itlbnum    => CFG_ITLBNUM,   
+    --      dtlbnum    => CFG_DTLBNUM,   
+    --      tlb_type   => CFG_TLB_TYPE,  
+    --      tlb_rep    => CFG_TLB_REP,   
+    --      lddel      => CFG_LDDEL,     
+    --      disas      => disas,         
+    --      tbuf       => CFG_ITBSZ,     
+    --      pwd        => CFG_PWD,       
+    --      svt        => CFG_SVT,       
+    --      rstaddr    => CFG_RSTADDR,   
+    --      smp        => CFG_NCPU-1,    
+    --      iuft       => 2, --: integer range 0 to 4;
+    --      fpft       => 1, --: integer range 0 to 4;
+    --      cmft       => 1, --: integer range 0 to 1;
+    --      iuinj      => 0, --: integer;
+    --      ceinj      => 0, --: integer range 0 to 3;
+    --      cached     => 0, --: integer;
+    --      netlist    => 0, --: integer;
+    --      scantest   => 0, --: integer;
+    --      mmupgsz    => 0, --: integer range 0 to 5;
+    --      bp         => 1)   --: integer);                 
+    --    PORT MAP (
+    --      clk   => clkm,
+    --      rstn  => rstn,
+    --      ahbi  => ahbmi,
+    --      ahbo  => ahbmo(i),
+    --      ahbsi => ahbsi,
+    --      ahbso => ahbso,
+    --      irqi  => irqi(i),
+    --      irqo  => irqo(i),
+    --      dbgi  => dbgi(i),
+    --      dbgo  => dbgo(i),
+    --      gclk  => clkm
+    --      ); 
       
     END GENERATE;
 

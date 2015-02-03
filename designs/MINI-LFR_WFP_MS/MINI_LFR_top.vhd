@@ -330,10 +330,8 @@ BEGIN  -- beh
   nCTS2 <= '1';
   nDCD2 <= '1';
 
-  --EXT CONNECTOR
-
-  --SPACE WIRE
-
+  --
+  
   leon3_soc_1 : leon3_soc
     GENERIC MAP (
       fabtech         => apa3e,
@@ -344,6 +342,7 @@ BEGIN  -- beh
       dbguart         => 0,
       pclow           => 2,
       clk_freq        => 25000,
+      IS_RADHARD      => 1,
       NB_CPU          => 1,
       ENABLE_FPU      => 1,
       FPU_NETLIST     => 0,
