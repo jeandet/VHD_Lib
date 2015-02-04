@@ -284,8 +284,9 @@ BEGIN
           PORT MAP (clkm, rstn, ahbmi, ahbmo(i), ahbsi, ahbso,
                     irqi(i), irqo(i), dbgi(i), dbgo(i));
       END GENERATE leon3_non_radhard;
+      
       leon3_radhard_i : IF IS_RADHARD = 1 GENERATE
-        cpu : ENTITY gaisler.leon3ft
+        cpu : leon3ft
           GENERIC MAP (
             HINDEX     => i,  --: integer;             --CPU_HINDEX,
             FABTECH    => fabtech,        --CFG_TECH,

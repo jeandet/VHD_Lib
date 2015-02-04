@@ -120,6 +120,8 @@ ARCHITECTURE Behavioral OF apb_lfr_management IS
   SIGNAL HK_temp_2_s          : STD_LOGIC_VECTOR(15 DOWNTO 0);
   SIGNAL HK_sel_s             : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
+  SIGNAL previous_fine_time_bit : STD_LOGIC;
+  
   SIGNAL rstn_LFR_TM : STD_LOGIC;
   
 BEGIN
@@ -358,6 +360,9 @@ BEGIN
   -----------------------------------------------------------------------------
 
   PROCESS (clk25MHz, resetn)
+    CONSTANT BIT_FREQUENCY_UPDATE : INTEGER := 11;  -- freq = 2^(16-BIT)
+                                                    -- for 11, the update frequency is 32Hz
+                                                    -- for each HK, the update frequency is freq/3
   BEGIN  -- PROCESS
     IF resetn = '0' THEN                -- asynchronous reset (active low)
 
@@ -366,17 +371,21 @@ BEGIN
       r.HK_temp_2 <= (OTHERS => '0');
 
       HK_sel_s <= "00";
+
+      previous_fine_time_bit <= '0';
       
     ELSIF clk25MHz'EVENT AND clk25MHz = '1' THEN  -- rising clock edge
 
       IF HK_val = '1' THEN
-        CASE HK_sel_s IS
-          WHEN "00"   => r.HK_temp_0 <= HK_sample; HK_sel_s <= "01";
-          WHEN "01"   => r.HK_temp_1 <= HK_sample; HK_sel_s <= "10";
-          WHEN "10"   => r.HK_temp_2 <= HK_sample; HK_sel_s <= "00";
-          WHEN OTHERS => NULL;
-        END CASE;
-        
+        IF previous_fine_time_bit = NOT(fine_time_s(BIT_FREQUENCY_UPDATE)) THEN
+          previous_fine_time_bit <= fine_time_s(BIT_FREQUENCY_UPDATE);
+          CASE HK_sel_s IS
+            WHEN "00"   => r.HK_temp_0 <= HK_sample; HK_sel_s <= "01";
+            WHEN "01"   => r.HK_temp_1 <= HK_sample; HK_sel_s <= "10";
+            WHEN "10"   => r.HK_temp_2 <= HK_sample; HK_sel_s <= "00";
+            WHEN OTHERS => NULL;
+          END CASE;
+        END IF;
       END IF;
       
     END IF;
