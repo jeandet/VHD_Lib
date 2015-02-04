@@ -274,7 +274,7 @@ BEGIN
   l3 : IF CFG_LEON3 = 1 GENERATE
     cpu : FOR i IN 0 TO CFG_NCPU-1 GENERATE
       leon3_non_radhard : IF IS_RADHARD = 0 GENERATE
-        u0 : leon3s                       -- LEON3 processor      
+        u0 : ENTITY gaisler.leon3s                       -- LEON3 processor      
           GENERIC MAP (i, fabtech, memtech, CFG_NWIN, CFG_DSU, CFG_FPU, CFG_V8,
                        0, CFG_MAC, pclow, 0, CFG_NWP, CFG_ICEN, CFG_IREPL, CFG_ISETS, CFG_ILINE,
                        CFG_ISETSZ, CFG_ILOCK, CFG_DCEN, CFG_DREPL, CFG_DSETS, CFG_DLINE, CFG_DSETSZ,
@@ -286,7 +286,7 @@ BEGIN
       END GENERATE leon3_non_radhard;
       
       leon3_radhard_i : IF IS_RADHARD = 1 GENERATE
-        cpu : leon3ft
+        cpu : ENTITY gaisler.leon3ft
           GENERIC MAP (
             HINDEX     => i,  --: integer;             --CPU_HINDEX,
             FABTECH    => fabtech,        --CFG_TECH,
