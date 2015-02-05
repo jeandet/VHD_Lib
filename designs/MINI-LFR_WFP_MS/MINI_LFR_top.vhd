@@ -342,7 +342,7 @@ BEGIN  -- beh
       dbguart         => 0,
       pclow           => 2,
       clk_freq        => 25000,
-      IS_RADHARD      => 1,
+      IS_RADHARD      => 0,
       NB_CPU          => 1,
       ENABLE_FPU      => 1,
       FPU_NETLIST     => 0,
@@ -517,7 +517,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000138")  -- aa.bb.cc version
+      top_lfr_version        => X"00013A")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,

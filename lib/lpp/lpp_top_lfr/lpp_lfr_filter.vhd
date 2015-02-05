@@ -50,6 +50,7 @@ ENTITY lpp_lfr_filter IS
   PORT (
     sample           : IN Samples(7 DOWNTO 0);
     sample_val       : IN STD_LOGIC;
+    sample_time      : IN STD_LOGIC_VECTOR(47 DOWNTO 0);    
     --
     clk             : IN  STD_LOGIC;
     rstn            : IN  STD_LOGIC;
@@ -68,7 +69,12 @@ ENTITY lpp_lfr_filter IS
     sample_f0_wdata : OUT STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);
     sample_f1_wdata : OUT STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);
     sample_f2_wdata : OUT STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);
-    sample_f3_wdata : OUT STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0)
+    sample_f3_wdata : OUT STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);
+    --
+    sample_f0_time  : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    sample_f1_time  : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    sample_f2_time  : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+    sample_f3_time  : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)  
     );
 END lpp_lfr_filter;
 
@@ -159,6 +165,9 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
   
   SIGNAL sample_f0_val_s : STD_LOGIC;
   SIGNAL sample_f1_val_s : STD_LOGIC;
+  SIGNAL sample_f1_val_ss : STD_LOGIC;
+  SIGNAL sample_f2_val_s : STD_LOGIC;
+  SIGNAL sample_f3_val_s : STD_LOGIC;
 
   -----------------------------------------------------------------------------
   -- CONFIG FILTER IIR f0 to f1
@@ -214,6 +223,16 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
       f2_f3_gain);
   -----------------------------------------------------------------------------
 
+  SIGNAL sample_time_reg           : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_f0_time_reg           : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_f1_time_reg           : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_f2_time_reg           : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_f3_time_reg           : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_f0_time_s           : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_f1_time_s           : STD_LOGIC_VECTOR(47 DOWNTO 0);
+--  SIGNAL sample_f2_time_s           : STD_LOGIC_VECTOR(47 DOWNTO 0);
+--  SIGNAL sample_f3_time_s           : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_filter_v2_out_time : STD_LOGIC_VECTOR(47 DOWNTO 0);
   
 BEGIN
   
@@ -258,6 +277,24 @@ BEGIN
       sample_in      => sample_filter_in,
       sample_out_val => sample_filter_v2_out_val,
       sample_out     => sample_filter_v2_out);
+
+  -- TIME --
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS
+    IF rstn = '0' THEN                  -- asynchronous reset (active low)
+      sample_time_reg           <= (OTHERS => '0');
+      sample_filter_v2_out_time <= (OTHERS => '0');
+    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      IF sample_val = '1' THEN
+        sample_time_reg <= sample_time;
+      END IF;
+      IF sample_filter_v2_out_val = '1' THEN
+        sample_filter_v2_out_time <= sample_time_reg;
+      END IF;
+    END IF;
+  END PROCESS;
+  ----------
+  
 
   -----------------------------------------------------------------------------
   -- DATA_SHAPING
@@ -336,6 +373,21 @@ BEGIN
       sample_out_val => sample_f0_val_s,
       sample_out     => sample_f0);
 
+  -- TIME --
+  PROCESS (clk, rstn)
+  BEGIN
+    IF rstn = '0' THEN
+      sample_f0_time_reg <= (OTHERS => '0');
+    ELSIF clk'event AND clk = '1' THEN
+      IF sample_f0_val_s = '1' THEN
+        sample_f0_time_reg <= sample_filter_v2_out_time;
+      END IF;
+    END IF;
+  END PROCESS;
+  sample_f0_time_s <= sample_filter_v2_out_time WHEN sample_f0_val_s = '1' ELSE sample_f0_time_reg;
+  sample_f0_time   <= sample_f0_time_s;
+  ----------
+
   sample_f0_val <= sample_f0_val_s;
 
   all_bit_sample_f0 : FOR I IN 15 DOWNTO 0 GENERATE
@@ -401,8 +453,26 @@ BEGIN
       rstn           => rstn,
       sample_in_val  => sample_f1_val_s,
       sample_in      => sample_f1_s,
-      sample_out_val => sample_f1_val,
-      sample_out     => sample_f1);  
+      sample_out_val => sample_f1_val_ss,
+      sample_out     => sample_f1);
+
+  sample_f1_val <= sample_f1_val_ss;
+  
+  -- TIME --
+  PROCESS (clk, rstn)
+  BEGIN
+    IF rstn = '0' THEN
+      sample_f1_time_reg <= (OTHERS => '0');
+    ELSIF clk'event AND clk = '1' THEN
+      IF sample_f1_val_ss = '1' THEN
+        sample_f1_time_reg <= sample_f0_time_s;
+      END IF;
+    END IF;
+  END PROCESS;
+  sample_f1_time_s <= sample_f0_time_s WHEN sample_f1_val_ss = '1' ELSE sample_f1_time_reg;
+  sample_f1_time   <= sample_f1_time_s;
+  ----------
+  
 
   all_bit_sample_f1 : FOR I IN 15 DOWNTO 0 GENERATE
     all_channel_sample_f1: FOR J IN 5 DOWNTO 0 GENERATE
@@ -509,8 +579,10 @@ BEGIN
       rstn           => rstn,
       sample_in_val  => sample_f2_filter_val ,
       sample_in      => sample_f2_cic_s,
-      sample_out_val => sample_f2_val,
-      sample_out     => sample_f2);  
+      sample_out_val => sample_f2_val_s,
+      sample_out     => sample_f2); 
+
+  sample_f2_val <= sample_f2_val_s; 
   
   all_bit_sample_f2 : FOR I IN 15 DOWNTO 0 GENERATE
     all_channel_sample_f2 : FOR J IN 5 DOWNTO 0 GENERATE
@@ -530,14 +602,32 @@ BEGIN
       rstn           => rstn,
       sample_in_val  => sample_f3_filter_val ,
       sample_in      => sample_f3_cic_s,
-      sample_out_val => sample_f3_val,
+      sample_out_val => sample_f3_val_s,
       sample_out     => sample_f3);
+  sample_f3_val <= sample_f3_val_s;
   
   all_bit_sample_f3 : FOR I IN 15 DOWNTO 0 GENERATE
     all_channel_sample_f3 : FOR J IN 5 DOWNTO 0 GENERATE
       sample_f3_wdata_s(16*J+I) <= sample_f3(J,I);
     END GENERATE all_channel_sample_f3;
-  END GENERATE all_bit_sample_f3; 
+  END GENERATE all_bit_sample_f3;
+
+  -----------------------------------------------------------------------------
+  
+  -- TIME --
+  PROCESS (clk, rstn)
+  BEGIN
+    IF rstn = '0' THEN
+      sample_f2_time_reg <= (OTHERS => '0');
+      sample_f3_time_reg <= (OTHERS => '0');
+    ELSIF clk'event AND clk = '1' THEN
+      IF sample_f2_val_s = '1' THEN  sample_f2_time_reg <= sample_f0_time_s; END IF;
+      IF sample_f3_val_s = '1' THEN  sample_f3_time_reg <= sample_f0_time_s; END IF;
+    END IF;
+  END PROCESS;
+  sample_f2_time <= sample_f0_time_s WHEN sample_f2_val_s = '1' ELSE sample_f2_time_reg;
+  sample_f3_time <= sample_f0_time_s WHEN sample_f3_val_s = '1' ELSE sample_f3_time_reg;
+  ----------
 
   -----------------------------------------------------------------------------
   -- 

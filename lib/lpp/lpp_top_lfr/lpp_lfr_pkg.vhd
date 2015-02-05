@@ -20,52 +20,52 @@ PACKAGE lpp_lfr_pkg IS
     GENERIC (
       Mem_use : INTEGER);
     PORT (
-      clk              : IN  STD_LOGIC;
-      rstn             : IN  STD_LOGIC;
-    
-    -- TIME
-    coarse_time     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);  -- todo
-    fine_time       : IN STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
-    --
-    sample_f0_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f0_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
-    --
-    sample_f1_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f1_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
-    --
-    sample_f2_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
-    sample_f2_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+      clk  : IN STD_LOGIC;
+      rstn : IN STD_LOGIC;
+
+      -- TIME
+      coarse_time     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);  -- todo
+      fine_time       : IN STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
+      --
+      sample_f0_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+      sample_f0_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+      --
+      sample_f1_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+      sample_f1_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+      --
+      sample_f2_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+      sample_f2_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
 
 
 
-    ---------------------------------------------------------------------------
-    error_input_fifo_write        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-    
-    --
-    --sample_ren   : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-    --sample_full  : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
-    --sample_empty : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
-    --sample_rdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+      ---------------------------------------------------------------------------
+      error_input_fifo_write : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 
-    --status_channel : IN STD_LOGIC_VECTOR(49 DOWNTO 0);
-    
-    -- IN
-    MEM_IN_SM_locked      : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
-  
-    -----------------------------------------------------------------------------
-    
-    status_component : OUT STD_LOGIC_VECTOR(53 DOWNTO 0);
-    SM_in_data : OUT STD_LOGIC_VECTOR(32*2-1 DOWNTO 0);
-    SM_in_ren : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-    SM_in_empty : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+      --
+      --sample_ren   : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+      --sample_full  : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+      --sample_empty : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
+      --sample_rdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
 
-    SM_correlation_start : OUT STD_LOGIC;
-    SM_correlation_auto : OUT STD_LOGIC;
-    SM_correlation_done : IN STD_LOGIC
-    );
+      --status_channel : IN STD_LOGIC_VECTOR(49 DOWNTO 0);
+
+      -- IN
+      MEM_IN_SM_locked : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
+
+      -----------------------------------------------------------------------------
+
+      status_component : OUT STD_LOGIC_VECTOR(53 DOWNTO 0);
+      SM_in_data       : OUT STD_LOGIC_VECTOR(32*2-1 DOWNTO 0);
+      SM_in_ren        : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+      SM_in_empty      : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+
+      SM_correlation_start : OUT STD_LOGIC;
+      SM_correlation_auto  : OUT STD_LOGIC;
+      SM_correlation_done  : IN  STD_LOGIC
+      );
   END COMPONENT;
 
-  
+
   -----------------------------------------------------------------------------
   COMPONENT lpp_lfr_ms
     GENERIC (
@@ -74,15 +74,17 @@ PACKAGE lpp_lfr_pkg IS
       clk                    : IN  STD_LOGIC;
       rstn                   : IN  STD_LOGIC;
       run                    : IN  STD_LOGIC;
-      start_date      : IN STD_LOGIC_VECTOR(30 DOWNTO 0);
+      start_date             : IN  STD_LOGIC_VECTOR(30 DOWNTO 0);
       coarse_time            : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-      fine_time              : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
       sample_f0_wen          : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
       sample_f0_wdata        : IN  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+      sample_f0_time         : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
       sample_f1_wen          : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
       sample_f1_wdata        : IN  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+      sample_f1_time         : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
       sample_f2_wen          : IN  STD_LOGIC_VECTOR(4 DOWNTO 0);
       sample_f2_wdata        : IN  STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+      sample_f2_time         : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
       dma_fifo_burst_valid   : OUT STD_LOGIC;
       dma_fifo_data          : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       dma_fifo_ren           : IN  STD_LOGIC;
@@ -147,7 +149,7 @@ PACKAGE lpp_lfr_pkg IS
       matrix_time_f2         : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
       error_buffer_full      : OUT STD_LOGIC);
   END COMPONENT;
-  
+
   COMPONENT lpp_lfr_ms_FFT
     PORT (
       clk            : IN  STD_LOGIC;
@@ -161,7 +163,7 @@ PACKAGE lpp_lfr_pkg IS
       fft_data_re    : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       fft_data_valid : OUT STD_LOGIC;
       fft_ready      : OUT STD_LOGIC);
-  END COMPONENT;  
+  END COMPONENT;
 
   COMPONENT lpp_lfr_filter
     GENERIC (
@@ -169,6 +171,7 @@ PACKAGE lpp_lfr_pkg IS
     PORT (
       sample           : IN  Samples(7 DOWNTO 0);
       sample_val       : IN  STD_LOGIC;
+      sample_time      : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
       clk              : IN  STD_LOGIC;
       rstn             : IN  STD_LOGIC;
       data_shaping_SP0 : IN  STD_LOGIC;
@@ -183,7 +186,12 @@ PACKAGE lpp_lfr_pkg IS
       sample_f0_wdata  : OUT STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);
       sample_f1_wdata  : OUT STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);
       sample_f2_wdata  : OUT STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);
-      sample_f3_wdata  : OUT STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0));
+      sample_f3_wdata  : OUT STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);
+      sample_f0_time   : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      sample_f1_time   : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      sample_f2_time   : OUT STD_LOGIC_VECTOR(47 DOWNTO 0);
+      sample_f3_time   : OUT STD_LOGIC_VECTOR(47 DOWNTO 0)
+      );
   END COMPONENT;
 
   COMPONENT lpp_lfr
@@ -214,8 +222,8 @@ PACKAGE lpp_lfr_pkg IS
       ahbo            : OUT AHB_Mst_Out_Type;
       coarse_time     : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
       fine_time       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-      data_shaping_BW : OUT STD_LOGIC ;
-      debug_vector : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+      data_shaping_BW : OUT STD_LOGIC;
+      debug_vector    : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
       debug_vector_ms : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
       );
   END COMPONENT;
@@ -323,9 +331,9 @@ PACKAGE lpp_lfr_pkg IS
       sample_f3_e1            : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
       sample_f3_e2            : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
       sample_f3_valid         : IN  STD_LOGIC;
-      debug_vector : OUT STD_LOGIC_VECTOR(11 DOWNTO 0));
+      debug_vector            : OUT STD_LOGIC_VECTOR(11 DOWNTO 0));
   END COMPONENT;
-  
+
   COMPONENT lpp_top_ms
     GENERIC (
       Mem_use                 : INTEGER;
@@ -342,20 +350,20 @@ PACKAGE lpp_lfr_pkg IS
       hindex_wfp              : INTEGER;
       hindex_ms               : INTEGER);
     PORT (
-      clk             : IN  STD_LOGIC;
-      rstn            : IN  STD_LOGIC;
-      sample_B        : IN  Samples14v(2 DOWNTO 0);
-      sample_E        : IN  Samples14v(4 DOWNTO 0);
-      sample_val      : IN  STD_LOGIC;
-      apbi            : IN  apb_slv_in_type;
-      apbo            : OUT apb_slv_out_type;
-      ahbi_ms         : IN  AHB_Mst_In_Type;
-      ahbo_ms         : OUT AHB_Mst_Out_Type;
-      data_shaping_BW : OUT STD_LOGIC;
-      matrix_time_f0_0                       : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-      matrix_time_f0_1                       : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-      matrix_time_f1                         : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
-      matrix_time_f2                         : IN STD_LOGIC_VECTOR(47 DOWNTO 0)
+      clk              : IN  STD_LOGIC;
+      rstn             : IN  STD_LOGIC;
+      sample_B         : IN  Samples14v(2 DOWNTO 0);
+      sample_E         : IN  Samples14v(4 DOWNTO 0);
+      sample_val       : IN  STD_LOGIC;
+      apbi             : IN  apb_slv_in_type;
+      apbo             : OUT apb_slv_out_type;
+      ahbi_ms          : IN  AHB_Mst_In_Type;
+      ahbo_ms          : OUT AHB_Mst_Out_Type;
+      data_shaping_BW  : OUT STD_LOGIC;
+      matrix_time_f0_0 : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f0_1 : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f1   : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
+      matrix_time_f2   : IN  STD_LOGIC_VECTOR(47 DOWNTO 0)
       );
   END COMPONENT;
 
@@ -380,16 +388,16 @@ PACKAGE lpp_lfr_pkg IS
 
   COMPONENT lpp_lfr_ms_reg_head
     PORT (
-      clk      : IN  STD_LOGIC;
-      rstn     : IN  STD_LOGIC;
-      in_wen   : IN  STD_LOGIC;
-      in_data  : IN  STD_LOGIC_VECTOR(5*16-1 DOWNTO 0);
-      in_full  : IN  STD_LOGIC;
-      in_empty : IN  STD_LOGIC;
-      out_write_error : OUT STD_LOGIC;      
-      out_wen  : OUT STD_LOGIC;
-      out_data : OUT STD_LOGIC_VECTOR(5*16-1 DOWNTO 0);
-      out_full : OUT STD_LOGIC);
+      clk             : IN  STD_LOGIC;
+      rstn            : IN  STD_LOGIC;
+      in_wen          : IN  STD_LOGIC;
+      in_data         : IN  STD_LOGIC_VECTOR(5*16-1 DOWNTO 0);
+      in_full         : IN  STD_LOGIC;
+      in_empty        : IN  STD_LOGIC;
+      out_write_error : OUT STD_LOGIC;
+      out_wen         : OUT STD_LOGIC;
+      out_data        : OUT STD_LOGIC_VECTOR(5*16-1 DOWNTO 0);
+      out_full        : OUT STD_LOGIC);
   END COMPONENT;
   
 END lpp_lfr_pkg;

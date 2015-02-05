@@ -115,9 +115,6 @@ ARCHITECTURE Behavioral OF apb_lfr_management IS
   SIGNAL soft_reset           : STD_LOGIC;
   SIGNAL soft_reset_sync      : STD_LOGIC;
   -----------------------------------------------------------------------------
-  SIGNAL HK_temp_0_s          : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL HK_temp_1_s          : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL HK_temp_2_s          : STD_LOGIC_VECTOR(15 DOWNTO 0);
   SIGNAL HK_sel_s             : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
   SIGNAL previous_fine_time_bit : STD_LOGIC;
@@ -360,9 +357,13 @@ BEGIN
   -----------------------------------------------------------------------------
 
   PROCESS (clk25MHz, resetn)
-    CONSTANT BIT_FREQUENCY_UPDATE : INTEGER := 11;  -- freq = 2^(16-BIT)
-                                                    -- for 11, the update frequency is 32Hz
+    CONSTANT BIT_FREQUENCY_UPDATE : INTEGER := 14;  -- freq = 2^(16-BIT)
                                                     -- for each HK, the update frequency is freq/3
+                                                    --  
+                                                    -- for 14, the update frequency is
+                                                    -- 4Hz and update for each
+                                                    -- HK is 1.33Hz
+
   BEGIN  -- PROCESS
     IF resetn = '0' THEN                -- asynchronous reset (active low)
 

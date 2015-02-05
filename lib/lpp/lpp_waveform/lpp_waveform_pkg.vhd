@@ -135,15 +135,19 @@ PACKAGE lpp_waveform_pkg IS
       buffer_time         : OUT STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
       error_buffer_full   : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       coarse_time                  : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-      fine_time                    : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+      --fine_time                    : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
       data_f0_in_valid             : IN  STD_LOGIC;
       data_f0_in                   : IN  STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+      data_f0_time                 : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
       data_f1_in_valid             : IN  STD_LOGIC;
       data_f1_in                   : IN  STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+      data_f1_time                 : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
       data_f2_in_valid             : IN  STD_LOGIC;
       data_f2_in                   : IN  STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+      data_f2_time                 : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
       data_f3_in_valid             : IN  STD_LOGIC;
       data_f3_in                   : IN  STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+      data_f3_time                 : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
     
       dma_fifo_valid_burst : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       dma_fifo_data        : OUT STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);

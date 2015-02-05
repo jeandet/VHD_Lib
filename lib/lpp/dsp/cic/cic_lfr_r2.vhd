@@ -75,8 +75,6 @@ ARCHITECTURE beh OF cic_lfr_r2 IS
   --
   CONSTANT S_parameter : INTEGER := 3;
   SIGNAL carry_reg  : STD_LOGIC_VECTOR(S_parameter-1 DOWNTO 0);
-  SIGNAL CARRY_PUSH : STD_LOGIC;
-  SIGNAL CARRY_POP  : STD_LOGIC;
   --
   
   SIGNAL OPERATION    : STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -397,4 +395,3 @@ BEGIN
   END GENERATE all_channel_out_v;
   
 END beh;
-

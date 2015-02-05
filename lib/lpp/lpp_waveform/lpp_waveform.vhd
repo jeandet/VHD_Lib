@@ -94,20 +94,24 @@ ENTITY lpp_waveform IS
     ---------------------------------------------------------------------------
     -- INPUT
     coarse_time       : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-    fine_time         : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+--    fine_time         : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 
     --f0
     data_f0_in_valid : IN STD_LOGIC;
     data_f0_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    data_f0_time     : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
     --f1
     data_f1_in_valid : IN STD_LOGIC;
     data_f1_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    data_f1_time     : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
     --f2
     data_f2_in_valid : IN STD_LOGIC;
     data_f2_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    data_f2_time     : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
     --f3
     data_f3_in_valid : IN STD_LOGIC;
     data_f3_in       : IN STD_LOGIC_VECTOR(data_size-1 DOWNTO 0);
+    data_f3_time     : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
         
     ---------------------------------------------------------------------------
     -- DMA --------------------------------------------------------------------
@@ -172,8 +176,8 @@ ARCHITECTURE beh OF lpp_waveform IS
   SIGNAL time_out_2                 : Data_Vector(3 DOWNTO 0, 47 DOWNTO 0);
   SIGNAL time_out                   : TIME_VECTOR(3 DOWNTO 0);
   SIGNAL time_out_debug             : TIME_VECTOR(3 DOWNTO 0);  -- TODO : debug
-  SIGNAL time_reg1                  : STD_LOGIC_VECTOR(47 DOWNTO 0);
-  SIGNAL time_reg2                  : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL time_reg1                  : STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
+  SIGNAL time_reg2                  : STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
   --
 
   SIGNAL s_empty_almost : STD_LOGIC_VECTOR(3 DOWNTO 0);  --occupancy is lesser than 16 * 32b
@@ -301,7 +305,10 @@ BEGIN  -- beh
       time_reg1 <= (OTHERS => '0');
       time_reg2 <= (OTHERS => '0');
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      time_reg1 <= fine_time & coarse_time;
+      time_reg1(48*1-1 DOWNTO 48*0) <= data_f0_time(15 DOWNTO 0) & data_f0_time(47 DOWNTO 16);
+      time_reg1(48*2-1 DOWNTO 48*1) <= data_f1_time(15 DOWNTO 0) & data_f1_time(47 DOWNTO 16);
+      time_reg1(48*3-1 DOWNTO 48*2) <= data_f2_time(15 DOWNTO 0) & data_f2_time(47 DOWNTO 16);
+      time_reg1(48*4-1 DOWNTO 48*3) <= data_f3_time(15 DOWNTO 0) & data_f3_time(47 DOWNTO 16);
       time_reg2 <= time_reg1;
     END IF;
   END PROCESS;
@@ -315,7 +322,7 @@ BEGIN  -- beh
         run       => run,
         valid_in  => valid_in(I),
         ack_in    => valid_ack(I),
-        time_in   => time_reg2,         -- Todo
+        time_in   => time_reg2(48*(I+1)-1 DOWNTO 48*I),         -- Todo
         valid_out => valid_out(I),
         time_out  => time_out(I),       -- Todo
         error     => status_new_err(I));

@@ -228,7 +228,12 @@ ARCHITECTURE beh OF lpp_lfr IS
 
   SIGNAL apb_reg_debug_vector : STD_LOGIC_VECTOR(11 DOWNTO 0);
   -----------------------------------------------------------------------------
---  SIGNAL run_dma : STD_LOGIC;
+  SIGNAL sample_time        :  STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_f0_time     :  STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_f1_time     :  STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_f2_time     :  STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_f3_time     :  STD_LOGIC_VECTOR(47 DOWNTO 0);
+  
 BEGIN
 
   debug_vector <= apb_reg_debug_vector;
@@ -236,7 +241,8 @@ BEGIN
   
   sample_s(4 DOWNTO 0) <= sample_E(4 DOWNTO 0);
   sample_s(7 DOWNTO 5) <= sample_B(2 DOWNTO 0);
-
+  sample_time <= coarse_time & fine_time;
+  
   --all_channel : FOR i IN 7 DOWNTO 0 GENERATE
   --  sample_s(i) <= sample(i)(13) & sample(i)(13) & sample(i);
   --END GENERATE all_channel;
@@ -248,6 +254,7 @@ BEGIN
     PORT MAP (
       sample           => sample_s,
       sample_val       => sample_val,
+      sample_time      => sample_time,
       clk              => clk,
       rstn             => rstn,
       data_shaping_SP0 => data_shaping_SP0,
@@ -262,7 +269,12 @@ BEGIN
       sample_f0_wdata  => sample_f0_data,
       sample_f1_wdata  => sample_f1_data,
       sample_f2_wdata  => sample_f2_data,
-      sample_f3_wdata  => sample_f3_data);
+      sample_f3_wdata  => sample_f3_data,
+      sample_f0_time   => sample_f0_time, 
+      sample_f1_time   => sample_f1_time,
+      sample_f2_time   => sample_f2_time,
+      sample_f3_time   => sample_f3_time
+      );
 
   -----------------------------------------------------------------------------
   lpp_lfr_apbreg_1 : lpp_lfr_apbreg
@@ -393,20 +405,24 @@ BEGIN
       error_buffer_full   => wfp_error_buffer_full,
 
       coarse_time => coarse_time,
-      fine_time   => fine_time,
+--      fine_time   => fine_time,
 
       --f0
       data_f0_in_valid             => sample_f0_val,
       data_f0_in                   => sample_f0_data,
+      data_f0_time                 => sample_f0_time,
       --f1
       data_f1_in_valid             => sample_f1_val,
       data_f1_in                   => sample_f1_data,
+      data_f1_time                 => sample_f1_time,
       --f2
       data_f2_in_valid             => sample_f2_val,
       data_f2_in                   => sample_f2_data,
+      data_f2_time                 => sample_f2_time,
       --f3
       data_f3_in_valid             => sample_f3_val,
       data_f3_in                   => sample_f3_data,
+      data_f3_time                 => sample_f3_time,
       -- OUTPUT -- DMA interface
     
       dma_fifo_valid_burst => dma_fifo_burst_valid(3 DOWNTO 0),
@@ -452,14 +468,16 @@ BEGIN
       start_date => start_date,
       
       coarse_time => coarse_time,
-      fine_time   => fine_time,
 
       sample_f0_wen   => sample_f0_wen,
       sample_f0_wdata => sample_f0_wdata,
+      sample_f0_time  => sample_f0_time,
       sample_f1_wen   => sample_f1_wen,
       sample_f1_wdata => sample_f1_wdata,
+      sample_f1_time  => sample_f1_time,
       sample_f2_wen   => sample_f2_wen,
       sample_f2_wdata => sample_f2_wdata,
+      sample_f2_time  => sample_f2_time,
 
       --DMA
       dma_fifo_burst_valid => dma_fifo_burst_valid(4),                  -- OUT

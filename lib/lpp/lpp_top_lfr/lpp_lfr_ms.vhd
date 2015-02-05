@@ -28,18 +28,20 @@ ENTITY lpp_lfr_ms IS
     -- DATA INPUT
     ---------------------------------------------------------------------------
     start_date      : IN STD_LOGIC_VECTOR(30 DOWNTO 0);
-    -- TIME
-    coarse_time     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);  -- todo
-    fine_time       : IN STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
+    coarse_time     : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    --fine_time       : IN STD_LOGIC_VECTOR(15 DOWNTO 0);  -- todo
     --
     sample_f0_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
     sample_f0_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+    sample_f0_time  : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
     --
     sample_f1_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
     sample_f1_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+    sample_f1_time  : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
     --
     sample_f2_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
     sample_f2_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
+    sample_f2_time  : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
 
     ---------------------------------------------------------------------------
     -- DMA
@@ -217,7 +219,7 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   -----------------------------------------------------------------------------
   -- TIME REG & INFOs
   -----------------------------------------------------------------------------
-  SIGNAL all_time : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL all_time : STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
 
   SIGNAL f_empty       : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL f_empty_reg   : STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -1173,7 +1175,8 @@ BEGIN
   -----------------------------------------------------------------------------
   -- TIME MANAGMENT
   -----------------------------------------------------------------------------
-  all_time         <= coarse_time & fine_time;
+  all_time <= sample_f2_time & sample_f1_time & sample_f0_time & sample_f0_time;
+  --all_time         <= coarse_time & fine_time;
   --
   f_empty(0) <= '1' WHEN sample_f0_A_empty = "11111" ELSE '0';
   f_empty(1) <= '1' WHEN sample_f0_B_empty = "11111" ELSE '0';
@@ -1197,7 +1200,7 @@ BEGIN
       PORT MAP (
         clk      => clk,
         rstn     => rstn,
-        time_in  => all_time,
+        time_in  => all_time((I+1)*48-1 DOWNTO I*48),
         update_1 => time_update_f(I),
         time_out => time_reg_f((I+1)*48-1 DOWNTO I*48)
         );
