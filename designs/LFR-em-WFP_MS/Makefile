@@ -18,7 +18,7 @@ VHDLSIMFILES=testbench.vhd
 #SIMTOP=testbench
 #SDCFILE=$(GRLIB)/boards/$(BOARD)/synplify.sdc
 #SDC=$(GRLIB)/boards/$(BOARD)/leon3mp.sdc
-PDC=$(VHDLIB)/boards/$(BOARD)/em-LeonLPP-A3PE3kL_withHK.pdc
+PDC=$(VHDLIB)/boards/$(BOARD)/em-LeonLPP-A3PE3kL_withHK-DAC.pdc
 
 #SDCFILE=$(VHDLIB)/boards/$(BOARD)/LFR_EM_synthesis.sdc
 SDC=$(VHDLIB)/boards/$(BOARD)/LFR_EM_place_and_route.sdc
@@ -38,7 +38,6 @@ DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	./general_purpose/lpp_balise \
 	./general_purpose/lpp_delay \
 	./lpp_bootloader \
-	./lpp_cna \
 	./dsp/lpp_fft_rtax \
 	./lpp_uart \
 	./lpp_usb \

@@ -19,163 +19,165 @@
 --                        Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@member.fsf.org
 ------------------------------------------------------------------------------
-library ieee;
-use ieee.std_logic_1164.all;
-use IEEE.numeric_std.all;
-library grlib;
-use grlib.amba.all;
-use grlib.stdlib.all;
-use grlib.devices.all;
-library lpp;
-use lpp.lpp_amba.all;
-use lpp.lpp_cna.all;
-use lpp.apb_devices_list.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
+LIBRARY grlib;
+USE grlib.amba.ALL;
+USE grlib.stdlib.ALL;
+USE grlib.devices.ALL;
+LIBRARY lpp;
+USE lpp.lpp_amba.ALL;
+USE lpp.lpp_cna.ALL;
+USE lpp.apb_devices_list.ALL;
 
-entity apb_lfr_cal is
-  generic (
-    pindex   : integer := 0;
-    paddr    : integer := 0;
-    pmask    : integer := 16#fff#;
-    tech     : integer := 0;
-    PRESZ    : integer := 8;
-    CPTSZ    : integer := 16;
-    datawidth : integer := 18;
-    dacresolution : integer := 12;
-    abits     : integer := 8
+ENTITY apb_lfr_cal IS
+  GENERIC (
+    pindex        : INTEGER := 0;
+    paddr         : INTEGER := 0;
+    pmask         : INTEGER := 16#fff#;
+    tech          : INTEGER := 0;
+    PRESZ         : INTEGER := 8;
+    CPTSZ         : INTEGER := 16;
+    datawidth     : INTEGER := 18;
+    dacresolution : INTEGER := 12;
+    abits         : INTEGER := 8
     );
-  port (
-    rstn    : in  std_logic;
-    clk     : in  std_logic;
-    apbi    : in  apb_slv_in_type;
-    apbo    : out apb_slv_out_type;
-    SDO     : out  std_logic;
-    SCK     : out  std_logic;
-    SYNC    : out  std_logic;
-    SMPCLK  : out  std_logic
+  PORT (
+    rstn   : IN  STD_LOGIC;
+    clk    : IN  STD_LOGIC;
+    apbi   : IN  apb_slv_in_type;
+    apbo   : OUT apb_slv_out_type;
+    SDO    : OUT STD_LOGIC;
+    SCK    : OUT STD_LOGIC;
+    SYNC   : OUT STD_LOGIC;
+    SMPCLK : OUT STD_LOGIC
     );
-end entity;
+END ENTITY;
 
 --! @details Les deux registres (apbi,apbo) permettent de gérer la communication sur le bus
 --! et les sorties seront cablées vers le convertisseur.
 
-architecture ar_apb_lfr_cal of apb_lfr_cal is
+ARCHITECTURE ar_apb_lfr_cal OF apb_lfr_cal IS
 
-constant REVISION : integer := 1;
+  CONSTANT REVISION : INTEGER := 1;
 
-constant pconfig : apb_config_type := (
-  0 => ahb_device_reg (VENDOR_LPP, LPP_CNA, 0, REVISION, 0),
-  1 => apb_iobar(paddr, pmask));
+  CONSTANT pconfig : apb_config_type := (
+    0 => ahb_device_reg (VENDOR_LPP, LPP_CNA, 0, REVISION, 0),
+    1 => apb_iobar(paddr, pmask));
 
-signal pre             : STD_LOGIC_VECTOR(PRESZ-1 downto 0);
-signal N               : STD_LOGIC_VECTOR(CPTSZ-1 downto 0);
-signal Reload          : std_logic;
-signal DATA_IN         : STD_LOGIC_VECTOR(datawidth-1 downto 0);
-signal WEN             : STD_LOGIC;
-signal LOAD_ADDRESSN   : STD_LOGIC;
-signal ADDRESS_IN      : STD_LOGIC_VECTOR(abits-1 downto 0);
-signal ADDRESS_OUT     : STD_LOGIC_VECTOR(abits-1 downto 0);
-signal INTERLEAVED     : STD_LOGIC;
-signal DAC_CFG         : STD_LOGIC_VECTOR(3 downto 0);
-signal Rdata           : std_logic_vector(31 downto 0);
+  SIGNAL pre           : STD_LOGIC_VECTOR(PRESZ-1 DOWNTO 0);
+  SIGNAL N             : STD_LOGIC_VECTOR(CPTSZ-1 DOWNTO 0);
+  SIGNAL Reload        : STD_LOGIC;
+  SIGNAL DATA_IN       : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0);
+  SIGNAL WEN           : STD_LOGIC;
+  SIGNAL LOAD_ADDRESSN : STD_LOGIC;
+  SIGNAL ADDRESS_IN    : STD_LOGIC_VECTOR(abits-1 DOWNTO 0);
+  SIGNAL ADDRESS_OUT   : STD_LOGIC_VECTOR(abits-1 DOWNTO 0);
+  SIGNAL INTERLEAVED   : STD_LOGIC;
+  SIGNAL DAC_CFG       : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL Rdata         : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-begin
+BEGIN
 
-cal: lfr_cal_driver
-    generic map(
-        tech      => tech,
-        PRESZ     => PRESZ,
-        CPTSZ     => CPTSZ,
-        datawidth => datawidth,
-        abits     => abits
-     )
-    Port map(
-        clk             => clk,
-        rstn            => rstn,
-        pre             => pre,
-        N               => N,
-        Reload          => Reload,
-        DATA_IN         => DATA_IN,
-        WEN             => WEN,
-        LOAD_ADDRESSN   => LOAD_ADDRESSN,
-        ADDRESS_IN      => ADDRESS_IN,
-        ADDRESS_OUT     => ADDRESS_OUT,
-        INTERLEAVED     => INTERLEAVED,
-        DAC_CFG         => DAC_CFG,
-        SYNC            => SYNC,
-        DOUT            => SDO,
-        SCLK            => SCK,
-        SMPCLK          => SMPCLK
-              );
+  cal : lfr_cal_driver
+    GENERIC MAP(
+      tech      => tech,
+      PRESZ     => PRESZ,
+      CPTSZ     => CPTSZ,
+      datawidth => datawidth,
+      abits     => abits
+      )
+    PORT MAP(
+      clk           => clk,
+      rstn          => rstn,
+      
+      pre           => pre,
+      N             => N,
+      Reload        => Reload,
+      DATA_IN       => DATA_IN,
+      WEN           => WEN,
+      LOAD_ADDRESSN => LOAD_ADDRESSN,
+      ADDRESS_IN    => ADDRESS_IN,
+      ADDRESS_OUT   => ADDRESS_OUT,
+      INTERLEAVED   => INTERLEAVED,
+      DAC_CFG       => DAC_CFG,
+      
+      SYNC          => SYNC,
+      DOUT          => SDO,
+      SCLK          => SCK,
+      SMPCLK        => SMPCLK           -- OPEN
+      );
 
-    process(rstn,clk)
-    begin
-        if(rstn='0')then
-           pre           <= (others=>'1');
-           N             <= (others=>'1');
-           Reload        <= '1';
-           DATA_IN       <= (others=>'0');
-           WEN           <= '1';
-           LOAD_ADDRESSN <= '1';
-           ADDRESS_IN    <= (others=>'1');
-           INTERLEAVED   <= '0';
-           DAC_CFG       <= (others=>'0');
-           Rdata         <= (others=>'0');
-        elsif(clk'event and clk='1')then 
-        
+  PROCESS(rstn, clk)
+  BEGIN
+    IF(rstn = '0')then
+      pre           <= (OTHERS => '1');
+      N             <= (OTHERS => '1');
+      Reload        <= '1';
+      DATA_IN       <= (OTHERS => '0');
+      WEN           <= '1';
+      LOAD_ADDRESSN <= '1';
+      ADDRESS_IN    <= (OTHERS => '1');
+      INTERLEAVED   <= '0';
+      DAC_CFG       <= (OTHERS => '0');
+      Rdata         <= (OTHERS => '0');
+    ELSIF(clk'EVENT AND clk = '1')then
 
-    --APB Write OP
-            if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
-                case apbi.paddr(abits-1 downto 2) is
-                    when "000000" =>
-                        DAC_CFG     <= apbi.pwdata(3 downto 0);
-                        Reload      <= apbi.pwdata(4);
-                        INTERLEAVED <= apbi.pwdata(5);
-                    when "000001" =>
-                         pre        <= apbi.pwdata(PRESZ-1 downto 0);
-                    when "000010" =>
-                         N          <= apbi.pwdata(CPTSZ-1 downto 0);
-                    when "000011" =>
-                         ADDRESS_IN <= apbi.pwdata(abits-1 downto 0);
-                         LOAD_ADDRESSN <= '0';
-                    when "000100" =>
-                         DATA_IN    <= apbi.pwdata(datawidth-1 downto 0);
-                         WEN        <= '0';
-                    when others =>
-                        null;
-                end case;
-            else
-                LOAD_ADDRESSN <= '1';
-                WEN           <= '1';
-            end if;
 
-    --APB Read OP
-            if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
-                case apbi.paddr(abits-1 downto 2) is
-                    when "000000" =>
-                         Rdata(3 downto 0)  <= DAC_CFG;
-                         Rdata(4)           <= Reload;
-                         Rdata(5)           <= INTERLEAVED;
-                         Rdata(31 downto 6) <= (others => '0');
-                    when "000001" =>
-                         Rdata(PRESZ-1 downto 0)  <= pre;
-                         Rdata(31 downto PRESZ)   <= (others => '0');
-                    when "000010" =>
-                         Rdata(CPTSZ-1 downto 0)  <= N;
-                         Rdata(31 downto CPTSZ)   <= (others => '0');
-                    when "000011" =>
-                         Rdata(abits-1 downto 0)  <= ADDRESS_OUT;
-                         Rdata(31 downto abits)   <= (others => '0');
-                    when "000100" =>
-                         Rdata(datawidth-1 downto 0)  <= DATA_IN;
-                         Rdata(31 downto datawidth)   <= (others => '0');
-                    when others =>
-                         Rdata <= (others => '0');
-                end case;
-            end if;
+      --APB Write OP
+      IF (apbi.psel(pindex) AND apbi.penable AND apbi.pwrite) = '1' THEN
+        CASE apbi.paddr(abits-1 DOWNTO 2) IS
+          WHEN "000000" =>
+            DAC_CFG     <= apbi.pwdata(3 DOWNTO 0);
+            Reload      <= apbi.pwdata(4);
+            INTERLEAVED <= apbi.pwdata(5);
+          WHEN "000001" =>
+            pre <= apbi.pwdata(PRESZ-1 DOWNTO 0);
+          WHEN "000010" =>
+            N <= apbi.pwdata(CPTSZ-1 DOWNTO 0);
+          WHEN "000011" =>
+            ADDRESS_IN    <= apbi.pwdata(abits-1 DOWNTO 0);
+            LOAD_ADDRESSN <= '0';
+          WHEN "000100" =>
+            DATA_IN <= apbi.pwdata(datawidth-1 DOWNTO 0);
+            WEN     <= '0';
+          WHEN OTHERS =>
+            NULL;
+        END CASE;
+      ELSE
+        LOAD_ADDRESSN <= '1';
+        WEN           <= '1';
+      END IF;
 
-        end if;
-        apbo.pconfig <= pconfig;
-    end process;
+      --APB Read OP
+      IF (apbi.psel(pindex) AND (NOT apbi.pwrite)) = '1' THEN
+        CASE apbi.paddr(abits-1 DOWNTO 2) IS
+          WHEN "000000" =>
+            Rdata(3 DOWNTO 0)  <= DAC_CFG;
+            Rdata(4)           <= Reload;
+            Rdata(5)           <= INTERLEAVED;
+            Rdata(31 DOWNTO 6) <= (OTHERS => '0');
+          WHEN "000001" =>
+            Rdata(PRESZ-1 DOWNTO 0) <= pre;
+            Rdata(31 DOWNTO PRESZ)  <= (OTHERS => '0');
+          WHEN "000010" =>
+            Rdata(CPTSZ-1 DOWNTO 0) <= N;
+            Rdata(31 DOWNTO CPTSZ)  <= (OTHERS => '0');
+          WHEN "000011" =>
+            Rdata(abits-1 DOWNTO 0) <= ADDRESS_OUT;
+            Rdata(31 DOWNTO abits)  <= (OTHERS => '0');
+          WHEN "000100" =>
+            Rdata(datawidth-1 DOWNTO 0) <= DATA_IN;
+            Rdata(31 DOWNTO datawidth)  <= (OTHERS => '0');
+          WHEN OTHERS =>
+            Rdata <= (OTHERS => '0');
+        END CASE;
+      END IF;
 
-apbo.prdata     <=   Rdata when apbi.penable = '1';
-end architecture ar_apb_lfr_cal;
+    END IF;
+    apbo.pconfig <= pconfig;
+  END PROCESS;
+
+  apbo.prdata <= Rdata WHEN apbi.penable = '1';
+END ARCHITECTURE ar_apb_lfr_cal;

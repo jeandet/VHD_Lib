@@ -82,6 +82,11 @@ ENTITY LFR_em IS
     ADC_OEB_bar_CH : OUT   STD_LOGIC_VECTOR(7 DOWNTO 0);
     ADC_smpclk     : OUT   STD_LOGIC;
     ADC_data       : IN    STD_LOGIC_VECTOR(13 DOWNTO 0);
+    -- DAC --------------------------------------------------------------------
+    DAC_SDO    : OUT STD_LOGIC;
+    DAC_SCK    : OUT STD_LOGIC;
+    DAC_SYNC   : OUT STD_LOGIC;
+    DAC_CAL_EN : OUT STD_LOGIC;
     -- HK ---------------------------------------------------------------------
     HK_smpclk      : OUT   STD_LOGIC;
     ADC_OEB_bar_HK : OUT   STD_LOGIC;
@@ -253,6 +258,7 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
   apb_lfr_management_1 : apb_lfr_management
     GENERIC MAP (
+      tech             => apa3e,
       pindex           => 6,
       paddr            => 6,
       pmask            => 16#fff#,
@@ -270,6 +276,11 @@ BEGIN  -- beh
       HK_val        => sample_val,
       HK_sel        => HK_SEL, 
       
+      DAC_SDO           => DAC_SDO,
+      DAC_SCK            => DAC_SCK,
+      DAC_SYNC          => DAC_SYNC,
+      DAC_CAL_EN        => DAC_CAL_EN,     
+
       coarse_time   => coarse_time,
       fine_time     => fine_time,
       LFR_soft_rstn => LFR_soft_rstn
@@ -380,7 +391,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"01013A")  -- aa.bb.cc version
+      top_lfr_version        => X"01013B")  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             --      0 => MINI_LFR
                                             --      1 => EM

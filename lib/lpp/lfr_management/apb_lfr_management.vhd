@@ -29,11 +29,15 @@ USE lpp.apb_devices_list.ALL;
 USE lpp.general_purpose.ALL;
 USE lpp.lpp_lfr_management.ALL;
 USE lpp.lpp_lfr_management_apbreg_pkg.ALL;
+USE lpp.lpp_cna.ALL;
+LIBRARY techmap;
+USE techmap.gencomp.ALL;
 
 
 ENTITY apb_lfr_management IS
 
   GENERIC(
+    tech             : INTEGER := 0;
     pindex           : INTEGER := 0;        --! APB slave index
     paddr            : INTEGER := 0;        --! ADDR field of the APB BAR
     pmask            : INTEGER := 16#fff#;  --! MASK field of the APB BAR
@@ -55,6 +59,11 @@ ENTITY apb_lfr_management IS
     HK_val        : IN  STD_LOGIC;
     HK_sel        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
     ---------------------------------------------------------------------------
+    DAC_SDO    : OUT STD_LOGIC;
+    DAC_SCK    : OUT STD_LOGIC;
+    DAC_SYNC   : OUT STD_LOGIC;
+    DAC_CAL_EN : OUT STD_LOGIC;
+    ---------------------------------------------------------------------------
     coarse_time   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --! coarse time
     fine_time     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);  --! fine TIME
     ---------------------------------------------------------------------------
@@ -67,7 +76,7 @@ ARCHITECTURE Behavioral OF apb_lfr_management IS
 
   CONSTANT REVISION : INTEGER := 1;
   CONSTANT pconfig : apb_config_type := (
-    0 => ahb_device_reg (VENDOR_LPP, 14, 0, REVISION, 0),
+    0 => ahb_device_reg (VENDOR_LPP, LPP_LFR_MANAGEMENT, 0, REVISION, 0),
     1 => apb_iobar(paddr, pmask)
     );
 
@@ -120,6 +129,27 @@ ARCHITECTURE Behavioral OF apb_lfr_management IS
   SIGNAL previous_fine_time_bit : STD_LOGIC;
   
   SIGNAL rstn_LFR_TM : STD_LOGIC;
+
+  -----------------------------------------------------------------------------
+  -- DAC
+  -----------------------------------------------------------------------------
+  CONSTANT  PRESZ         : INTEGER := 8;
+  CONSTANT  CPTSZ         : INTEGER := 16;
+  CONSTANT  datawidth     : INTEGER := 18;
+  CONSTANT  dacresolution : INTEGER := 12;
+  CONSTANT  abits         : INTEGER := 8;
+  
+  SIGNAL pre           : STD_LOGIC_VECTOR(PRESZ-1 DOWNTO 0);
+  SIGNAL N             : STD_LOGIC_VECTOR(CPTSZ-1 DOWNTO 0);
+  SIGNAL Reload        : STD_LOGIC;
+  SIGNAL DATA_IN       : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0);
+  SIGNAL WEN           : STD_LOGIC;
+  SIGNAL LOAD_ADDRESSN : STD_LOGIC;
+  SIGNAL ADDRESS_IN    : STD_LOGIC_VECTOR(abits-1 DOWNTO 0);
+  SIGNAL ADDRESS_OUT   : STD_LOGIC_VECTOR(abits-1 DOWNTO 0);
+  SIGNAL INTERLEAVED   : STD_LOGIC;
+  SIGNAL DAC_CFG       : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL DAC_CAL_EN_s  : STD_LOGIC;
   
 BEGIN
 
@@ -141,7 +171,18 @@ BEGIN
       soft_tick           <= '0';
 
       coarsetime_reg_updated <= '0';
-
+      --DAC
+      pre           <= (OTHERS => '1');
+      N             <= (OTHERS => '1');
+      Reload        <= '1';
+      DATA_IN       <= (OTHERS => '0');
+      WEN           <= '1';
+      LOAD_ADDRESSN <= '1';
+      ADDRESS_IN    <= (OTHERS => '1');
+      INTERLEAVED   <= '0';
+      DAC_CFG       <= (OTHERS => '0');
+      --
+      DAC_CAL_EN_s <= '0';
     ELSIF clk25MHz'EVENT AND clk25MHz = '1' THEN
       coarsetime_reg_updated <= '0';
 
@@ -190,6 +231,24 @@ BEGIN
           WHEN ADDR_LFR_MANAGMENT_HK_TEMP_2 =>
             Rdata(31 DOWNTO 16) <= (OTHERS => '0');
             Rdata(15 DOWNTO 0)  <= r.HK_temp_2;
+          WHEN ADDR_LFR_MANAGMENT_DAC_CONTROL =>
+            Rdata(3 DOWNTO 0)  <= DAC_CFG;
+            Rdata(4)           <= Reload;
+            Rdata(5)           <= INTERLEAVED;
+            Rdata(6)           <= DAC_CAL_EN_s;
+            Rdata(31 DOWNTO 7) <= (OTHERS => '0');
+          WHEN ADDR_LFR_MANAGMENT_DAC_PRE =>
+            Rdata(PRESZ-1 DOWNTO 0) <= pre;
+            Rdata(31 DOWNTO PRESZ)  <= (OTHERS => '0');
+          WHEN ADDR_LFR_MANAGMENT_DAC_N =>
+            Rdata(CPTSZ-1 DOWNTO 0) <= N;
+            Rdata(31 DOWNTO CPTSZ)  <= (OTHERS => '0');
+          WHEN ADDR_LFR_MANAGMENT_DAC_ADDRESS_OUT =>
+            Rdata(abits-1 DOWNTO 0) <= ADDRESS_OUT;
+            Rdata(31 DOWNTO abits)  <= (OTHERS => '0');
+          WHEN ADDR_LFR_MANAGMENT_DAC_DATA_IN =>
+            Rdata(datawidth-1 DOWNTO 0) <= DATA_IN;
+            Rdata(31 DOWNTO datawidth)  <= (OTHERS => '0');
           WHEN OTHERS =>
             Rdata(31 DOWNTO 0) <= (OTHERS => '0');
         END CASE;
@@ -204,10 +263,28 @@ BEGIN
             WHEN ADDR_LFR_MANAGMENT_TIME_LOAD =>
               r.coarse_time_load     <= apbi.pwdata(30 DOWNTO 0);
               coarsetime_reg_updated <= '1';
+          WHEN ADDR_LFR_MANAGMENT_DAC_CONTROL =>
+            DAC_CFG      <= apbi.pwdata(3 DOWNTO 0);
+            Reload       <= apbi.pwdata(4);
+            INTERLEAVED  <= apbi.pwdata(5);
+            DAC_CAL_EN_s <= apbi.pwdata(6);
+          WHEN ADDR_LFR_MANAGMENT_DAC_PRE =>
+            pre <= apbi.pwdata(PRESZ-1 DOWNTO 0);
+          WHEN ADDR_LFR_MANAGMENT_DAC_N =>
+            N <= apbi.pwdata(CPTSZ-1 DOWNTO 0);
+          WHEN ADDR_LFR_MANAGMENT_DAC_ADDRESS_OUT =>
+            ADDRESS_IN    <= apbi.pwdata(abits-1 DOWNTO 0);
+            LOAD_ADDRESSN <= '0';
+          WHEN ADDR_LFR_MANAGMENT_DAC_DATA_IN =>
+            DATA_IN <= apbi.pwdata(datawidth-1 DOWNTO 0);
+            WEN     <= '0';
+              
             WHEN OTHERS =>
               NULL;
           END CASE;
         ELSE
+          LOAD_ADDRESSN <= '1';
+          WEN           <= '1';
           IF r.ctrl = '1' THEN
             r.ctrl <= '0';
           END IF;
@@ -393,5 +470,38 @@ BEGIN
   END PROCESS;
 
   HK_sel <= HK_sel_s;
-  
+
+  -----------------------------------------------------------------------------
+  -- DAC
+  -----------------------------------------------------------------------------
+  cal : lfr_cal_driver
+    GENERIC MAP(
+      tech      => tech,
+      PRESZ     => PRESZ,
+      CPTSZ     => CPTSZ,
+      datawidth => datawidth,
+      abits     => abits
+      )
+    PORT MAP(
+      clk           => clk25MHz,
+      rstn          => resetn,
+      
+      pre           => pre,
+      N             => N,
+      Reload        => Reload,
+      DATA_IN       => DATA_IN,
+      WEN           => WEN,
+      LOAD_ADDRESSN => LOAD_ADDRESSN,
+      ADDRESS_IN    => ADDRESS_IN,
+      ADDRESS_OUT   => ADDRESS_OUT,
+      INTERLEAVED   => INTERLEAVED,
+      DAC_CFG       => DAC_CFG,
+      
+      SYNC          => DAC_SYNC,
+      DOUT          => DAC_SDO,
+      SCLK          => DAC_SCK,
+      SMPCLK        => OPEN --DAC_SMPCLK
+      );
+
+  DAC_CAL_EN <= DAC_CAL_EN_s;
 END Behavioral;

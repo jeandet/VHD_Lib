@@ -11,10 +11,10 @@
 ./dsp/lpp_fft_rtax
 ./lpp_memory
 ./dsp/lpp_fft
+./lpp_cna
 ./lfr_management
 ./lpp_ad_Conv
 ./lpp_bootloader
-./lpp_cna
 ./lpp_spectral_matrix
 ./lpp_demux
 ./lpp_Header

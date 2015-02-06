@@ -84,7 +84,7 @@ set_io	TAG3	-pinname	L16	-fixed	yes	-DIRECTION	Inout
 set_io	TAG4	-pinname	L15	-fixed	yes	-DIRECTION	Inout
 #set_io	TAG5	-pinname	M16	-fixed	yes	-DIRECTION	Inout
 #set_io	TAG6	-pinname	L13	-fixed	yes	-DIRECTION	Inout
-#set_io  TAG7	-pinname	P6	-fixed	yes	-DIRECTION	Inout
+#set_io TAG7	-pinname	P6	-fixed	yes	-DIRECTION	Inout
 set_io	TAG8	-pinname	R6	-fixed	yes	-DIRECTION	Inout
 #set_io	TAG9	-pinname	T4	-fixed	yes	-DIRECTION	Inout
 

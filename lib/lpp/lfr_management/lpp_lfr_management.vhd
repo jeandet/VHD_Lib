@@ -31,6 +31,7 @@ PACKAGE lpp_lfr_management IS
 
   COMPONENT apb_lfr_management
     GENERIC (
+      tech             : INTEGER;
       pindex           : INTEGER;
       paddr            : INTEGER;
       pmask            : INTEGER;
@@ -46,6 +47,10 @@ PACKAGE lpp_lfr_management IS
       HK_sample     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
       HK_val        : IN  STD_LOGIC;
       HK_sel        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+      DAC_SDO    : OUT STD_LOGIC;
+      DAC_SCK    : OUT STD_LOGIC;
+      DAC_SYNC   : OUT STD_LOGIC;
+      DAC_CAL_EN : OUT STD_LOGIC;
       coarse_time   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       fine_time     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       LFR_soft_rstn : OUT STD_LOGIC);
