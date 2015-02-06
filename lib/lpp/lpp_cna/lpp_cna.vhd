@@ -31,6 +31,127 @@ use lpp.lpp_amba.all;
 
 package lpp_cna is
 
+component apb_lfr_cal is
+  generic (
+    pindex   : integer := 0;
+    paddr    : integer := 0;
+    pmask    : integer := 16#fff#;
+    tech     : integer := 0;
+    PRESZ    : integer := 8;
+    CPTSZ    : integer := 16;
+    datawidth : integer := 18;
+    dacresolution : integer := 12;
+    abits     : integer := 8);
+  port (
+    rstn    : in  std_logic;
+    clk     : in  std_logic;
+    apbi    : in  apb_slv_in_type;
+    apbo    : out apb_slv_out_type;
+    SDO     : out  std_logic;
+    SCK     : out  std_logic;
+    SYNC    : out  std_logic;
+    SMPCLK  : out  std_logic
+    );
+end component;
+
+component SPI_DAC_DRIVER is
+    Generic(
+        datawidth     : INTEGER := 16;
+        MSBFIRST      : INTEGER := 1
+    );
+    Port ( 
+        clk        : in  STD_LOGIC;
+        rstn       : in  STD_LOGIC;
+        DATA       : in STD_LOGIC_VECTOR(datawidth-1 downto 0);
+        SMP_CLK    : in STD_LOGIC;
+        SYNC       : out STD_LOGIC;
+        DOUT       : out STD_LOGIC;
+        SCLK       : out STD_LOGIC
+         );
+end component;
+
+component dynamic_freq_div is
+    generic(
+        PRESZ  :  integer range 1 to 32:=4;
+        PREMAX :  integer := 16#FFFFFF#;
+        CPTSZ  :  integer range 1 to 32:=16
+     );
+    Port ( 
+        clk     : in  STD_LOGIC;
+        rstn    : in  STD_LOGIC;
+        pre     : in  STD_LOGIC_VECTOR(PRESZ-1 downto 0);
+        N       : in  STD_LOGIC_VECTOR(CPTSZ-1 downto 0);
+        Reload  : in  std_logic;
+        clk_out : out STD_LOGIC
+        );
+end component;
+
+component lfr_cal_driver is
+        generic(
+        tech   :  integer := 0;
+        PRESZ  :  integer range 1 to 32:=4;
+        PREMAX :  integer := 16#FFFFFF#;
+        CPTSZ  :  integer range 1 to 32:=16;
+        datawidth     : integer := 18;
+        abits         : integer := 8
+     );
+    Port ( 
+        clk             : in  STD_LOGIC;
+        rstn            : in  STD_LOGIC;
+        pre             : in  STD_LOGIC_VECTOR(PRESZ-1 downto 0);
+        N               : in  STD_LOGIC_VECTOR(CPTSZ-1 downto 0);
+        Reload          : in  std_logic;
+        DATA_IN         : in  STD_LOGIC_VECTOR(datawidth-1 downto 0);
+        WEN             : in  STD_LOGIC;
+        LOAD_ADDRESSN   : IN  STD_LOGIC;
+        ADDRESS_IN      : IN  STD_LOGIC_VECTOR(abits-1 downto 0);
+        ADDRESS_OUT     : OUT STD_LOGIC_VECTOR(abits-1 downto 0);
+        INTERLEAVED     : IN  STD_LOGIC;
+        DAC_CFG         : IN  STD_LOGIC_VECTOR(3 downto 0);
+        SYNC            : out STD_LOGIC;
+        DOUT            : out STD_LOGIC;
+        SCLK            : out STD_LOGIC;
+        SMPCLK          : out STD_lOGIC
+              );
+end component;
+
+component RAM_READER is
+    Generic(
+        datawidth     : integer := 18;
+        dacresolution : integer := 12;
+        abits         : integer := 8
+    );
+    Port ( 
+        clk         : in  STD_LOGIC;                                    --! clock input
+        rstn        : in  STD_LOGIC;                                    --! Active low restet input
+        DATA_IN     : in  STD_LOGIC_VECTOR (datawidth-1 downto 0);      --! DATA input vector -> connect to RAM DATA output
+        ADDRESS     : out STD_LOGIC_VECTOR (abits-1 downto 0);          --! ADDRESS output vector -> connect to RAM read ADDRESS input
+        REN         : out STD_LOGIC;                                    --! Active low read enable -> connect to RAM read enable
+        DATA_OUT    : out STD_LOGIC_VECTOR (dacresolution-1 downto 0);  --! DATA output vector
+        SMP_CLK     : in  STD_LOGIC;                                    --! Sampling clock input, each rising edge will provide a DATA to the output and read a new one in RAM
+        INTERLEAVED : in  STD_LOGIC                                     --! When 1, interleaved mode is actived.
+              );
+end component;
+
+
+component RAM_WRITER is
+    Generic(
+        datawidth     : integer := 18;
+        abits         : integer := 8
+    );
+    Port ( 
+        clk            : in  STD_LOGIC;                                --! clk input
+        rstn           : in  STD_LOGIC;                                --! Active low reset input
+        DATA_IN        : in  STD_LOGIC_VECTOR (datawidth-1 downto 0);  --! DATA input vector
+        DATA_OUT       : out  STD_LOGIC_VECTOR (datawidth-1 downto 0); --! DATA output vector
+        WEN_IN         : in  STD_LOGIC;                                --! Active low Write Enable input
+        WEN_OUT        : out STD_LOGIC;                                --! Active low Write Enable output
+        LOAD_ADDRESSN  : in  STD_LOGIC;                                --! Active low address load input
+        ADDRESS_IN     : in  STD_LOGIC_VECTOR (abits-1 downto 0);      --! Adress input vector
+        ADDRESS_OUT    : out  STD_LOGIC_VECTOR (abits-1 downto 0)      --! Adress output vector
+   );
+end component;
+
 component APB_DAC is
   generic (
     pindex   : integer := 0;

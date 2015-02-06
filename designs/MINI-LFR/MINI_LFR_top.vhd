@@ -140,6 +140,9 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   SIGNAL  ahbi_m_ext  :  AHB_Mst_In_Type;
   SIGNAL  ahbo_m_ext  :  soc_ahb_mst_out_vector(NB_AHB_MASTER-1+1 DOWNTO 1):= (OTHERS => ahbm_none);
   
+  SIGNAL  SRAM_CE_V   :  STD_LOGIC_VECTOR(1 downto 0);
+
+  
 BEGIN  -- beh
 
   -----------------------------------------------------------------------------
@@ -262,8 +265,9 @@ BEGIN  -- beh
       nSRAM_BE2  => SRAM_nBE(2),
       nSRAM_BE3  => SRAM_nBE(3),
       nSRAM_WE   => SRAM_nWE,   
-      nSRAM_CE   => SRAM_CE,    
+      nSRAM_CE   => SRAM_CE_V,    
       nSRAM_OE   => SRAM_nOE,
+      nSRAM_READY=> open,
       
       apbi_ext   => apbi_ext,
       apbo_ext   => apbo_ext,
@@ -271,5 +275,7 @@ BEGIN  -- beh
       ahbo_s_ext => ahbo_s_ext,
       ahbi_m_ext => ahbi_m_ext,
       ahbo_m_ext => ahbo_m_ext);
+
+      SRAM_CE   <= SRAM_CE_V(0);
   
 END beh;
