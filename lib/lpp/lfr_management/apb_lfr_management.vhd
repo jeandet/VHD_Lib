@@ -59,10 +59,10 @@ ENTITY apb_lfr_management IS
     HK_val        : IN  STD_LOGIC;
     HK_sel        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
     ---------------------------------------------------------------------------
-    DAC_SDO    : OUT STD_LOGIC;
-    DAC_SCK    : OUT STD_LOGIC;
-    DAC_SYNC   : OUT STD_LOGIC;
-    DAC_CAL_EN : OUT STD_LOGIC;
+    DAC_SDO       : OUT STD_LOGIC;
+    DAC_SCK       : OUT STD_LOGIC;
+    DAC_SYNC      : OUT STD_LOGIC;
+    DAC_CAL_EN    : OUT STD_LOGIC;
     ---------------------------------------------------------------------------
     coarse_time   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);  --! coarse time
     fine_time     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);  --! fine TIME
@@ -127,18 +127,18 @@ ARCHITECTURE Behavioral OF apb_lfr_management IS
   SIGNAL HK_sel_s             : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
   SIGNAL previous_fine_time_bit : STD_LOGIC;
-  
+
   SIGNAL rstn_LFR_TM : STD_LOGIC;
 
   -----------------------------------------------------------------------------
   -- DAC
   -----------------------------------------------------------------------------
-  CONSTANT  PRESZ         : INTEGER := 8;
-  CONSTANT  CPTSZ         : INTEGER := 16;
-  CONSTANT  datawidth     : INTEGER := 18;
-  CONSTANT  dacresolution : INTEGER := 12;
-  CONSTANT  abits         : INTEGER := 8;
-  
+  CONSTANT PRESZ         : INTEGER := 8;
+  CONSTANT CPTSZ         : INTEGER := 16;
+  CONSTANT datawidth     : INTEGER := 18;
+  CONSTANT dacresolution : INTEGER := 12;
+  CONSTANT abits         : INTEGER := 8;
+
   SIGNAL pre           : STD_LOGIC_VECTOR(PRESZ-1 DOWNTO 0);
   SIGNAL N             : STD_LOGIC_VECTOR(CPTSZ-1 DOWNTO 0);
   SIGNAL Reload        : STD_LOGIC;
@@ -150,6 +150,9 @@ ARCHITECTURE Behavioral OF apb_lfr_management IS
   SIGNAL INTERLEAVED   : STD_LOGIC;
   SIGNAL DAC_CFG       : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL DAC_CAL_EN_s  : STD_LOGIC;
+  
+  SIGNAL HK_debug_mode : STD_LOGIC;
+  SIGNAL HK_sel_debug  : STD_LOGIC_VECTOR(1 DOWNTO 0);
   
 BEGIN
 
@@ -172,17 +175,17 @@ BEGIN
 
       coarsetime_reg_updated <= '0';
       --DAC
-      pre           <= (OTHERS => '1');
-      N             <= (OTHERS => '1');
-      Reload        <= '1';
-      DATA_IN       <= (OTHERS => '0');
-      WEN           <= '1';
-      LOAD_ADDRESSN <= '1';
-      ADDRESS_IN    <= (OTHERS => '1');
-      INTERLEAVED   <= '0';
-      DAC_CFG       <= (OTHERS => '0');
+      pre                    <= (OTHERS => '1');
+      N                      <= (OTHERS => '1');
+      Reload                 <= '1';
+      DATA_IN                <= (OTHERS => '0');
+      WEN                    <= '1';
+      LOAD_ADDRESSN          <= '1';
+      ADDRESS_IN             <= (OTHERS => '1');
+      INTERLEAVED            <= '0';
+      DAC_CFG                <= (OTHERS => '0');
       --
-      DAC_CAL_EN_s <= '0';
+      DAC_CAL_EN_s           <= '0';
     ELSIF clk25MHz'EVENT AND clk25MHz = '1' THEN
       coarsetime_reg_updated <= '0';
 
@@ -214,7 +217,9 @@ BEGIN
             Rdata(0)           <= r.ctrl;
             Rdata(1)           <= r.soft_reset;
             Rdata(2)           <= r.LFR_soft_reset;
-            Rdata(31 DOWNTO 3) <= (OTHERS => '0');
+            Rdata(3)           <= HK_debug_mode;
+            Rdata(5 DOWNTO 4)  <= HK_sel_debug;
+            Rdata(31 DOWNTO 6) <= (OTHERS => '0');
           WHEN ADDR_LFR_MANAGMENT_TIME_LOAD =>
             Rdata(30 DOWNTO 0) <= r.coarse_time_load(30 DOWNTO 0);
           WHEN ADDR_LFR_MANAGMENT_TIME_COARSE =>
@@ -252,7 +257,7 @@ BEGIN
           WHEN OTHERS =>
             Rdata(31 DOWNTO 0) <= (OTHERS => '0');
         END CASE;
-        
+
         --APB Write OP
         IF (apbi.pwrite AND apbi.penable) = '1' THEN
           CASE paddr(7 DOWNTO 2) IS
@@ -260,24 +265,26 @@ BEGIN
               r.ctrl           <= apbi.pwdata(0);
               r.soft_reset     <= apbi.pwdata(1);
               r.LFR_soft_reset <= apbi.pwdata(2);
+              HK_debug_mode    <= apbi.pwdata(3);
+              HK_sel_debug     <= apbi.pwdata(5 DOWNTO 4);
             WHEN ADDR_LFR_MANAGMENT_TIME_LOAD =>
               r.coarse_time_load     <= apbi.pwdata(30 DOWNTO 0);
               coarsetime_reg_updated <= '1';
-          WHEN ADDR_LFR_MANAGMENT_DAC_CONTROL =>
-            DAC_CFG      <= apbi.pwdata(3 DOWNTO 0);
-            Reload       <= apbi.pwdata(4);
-            INTERLEAVED  <= apbi.pwdata(5);
-            DAC_CAL_EN_s <= apbi.pwdata(6);
-          WHEN ADDR_LFR_MANAGMENT_DAC_PRE =>
-            pre <= apbi.pwdata(PRESZ-1 DOWNTO 0);
-          WHEN ADDR_LFR_MANAGMENT_DAC_N =>
-            N <= apbi.pwdata(CPTSZ-1 DOWNTO 0);
-          WHEN ADDR_LFR_MANAGMENT_DAC_ADDRESS_OUT =>
-            ADDRESS_IN    <= apbi.pwdata(abits-1 DOWNTO 0);
-            LOAD_ADDRESSN <= '0';
-          WHEN ADDR_LFR_MANAGMENT_DAC_DATA_IN =>
-            DATA_IN <= apbi.pwdata(datawidth-1 DOWNTO 0);
-            WEN     <= '0';
+            WHEN ADDR_LFR_MANAGMENT_DAC_CONTROL =>
+              DAC_CFG      <= apbi.pwdata(3 DOWNTO 0);
+              Reload       <= apbi.pwdata(4);
+              INTERLEAVED  <= apbi.pwdata(5);
+              DAC_CAL_EN_s <= apbi.pwdata(6);
+            WHEN ADDR_LFR_MANAGMENT_DAC_PRE =>
+              pre <= apbi.pwdata(PRESZ-1 DOWNTO 0);
+            WHEN ADDR_LFR_MANAGMENT_DAC_N =>
+              N <= apbi.pwdata(CPTSZ-1 DOWNTO 0);
+            WHEN ADDR_LFR_MANAGMENT_DAC_ADDRESS_OUT =>
+              ADDRESS_IN    <= apbi.pwdata(abits-1 DOWNTO 0);
+              LOAD_ADDRESSN <= '0';
+            WHEN ADDR_LFR_MANAGMENT_DAC_DATA_IN =>
+              DATA_IN <= apbi.pwdata(datawidth-1 DOWNTO 0);
+              WEN     <= '0';
               
             WHEN OTHERS =>
               NULL;
@@ -440,7 +447,6 @@ BEGIN
                                                     -- for 14, the update frequency is
                                                     -- 4Hz and update for each
                                                     -- HK is 1.33Hz
-
   BEGIN  -- PROCESS
     IF resetn = '0' THEN                -- asynchronous reset (active low)
 
@@ -458,9 +464,27 @@ BEGIN
         IF previous_fine_time_bit = NOT(fine_time_s(BIT_FREQUENCY_UPDATE)) THEN
           previous_fine_time_bit <= fine_time_s(BIT_FREQUENCY_UPDATE);
           CASE HK_sel_s IS
-            WHEN "00"   => r.HK_temp_0 <= HK_sample; HK_sel_s <= "01";
-            WHEN "01"   => r.HK_temp_1 <= HK_sample; HK_sel_s <= "10";
-            WHEN "10"   => r.HK_temp_2 <= HK_sample; HK_sel_s <= "00";
+            WHEN "00" =>
+              r.HK_temp_0 <= HK_sample;
+              IF HK_debug_mode = '1' THEN
+                HK_sel_s <= HK_sel_debug;
+              ELSE
+                HK_sel_s <= "01";
+              END IF;
+            WHEN "01" =>
+              r.HK_temp_1 <= HK_sample;
+              IF HK_debug_mode = '1' THEN
+                HK_sel_s <= HK_sel_debug;
+              ELSE
+                HK_sel_s <= "10";
+              END IF;
+            WHEN "10" =>
+              r.HK_temp_2 <= HK_sample;
+              IF HK_debug_mode = '1' THEN
+                HK_sel_s <= HK_sel_debug;
+              ELSE
+                HK_sel_s <= "00";
+              END IF;
             WHEN OTHERS => NULL;
           END CASE;
         END IF;
@@ -483,9 +507,9 @@ BEGIN
       abits     => abits
       )
     PORT MAP(
-      clk           => clk25MHz,
-      rstn          => resetn,
-      
+      clk  => clk25MHz,
+      rstn => resetn,
+
       pre           => pre,
       N             => N,
       Reload        => Reload,
@@ -496,11 +520,11 @@ BEGIN
       ADDRESS_OUT   => ADDRESS_OUT,
       INTERLEAVED   => INTERLEAVED,
       DAC_CFG       => DAC_CFG,
-      
-      SYNC          => DAC_SYNC,
-      DOUT          => DAC_SDO,
-      SCLK          => DAC_SCK,
-      SMPCLK        => OPEN --DAC_SMPCLK
+
+      SYNC   => DAC_SYNC,
+      DOUT   => DAC_SDO,
+      SCLK   => DAC_SCK,
+      SMPCLK => OPEN                    --DAC_SMPCLK
       );
 
   DAC_CAL_EN <= DAC_CAL_EN_s;
