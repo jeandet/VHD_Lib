@@ -21,85 +21,85 @@
 ------------------------------------------------------------------------------
 
 
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
 
-entity SPI_DAC_DRIVER is
-    Generic(
-        datawidth     : INTEGER := 16;
-        MSBFIRST      : INTEGER := 1
+ENTITY SPI_DAC_DRIVER IS
+  GENERIC(
+    datawidth : INTEGER := 16;
+    MSBFIRST  : INTEGER := 1
     );
-    Port ( 
-        clk        : in  STD_LOGIC;
-        rstn       : in  STD_LOGIC;
-        DATA       : in STD_LOGIC_VECTOR(datawidth-1 downto 0);
-        SMP_CLK    : in STD_LOGIC;
-        SYNC       : out STD_LOGIC;
-        DOUT       : out STD_LOGIC;
-        SCLK       : out STD_LOGIC
-         );
-end entity SPI_DAC_DRIVER;
+  PORT (
+    clk     : IN  STD_LOGIC;
+    rstn    : IN  STD_LOGIC;
+    DATA    : IN  STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0);
+    SMP_CLK : IN  STD_LOGIC;
+    SYNC    : OUT STD_LOGIC;
+    DOUT    : OUT STD_LOGIC;
+    SCLK    : OUT STD_LOGIC
+    );
+END ENTITY SPI_DAC_DRIVER;
 
-architecture behav of SPI_DAC_DRIVER is
-signal SHIFTREG     : STD_LOGIC_VECTOR(datawidth-1 downto 0):=(others=>'0');
-signal INPUTREG     : STD_LOGIC_VECTOR(datawidth-1 downto 0):=(others=>'0');
-signal SMP_CLK_R    : STD_LOGIC:='0';
-signal shiftcnt     : INTEGER:=0;
-signal shifting     : STD_LOGIC:='0';
-signal shifting_R   : STD_LOGIC:='0';
-begin
+ARCHITECTURE behav OF SPI_DAC_DRIVER IS
+  SIGNAL SHIFTREG   : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL INPUTREG   : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL SMP_CLK_R  : STD_LOGIC                              := '0';
+  SIGNAL shiftcnt   : INTEGER                                := 0;
+  SIGNAL shifting   : STD_LOGIC                              := '0';
+  SIGNAL shifting_R : STD_LOGIC                              := '0';
+BEGIN
 
-DOUT <= SHIFTREG(datawidth-1);
+  DOUT <= SHIFTREG(datawidth-1);
 
-MSB:IF MSBFIRST=1 GENERATE
-    INPUTREG    <= DATA;
-END GENERATE;
+  MSB : IF MSBFIRST = 1 GENERATE
+    INPUTREG <= DATA;
+  END GENERATE;
 
-LSB:IF MSBFIRST=0 GENERATE
-    INPUTREG(datawidth-1 downto 0)    <= DATA(0 to datawidth-1);
-END GENERATE;
+  LSB : IF MSBFIRST = 0 GENERATE
+    INPUTREG(datawidth-1 DOWNTO 0) <= DATA(0 TO datawidth-1);
+  END GENERATE;
 
-SCLK   <= clk;
+  SCLK <= clk;
 
-process(clk,rstn)
-begin
-    if rstn='0' then
-        shifting_R  <= '0';
-        SMP_CLK_R   <= '0';
-    elsif clk'event and clk='1' then
-        SMP_CLK_R   <= SMP_CLK;
-        shifting_R  <= shifting;
-    end if;
-end process;
+  PROCESS(clk, rstn)
+  BEGIN
+    IF rstn = '0' then
+      shifting_R <= '0';
+      SMP_CLK_R  <= '0';
+    ELSIF clk'EVENT AND clk = '1' then
+      SMP_CLK_R  <= SMP_CLK;
+      shifting_R <= shifting;
+    END IF;
+  END PROCESS;
 
-process(clk,rstn)
-begin
-    if rstn='0' then
-        shifting    <= '0';
-        SHIFTREG    <= (others=>'0');
-        SYNC        <= '0';
-        shiftcnt    <= 0;
-    elsif clk'event and clk='1' then
-        if(SMP_CLK='1' and SMP_CLK_R='0') then
-            SYNC        <= '1';
-            shifting    <= '1';
-        else
-            SYNC        <= '0';
-            if shiftcnt = datawidth-1 then
-                shifting <= '0';
-            end if;
-        end if;
-        if shifting_R='1' then
-            shiftcnt    <= shiftcnt + 1;
-            SHIFTREG    <= SHIFTREG (datawidth-2 downto 0) & '0';
-        else
-            SHIFTREG    <= INPUTREG;
-            shiftcnt    <= 0;
-        end if;
-    end if;
-end process;
+  PROCESS(clk, rstn)
+  BEGIN
+    IF rstn = '0' then
+      shifting <= '0';
+      SHIFTREG <= (OTHERS => '0');
+      SYNC     <= '0';
+      shiftcnt <= 0;
+    ELSIF clk'EVENT AND clk = '1' then
+      IF(SMP_CLK = '1' and SMP_CLK_R = '0') THEN
+        SYNC     <= '1';
+        shifting <= '1';
+      ELSE
+        SYNC <= '0';
+        IF shiftcnt = datawidth-1 THEN
+          shifting <= '0';
+        END IF;
+      END IF;
+      IF shifting = '1' then
+        shiftcnt <= shiftcnt + 1;
+        SHIFTREG <= SHIFTREG (datawidth-2 DOWNTO 0) & '0';
+      ELSE
+        SHIFTREG <= INPUTREG;
+        shiftcnt <= 0;
+      END IF;
+    END IF;
+  END PROCESS;
 
-end architecture behav;
+END ARCHITECTURE behav;
 
 
