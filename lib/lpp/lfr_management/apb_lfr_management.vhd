@@ -209,6 +209,8 @@ BEGIN
       paddr(7 DOWNTO 2) := apbi.paddr(7 DOWNTO 2);
       Rdata             <= (OTHERS => '0');
 
+      LOAD_ADDRESSN <= '1';
+      WEN           <= '1';
 
       IF apbi.psel(pindex) = '1' THEN
         --APB READ OP
@@ -290,8 +292,6 @@ BEGIN
               NULL;
           END CASE;
         ELSE
-          LOAD_ADDRESSN <= '1';
-          WEN           <= '1';
           IF r.ctrl = '1' THEN
             r.ctrl <= '0';
           END IF;
