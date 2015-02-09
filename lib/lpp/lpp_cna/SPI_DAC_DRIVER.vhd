@@ -65,11 +65,11 @@ BEGIN
   PROCESS(clk, rstn)
   BEGIN
     IF rstn = '0' then
-      shifting_R <= '0';
+--      shifting_R <= '0';
       SMP_CLK_R  <= '0';
     ELSIF clk'EVENT AND clk = '1' then
       SMP_CLK_R  <= SMP_CLK;
-      shifting_R <= shifting;
+--      shifting_R <= shifting;
     END IF;
   END PROCESS;
 
