@@ -50,7 +50,6 @@ ARCHITECTURE behav OF SPI_DAC_DRIVER IS
   SIGNAL shifting_R : STD_LOGIC                              := '0';
 BEGIN
 
-  DOUT <= SHIFTREG(datawidth-1);
 
   MSB : IF MSBFIRST = 1 GENERATE
     INPUTREG <= DATA;
@@ -64,24 +63,26 @@ BEGIN
 
   PROCESS(clk, rstn)
   BEGIN
-    IF rstn = '0' then
+    IF rstn = '0' THEN
 --      shifting_R <= '0';
-      SMP_CLK_R  <= '0';
-    ELSIF clk'EVENT AND clk = '1' then
-      SMP_CLK_R  <= SMP_CLK;
+      SMP_CLK_R <= '0';
+    ELSIF clk'EVENT AND clk = '1' THEN
+      SMP_CLK_R <= SMP_CLK;
 --      shifting_R <= shifting;
     END IF;
   END PROCESS;
 
   PROCESS(clk, rstn)
   BEGIN
-    IF rstn = '0' then
+    IF rstn = '0' THEN
       shifting <= '0';
       SHIFTREG <= (OTHERS => '0');
       SYNC     <= '0';
       shiftcnt <= 0;
-    ELSIF clk'EVENT AND clk = '1' then
-      IF(SMP_CLK = '1' and SMP_CLK_R = '0') THEN
+      DOUT     <= '0';
+    ELSIF clk'EVENT AND clk = '1' THEN
+      DOUT <= SHIFTREG(datawidth-1);
+      IF(SMP_CLK = '1' AND SMP_CLK_R = '0') THEN
         SYNC     <= '1';
         shifting <= '1';
       ELSE
@@ -90,9 +91,10 @@ BEGIN
           shifting <= '0';
         END IF;
       END IF;
-      IF shifting = '1' then
+      IF shifting = '1' THEN
         shiftcnt <= shiftcnt + 1;
         SHIFTREG <= SHIFTREG (datawidth-2 DOWNTO 0) & '0';
+
       ELSE
         SHIFTREG <= INPUTREG;
         shiftcnt <= 0;
