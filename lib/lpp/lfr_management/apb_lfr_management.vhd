@@ -151,9 +151,6 @@ ARCHITECTURE Behavioral OF apb_lfr_management IS
   SIGNAL DAC_CFG       : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL DAC_CAL_EN_s  : STD_LOGIC;
   
-  SIGNAL HK_debug_mode : STD_LOGIC;
-  SIGNAL HK_sel_debug  : STD_LOGIC_VECTOR(1 DOWNTO 0);
-  
 BEGIN
 
   LFR_soft_rstn <= NOT r.LFR_soft_reset;
@@ -219,9 +216,7 @@ BEGIN
             Rdata(0)           <= r.ctrl;
             Rdata(1)           <= r.soft_reset;
             Rdata(2)           <= r.LFR_soft_reset;
-            Rdata(3)           <= HK_debug_mode;
-            Rdata(5 DOWNTO 4)  <= HK_sel_debug;
-            Rdata(31 DOWNTO 6) <= (OTHERS => '0');
+            Rdata(31 DOWNTO 3) <= (OTHERS => '0');
           WHEN ADDR_LFR_MANAGMENT_TIME_LOAD =>
             Rdata(30 DOWNTO 0) <= r.coarse_time_load(30 DOWNTO 0);
           WHEN ADDR_LFR_MANAGMENT_TIME_COARSE =>
@@ -267,8 +262,6 @@ BEGIN
               r.ctrl           <= apbi.pwdata(0);
               r.soft_reset     <= apbi.pwdata(1);
               r.LFR_soft_reset <= apbi.pwdata(2);
-              HK_debug_mode    <= apbi.pwdata(3);
-              HK_sel_debug     <= apbi.pwdata(5 DOWNTO 4);
             WHEN ADDR_LFR_MANAGMENT_TIME_LOAD =>
               r.coarse_time_load     <= apbi.pwdata(30 DOWNTO 0);
               coarsetime_reg_updated <= '1';
@@ -466,25 +459,13 @@ BEGIN
           CASE HK_sel_s IS
             WHEN "00" =>
               r.HK_temp_0 <= HK_sample;
-              IF HK_debug_mode = '1' THEN
-                HK_sel_s <= HK_sel_debug;
-              ELSE
-                HK_sel_s <= "01";
-              END IF;
+              HK_sel_s <= "01";
             WHEN "01" =>
               r.HK_temp_1 <= HK_sample;
-              IF HK_debug_mode = '1' THEN
-                HK_sel_s <= HK_sel_debug;
-              ELSE
-                HK_sel_s <= "10";
-              END IF;
+              HK_sel_s <= "10";
             WHEN "10" =>
               r.HK_temp_2 <= HK_sample;
-              IF HK_debug_mode = '1' THEN
-                HK_sel_s <= HK_sel_debug;
-              ELSE
-                HK_sel_s <= "00";
-              END IF;
+              HK_sel_s <= "00";
             WHEN OTHERS => NULL;
           END CASE;
         END IF;
