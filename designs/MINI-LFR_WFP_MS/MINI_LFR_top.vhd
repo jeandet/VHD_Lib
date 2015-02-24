@@ -388,6 +388,7 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
   apb_lfr_management_1 : apb_lfr_management
     GENERIC MAP (
+      tech             => apa3e,
       pindex           => 6,
       paddr            => 6,
       pmask            => 16#fff#,
@@ -402,7 +403,11 @@ BEGIN  -- beh
       apbo          => apbo_ext(6),
       HK_sample     => sample_hk,
       HK_val        => sample_val,
-      HK_sel        => HK_SEL, 
+      HK_sel        => HK_SEL,
+      DAC_SDO       => OPEN,
+      DAC_SCK       => OPEN,
+      DAC_SYNC      => OPEN,
+      DAC_CAL_EN    => OPEN,
       coarse_time   => coarse_time,
       fine_time     => fine_time,
       LFR_soft_rstn => LFR_soft_rstn
@@ -517,7 +522,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"00013A")  -- aa.bb.cc version
+      top_lfr_version        => X"00013F")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,

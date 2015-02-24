@@ -1,29 +1,30 @@
+#GRLIB=../..
 VHDLIB=../..
 SCRIPTSDIR=$(VHDLIB)/scripts/
 GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
-TOP=MINI_LFR_top
-BOARD=MINI-LFR
-include $(VHDLIB)/boards/$(BOARD)/Makefile.inc
+TOP=leon3mp
+BOARD=em-LeonLPP-A3PE3kL-v3-core1
+include $(GRLIB)/boards/$(BOARD)/Makefile.inc
 DEVICE=$(PART)-$(PACKAGE)$(SPEED)
-UCF=$(VHDLIB)/boards/$(BOARD)/$(TOP).ucf
-QSF=$(VHDLIB)/boards/$(BOARD)/$(TOP).qsf
+UCF=$(GRLIB)/boards/$(BOARD)/$(TOP).ucf
+QSF=$(GRLIB)/boards/$(BOARD)/$(TOP).qsf
 EFFORT=high
 XSTOPT=
 SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_constraint 0"
-VHDLSYNFILES= MINI_LFR_top.vhd 
-VHDLSIMFILES= testbench.vhd
+#VHDLSYNFILES=config.vhd ahbrom.vhd leon3mp.vhd
+VHDLSYNFILES=
+VHDLSIMFILES= tb.vhd 
 SIMTOP=testbench
-PDC=$(VHDLIB)/boards/$(BOARD)/default.pdc
-##SDC=$(VHDLIB)/boards/$(BOARD)/default.sdc
-##SDCFILE=$(VHDLIB)/boards/$(BOARD)/MINI_LFR_synthesis.sdc
-SDC=$(VHDLIB)/boards/$(BOARD)/MINI_LFR_place_and_route.sdc
-BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut
+#SDCFILE=$(GRLIB)/boards/$(BOARD)/synplify.sdc
+#SDC=$(GRLIB)/boards/$(BOARD)/leon3mp.sdc
+PDC=$(GRLIB)/boards/$(BOARD)/em-LeonLPP-A3PE3kL.pdc
+BITGEN=$(GRLIB)/boards/$(BOARD)/default.ut
 CLEAN=soft-clean
 
 TECHLIBS = proasic3e
 
 LIBSKIP = core1553bbc core1553brm core1553brt gr1553 corePCIF \
-	tmtc openchip hynix ihp gleichmann micron usbhc 
+	tmtc openchip hynix ihp gleichmann micron usbhc
 
 DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	pci grusbhc haps slink ascs pwm coremp7 spi ac97 \
@@ -32,18 +33,18 @@ DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	./general_purpose/lpp_balise \
 	./general_purpose/lpp_delay \
 	./lpp_bootloader \
+	./lpp_cna \
 	./lpp_uart \
 	./lpp_usb \
 	./dsp/lpp_fft_rtax \
-	./lpp_sim/CY7C1061DV33 \
 
-FILESKIP =i2cmst.vhd \
+FILESKIP = i2cmst.vhd \
 	APB_MULTI_DIODE.vhd \
-	APB_SIMPLE_DIODE.vhd \
+	APB_MULTI_DIODE.vhd \
 	Top_MatrixSpec.vhd \
 	APB_FFT.vhd \
-	CoreFFT_simu.vhd \
-	lpp_lfr_apbreg_simu.vhd
+	lpp_lfr_apbreg.vhd \
+	CoreFFT.vhd
 
 include $(GRLIB)/bin/Makefile
 include $(GRLIB)/software/leon3/Makefile
