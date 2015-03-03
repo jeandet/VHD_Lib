@@ -1,0 +1,124 @@
+set_io	clk49_152MHz		-pinname	314	-fixed	yes	-DIRECTION	Inout
+set_io	clk50MHz		-pinname	318	-fixed	yes	-DIRECTION	Inout
+set_io	reset			-pinname	128	-fixed	yes	-DIRECTION	Inout
+
+set_io	{address[0]}		-pinname	124	-fixed	yes	-DIRECTION	Inout
+set_io	{address[1]}		-pinname	156	-fixed	yes	-DIRECTION	Inout
+set_io	{address[2]}		-pinname	154	-fixed	yes	-DIRECTION	Inout
+set_io	{address[3]}		-pinname	160	-fixed	yes	-DIRECTION	Inout
+set_io	{address[4]}		-pinname	162	-fixed	yes	-DIRECTION	Inout
+set_io	{address[5]}		-pinname	165	-fixed	yes	-DIRECTION	Inout
+set_io	{address[6]}		-pinname	155	-fixed	yes	-DIRECTION	Inout
+set_io	{address[7]}		-pinname	127	-fixed	yes	-DIRECTION	Inout
+set_io	{address[8]}		-pinname	123	-fixed	yes	-DIRECTION	Inout
+set_io	{address[9]}		-pinname	137	-fixed	yes	-DIRECTION	Inout
+set_io	{address[10]}		-pinname	141	-fixed	yes	-DIRECTION	Inout
+set_io	{address[11]}		-pinname	166	-fixed	yes	-DIRECTION	Inout
+set_io	{address[12]}		-pinname	182	-fixed	yes	-DIRECTION	Inout
+set_io	{address[13]}		-pinname	167	-fixed	yes	-DIRECTION	Inout
+set_io	{address[14]}		-pinname	181	-fixed	yes	-DIRECTION	Inout
+set_io	{address[15]}		-pinname	171	-fixed	yes	-DIRECTION	Inout
+set_io	{address[16]}		-pinname	183	-fixed	yes	-DIRECTION	Inout
+set_io	{address[17]}		-pinname	161	-fixed	yes	-DIRECTION	Inout
+set_io	{address[18]}		-pinname	159	-fixed	yes	-DIRECTION	Inout
+
+set_io	{data[0]}		-pinname	103	-fixed	yes	-DIRECTION	Inout
+set_io	{data[1]}		-pinname	100	-fixed	yes	-DIRECTION	Inout
+set_io	{data[2]}		-pinname	99	-fixed	yes	-DIRECTION	Inout
+set_io	{data[3]}		-pinname	98	-fixed	yes	-DIRECTION	Inout
+set_io	{data[4]}		-pinname	97	-fixed	yes	-DIRECTION	Inout
+set_io	{data[5]}		-pinname	94	-fixed	yes	-DIRECTION	Inout
+set_io	{data[6]}		-pinname	93	-fixed	yes	-DIRECTION	Inout
+set_io	{data[7]}		-pinname	92	-fixed	yes	-DIRECTION	Inout
+set_io	{data[8]}		-pinname	82	-fixed	yes	-DIRECTION	Inout
+set_io	{data[9]}		-pinname	79	-fixed	yes	-DIRECTION	Inout
+set_io	{data[10]}		-pinname	78	-fixed	yes	-DIRECTION	Inout
+set_io	{data[11]}		-pinname	77	-fixed	yes	-DIRECTION	Inout
+set_io	{data[12]}		-pinname	71	-fixed	yes	-DIRECTION	Inout
+set_io	{data[13]}		-pinname	70	-fixed	yes	-DIRECTION	Inout
+set_io	{data[14]}		-pinname	67	-fixed	yes	-DIRECTION	Inout
+set_io	{data[15]}		-pinname	66	-fixed	yes	-DIRECTION	Inout
+set_io	{data[16]}		-pinname	246	-fixed	yes	-DIRECTION	Inout
+set_io	{data[17]}		-pinname	242	-fixed	yes	-DIRECTION	Inout
+set_io	{data[18]}		-pinname	241	-fixed	yes	-DIRECTION	Inout
+set_io	{data[19]}		-pinname	229	-fixed	yes	-DIRECTION	Inout
+set_io	{data[20]}		-pinname	228	-fixed	yes	-DIRECTION	Inout
+set_io	{data[21]}		-pinname	227	-fixed	yes	-DIRECTION	Inout
+set_io	{data[22]}		-pinname	224	-fixed	yes	-DIRECTION	Inout
+set_io	{data[23]}		-pinname	223	-fixed	yes	-DIRECTION	Inout
+set_io	{data[24]}		-pinname	206	-fixed	yes	-DIRECTION	Inout
+set_io	{data[25]}		-pinname	212	-fixed	yes	-DIRECTION	Inout
+set_io	{data[26]}		-pinname	207	-fixed	yes	-DIRECTION	Inout
+set_io	{data[27]}		-pinname	211	-fixed	yes	-DIRECTION	Inout
+set_io	{data[28]}		-pinname	205	-fixed	yes	-DIRECTION	Inout
+set_io	{data[29]}		-pinname	213	-fixed	yes	-DIRECTION	Inout
+set_io	{data[30]}		-pinname	202	-fixed	yes	-DIRECTION	Inout
+set_io	{data[31]}		-pinname	214	-fixed	yes	-DIRECTION	Inout
+
+set_io	nSRAM_MBE		-pinname	9	-fixed	yes	-DIRECTION	Inout
+set_io	nSRAM_E1		-pinname	20	-fixed	yes	-DIRECTION	Inout
+set_io	nSRAM_E2		-pinname	15	-fixed	yes	-DIRECTION	Inout
+set_io	nSRAM_SCRUB		-pinname	14	-fixed	yes	-DIRECTION	Inout
+set_io	nSRAM_W			-pinname	8	-fixed	yes	-DIRECTION	Inout
+set_io	nSRAM_G			-pinname	21	-fixed	yes	-DIRECTION	Inout
+set_io	nSRAM_BUSY		-pinname	24	-fixed	yes	-DIRECTION	Inout
+
+set_io	spw1_en			-pinname	31	-fixed	yes	-DIRECTION	Inout
+set_io	spw1_din		-pinname	300	-fixed	yes	-DIRECTION	Inout
+set_io	spw1_sin		-pinname	299	-fixed	yes	-DIRECTION	Inout
+set_io	spw1_dout		-pinname	303	-fixed	yes	-DIRECTION	Inout
+set_io	spw1_sout		-pinname	317	-fixed	yes	-DIRECTION	Inout
+
+set_io	spw2_en			-pinname	30	-fixed	yes	-DIRECTION	Inout
+set_io	spw2_din		-pinname	313	-fixed	yes	-DIRECTION	Inout
+set_io	spw2_sin		-pinname	304	-fixed	yes	-DIRECTION	Inout
+set_io	spw2_dout		-pinname	335	-fixed	yes	-DIRECTION	Inout
+set_io	spw2_sout		-pinname	330	-fixed	yes	-DIRECTION	Inout
+
+set_io	TAG1    		-pinname	195	-fixed	yes	-DIRECTION	Inout
+set_io	TAG2			-pinname	190	-fixed	yes	-DIRECTION	Inout
+set_io	TAG3			-pinname	189	-fixed	yes	-DIRECTION	Inout
+set_io	TAG4			-pinname	188	-fixed	yes	-DIRECTION	Inout
+#set_io	TAG5			-pinname	187	-fixed	yes	-DIRECTION	Inout
+#set_io	TAG6			-pinname	184	-fixed	yes	-DIRECTION	Inout
+#set_io TAG7			-pinname	200	-fixed	yes	-DIRECTION	Inout
+set_io	TAG8			-pinname	199	-fixed	yes	-DIRECTION	Inout
+#set_io	TAG9			-pinname	196	-fixed	yes	-DIRECTION	Inout
+
+set_io bias_fail_sw 		-pinname 	342 	-fixed	yes	-DIRECTION	Inout
+
+set_io	{ADC_OEB_bar_CH[0]}	-pinname	288	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_OEB_bar_CH[1]}	-pinname	287	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_OEB_bar_CH[2]}	-pinname	285	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_OEB_bar_CH[3]}	-pinname	286	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_OEB_bar_CH[4]}	-pinname	281	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_OEB_bar_CH[5]}	-pinname	332	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_OEB_bar_CH[6]}	-pinname	282	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_OEB_bar_CH[7]}	-pinname	280	-fixed	yes	-DIRECTION	Inout
+
+set_io	ADC_smpclk		-pinname	279	-fixed	yes	-DIRECTION	Inout
+
+set_io	HK_smpclk  		-pinname	172	-fixed	yes	-DIRECTION	Inout
+set_io	ADC_OEB_bar_HK 		-pinname	331	-fixed	yes	-DIRECTION	Inout
+set_io	{HK_SEL[0]}		-pinname	6	-fixed	yes	-DIRECTION	Inout
+set_io	{HK_SEL[1]}		-pinname	343	-fixed	yes	-DIRECTION	Inout
+
+set_io	{ADC_data[0]}		-pinname	251	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[1]}		-pinname	253	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[2]}		-pinname	257	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[3]}		-pinname	259	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[4]}		-pinname	252	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[5]}		-pinname	254	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[6]}		-pinname	258	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[7]}		-pinname	260	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[8]}		-pinname	270	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[9]}		-pinname	274	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[10]}		-pinname	276	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[11]}		-pinname	275	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[12]}		-pinname	273	-fixed	yes	-DIRECTION	Inout
+set_io	{ADC_data[13]}		-pinname	269	-fixed	yes	-DIRECTION	Inout
+
+set_io	DAC_SDO    		-pinname	341	-fixed	yes	-DIRECTION	Inout
+set_io	DAC_SCK    		-pinname	338	-fixed	yes	-DIRECTION	Inout
+set_io	DAC_SYNC   		-pinname	337	-fixed	yes	-DIRECTION	Inout
+set_io	DAC_CAL_EN 		-pinname	336	-fixed	yes	-DIRECTION	Inout
