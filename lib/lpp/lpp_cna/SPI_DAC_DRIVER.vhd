@@ -47,7 +47,6 @@ ARCHITECTURE behav OF SPI_DAC_DRIVER IS
   SIGNAL SMP_CLK_R  : STD_LOGIC                              := '0';
   SIGNAL shiftcnt   : INTEGER                                := 0;
   SIGNAL shifting   : STD_LOGIC                              := '0';
-  SIGNAL shifting_R : STD_LOGIC                              := '0';
 BEGIN
 
 
@@ -64,11 +63,9 @@ BEGIN
   PROCESS(clk, rstn)
   BEGIN
     IF rstn = '0' THEN
---      shifting_R <= '0';
       SMP_CLK_R <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN
       SMP_CLK_R <= SMP_CLK;
---      shifting_R <= shifting;
     END IF;
   END PROCESS;
 
@@ -103,5 +100,4 @@ BEGIN
   END PROCESS;
 
 END ARCHITECTURE behav;
-
 

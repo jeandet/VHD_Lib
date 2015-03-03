@@ -32,16 +32,16 @@ USE IEEE.NUMERIC_STD.ALL;
 
 
 PACKAGE general_purpose IS
-
+  
   COMPONENT general_counter
     GENERIC (
       CYCLIC          : STD_LOGIC;
-      NB_BITS_COUNTER : INTEGER);
+      NB_BITS_COUNTER : INTEGER;
+      RST_VALUE       : INTEGER);
     PORT (
       clk       : IN  STD_LOGIC;
       rstn      : IN  STD_LOGIC;
-      RST_VALUE : IN STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0);
-      MAX_VALUE : IN STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0);
+      MAX_VALUE : IN  STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0);
       set       : IN  STD_LOGIC;
       set_value : IN  STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0);
       add1      : IN  STD_LOGIC;

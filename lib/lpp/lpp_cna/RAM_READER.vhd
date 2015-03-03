@@ -44,7 +44,7 @@ end RAM_READER;
 architecture Behavioral of RAM_READER is
 CONSTANT interleaved_sz   : integer := dacresolution/(datawidth-dacresolution);
 
-signal ADDRESS_R             :  STD_LOGIC_VECTOR (abits-1 downto 0):=(others=>'0');
+signal ADDRESS_R             :  STD_LOGIC_VECTOR (abits-1 downto 0);--:=(others=>'0');
 signal SAMPLE_R              :  STD_LOGIC_VECTOR (dacresolution-1 downto 0):=(others=>'0');
 signal INTERLEAVED_SAMPLE_R  :  STD_LOGIC_VECTOR (dacresolution-1 downto 0):=(others=>'0');
 signal SMP_CLK_R             :  STD_LOGIC;

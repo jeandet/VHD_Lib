@@ -43,11 +43,12 @@ BEGIN  -- beh
   counter_1 : general_counter
     GENERIC MAP (
       CYCLIC          => '1',
-      NB_BITS_COUNTER => 9)
+      NB_BITS_COUNTER => 9,
+      RST_VALUE       => 0
+      )
     PORT MAP (
       clk       => clk,
       rstn      => rstn,
-      RST_VALUE => (OTHERS => '0'),
       MAX_VALUE => STD_LOGIC_VECTOR(to_unsigned(FIRST_DIVISION, 9)),  
       set       => tick,
       set_value => (OTHERS => '0'),
@@ -59,11 +60,12 @@ BEGIN  -- beh
   counter_2 : general_counter
     GENERIC MAP (
       CYCLIC          => '1',
-      NB_BITS_COUNTER => 16)
+      NB_BITS_COUNTER => 16,
+      RST_VALUE       => 0
+      )
     PORT MAP (
       clk       => clk,
       rstn      => rstn,
-      RST_VALUE => (OTHERS => '0'),
       MAX_VALUE => X"FFFF",
       set       => tick,
       set_value => (OTHERS => '0'),
@@ -90,4 +92,3 @@ BEGIN  -- beh
   END PROCESS;
   
 END beh;
-

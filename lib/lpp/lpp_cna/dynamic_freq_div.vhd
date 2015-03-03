@@ -43,7 +43,7 @@ architecture Behavioral of dynamic_freq_div is
 constant prescaller_reg_sz : integer := 2**PRESZ;
 constant PREMAX_max        : STD_LOGIC_VECTOR(PRESZ-1 downto 0):=(others => '1');
 signal cpt_reg             : std_logic_vector(CPTSZ-1 downto 0):=(others => '0');
-signal prescaller_reg      : std_logic_vector(prescaller_reg_sz-1 downto 0):=(others => '0');
+signal prescaller_reg      : std_logic_vector(prescaller_reg_sz-1 downto 0);--:=(others => '0');
 signal internal_clk        : std_logic:='0';
 signal internal_clk_reg    : std_logic:='0';
 signal clk_out_reg         : std_logic:='0';

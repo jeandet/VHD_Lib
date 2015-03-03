@@ -48,11 +48,11 @@ BEGIN  -- beh
   counter_1 : general_counter
     GENERIC MAP (
       CYCLIC => '1',
-      NB_BITS_COUNTER => 31)
+      NB_BITS_COUNTER => 31,
+      RST_VALUE => 0)
     PORT MAP (
       clk       => clk,
       rstn      => rstn,
-      RST_VALUE => (OTHERS => '0'),
       MAX_VALUE => "111" & X"FFFFFFF" ,
       set       => set_TCU,
       set_value => set_TCU_value(30 DOWNTO 0),
@@ -75,11 +75,12 @@ BEGIN  -- beh
   counter_2 : general_counter
     GENERIC MAP (
       CYCLIC          => '0',
-      NB_BITS_COUNTER => 6)
+      NB_BITS_COUNTER => 6,
+      RST_VALUE       => NB_SECOND_DESYNC
+      )
     PORT MAP (
       clk       => clk,
       rstn      => rstn,
-      RST_VALUE => STD_LOGIC_VECTOR(to_unsigned(NB_SECOND_DESYNC, 6)),
       MAX_VALUE => STD_LOGIC_VECTOR(to_unsigned(NB_SECOND_DESYNC, 6)),
       set       => set_synchronized,
       set_value => set_synchronized_value,
