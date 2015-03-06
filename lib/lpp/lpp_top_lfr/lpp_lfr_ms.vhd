@@ -41,7 +41,7 @@ ENTITY lpp_lfr_ms IS
     --
     sample_f2_wen   : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
     sample_f2_wdata : IN STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
-    sample_f2_time  : IN  STD_LOGIC_VECTOR(47 DOWNTO 0);
+    sample_f2_time  : IN STD_LOGIC_VECTOR(47 DOWNTO 0);
 
     ---------------------------------------------------------------------------
     -- DMA
@@ -201,6 +201,7 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL fifo_0_ready              : STD_LOGIC;
   SIGNAL fifo_1_ready              : STD_LOGIC;
   SIGNAL fifo_ongoing              : STD_LOGIC;
+  SIGNAL fifo_ongoing_reg          : STD_LOGIC;
 
   SIGNAL FSM_DMA_fifo_ren    : STD_LOGIC;
   SIGNAL FSM_DMA_fifo_empty  : STD_LOGIC;
@@ -998,7 +999,9 @@ BEGIN
       fifo_0_ready <= '0';
       fifo_1_ready <= '0';
       fifo_ongoing <= '0';
+      fifo_ongoing_reg <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN
+      fifo_ongoing_reg <= fifo_ongoing;
       IF fifo_0_ready = '1' AND MEM_OUT_SM_Empty(0) = '1' THEN
         fifo_ongoing <= '1';
         fifo_0_ready <= '0';
@@ -1031,7 +1034,7 @@ BEGIN
   FSM_DMA_fifo_status <= status_component_fifo_0 WHEN fifo_ongoing = '0' ELSE
                          status_component_fifo_1;
 
-  FSM_DMA_fifo_data <= MEM_OUT_SM_Data_out(31 DOWNTO 0) WHEN fifo_ongoing = '0' ELSE
+  FSM_DMA_fifo_data <= MEM_OUT_SM_Data_out(31 DOWNTO 0) WHEN fifo_ongoing_reg = '0' ELSE
                        MEM_OUT_SM_Data_out(63 DOWNTO 32);
 
     

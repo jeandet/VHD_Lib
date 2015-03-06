@@ -52,5 +52,6 @@ vsim work.testbench \
 -goutput_file_name_f1=$outputfile_f1 -ginput_file_name_f1=$inputfile_f1  \
 -goutput_file_name_f2=$outputfile_f2 -ginput_file_name_f2=$inputfile_f2 
 when -label end_of_simulation {end_of_sim == '1'} {echo "End of simulation"; exit ;}
+
 run -all
 exit

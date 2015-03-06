@@ -62,19 +62,24 @@ ARCHITECTURE beh OF MS_calculation IS
   --SIGNAL res_wen_reg3 : STD_LOGIC;
 
   SIGNAL fifo_in_ren_s : STD_LOGIC_VECTOR(1 DOWNTO 0);
+
+
+  SIGNAL fifo_in_empty_reg : STD_LOGIC_VECTOR(1 DOWNTO 0);
+
   
 BEGIN
 
 
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      fifo_in_ren <= "11";
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      fifo_in_ren <= fifo_in_ren_s;
-    END IF;
-  END PROCESS;
+  --PROCESS (clk, rstn)
+  --BEGIN  -- PROCESS
+  --  IF rstn = '0' THEN                  -- asynchronous reset (active low)
+  --    fifo_in_ren <= "11";
+  --  ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+  --    fifo_in_ren <= fifo_in_ren_s;
+  --  END IF;
+  --END PROCESS;
   
+  fifo_in_ren <= fifo_in_ren_s;
   
   PROCESS (clk, rstn)
   BEGIN
@@ -89,6 +94,7 @@ BEGIN
       select_op1  <= select_R0(0);
       select_op2  <= select_R0;
       res_wen <= '1';
+      fifo_in_empty_reg <= "11";
       
     ELSIF clk'EVENT AND clk = '1' THEN
       select_ctrl <= select_ctrl_NOP;
@@ -97,6 +103,7 @@ BEGIN
       fifo_in_ren_s <= "11";
       res_wen <= '1';
       correlation_done <= '0';
+      fifo_in_empty_reg <= fifo_in_empty;
       CASE state IS
         WHEN IDLE =>
           IF correlation_start = '1' THEN
@@ -106,7 +113,7 @@ BEGIN
               ELSE
                 correlation_begin <= '1';
                 state       <= S1a;
-                fifo_in_ren_s <= "10";
+                --fifo_in_ren_s <= "10";
               END IF;
             ELSE
               IF fifo_out_full = '1' THEN
@@ -114,7 +121,7 @@ BEGIN
               ELSE
                 correlation_begin <= '1';
                 state       <= S1;
-                fifo_in_ren_s <= "00";
+                --fifo_in_ren_s <= "00";
               END IF;
             END IF;
           END IF;
@@ -126,7 +133,7 @@ BEGIN
           IF fifo_out_full = '0' THEN
             correlation_begin <= '1';
             state       <= S1;
-            fifo_in_ren_s <= "00";
+            --fifo_in_ren_s <= "00";
           END IF;
         WHEN S1 =>
           select_ctrl <= select_ctrl_MULT;
@@ -144,8 +151,9 @@ BEGIN
         WHEN S3 =>
           select_ctrl <= select_ctrl_MULT;
           --ALU_CTRL    <= ALU_CTRL_MULT;
-          select_op1  <= select_I0(0);
-          select_op2  <= select_R1;
+          select_op1    <= select_I0(0);
+          select_op2    <= select_R1;
+          fifo_in_ren_s <= fifo_in_empty;
           state <= S4;
         WHEN S4 =>
           select_ctrl <= select_ctrl_MACn;
@@ -155,7 +163,7 @@ BEGIN
           res_wen     <= '0';
           IF fifo_in_empty = "00" THEN
             state       <= S1;
-            fifo_in_ren_s <= "00";
+--            fifo_in_ren_s <= "00";
           ELSE
             correlation_done <= '1';
             state <= IDLE;
@@ -170,13 +178,14 @@ BEGIN
           IF fifo_out_full = '0' THEN
             correlation_begin <= '1';
             state               <= S1a;
-            fifo_in_ren_s         <= "10";
+            --fifo_in_ren_s         <= "10";
           END IF;
         WHEN S1a =>
           select_ctrl <= select_ctrl_MULT;
           --ALU_CTRL    <= ALU_CTRL_MULT;
           select_op1  <= select_R0(0);
           select_op2  <= select_R0;
+          fifo_in_ren_s(0) <= fifo_in_empty(0);
           state <= S2a;
         WHEN S2a =>
           select_ctrl <= select_ctrl_MAC;
@@ -186,7 +195,7 @@ BEGIN
           res_wen     <= '0';
           IF fifo_in_empty(0) = '0' THEN
             state       <= S1a;
-            fifo_in_ren_s <= "10";
+            --fifo_in_ren_s <= "10";
           ELSE
             correlation_done <= '1';
             state <= IDLE;

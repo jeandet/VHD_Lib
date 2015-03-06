@@ -43,6 +43,7 @@ ARCHITECTURE beh OF data_write_with_burstCounter IS
   SIGNAL data_ren_s : STD_LOGIC;
   SIGNAL data_s : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL data_in_val : STD_LOGIC;
+
   
 BEGIN 
 
@@ -52,6 +53,7 @@ BEGIN
       ren_counter <= 0;
       data_ren_s <= '1';
       data_s <= (OTHERS => '0');
+      data_in_val <= '0';
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
       data_s <= data;
       data_ren_s <= '1';
@@ -61,11 +63,11 @@ BEGIN
       IF ren_counter > 0 THEN
         ren_counter <= ren_counter - 1;
         data_ren_s <= '0';
-      END IF;      
+      END IF;
+      data_in_val <= NOT data_ren_s;
     END IF;
   END PROCESS;
   
-  data_in_val <= NOT data_ren_s;
   data_ren    <= data_ren_s;
   
   data_write_1: data_write
@@ -75,7 +77,7 @@ BEGIN
     PORT MAP (
       clk              => clk,
       data_in_val      => data_in_val,
-      data             => data_s,
+      data             => data,
       close_file       => close_file);
   
 END beh;

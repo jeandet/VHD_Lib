@@ -103,6 +103,9 @@ ARCHITECTURE behav OF testbench IS
   SIGNAL start_date   : STD_LOGIC_VECTOR(30 DOWNTO 0);
   SIGNAL coarse_time  : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL fine_time    : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL sample_f0_time : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_f1_time : STD_LOGIC_VECTOR(47 DOWNTO 0);
+  SIGNAL sample_f2_time : STD_LOGIC_VECTOR(47 DOWNTO 0);
   SIGNAL time_counter : INTEGER;
 
   SIGNAL new_fine_time     : STD_LOGIC := '0';
@@ -367,6 +370,10 @@ BEGIN
   sample_f1_wen_v <= sample_f1_wen & sample_f1_wen & sample_f1_wen & sample_f1_wen & sample_f1_wen;
   sample_f2_wen_v <= sample_f2_wen & sample_f2_wen & sample_f2_wen & sample_f2_wen & sample_f2_wen;
 
+  sample_f0_time <= coarse_time & fine_time;
+  sample_f1_time <= coarse_time & fine_time;
+  sample_f2_time <= coarse_time & fine_time;
+  
   -----------------------------------------------------------------------------
   -- DUT
   -----------------------------------------------------------------------------
@@ -383,17 +390,20 @@ BEGIN
       -----------------------------------------------------------------------------
       start_date  => start_date,
       coarse_time => coarse_time,
-      fine_time   => fine_time,
+--      fine_time   => fine_time,
 
       -------------------------------------------------------------------------
       -- DATA IN
       -------------------------------------------------------------------------
       sample_f0_wen   => sample_f0_wen_v,  -- 
       sample_f0_wdata => sample_f0_wdata,
+      sample_f0_time  => sample_f0_time,
       sample_f1_wen   => sample_f1_wen_v,
       sample_f1_wdata => sample_f1_wdata,
+      sample_f1_time  => sample_f1_time,
       sample_f2_wen   => sample_f2_wen_v,
       sample_f2_wdata => sample_f2_wdata,
+      sample_f2_time  => sample_f2_time,
 
       -------------------------------------------------------------------------
       -- DMA OUT
