@@ -136,9 +136,9 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   -----------------------------------------------------------------------------
   -- FSM LOAD FFT
   -----------------------------------------------------------------------------
-  TYPE   fsm_load_FFT IS (IDLE, FIFO_1, FIFO_2, FIFO_3, FIFO_4, FIFO_5);
+  TYPE   fsm_load_FFT IS (IDLE, FIFO_1, FIFO_2, FIFO_3, FIFO_4, FIFO_5, WAIT_STATE, WAIT_STATE_2);
   SIGNAL state_fsm_load_FFT      : fsm_load_FFT;
---  SIGNAL next_state_fsm_load_FFT : fsm_load_FFT;
+  SIGNAL next_state_fsm_load_FFT : fsm_load_FFT;
   SIGNAL select_fifo     : STD_LOGIC_VECTOR(2 DOWNTO 0);
   SIGNAL select_fifo_reg : STD_LOGIC_VECTOR(2 DOWNTO 0);
 
@@ -146,6 +146,7 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL sample_load    : STD_LOGIC;
   SIGNAL sample_valid   : STD_LOGIC;
   SIGNAL sample_valid_r : STD_LOGIC;
+  SIGNAL sample_valid_delay : STD_LOGIC;
   SIGNAL sample_data    : STD_LOGIC_VECTOR(15 DOWNTO 0);
 
 
@@ -157,6 +158,7 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL fft_data_im              : STD_LOGIC_VECTOR(15 DOWNTO 0);
   SIGNAL fft_data_re              : STD_LOGIC_VECTOR(15 DOWNTO 0);
   SIGNAL fft_data_valid           : STD_LOGIC;
+  SIGNAL fft_data_valid_pre       : STD_LOGIC;
   SIGNAL fft_ready                : STD_LOGIC;
   -----------------------------------------------------------------------------
 --  SIGNAL fft_linker_ReUse    : STD_LOGIC_VECTOR(4 DOWNTO 0);
@@ -597,40 +599,45 @@ BEGIN
           --sample_valid <= '0';
           sample_ren_s <= (OTHERS => '1');
           IF sample_full = "11111" AND sample_load = '1' THEN
+            sample_ren_s       <= "11111";
             state_fsm_load_FFT <= FIFO_1;
             status_MS_input    <= status_channel;
-            select_fifo <= "000";
+            select_fifo        <= "000";
           END IF;
           
         WHEN FIFO_1 =>
           sample_ren_s <= "1111" & NOT(sample_load);
           IF sample_empty(0) = '1' THEN
-            sample_ren_s       <= (OTHERS => '1');
-            state_fsm_load_FFT <= FIFO_2;
+            sample_ren_s            <= "11111";
+            state_fsm_load_FFT      <= WAIT_STATE;
+            next_state_fsm_load_FFT <= FIFO_2;
             select_fifo <= "001";
           END IF;
           
         WHEN FIFO_2 =>
           sample_ren_s <= "111" & NOT(sample_load) & '1';
           IF sample_empty(1) = '1' THEN
-            sample_ren_s       <= (OTHERS => '1');
-            state_fsm_load_FFT <= FIFO_3;
+            sample_ren_s            <= "11111";
+            state_fsm_load_FFT      <= WAIT_STATE;
+            next_state_fsm_load_FFT <= FIFO_3;
             select_fifo <= "010";
           END IF;
           
         WHEN FIFO_3 =>
           sample_ren_s <= "11" & NOT(sample_load) & "11";
           IF sample_empty(2) = '1' THEN
-            sample_ren_s       <= (OTHERS => '1');
-            state_fsm_load_FFT <= FIFO_4;
+            sample_ren_s            <= "11111";
+            state_fsm_load_FFT      <= WAIT_STATE;
+            next_state_fsm_load_FFT  <= FIFO_4;
             select_fifo <= "011";
           END IF;
           
         WHEN FIFO_4 =>
           sample_ren_s <= '1' & NOT(sample_load) & "111";
           IF sample_empty(3) = '1' THEN
-            sample_ren_s       <= (OTHERS => '1');
-            state_fsm_load_FFT <= FIFO_5;
+            sample_ren_s            <= "11111";
+            state_fsm_load_FFT      <= WAIT_STATE;
+            next_state_fsm_load_FFT <= FIFO_5;
             select_fifo <= "100";
           END IF;
           
@@ -641,8 +648,30 @@ BEGIN
             state_fsm_load_FFT <= IDLE;
             select_fifo <= "000";
           END IF;
+
+        WHEN WAIT_STATE =>
+          sample_ren_s       <= (OTHERS => '1');
+          IF sample_load = '1' THEN
+            state_fsm_load_FFT <= WAIT_STATE_2 ;
+          END IF;
+
+        WHEN WAIT_STATE_2 =>
+          sample_ren_s       <= (OTHERS => '1');
+          IF fft_data_valid = '0' AND fft_data_valid_pre = '1' THEN
+            state_fsm_load_FFT <= next_state_fsm_load_FFT;
+          END IF;
+          
         WHEN OTHERS => NULL;
       END CASE;
+    END IF;
+  END PROCESS;
+
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS
+    IF rstn = '0' THEN                    -- asynchronous reset (active low)
+      fft_data_valid_pre <= '0';
+    ELSIF clk'event AND clk = '1' THEN    -- rising clock edge
+      fft_data_valid_pre <= fft_data_valid;
     END IF;
   END PROCESS;
 
