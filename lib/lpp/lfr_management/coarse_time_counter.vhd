@@ -39,7 +39,9 @@ ARCHITECTURE beh OF coarse_time_counter IS
   SIGNAL set_synchronized       : STD_LOGIC;
   SIGNAL set_synchronized_value : STD_LOGIC_VECTOR(5 DOWNTO 0);
   
-  --CONSTANT NB_SECOND_DESYNC : INTEGER := 4; -- TODO : 60 
+  --CONSTANT NB_SECOND_DESYNC : INTEGER := 4; -- TODO : 60 ;
+  SIGNAL set_TCU_reg       :  STD_LOGIC;
+  
 BEGIN  -- beh
 
   -----------------------------------------------------------------------------
@@ -54,7 +56,7 @@ BEGIN  -- beh
       clk       => clk,
       rstn      => rstn,
       MAX_VALUE => "111" & X"FFFFFFF" ,
-      set       => set_TCU,
+      set       => set_TCU_reg,
       set_value => set_TCU_value(30 DOWNTO 0),
       add1      => CT_add1,
       counter   => coarse_time(30 DOWNTO 0));
@@ -98,12 +100,24 @@ BEGIN  -- beh
       coarse_time_31_reg <= '0';
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
       coarse_time_31_reg <= coarse_time_31;
-      IF set_TCU = '1' OR CT_add1 = '1' THEN
+      IF set_TCU_reg = '1' OR CT_add1 = '1' THEN
         coarse_time_new_counter <= '1';
       ELSE
         coarse_time_new_counter <= '0';
       END IF;
     END IF;
   END PROCESS;
+
+  -----------------------------------------------------------------------------
+  -- Just to try to limit the constraint
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS
+    IF rstn = '0' THEN                  -- asynchronous reset (active low)
+      set_TCU_reg <= '0';
+    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      set_TCU_reg <= set_TCU;
+    END IF;
+  END PROCESS;  
+  -----------------------------------------------------------------------------
 
 END beh;

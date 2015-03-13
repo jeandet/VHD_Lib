@@ -146,7 +146,6 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms IS
   SIGNAL sample_load    : STD_LOGIC;
   SIGNAL sample_valid   : STD_LOGIC;
   SIGNAL sample_valid_r : STD_LOGIC;
-  SIGNAL sample_valid_delay : STD_LOGIC;
   SIGNAL sample_data    : STD_LOGIC_VECTOR(15 DOWNTO 0);
 
 
