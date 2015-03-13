@@ -185,18 +185,18 @@ add wave -noupdate -expand -group FFT -expand -group IN -format Analog-Step -hei
 add wave -noupdate -expand -group FFT -expand -group IN /testbench/lpp_lfr_ms_1/lpp_lfr_ms_FFT_1/sample_load
 add wave -noupdate -expand -group FFT -expand -group IN /testbench/lpp_lfr_ms_1/lpp_lfr_ms_FFT_1/fft_read
 add wave -noupdate -expand -group FFT -expand -group IN /testbench/lpp_lfr_ms_1/lpp_lfr_ms_FFT_1/sample_valid
-add wave -noupdate -expand -group FFT -expand -group OUT -radix decimal /testbench/lpp_lfr_ms_1/lpp_lfr_ms_FFT_1/fft_data_im
-add wave -noupdate -expand -group FFT -expand -group OUT -radix decimal /testbench/lpp_lfr_ms_1/lpp_lfr_ms_FFT_1/fft_data_re
+add wave -noupdate -expand -group FFT -expand -group OUT -format Analog-Step -height 74 -max 17.0 -min -17.0 -radix decimal /testbench/lpp_lfr_ms_1/lpp_lfr_ms_FFT_1/fft_data_im
+add wave -noupdate -expand -group FFT -expand -group OUT -format Analog-Step -height 74 -max 4660.0 -min -1.0 -radix decimal /testbench/lpp_lfr_ms_1/lpp_lfr_ms_FFT_1/fft_data_re
 add wave -noupdate -expand -group FFT -expand -group OUT /testbench/lpp_lfr_ms_1/lpp_lfr_ms_FFT_1/fft_data_valid
 add wave -noupdate /testbench/lpp_lfr_ms_1/sample_valid
 add wave -noupdate /testbench/lpp_lfr_ms_1/sample_valid_delay
 add wave -noupdate /testbench/lpp_lfr_ms_1/sample_valid_r
 add wave -noupdate /testbench/lpp_lfr_ms_1/state_fsm_load_FFT
-add wave -noupdate -expand /testbench/lpp_lfr_ms_1/sample_f0_A_ren
+add wave -noupdate /testbench/lpp_lfr_ms_1/sample_f0_A_ren
 add wave -noupdate /testbench/lpp_lfr_ms_1/sample_f0_B_ren
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {WDATA_1 {10541340000 ps} 1} {WDATA_2 {10541500000 ps} 1} {WDATA_8 {10542460000 ps} 1} {WDATA_16 {10543740000 ps} 1} {{Cursor 9} {10490580000 ps} 0} {{Cursor 10} {6346220000 ps} 0}
-quietly wave cursor active 5
+WaveRestoreCursors {WDATA_1 {10541340000 ps} 1} {WDATA_2 {10541500000 ps} 1} {WDATA_8 {10542460000 ps} 1} {WDATA_16 {10543740000 ps} 1} {{Cursor 9} {91072272990 ps} 0} {{Cursor 10} {62824940000 ps} 0} {{Cursor 7} {62825020000 ps} 0}
+quietly wave cursor active 7
 configure wave -namecolwidth 573
 configure wave -valuecolwidth 108
 configure wave -justifyvalue left
@@ -211,4 +211,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {10489250172 ps} {10491702980 ps}
+WaveRestoreZoom {62467271961 ps} {63182321178 ps}

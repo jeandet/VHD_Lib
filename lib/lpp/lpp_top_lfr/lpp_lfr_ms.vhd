@@ -643,8 +643,10 @@ BEGIN
         WHEN FIFO_5 =>
           sample_ren_s <= NOT(sample_load) & "1111";
           IF sample_empty(4) = '1' THEN
-            sample_ren_s       <= (OTHERS => '1');
-            state_fsm_load_FFT <= IDLE;
+            sample_ren_s            <= (OTHERS => '1');
+            state_fsm_load_FFT      <= WAIT_STATE;
+            next_state_fsm_load_FFT <= IDLE;
+            --state_fsm_load_FFT <= IDLE;
             select_fifo <= "000";
           END IF;
 
