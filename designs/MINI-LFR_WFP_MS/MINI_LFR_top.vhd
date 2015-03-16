@@ -185,6 +185,11 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   SIGNAL rstn_25_d2 : STD_LOGIC;
   SIGNAL rstn_25_d3 : STD_LOGIC;
 
+  SIGNAL rstn_24    : STD_LOGIC;
+  SIGNAL rstn_24_d1 : STD_LOGIC;
+  SIGNAL rstn_24_d2 : STD_LOGIC;
+  SIGNAL rstn_24_d3 : STD_LOGIC;
+
   SIGNAL rstn_50    : STD_LOGIC;
   SIGNAL rstn_50_d1 : STD_LOGIC;
   SIGNAL rstn_50_d2 : STD_LOGIC;
@@ -198,7 +203,7 @@ ARCHITECTURE beh OF MINI_LFR_top IS
 
   --
   SIGNAL sample_hk : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL HK_SEL    : STD_LOGIC_VECTOR( 1 DOWNTO 0);
+  SIGNAL HK_SEL    : STD_LOGIC_VECTOR(1 DOWNTO 0);
   
 BEGIN  -- beh
 
@@ -272,9 +277,17 @@ BEGIN  -- beh
   PROCESS (clk_49, reset)
   BEGIN  -- PROCESS
     IF reset = '0' THEN                 -- asynchronous reset (active low)
-      clk_24 <= '0';
+      clk_24     <= '0';
+      rstn_24_d1 <= '0';
+      rstn_24_d2 <= '0';
+      rstn_24_d3 <= '0';
+      rstn_24    <= '0';
     ELSIF clk_49'EVENT AND clk_49 = '1' THEN  -- rising clock edge
-      clk_24 <= NOT clk_24;
+      clk_24     <= NOT clk_24;
+      rstn_24_d1 <= '1';
+      rstn_24_d2 <= rstn_24_d1;
+      rstn_24_d3 <= rstn_24_d2;
+      rstn_24    <= rstn_24_d3;
     END IF;
   END PROCESS;
 
@@ -315,9 +328,9 @@ BEGIN  -- beh
     END IF;
   END PROCESS;
 
-  PROCESS (clk_24, rstn_25)
+  PROCESS (clk_24, rstn_24)
   BEGIN  -- PROCESS
-    IF rstn_25 = '0' THEN               -- asynchronous reset (active low)
+    IF rstn_24 = '0' THEN               -- asynchronous reset (active low)
       I00_s <= '0';
     ELSIF clk_24'EVENT AND clk_24 = '1' THEN  -- rising clock edge
       I00_s <= NOT I00_s;
@@ -331,56 +344,56 @@ BEGIN  -- beh
   nDCD2 <= '1';
 
   --
-  
+
   leon3_soc_1 : leon3_soc
     GENERIC MAP (
-      fabtech         => apa3e,
-      memtech         => apa3e,
-      padtech         => inferred,
-      clktech         => inferred,
-      disas           => 0,
-      dbguart         => 0,
-      pclow           => 2,
-      clk_freq        => 25000,
-      IS_RADHARD      => 0,
-      NB_CPU          => 1,
-      ENABLE_FPU      => 1,
-      FPU_NETLIST     => 0,
-      ENABLE_DSU      => 1,
-      ENABLE_AHB_UART => 1,
-      ENABLE_APB_UART => 1,
-      ENABLE_IRQMP    => 1,
-      ENABLE_GPT      => 1,
-      NB_AHB_MASTER   => NB_AHB_MASTER,
-      NB_AHB_SLAVE    => NB_AHB_SLAVE,
-      NB_APB_SLAVE    => NB_APB_SLAVE,
-      ADDRESS_SIZE    => 20,
+      fabtech           => apa3e,
+      memtech           => apa3e,
+      padtech           => inferred,
+      clktech           => inferred,
+      disas             => 0,
+      dbguart           => 0,
+      pclow             => 2,
+      clk_freq          => 25000,
+      IS_RADHARD        => 0,
+      NB_CPU            => 1,
+      ENABLE_FPU        => 1,
+      FPU_NETLIST       => 0,
+      ENABLE_DSU        => 1,
+      ENABLE_AHB_UART   => 1,
+      ENABLE_APB_UART   => 1,
+      ENABLE_IRQMP      => 1,
+      ENABLE_GPT        => 1,
+      NB_AHB_MASTER     => NB_AHB_MASTER,
+      NB_AHB_SLAVE      => NB_AHB_SLAVE,
+      NB_APB_SLAVE      => NB_APB_SLAVE,
+      ADDRESS_SIZE      => 20,
       USES_IAP_MEMCTRLR => 0)
     PORT MAP (
-      clk       => clk_25,
-      reset     => rstn_25,
-      errorn    => errorn,
-      ahbrxd    => TXD1,
-      ahbtxd    => RXD1,
-      urxd1     => TXD2,
-      utxd1     => RXD2,
-      address   => SRAM_A,
-      data      => SRAM_DQ,
-      nSRAM_BE0 => SRAM_nBE(0),
-      nSRAM_BE1 => SRAM_nBE(1),
-      nSRAM_BE2 => SRAM_nBE(2),
-      nSRAM_BE3 => SRAM_nBE(3),
-      nSRAM_WE  => SRAM_nWE,
-      nSRAM_CE  => SRAM_CE_s,
-      nSRAM_OE  => SRAM_nOE,
+      clk         => clk_25,
+      reset       => rstn_25,
+      errorn      => errorn,
+      ahbrxd      => TXD1,
+      ahbtxd      => RXD1,
+      urxd1       => TXD2,
+      utxd1       => RXD2,
+      address     => SRAM_A,
+      data        => SRAM_DQ,
+      nSRAM_BE0   => SRAM_nBE(0),
+      nSRAM_BE1   => SRAM_nBE(1),
+      nSRAM_BE2   => SRAM_nBE(2),
+      nSRAM_BE3   => SRAM_nBE(3),
+      nSRAM_WE    => SRAM_nWE,
+      nSRAM_CE    => SRAM_CE_s,
+      nSRAM_OE    => SRAM_nOE,
       nSRAM_READY => '0',
       SRAM_MBE    => OPEN,
-      apbi_ext   => apbi_ext,
-      apbo_ext   => apbo_ext,
-      ahbi_s_ext => ahbi_s_ext,
-      ahbo_s_ext => ahbo_s_ext,
-      ahbi_m_ext => ahbi_m_ext,
-      ahbo_m_ext => ahbo_m_ext);
+      apbi_ext    => apbi_ext,
+      apbo_ext    => apbo_ext,
+      ahbi_s_ext  => ahbi_s_ext,
+      ahbo_s_ext  => ahbo_s_ext,
+      ahbi_m_ext  => ahbi_m_ext,
+      ahbo_m_ext  => ahbo_m_ext);
 
   SRAM_CE <= SRAM_CE_s(0);
 -------------------------------------------------------------------------------
@@ -392,25 +405,26 @@ BEGIN  -- beh
       pindex           => 6,
       paddr            => 6,
       pmask            => 16#fff#,
-      FIRST_DIVISION   => 374,  -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
+      FIRST_DIVISION   => 374,      -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
       NB_SECOND_DESYNC => 60)  -- 60 secondes of desynchronization before CoarseTime's MSB is Set
     PORT MAP (
-      clk25MHz      => clk_25,
-      clk24_576MHz  => clk_24,          -- 49.152MHz/2
-      resetn        => rstn_25,
-      grspw_tick    => swno.tickout,
-      apbi          => apbi_ext,
-      apbo          => apbo_ext(6),
-      HK_sample     => sample_hk,
-      HK_val        => sample_val,
-      HK_sel        => HK_SEL,
-      DAC_SDO       => OPEN,
-      DAC_SCK       => OPEN,
-      DAC_SYNC      => OPEN,
-      DAC_CAL_EN    => OPEN,
-      coarse_time   => coarse_time,
-      fine_time     => fine_time,
-      LFR_soft_rstn => LFR_soft_rstn
+      clk25MHz         => clk_25,
+      resetn_25MHz     => rstn_25,      --      TODO
+      clk24_576MHz     => clk_24,       -- 49.152MHz/2
+      resetn_24_576MHz => rstn_24,      --      TODO
+      grspw_tick       => swno.tickout,
+      apbi             => apbi_ext,
+      apbo             => apbo_ext(6),
+      HK_sample        => sample_hk,
+      HK_val           => sample_val,
+      HK_sel           => HK_SEL,
+      DAC_SDO          => OPEN,
+      DAC_SCK          => OPEN,
+      DAC_SYNC         => OPEN,
+      DAC_CAL_EN       => OPEN,
+      coarse_time      => coarse_time,
+      fine_time        => fine_time,
+      LFR_soft_rstn    => LFR_soft_rstn
       );
 
 -----------------------------------------------------------------------
@@ -522,7 +536,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000143")  -- aa.bb.cc version
+      top_lfr_version        => X"000144")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
@@ -566,7 +580,7 @@ BEGIN  -- beh
     PORT MAP (
       -- CONV
       cnv_clk    => clk_24,
-      cnv_rstn   => rstn_25,
+      cnv_rstn   => rstn_24,
       cnv        => ADC_nCS_sig,
       -- DATA
       clk        => clk_25,
@@ -589,7 +603,7 @@ BEGIN  -- beh
                "0010001000100010" WHEN HK_SEL = "01" ELSE
                "0100010001000100" WHEN HK_SEL = "10" ELSE
                (OTHERS => '0');
-  
+
 
 ----------------------------------------------------------------------
 ---  GPIO  -----------------------------------------------------------

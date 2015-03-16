@@ -38,22 +38,23 @@ PACKAGE lpp_lfr_management IS
       FIRST_DIVISION   : INTEGER;
       NB_SECOND_DESYNC : INTEGER);
     PORT (
-      clk25MHz      : IN  STD_LOGIC;
-      clk24_576MHz  : IN  STD_LOGIC;
-      resetn        : IN  STD_LOGIC;
-      grspw_tick    : IN  STD_LOGIC;
-      apbi          : IN  apb_slv_in_type;
-      apbo          : OUT apb_slv_out_type;
-      HK_sample     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-      HK_val        : IN  STD_LOGIC;
-      HK_sel        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-      DAC_SDO    : OUT STD_LOGIC;
-      DAC_SCK    : OUT STD_LOGIC;
-      DAC_SYNC   : OUT STD_LOGIC;
-      DAC_CAL_EN : OUT STD_LOGIC;
-      coarse_time   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      fine_time     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-      LFR_soft_rstn : OUT STD_LOGIC);
+      clk25MHz         : IN  STD_LOGIC;
+      resetn_25MHz     : IN  STD_LOGIC;
+      clk24_576MHz     : IN  STD_LOGIC;
+      resetn_24_576MHz : IN  STD_LOGIC;
+      grspw_tick       : IN  STD_LOGIC;
+      apbi             : IN  apb_slv_in_type;
+      apbo             : OUT apb_slv_out_type;
+      HK_sample        : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+      HK_val           : IN  STD_LOGIC;
+      HK_sel           : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+      DAC_SDO          : OUT STD_LOGIC;
+      DAC_SCK          : OUT STD_LOGIC;
+      DAC_SYNC         : OUT STD_LOGIC;
+      DAC_CAL_EN       : OUT STD_LOGIC;
+      coarse_time      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      fine_time        : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      LFR_soft_rstn    : OUT STD_LOGIC);
   END COMPONENT;
 
   COMPONENT lfr_time_management
@@ -74,7 +75,7 @@ PACKAGE lpp_lfr_management IS
 
   COMPONENT coarse_time_counter
     GENERIC (
-      NB_SECOND_DESYNC : INTEGER );
+      NB_SECOND_DESYNC : INTEGER);
     PORT (
       clk             : IN  STD_LOGIC;
       rstn            : IN  STD_LOGIC;
@@ -91,8 +92,8 @@ PACKAGE lpp_lfr_management IS
 
   COMPONENT fine_time_counter
     GENERIC (
-      WAITING_TIME : STD_LOGIC_VECTOR(15 DOWNTO 0);
-      FIRST_DIVISION : INTEGER );
+      WAITING_TIME   : STD_LOGIC_VECTOR(15 DOWNTO 0);
+      FIRST_DIVISION : INTEGER);
     PORT (
       clk            : IN  STD_LOGIC;
       rstn           : IN  STD_LOGIC;

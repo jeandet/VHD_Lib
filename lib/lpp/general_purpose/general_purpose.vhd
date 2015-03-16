@@ -366,15 +366,27 @@ Constant CLR_MAC_V0 : std_logic_vector(3 downto 0) := "0100";
       sout : OUT STD_LOGIC);
   END COMPONENT;
   
+  --COMPONENT SYNC_VALID_BIT
+  --  GENERIC (
+  --    NB_FF_OF_SYNC : INTEGER);
+  --  PORT (
+  --    clk_in  : IN  STD_LOGIC;
+  --    clk_out : IN  STD_LOGIC;
+  --    rstn : IN  STD_LOGIC;
+  --    sin  : IN  STD_LOGIC;
+  --    sout : OUT STD_LOGIC);
+  --END COMPONENT;
+
   COMPONENT SYNC_VALID_BIT
     GENERIC (
       NB_FF_OF_SYNC : INTEGER);
     PORT (
-      clk_in  : IN  STD_LOGIC;
-      clk_out : IN  STD_LOGIC;
-      rstn : IN  STD_LOGIC;
-      sin  : IN  STD_LOGIC;
-      sout : OUT STD_LOGIC);
+      clk_in   : IN  STD_LOGIC;
+      rstn_in  : IN  STD_LOGIC;
+      clk_out  : IN  STD_LOGIC;
+      rstn_out : IN  STD_LOGIC;
+      sin      : IN  STD_LOGIC;
+      sout     : OUT STD_LOGIC);
   END COMPONENT;
 
   COMPONENT RR_Arbiter_4

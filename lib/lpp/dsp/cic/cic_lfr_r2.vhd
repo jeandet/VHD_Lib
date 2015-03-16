@@ -89,14 +89,10 @@ ARCHITECTURE beh OF cic_lfr_r2 IS
   SIGNAL addr_gen: STD_LOGIC_VECTOR(8 DOWNTO 0);
   SIGNAL addr_read: STD_LOGIC_VECTOR(8 DOWNTO 0);
   SIGNAL addr_write: STD_LOGIC_VECTOR(8 DOWNTO 0);
-  SIGNAL addr_write_mux: STD_LOGIC_VECTOR(8 DOWNTO 0);
   SIGNAL addr_write_s: STD_LOGIC_VECTOR(8 DOWNTO 0);
   SIGNAL data_we: STD_LOGIC;
   SIGNAL data_we_s: STD_LOGIC;
   SIGNAL data_wen       : STD_LOGIC;
---  SIGNAL data_write     : STD_LOGIC_VECTOR(15 DOWNTO 0);
---  SIGNAL data_read      : STD_LOGIC_VECTOR(15 DOWNTO 0);
---  SIGNAL data_read_pre      : STD_LOGIC_VECTOR(15 DOWNTO 0);
   -----------------------------------------------------------------------------
   SIGNAL sample_out_reg16   : sample_vector(8*2-1 DOWNTO 0, 15 DOWNTO 0);
   SIGNAL sample_out_reg256  : sample_vector(6*3-1 DOWNTO 0, 15 DOWNTO 0);

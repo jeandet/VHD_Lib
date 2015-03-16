@@ -146,8 +146,8 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v3 OF IIR_CEL_CTRLR_v3 IS
 
   SIGNAL sample_out_s2 : samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0);
 
-  SIGNAL ram_input : STD_LOGIC_VECTOR(Sample_SZ-1 DOWNTO 0);
-  SIGNAL ram_output : STD_LOGIC_VECTOR(Sample_SZ-1 DOWNTO 0);
+  SIGNAL ram_input      : STD_LOGIC_VECTOR(Sample_SZ-1 DOWNTO 0);
+  SIGNAL ram_output     : STD_LOGIC_VECTOR(Sample_SZ-1 DOWNTO 0);
   --
   SIGNAL sample_in_val  : STD_LOGIC;
   SIGNAL sample_in      : samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0);
@@ -157,58 +157,54 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v3 OF IIR_CEL_CTRLR_v3 IS
   -----------------------------------------------------------------------------
   -- 
   -----------------------------------------------------------------------------
-  SIGNAL CHANNEL_SEL     : STD_LOGIC;
-  
+  SIGNAL CHANNEL_SEL : STD_LOGIC;
+
   SIGNAL ram_output_1 : STD_LOGIC_VECTOR(Sample_SZ-1 DOWNTO 0);
   SIGNAL ram_output_2 : STD_LOGIC_VECTOR(Sample_SZ-1 DOWNTO 0);
-  
+
   SIGNAL ram_write_1      : STD_LOGIC;
   SIGNAL ram_read_1       : STD_LOGIC;
   SIGNAL raddr_rst_1      : STD_LOGIC;
   SIGNAL raddr_add1_1     : STD_LOGIC;
   SIGNAL waddr_previous_1 : STD_LOGIC_VECTOR(1 DOWNTO 0);
-  
-  SIGNAL ram_write_2      : STD_LOGIC;
-  SIGNAL ram_read_2       : STD_LOGIC;
-  SIGNAL raddr_rst_2      : STD_LOGIC;
-  SIGNAL raddr_add1_2     : STD_LOGIC;
-  SIGNAL waddr_previous_2 : STD_LOGIC_VECTOR(1 DOWNTO 0);
+
+  SIGNAL ram_write_2             : STD_LOGIC;
+  SIGNAL ram_read_2              : STD_LOGIC;
+  SIGNAL raddr_rst_2             : STD_LOGIC;
+  SIGNAL raddr_add1_2            : STD_LOGIC;
+  SIGNAL waddr_previous_2        : STD_LOGIC_VECTOR(1 DOWNTO 0);
   -----------------------------------------------------------------------------
-  SIGNAL channel_ready : STD_LOGIC_VECTOR(1 DOWNTO 0);
-  SIGNAL channel_val   : STD_LOGIC_VECTOR(1 DOWNTO 0);
-  SIGNAL channel_done  : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL channel_ready           : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL channel_val             : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL channel_done            : STD_LOGIC_VECTOR(1 DOWNTO 0);
   -----------------------------------------------------------------------------
-  TYPE FSM_CHANNEL_SELECTION IS (IDLE, ONGOING_1, ONGOING_2, WAIT_STATE);
+  TYPE   FSM_CHANNEL_SELECTION IS (IDLE, ONGOING_1, ONGOING_2, WAIT_STATE);
   SIGNAL state_channel_selection : FSM_CHANNEL_SELECTION;
 
-  SIGNAL   sample_out_zero     : samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0);
+  --SIGNAL   sample_out_zero     : samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0);
   
 BEGIN
 
   -----------------------------------------------------------------------------
   channel_val(0) <= sample_in1_val;
   channel_val(1) <= sample_in2_val;
-  all_channel_input_valid: FOR I IN 1 DOWNTO 0 GENERATE
+  all_channel_input_valid : FOR I IN 1 DOWNTO 0 GENERATE
     PROCESS (clk, rstn)
     BEGIN  -- PROCESS
       IF rstn = '0' THEN                  -- asynchronous reset (active low)
         channel_ready(I) <= '0';
-      ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
         IF channel_val(I) = '1' THEN
           channel_ready(I) <= '1';
         ELSIF channel_done(I) = '1' THEN
-          channel_ready(I) <= '0';        
+          channel_ready(I) <= '0';
         END IF;
       END IF;
-    END PROCESS;    
+    END PROCESS;
   END GENERATE all_channel_input_valid;
   -----------------------------------------------------------------------------
-  all_channel_sample_out: FOR I IN ChanelsCount-1 DOWNTO 0 GENERATE
-    all_bit: FOR J IN Sample_SZ-1 DOWNTO 0 GENERATE
-      sample_out_zero(I,J) <= '0';
-    END GENERATE all_bit;
-  END GENERATE all_channel_sample_out;
-  
+
+
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
@@ -217,18 +213,22 @@ BEGIN
       sample_in_val           <= '0';
       sample_out1_val         <= '0';
       sample_out2_val         <= '0';
-      sample_out1 <= sample_out_zero;
-      sample_out2 <= sample_out_zero;
+      all_channel_sample_out : FOR I IN ChanelsCount-1 DOWNTO 0 LOOP
+        all_bit : FOR J IN Sample_SZ-1 DOWNTO 0 LOOP
+          sample_out1(I, J) <= '0';
+          sample_out2(I, J) <= '0';
+        END LOOP all_bit;
+      END LOOP all_channel_sample_out;
       channel_done <= "00";
       
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
       CASE state_channel_selection IS
         WHEN IDLE =>
-          CHANNEL_SEL             <= '0';
-          sample_in_val           <= '0';
-          sample_out1_val         <= '0';
-          sample_out2_val         <= '0';
-          channel_done            <= "00";
+          CHANNEL_SEL     <= '0';
+          sample_in_val   <= '0';
+          sample_out1_val <= '0';
+          sample_out2_val <= '0';
+          channel_done    <= "00";
           IF channel_ready(0) = '1' THEN
             state_channel_selection <= ONGOING_1;
             CHANNEL_SEL             <= '0';
@@ -236,10 +236,10 @@ BEGIN
           ELSIF channel_ready(1) = '1' THEN
             state_channel_selection <= ONGOING_2;
             CHANNEL_SEL             <= '1';
-            sample_in_val           <= '1';           
+            sample_in_val           <= '1';
           END IF;
         WHEN ONGOING_1 =>
-          sample_in_val           <= '0';
+          sample_in_val <= '0';
           IF sample_out_val = '1' THEN
             state_channel_selection <= WAIT_STATE;
             sample_out1             <= sample_out;
@@ -247,7 +247,7 @@ BEGIN
             channel_done(0)         <= '1';
           END IF;
         WHEN ONGOING_2 =>
-          sample_in_val           <= '0';
+          sample_in_val <= '0';
           IF sample_out_val = '1' THEN
             state_channel_selection <= WAIT_STATE;
             sample_out2             <= sample_out;
@@ -267,25 +267,25 @@ BEGIN
       
     END IF;
   END PROCESS;
-  
-  sample_in <= sample_in1 WHEN CHANNEL_SEL = '0' ELSE sample_in2;
+
+  sample_in  <= sample_in1   WHEN CHANNEL_SEL = '0' ELSE sample_in2;
   -----------------------------------------------------------------------------
-  ram_output       <= ram_output_1      WHEN CHANNEL_SEL = '0' ELSE
+  ram_output <= ram_output_1 WHEN CHANNEL_SEL = '0' ELSE
                       ram_output_2;
   
-  ram_write_1      <= ram_write         WHEN CHANNEL_SEL = '0' ELSE '0';
-  ram_read_1       <= ram_read          WHEN CHANNEL_SEL = '0' ELSE '0';
-  raddr_rst_1      <= raddr_rst         WHEN CHANNEL_SEL = '0' ELSE '1';
-  raddr_add1_1     <= raddr_add1        WHEN CHANNEL_SEL = '0' ELSE '0';
-  waddr_previous_1 <= waddr_previous    WHEN CHANNEL_SEL = '0' ELSE "00";
+  ram_write_1      <= ram_write      WHEN CHANNEL_SEL = '0' ELSE '0';
+  ram_read_1       <= ram_read       WHEN CHANNEL_SEL = '0' ELSE '0';
+  raddr_rst_1      <= raddr_rst      WHEN CHANNEL_SEL = '0' ELSE '1';
+  raddr_add1_1     <= raddr_add1     WHEN CHANNEL_SEL = '0' ELSE '0';
+  waddr_previous_1 <= waddr_previous WHEN CHANNEL_SEL = '0' ELSE "00";
 
-  ram_write_2      <= ram_write         WHEN CHANNEL_SEL = '1' ELSE '0';
-  ram_read_2       <= ram_read          WHEN CHANNEL_SEL = '1' ELSE '0';
-  raddr_rst_2      <= raddr_rst         WHEN CHANNEL_SEL = '1' ELSE '1';
-  raddr_add1_2     <= raddr_add1        WHEN CHANNEL_SEL = '1' ELSE '0';
-  waddr_previous_2 <= waddr_previous    WHEN CHANNEL_SEL = '1' ELSE "00";
-  
-  RAM_CTRLR_v2_1: RAM_CTRLR_v2
+  ram_write_2      <= ram_write      WHEN CHANNEL_SEL = '1' ELSE '0';
+  ram_read_2       <= ram_read       WHEN CHANNEL_SEL = '1' ELSE '0';
+  raddr_rst_2      <= raddr_rst      WHEN CHANNEL_SEL = '1' ELSE '1';
+  raddr_add1_2     <= raddr_add1     WHEN CHANNEL_SEL = '1' ELSE '0';
+  waddr_previous_2 <= waddr_previous WHEN CHANNEL_SEL = '1' ELSE "00";
+
+  RAM_CTRLR_v2_1 : RAM_CTRLR_v2
     GENERIC MAP (
       tech       => tech,
       Input_SZ_1 => Sample_SZ,
@@ -300,8 +300,8 @@ BEGIN
       waddr_previous => waddr_previous_1,
       sample_in      => ram_input,
       sample_out     => ram_output_1);
-  
-  RAM_CTRLR_v2_2: RAM_CTRLR_v2
+
+  RAM_CTRLR_v2_2 : RAM_CTRLR_v2
     GENERIC MAP (
       tech       => tech,
       Input_SZ_1 => Sample_SZ,
@@ -325,24 +325,24 @@ BEGIN
       Coef_Nb     => Coef_Nb,
       Coef_sel_SZ => Coef_sel_SZ)
     PORT MAP (
-      rstn           => rstn,
-      clk            => clk,
-      virg_pos       => virg_pos,
-      coefs          => coefs,
+      rstn          => rstn,
+      clk           => clk,
+      virg_pos      => virg_pos,
+      coefs         => coefs,
       --CTRL
-      in_sel_src     => in_sel_src,
-      ram_sel_Wdata  => ram_sel_Wdata,
+      in_sel_src    => in_sel_src,
+      ram_sel_Wdata => ram_sel_Wdata,
       --
-      ram_input => ram_input,
-      ram_output => ram_output,
+      ram_input     => ram_input,
+      ram_output    => ram_output,
       --
-      alu_sel_input  => alu_sel_input,
-      alu_sel_coeff  => alu_sel_coeff,
-      alu_ctrl       => alu_ctrl,
-      alu_comp       => "00",
+      alu_sel_input => alu_sel_input,
+      alu_sel_coeff => alu_sel_coeff,
+      alu_ctrl      => alu_ctrl,
+      alu_comp      => "00",
       --DATA
-      sample_in      => sample_in_s,
-      sample_out     => sample_out_s);
+      sample_in     => sample_in_s,
+      sample_out    => sample_out_s);
   -----------------------------------------------------------------------------
 
 

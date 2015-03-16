@@ -31,10 +31,11 @@ ENTITY SYNC_VALID_BIT IS
     NB_FF_OF_SYNC : INTEGER := 2);
   PORT (
     clk_in  : IN  STD_LOGIC;
-    clk_out : IN  STD_LOGIC;
-    rstn    : IN  STD_LOGIC;
-    sin     : IN  STD_LOGIC;
-    sout    : OUT STD_LOGIC);
+    rstn_in : IN  STD_LOGIC;
+    clk_out  : IN  STD_LOGIC;
+    rstn_out : IN  STD_LOGIC;
+    sin      : IN  STD_LOGIC;
+    sout     : OUT STD_LOGIC);
 END SYNC_VALID_BIT;
 
 ARCHITECTURE beh OF SYNC_VALID_BIT IS
@@ -45,7 +46,7 @@ BEGIN  -- beh
   lpp_front_to_level_1: lpp_front_to_level
     PORT MAP (
       clk  => clk_in,
-      rstn => rstn,
+      rstn => rstn_in,
       sin  => sin,
       sout => s_1);
   
@@ -54,14 +55,14 @@ BEGIN  -- beh
       NB_FF_OF_SYNC => NB_FF_OF_SYNC)
     PORT MAP (
       clk    => clk_out,
-      rstn   => rstn,
+      rstn   => rstn_out,
       A      => s_1,
       A_sync => s_2);
 
   lpp_front_detection_1: lpp_front_detection
     PORT MAP (
       clk  => clk_out,
-      rstn => rstn,
+      rstn => rstn_out,
       sin  => s_2,
       sout => sout);
   

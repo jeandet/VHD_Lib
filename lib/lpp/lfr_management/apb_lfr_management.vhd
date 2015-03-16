@@ -46,9 +46,10 @@ ENTITY apb_lfr_management IS
     );
 
   PORT (
-    clk25MHz     : IN STD_LOGIC;        --! Clock
-    clk24_576MHz : IN STD_LOGIC;        --! secondary clock
-    resetn       : IN STD_LOGIC;        --! Reset
+    clk25MHz         : IN STD_LOGIC;    --! Clock
+    resetn_25MHz     : IN STD_LOGIC;    --! Reset
+    clk24_576MHz     : IN STD_LOGIC;    --! secondary clock
+    resetn_24_576MHz : IN STD_LOGIC;    --! Reset
 
     grspw_tick : IN STD_LOGIC;  --! grspw signal asserted when a valid time-code is received
 
@@ -155,11 +156,11 @@ BEGIN
 
   LFR_soft_rstn <= NOT r.LFR_soft_reset;
 
-  PROCESS(resetn, clk25MHz)
+  PROCESS(resetn_25MHz, clk25MHz)
     VARIABLE paddr : STD_LOGIC_VECTOR(7 DOWNTO 2);
   BEGIN
 
-    IF resetn = '0' THEN
+    IF resetn_25MHz = '0' THEN
       Rdata              <= (OTHERS => '0');
       r.coarse_time_load <= (OTHERS => '0');
       r.soft_reset       <= '0';
@@ -324,8 +325,9 @@ BEGIN
       NB_FF_OF_SYNC => 2)
     PORT MAP (
       clk_in  => clk25MHz,
+      rstn_in    => resetn_25MHz,
       clk_out => clk24_576MHz,
-      rstn    => resetn,
+      rstn_out => resetn_24_576MHz,
       sin     => tick,
       sout    => new_timecode);
 
@@ -334,8 +336,9 @@ BEGIN
       NB_FF_OF_SYNC => 2)
     PORT MAP (
       clk_in  => clk25MHz,
+      rstn_in    => resetn_25MHz,
       clk_out => clk24_576MHz,
-      rstn    => resetn,
+      rstn_out => resetn_24_576MHz,
       sin     => coarsetime_reg_updated,
       sout    => new_coarsetime);
 
@@ -344,8 +347,9 @@ BEGIN
       NB_FF_OF_SYNC => 2)
     PORT MAP (
       clk_in  => clk25MHz,
+      rstn_in    => resetn_25MHz,
       clk_out => clk24_576MHz,
-      rstn    => resetn,
+      rstn_out => resetn_24_576MHz,
       sin     => soft_reset,
       sout    => soft_reset_sync);
 
@@ -383,16 +387,17 @@ BEGIN
       NB_FF_OF_SYNC => 2)
     PORT MAP (
       clk_in  => clk24_576MHz,
+      rstn_in    => resetn_24_576MHz,
       clk_out => clk25MHz,
-      rstn    => resetn,
+      rstn_out => resetn_25MHz,
       sin     => time_new_49,
       sout    => time_new);
 
 
 
-  PROCESS (clk25MHz, resetn)
+  PROCESS (clk25MHz, resetn_25MHz)
   BEGIN  -- PROCESS
-    IF resetn = '0' THEN                -- asynchronous reset (active low)
+    IF resetn_25MHz = '0' THEN                -- asynchronous reset (active low)
       fine_time_s   <= (OTHERS => '0');
       coarse_time_s <= (OTHERS => '0');
     ELSIF clk25MHz'EVENT AND clk25MHz = '1' THEN  -- rising clock edge
@@ -404,7 +409,7 @@ BEGIN
   END PROCESS;
 
 
-  rstn_LFR_TM <= '0' WHEN resetn = '0' ELSE
+  rstn_LFR_TM <= '0' WHEN resetn_24_576MHz = '0' ELSE
                  '0' WHEN soft_reset_sync = '1' ELSE
                  '1';
 
@@ -433,15 +438,15 @@ BEGIN
   -- HK
   -----------------------------------------------------------------------------
 
-  PROCESS (clk25MHz, resetn)
+  PROCESS (clk25MHz, resetn_25MHz)
     CONSTANT BIT_FREQUENCY_UPDATE : INTEGER := 14;  -- freq = 2^(16-BIT)
-                                                    -- for each HK, the update frequency is freq/3
-                                                    --  
-                                                    -- for 14, the update frequency is
-                                                    -- 4Hz and update for each
-                                                    -- HK is 1.33Hz
+                          -- for each HK, the update frequency is freq/3
+                          --  
+                          -- for 14, the update frequency is
+                          -- 4Hz and update for each
+                          -- HK is 1.33Hz
   BEGIN  -- PROCESS
-    IF resetn = '0' THEN                -- asynchronous reset (active low)
+    IF resetn_25MHz = '0' THEN                -- asynchronous reset (active low)
 
       r.HK_temp_0 <= (OTHERS => '0');
       r.HK_temp_1 <= (OTHERS => '0');
@@ -459,13 +464,13 @@ BEGIN
           CASE HK_sel_s IS
             WHEN "00" =>
               r.HK_temp_0 <= HK_sample;
-              HK_sel_s <= "01";
+              HK_sel_s    <= "01";
             WHEN "01" =>
               r.HK_temp_1 <= HK_sample;
-              HK_sel_s <= "10";
+              HK_sel_s    <= "10";
             WHEN "10" =>
               r.HK_temp_2 <= HK_sample;
-              HK_sel_s <= "00";
+              HK_sel_s    <= "00";
             WHEN OTHERS => NULL;
           END CASE;
         END IF;
@@ -489,7 +494,7 @@ BEGIN
       )
     PORT MAP(
       clk  => clk25MHz,
-      rstn => resetn,
+      rstn => resetn_25MHz,
 
       pre           => pre,
       N             => N,
