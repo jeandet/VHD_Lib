@@ -146,7 +146,8 @@ ARCHITECTURE beh OF LFR_EQM IS
   SIGNAL observation_reg : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
   -----------------------------------------------------------------------------
-  SIGNAL rstn : STD_LOGIC;
+  SIGNAL rstn_25 : STD_LOGIC;
+  SIGNAL rstn_24 : STD_LOGIC;
 
   SIGNAL LFR_soft_rstn : STD_LOGIC;
   SIGNAL LFR_rstn      : STD_LOGIC;
@@ -160,7 +161,8 @@ BEGIN  -- beh
   -----------------------------------------------------------------------------
   -- CLK
   -----------------------------------------------------------------------------
-  rst0 : rstgen PORT MAP (reset, clk_25, '1', rstn, OPEN);
+  rst_domain25 : rstgen PORT MAP (reset, clk_25, '1', rstn_25, OPEN);
+  rst_domain24 : rstgen PORT MAP (reset, clk_24, '1', rstn_24, OPEN);
 
   PROCESS(clk50MHz)
   BEGIN
@@ -204,7 +206,7 @@ BEGIN  -- beh
       USES_IAP_MEMCTRLR => 1)
     PORT MAP (
       clk    => clk_25,
-      reset  => rstn,
+      reset  => rstn_25,
       errorn => OPEN,
 
       ahbrxd => TAG1,
@@ -247,9 +249,11 @@ BEGIN  -- beh
       FIRST_DIVISION   => 374,  -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
       NB_SECOND_DESYNC => 60)  -- 60 secondes of desynchronization before CoarseTime's MSB is Set
     PORT MAP (
-      clk25MHz      => clk_25,
-      clk24_576MHz  => clk_24,          -- 49.152MHz/2
-      resetn        => rstn,
+      clk25MHz          => clk_25,
+      resetn_25MHz      => rstn_25,      --      TODO
+      clk24_576MHz      => clk_24,          -- 49.152MHz/2
+      resetn_24_576MHz  => rstn_24,      --      TODO
+      
       grspw_tick    => swno.tickout,
       apbi          => apbi_ext,
       apbo          => apbo_ext(6),
@@ -348,7 +352,7 @@ BEGIN  -- beh
     --output_type => CFG_SPW_OUTPUT,  -- not used byt the spw core 1
     --rxtx_sameclk => CFG_SPW_RTSAME -- not used byt the spw core 1
     )
-    PORT MAP(rstn, clk_25, spw_rxclk(0),
+    PORT MAP(rstn_25, clk_25, spw_rxclk(0),
              spw_rxclk(1), spw_rxtxclk, spw_rxtxclk,
              ahbi_m_ext, ahbo_m_ext(1), apbi_ext, apbo_ext(5),
              swni, swno);
@@ -364,7 +368,7 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
 -- LFR ------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-  LFR_rstn <= LFR_soft_rstn AND rstn;
+  LFR_rstn <= LFR_soft_rstn AND rstn_25;
 
   lpp_lfr_1 : lpp_lfr
     GENERIC MAP (
@@ -380,7 +384,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"02013F")  -- aa.bb.cc version
+      top_lfr_version        => X"020144")  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             --      0 => MINI_LFR
                                             --      1 => EM
@@ -421,10 +425,10 @@ BEGIN  -- beh
       FILTER_ENABLED  => 16#FF#)
     PORT MAP (
       cnv_clk    => clk_24,
-      cnv_rstn   => rstn,
+      cnv_rstn   => rstn_24,
       cnv        => ADC_smpclk_s,
       clk        => clk_25,
-      rstn       => rstn,
+      rstn       => rstn_25,
       ADC_data   => ADC_data,
       ADC_nOE    => ADC_OEB_bar_CH_s,
       sample     => sample,

@@ -241,25 +241,14 @@ BEGIN  -- beh
 
   PROCESS (clk_50, reset)
   BEGIN  -- PROCESS
-    IF reset = '0' THEN                 -- asynchronous reset (active low)
-      clk_50_s   <= '0';
-      rstn_50    <= '0';
-      rstn_50_d1 <= '0';
-      rstn_50_d2 <= '0';
-      rstn_50_d3 <= '0';
-      
-    ELSIF clk_50'EVENT AND clk_50 = '1' THEN  -- rising clock edge
+    IF clk_50'EVENT AND clk_50 = '1' THEN  -- rising clock edge
       clk_50_s   <= NOT clk_50_s;
-      rstn_50_d1 <= '1';
-      rstn_50_d2 <= rstn_50_d1;
-      rstn_50_d3 <= rstn_50_d2;
-      rstn_50    <= rstn_50_d3;
     END IF;
   END PROCESS;
 
-  PROCESS (clk_50_s, rstn_50)
+  PROCESS (clk_50_s, reset)
   BEGIN  -- PROCESS
-    IF rstn_50 = '0' THEN               -- asynchronous reset (active low)
+    IF reset = '0' THEN               -- asynchronous reset (active low)
       clk_25     <= '0';
       rstn_25    <= '0';
       rstn_25_d1 <= '0';

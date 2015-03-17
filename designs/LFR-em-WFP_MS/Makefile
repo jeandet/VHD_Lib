@@ -20,7 +20,7 @@ VHDLSIMFILES=testbench.vhd
 #SDC=$(GRLIB)/boards/$(BOARD)/leon3mp.sdc
 PDC=$(VHDLIB)/boards/$(BOARD)/em-LeonLPP-A3PE3kL_withHK-DAC.pdc
 
-#SDCFILE=$(VHDLIB)/boards/$(BOARD)/LFR_EM_synthesis.sdc
+SDCFILE=$(VHDLIB)/boards/$(BOARD)/LFR_EM_synthesis.sdc
 SDC=$(VHDLIB)/boards/$(BOARD)/LFR_EM_place_and_route.sdc
 
 BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut
