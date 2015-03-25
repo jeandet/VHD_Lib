@@ -34,7 +34,7 @@ USE techmap.gencomp.ALL;
 LIBRARY lpp;
 USE lpp.lpp_sim_pkg.ALL;
 USE lpp.lpp_lfr_apbreg_pkg.ALL;
-USE lpp.lpp_lfr_time_management_apbreg_pkg.ALL;
+USE lpp.lpp_lfr_management_apbreg_pkg.ALL;
 
 PACKAGE lpp_lfr_sim_pkg IS
 
@@ -195,8 +195,8 @@ PACKAGE BODY lpp_lfr_sim_pkg IS
     CONSTANT ADDR_BASE_TIME_MANAGMENT : IN  STD_LOGIC_VECTOR(31 DOWNTO 8))
   IS
   BEGIN
-    UART_WRITE(TX,tx_period,ADDR_BASE_TIME_MANAGMENT & ADDR_LFR_TM_CONTROL   , X"00000000");
-    UART_WRITE(TX,tx_period,ADDR_BASE_TIME_MANAGMENT & ADDR_LFR_TM_TIME_LOAD , X"00000000");
+    UART_WRITE(TX,tx_period,ADDR_BASE_TIME_MANAGMENT & ADDR_LFR_MANAGMENT_CONTROL   , X"00000000");
+    UART_WRITE(TX,tx_period,ADDR_BASE_TIME_MANAGMENT & ADDR_LFR_MANAGMENT_TIME_LOAD , X"00000000");
   END;
   
   PROCEDURE LAUNCH_SPECTRAL_MATRIX(
