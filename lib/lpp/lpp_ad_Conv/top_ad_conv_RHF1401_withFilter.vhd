@@ -32,8 +32,9 @@ ARCHITECTURE ar_top_ad_conv_RHF1401 OF top_ad_conv_RHF1401_withFilter IS
   
   SIGNAL cnv_cycle_counter : INTEGER;
   SIGNAL cnv_s             : STD_LOGIC;
+  SIGNAL cnv_s_reg         : STD_LOGIC;
   SIGNAL cnv_sync          : STD_LOGIC;
-  SIGNAL cnv_sync_pre          : STD_LOGIC;
+  SIGNAL cnv_sync_pre      : STD_LOGIC;
 
   SIGNAL ADC_nOE_reg : STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
   SIGNAL enable_ADC : STD_LOGIC;
@@ -79,6 +80,15 @@ BEGIN
   END PROCESS;
 
   cnv <= cnv_s;
+  
+  PROCESS (cnv_clk, cnv_rstn)
+  BEGIN  -- PROCESS
+    IF cnv_rstn = '0' THEN              -- asynchronous reset (active low)
+      cnv_s_reg             <= '0';
+    ELSIF cnv_clk'EVENT AND cnv_clk = '1' THEN  -- rising clock edge
+      cnv_s_reg             <= cnv_s;
+    END IF;
+  END PROCESS;
 
 
   -----------------------------------------------------------------------------
@@ -91,7 +101,7 @@ BEGIN
     PORT MAP (
       clk    => clk,
       rstn   => rstn,
-      A      => cnv_s,
+      A      => cnv_s_reg,
       A_sync => cnv_sync);
 
 

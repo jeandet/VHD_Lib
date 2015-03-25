@@ -45,6 +45,9 @@ USE lpp.general_purpose.ALL;
 USE lpp.lpp_lfr_management.ALL;
 USE lpp.lpp_leon3_soc_pkg.ALL;
 
+library proasic3e;
+use proasic3e.clkint;
+
 ENTITY LFR_EQM IS
   
   PORT (
@@ -156,6 +159,10 @@ ARCHITECTURE beh OF LFR_EQM IS
 
   SIGNAL nSRAM_CE : STD_LOGIC_VECTOR(1 DOWNTO 0);
   
+  SIGNAL clk50MHz_int : STD_LOGIC := '0';
+
+  component clkint port(A : in std_ulogic; Y :out std_ulogic); end component;
+  
 BEGIN  -- beh
 
   -----------------------------------------------------------------------------
@@ -164,9 +171,11 @@ BEGIN  -- beh
   rst_domain25 : rstgen PORT MAP (reset, clk_25, '1', rstn_25, OPEN);
   rst_domain24 : rstgen PORT MAP (reset, clk_24, '1', rstn_24, OPEN);
 
-  PROCESS(clk50MHz)
+  clk_pad : clkint  port map (A => clk50MHz, Y => clk50MHz_int ); 
+
+  PROCESS(clk50MHz_int)
   BEGIN
-    IF clk50MHz'EVENT AND clk50MHz = '1' THEN
+    IF clk50MHz_int'EVENT AND clk50MHz_int = '1' THEN
       clk_25 <= NOT clk_25;
     END IF;
   END PROCESS;
@@ -285,9 +294,9 @@ BEGIN  -- beh
   -- /\/\/\/\ --------------------------------------------------------- /\/\/\/\
   ------------------------------------------------------------------------------
   
-  spw_clk     <= clk50MHz;
-  spw_rxtxclk <= spw_clk;
-  spw_rxclkn  <= NOT spw_rxtxclk;
+  --spw_clk     <= clk50MHz;
+  --spw_rxtxclk <= spw_clk;
+  --spw_rxclkn  <= NOT spw_rxtxclk;
 
   -- PADS for SPW1
   spw1_rxd_pad : inpad GENERIC MAP (tech => inferred)
@@ -353,7 +362,10 @@ BEGIN  -- beh
     --rxtx_sameclk => CFG_SPW_RTSAME -- not used byt the spw core 1
     )
     PORT MAP(rstn_25, clk_25, spw_rxclk(0),
-             spw_rxclk(1), spw_rxtxclk, spw_rxtxclk,
+             spw_rxclk(1),
+             clk50MHz_int,
+             clk50MHz_int,
+--             spw_rxtxclk, spw_rxtxclk, spw_rxtxclk, spw_rxtxclk,
              ahbi_m_ext, ahbo_m_ext(1), apbi_ext, apbo_ext(5),
              swni, swno);
 
@@ -388,7 +400,7 @@ BEGIN  -- beh
                                             -- AA : BOARD NUMBER
                                             --      0 => MINI_LFR
                                             --      1 => EM
-                                            --      1 => EQM (with A3PE3000)
+                                            --      2 => EQM (with A3PE3000)
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
@@ -439,7 +451,7 @@ BEGIN  -- beh
   ADC_smpclk <= ADC_smpclk_s;
   HK_smpclk  <= ADC_smpclk_s;
 
-  TAG8 <= ADC_smpclk_s;
+  TAG8 <='0';
 
   -----------------------------------------------------------------------------
   -- HK

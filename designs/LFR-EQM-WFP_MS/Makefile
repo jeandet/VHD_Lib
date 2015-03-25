@@ -17,7 +17,8 @@ VHDLSYNFILES=LFR-EQM.vhd
 VHDLSIMFILES=testbench.vhd
 #SIMTOP=testbench
 PDC=$(VHDLIB)/boards/$(BOARD)/LFR_EQM_A3PE3000.pdc
-SDC=$(VHDLIB)/boards/$(BOARD)/LFR_EQM.sdc
+SDCFILE=$(VHDLIB)/boards/$(BOARD)/LFR_EQM_synthesis.sdc
+SDC=$(VHDLIB)/boards/$(BOARD)/LFR_EQM_place_and_route.sdc
 
 BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut
 CLEAN=soft-clean
