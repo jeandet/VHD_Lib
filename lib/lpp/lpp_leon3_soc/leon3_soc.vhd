@@ -416,8 +416,8 @@ BEGIN
         rmw      => 1,
         --Aeroflex memory generics:
         mprog    => 1,          -- program memory by default values after reset
-        mpsrate  => 12,                 -- default scrub rate period
-        mpb2s    => 4,                  -- default busy to scrub delay
+        mpsrate  => 15,                 -- default scrub rate period
+        mpb2s    => 14,                  -- default busy to scrub delay
         mpapb    => 1,                  -- instantiate apb register
         mchipcnt => 2,
         mpenall  => 1  -- when 0 program only E1 chip, else program all dies

@@ -45,8 +45,8 @@ USE lpp.general_purpose.ALL;
 USE lpp.lpp_lfr_management.ALL;
 USE lpp.lpp_leon3_soc_pkg.ALL;
 
-library proasic3e;
-use proasic3e.clkint;
+library proasic3l;
+use proasic3l.all;
 
 ENTITY LFR_EQM IS
   
@@ -160,6 +160,7 @@ ARCHITECTURE beh OF LFR_EQM IS
   SIGNAL nSRAM_CE : STD_LOGIC_VECTOR(1 DOWNTO 0);
   
   SIGNAL clk50MHz_int : STD_LOGIC := '0';
+  SIGNAL clk_25_int      : STD_LOGIC := '0';
 
   component clkint port(A : in std_ulogic; Y :out std_ulogic); end component;
   
@@ -171,14 +172,17 @@ BEGIN  -- beh
   rst_domain25 : rstgen PORT MAP (reset, clk_25, '1', rstn_25, OPEN);
   rst_domain24 : rstgen PORT MAP (reset, clk_24, '1', rstn_24, OPEN);
 
-  clk_pad : clkint  port map (A => clk50MHz, Y => clk50MHz_int ); 
+  --clk_pad : clkint  port map (A => clk50MHz, Y => clk50MHz_int ); 
+  clk50MHz_int <= clk50MHz;
 
   PROCESS(clk50MHz_int)
   BEGIN
     IF clk50MHz_int'EVENT AND clk50MHz_int = '1' THEN
+      --clk_25_int <= NOT clk_25_int;
       clk_25 <= NOT clk_25;
     END IF;
   END PROCESS;
+  --clk_pad_25 : clkint  port map (A => clk_25_int, Y => clk_25 ); 
 
   PROCESS(clk49_152MHz)
   BEGIN
@@ -371,7 +375,7 @@ BEGIN  -- beh
 
   swni.tickin      <= '0';
   swni.rmapen      <= '1';
-  swni.clkdiv10    <= "00000100";       -- 10 MHz / (4 + 1) = 10 MHz
+  swni.clkdiv10    <= "00000100";       -- 50 MHz / (4 + 1) = 10 MHz
   swni.tickinraw   <= '0';
   swni.timein      <= (OTHERS => '0');
   swni.dcrstval    <= (OTHERS => '0');
@@ -451,7 +455,7 @@ BEGIN  -- beh
   ADC_smpclk <= ADC_smpclk_s;
   HK_smpclk  <= ADC_smpclk_s;
 
-  TAG8 <='0';
+  TAG8 <= nSRAM_BUSY;
 
   -----------------------------------------------------------------------------
   -- HK
