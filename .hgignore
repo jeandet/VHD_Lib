@@ -36,3 +36,6 @@ fft_components.vhd
 CoreFFT.vhd
 actram.vhd
 actar.vhd
+*.bak
+*.pdc.ce
+*.zip

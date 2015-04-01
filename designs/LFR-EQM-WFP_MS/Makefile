@@ -23,7 +23,7 @@ SDC=$(VHDLIB)/boards/$(BOARD)/LFR_EQM_place_and_route.sdc
 BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut
 CLEAN=soft-clean
 
-TECHLIBS = proasic3e
+TECHLIBS = proasic3l
 
 LIBSKIP = core1553bbc core1553brm core1553brt gr1553 corePCIF \
 	tmtc openchip hynix ihp gleichmann micron usbhc

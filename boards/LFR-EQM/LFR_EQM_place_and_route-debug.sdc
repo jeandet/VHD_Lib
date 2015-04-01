@@ -3,11 +3,12 @@
 # Clocks
 
 create_clock -period 20.000000 -waveform {0.000000 10.000000} clk50MHz
-create_clock -period 40.000000 -waveform {0.000000 20.000000} clk_25
+create_clock -period 20.344999 -waveform {0.000000 10.172500} clk49_152MHz
+	     
 
+
+#create_clock -period 40.000000 -waveform {0.000000 20.000000} clk_25
 #create_generated_clock -name{clk_domain_25} -divide_by 2 -source{clk_25_int:CLK}{clk_25_int:Q}
-
-#create_clock -period 20.344999 -waveform {0.000000 10.172500} clk49_152MHz
 #create_clock -period 40.690000 -waveform {0.000000 20.345100} clk_24:Q
 #create_clock -name SPW_CLOCK -period 100.000000 -waveform {0.000000 50.000000} {spw1_din spw1_sin spw2_din spw2_sin}
 

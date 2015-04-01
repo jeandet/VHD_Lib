@@ -54,7 +54,7 @@ ENTITY lpp_dma_send_16word IS
     --
     send_ok : OUT STD_LOGIC;
     send_ko : OUT STD_LOGIC
-    
+
     );  
 END lpp_dma_send_16word;
 
@@ -88,8 +88,8 @@ BEGIN  -- beh
       grant_counter <= 0;
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
       
-      DMAIn.Reset   <= '0';
-      
+      DMAIn.Reset <= '0';
+
       CASE state IS
         WHEN IDLE =>
           DMAIn.Store   <= '1';
@@ -98,11 +98,11 @@ BEGIN  -- beh
           send_ko       <= '0';
           DMAIn.Address <= address;
           data_counter  <= 0;
-          DMAIn.Lock    <= '0';         -- FIX test
+          DMAIn.Lock    <= '0';
           IF send = '1' THEN
             state         <= REQUEST_BUS;
             DMAIn.Request <= '1';
-            DMAIn.Lock    <= '1';       -- FIX test
+            DMAIn.Lock    <= '1';
             DMAIn.Store   <= '1';
           END IF;
         WHEN REQUEST_BUS =>
@@ -124,10 +124,10 @@ BEGIN  -- beh
             
             IF DMAOut.Grant = '1' THEN
               IF grant_counter = 15 THEN
-                DMAIn.Reset   <= '0';
+                DMAIn.Reset <= '0';
                 DMAIn.Request <= '0';
-                DMAIn.Store   <= '0';
-                DMAIn.Burst   <= '0';
+                DMAIn.Store <= '0';
+                DMAIn.Burst <= '0';
               ELSE
                 grant_counter <= grant_counter+1;
               END IF;
@@ -135,6 +135,7 @@ BEGIN  -- beh
 
             IF DMAOut.OKAY = '1' THEN
               IF data_counter = 15 THEN
+                --DMAIn.Request <= '0';  -- FIX Test 31/03/2014 to handle burst interruption
                 DMAIn.Address <= (OTHERS => '0');
                 state         <= WAIT_LAST_READY;
               ELSE
@@ -167,7 +168,7 @@ BEGIN  -- beh
   END PROCESS;
 
   DMAIn.Data <= data;
-  
+
   ren <= NOT (DMAOut.OKAY OR DMAOut.GRANT) WHEN state = SEND_DATA ELSE
          '1';
 
@@ -175,7 +176,7 @@ BEGIN  -- beh
   --ren <= '0' WHEN DMAOut.OKAY = '1' ELSE --AND (state = SEND_DATA OR state = WAIT_LAST_READY) ELSE
   --       '1';
   -- /\ JC - 20/01/2014 /\
-  
+
   -- \/ JC - 11/12/2013 \/
   --ren <= '0' WHEN DMAOut.OKAY = '1' AND state = SEND_DATA ELSE
   --       '1';
@@ -191,5 +192,5 @@ BEGIN  -- beh
   --ren <= '0' WHEN state = SEND_DATA ELSE
   --       '1';
   -- /\ JC - 09/12/2013 /\
-    
+  
 END beh;

@@ -41,15 +41,15 @@ ENTITY apb_lfr_management IS
     pindex           : INTEGER := 0;        --! APB slave index
     paddr            : INTEGER := 0;        --! ADDR field of the APB BAR
     pmask            : INTEGER := 16#fff#;  --! MASK field of the APB BAR
-    FIRST_DIVISION   : INTEGER := 374;
+--    FIRST_DIVISION   : INTEGER := 374;
     NB_SECOND_DESYNC : INTEGER := 60
     );
 
   PORT (
     clk25MHz         : IN STD_LOGIC;    --! Clock
     resetn_25MHz     : IN STD_LOGIC;    --! Reset
-    clk24_576MHz     : IN STD_LOGIC;    --! secondary clock
-    resetn_24_576MHz : IN STD_LOGIC;    --! Reset
+--    clk24_576MHz     : IN STD_LOGIC;    --! secondary clock
+--    resetn_24_576MHz : IN STD_LOGIC;    --! Reset
 
     grspw_tick : IN STD_LOGIC;  --! grspw signal asserted when a valid time-code is received
 
@@ -304,6 +304,19 @@ BEGIN
   apbo.pconfig <= pconfig;
   apbo.pindex  <= pindex;
 
+
+
+
+
+
+
+
+
+
+
+
+
+  
   -----------------------------------------------------------------------------
   -- IN
   coarse_time    <= r.coarse_time;
@@ -320,109 +333,87 @@ BEGIN
   -----------------------------------------------------------------------------
   tick <= grspw_tick OR soft_tick;
 
-  SYNC_VALID_BIT_1 : SYNC_VALID_BIT
-    GENERIC MAP (
-      NB_FF_OF_SYNC => 2)
-    PORT MAP (
-      clk_in  => clk25MHz,
-      rstn_in    => resetn_25MHz,
-      clk_out => clk24_576MHz,
-      rstn_out => resetn_24_576MHz,
-      sin     => tick,
-      sout    => new_timecode);
-
-  SYNC_VALID_BIT_2 : SYNC_VALID_BIT
-    GENERIC MAP (
-      NB_FF_OF_SYNC => 2)
-    PORT MAP (
-      clk_in  => clk25MHz,
-      rstn_in    => resetn_25MHz,
-      clk_out => clk24_576MHz,
-      rstn_out => resetn_24_576MHz,
-      sin     => coarsetime_reg_updated,
-      sout    => new_coarsetime);
-
-  SYNC_VALID_BIT_3 : SYNC_VALID_BIT
-    GENERIC MAP (
-      NB_FF_OF_SYNC => 2)
-    PORT MAP (
-      clk_in  => clk25MHz,
-      rstn_in    => resetn_25MHz,
-      clk_out => clk24_576MHz,
-      rstn_out => resetn_24_576MHz,
-      sin     => soft_reset,
-      sout    => soft_reset_sync);
-
-  -----------------------------------------------------------------------------
-  --SYNC_FF_1 : SYNC_FF
+  --SYNC_VALID_BIT_1 : SYNC_VALID_BIT
   --  GENERIC MAP (
   --    NB_FF_OF_SYNC => 2)
   --  PORT MAP (
-  --    clk    => clk25MHz,
-  --    rstn   => resetn,
-  --    A      => fine_time_new_49,
-  --    A_sync => fine_time_new_temp);
+  --    clk_in  => clk25MHz,
+  --    rstn_in    => resetn_25MHz,
+  --    clk_out => clk24_576MHz,
+  --    rstn_out => resetn_24_576MHz,
+  --    sin     => tick,
+  --    sout    => new_timecode);
+  new_timecode <= tick;
 
-  --lpp_front_detection_1 : lpp_front_detection
+  --SYNC_VALID_BIT_2 : SYNC_VALID_BIT
+  --  GENERIC MAP (
+  --    NB_FF_OF_SYNC => 2)
   --  PORT MAP (
-  --    clk  => clk25MHz,
-  --    rstn => resetn,
-  --    sin  => fine_time_new_temp,
-  --    sout => fine_time_new);
+  --    clk_in  => clk25MHz,
+  --    rstn_in    => resetn_25MHz,
+  --    clk_out => clk24_576MHz,
+  --    rstn_out => resetn_24_576MHz,
+  --    sin     => coarsetime_reg_updated,
+  --    sout    => new_coarsetime);
+  
+  new_coarsetime <= coarsetime_reg_updated;
+  
+  --SYNC_VALID_BIT_3 : SYNC_VALID_BIT
+  --  GENERIC MAP (
+  --    NB_FF_OF_SYNC => 2)
+  --  PORT MAP (
+  --    clk_in  => clk25MHz,
+  --    rstn_in    => resetn_25MHz,
+  --    clk_out => clk24_576MHz,
+  --    rstn_out => resetn_24_576MHz,
+  --    sin     => soft_reset,
+  --    sout    => soft_reset_sync);
+  
+
+  -----------------------------------------------------------------------------
+  time_new_49 <= coarse_time_new_49 OR fine_time_new_49;
 
   --SYNC_VALID_BIT_4 : SYNC_VALID_BIT
   --  GENERIC MAP (
   --    NB_FF_OF_SYNC => 2)
   --  PORT MAP (
   --    clk_in  => clk24_576MHz,
+  --    rstn_in    => resetn_24_576MHz,
   --    clk_out => clk25MHz,
-  --    rstn    => resetn,
-  --    sin     => coarse_time_new_49,
-  --    sout    => coarse_time_new);
+  --    rstn_out => resetn_25MHz,
+  --    sin     => time_new_49,
+  --    sout    => time_new);
 
-  time_new_49 <= coarse_time_new_49 OR fine_time_new_49;
+  time_new <= time_new_49;
 
-  SYNC_VALID_BIT_4 : SYNC_VALID_BIT
-    GENERIC MAP (
-      NB_FF_OF_SYNC => 2)
-    PORT MAP (
-      clk_in  => clk24_576MHz,
-      rstn_in    => resetn_24_576MHz,
-      clk_out => clk25MHz,
-      rstn_out => resetn_25MHz,
-      sin     => time_new_49,
-      sout    => time_new);
+  --PROCESS (clk25MHz, resetn_25MHz)
+  --BEGIN  -- PROCESS
+  --  IF resetn_25MHz = '0' THEN                -- asynchronous reset (active low)
+  --    fine_time_s   <= (OTHERS => '0');
+  --    coarse_time_s <= (OTHERS => '0');
+  --  ELSIF clk25MHz'EVENT AND clk25MHz = '1' THEN  -- rising clock edge
+  --    IF time_new = '1' THEN
+  --    END IF;
+  --  END IF;
+  --END PROCESS;
+  
+  fine_time_s   <= fine_time_49;
+  coarse_time_s <= coarse_time_49;
+  
 
-
-
-  PROCESS (clk25MHz, resetn_25MHz)
-  BEGIN  -- PROCESS
-    IF resetn_25MHz = '0' THEN                -- asynchronous reset (active low)
-      fine_time_s   <= (OTHERS => '0');
-      coarse_time_s <= (OTHERS => '0');
-    ELSIF clk25MHz'EVENT AND clk25MHz = '1' THEN  -- rising clock edge
-      IF time_new = '1' THEN
-        fine_time_s   <= fine_time_49;
-        coarse_time_s <= coarse_time_49;
-      END IF;
-    END IF;
-  END PROCESS;
-
-
-  rstn_LFR_TM <= '0' WHEN resetn_24_576MHz = '0' ELSE
-                 '0' WHEN soft_reset_sync = '1' ELSE
+  rstn_LFR_TM <= '0' WHEN resetn_25MHz = '0' ELSE
+                 '0' WHEN soft_reset = '1' ELSE
                  '1';
-
-
+  
   -----------------------------------------------------------------------------
   -- LFR_TIME_MANAGMENT
   -----------------------------------------------------------------------------
   lfr_time_management_1 : lfr_time_management
     GENERIC MAP (
-      FIRST_DIVISION   => FIRST_DIVISION,
+      --FIRST_DIVISION   => FIRST_DIVISION,
       NB_SECOND_DESYNC => NB_SECOND_DESYNC)
     PORT MAP (
-      clk  => clk24_576MHz,
+      clk  => clk25MHz,
       rstn => rstn_LFR_TM,
 
       tick           => new_timecode,
@@ -433,6 +424,8 @@ BEGIN
       fine_time_new   => fine_time_new_49,
       coarse_time     => coarse_time_49,
       coarse_time_new => coarse_time_new_49);
+
+  
 
   -----------------------------------------------------------------------------
   -- HK
@@ -480,6 +473,19 @@ BEGIN
   END PROCESS;
 
   HK_sel <= HK_sel_s;
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
   -----------------------------------------------------------------------------
   -- DAC

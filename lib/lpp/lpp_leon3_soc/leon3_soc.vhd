@@ -72,7 +72,9 @@ ENTITY leon3_soc IS
     NB_APB_SLAVE      : INTEGER := 1;
     --
     ADDRESS_SIZE      : INTEGER := 20;
-    USES_IAP_MEMCTRLR : INTEGER := 0
+    USES_IAP_MEMCTRLR : INTEGER := 0;
+    BYPASS_EDAC_MEMCTRLR : STD_LOGIC := '0';
+    SRBANKSZ          : INTEGER := 8
 
     );
   PORT (
@@ -412,9 +414,10 @@ BEGIN
         pindex   => 0,
         paddr    => 0,
         srbanks  => 2,
-        banksz   => 8,                  --512k * 32
+        banksz   => SRBANKSZ,                  --512k * 32
         rmw      => 1,
         --Aeroflex memory generics:
+        mbpbusy  => BYPASS_EDAC_MEMCTRLR,
         mprog    => 1,          -- program memory by default values after reset
         mpsrate  => 15,                 -- default scrub rate period
         mpb2s    => 14,                  -- default busy to scrub delay
@@ -440,7 +443,7 @@ BEGIN
     memi.brdyn <= nSRAM_READY;
 
     mbe_pad : iopad
-      GENERIC MAP(tech => padtech)
+      GENERIC MAP(tech => padtech, oepol => USES_IAP_MEMCTRLR)
       PORT MAP(pad => SRAM_MBE,
                i   => mbe,
                en  => mbe_drive,

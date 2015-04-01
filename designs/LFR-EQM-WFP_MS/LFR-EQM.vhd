@@ -49,6 +49,8 @@ library proasic3l;
 use proasic3l.all;
 
 ENTITY LFR_EQM IS
+  GENERIC (
+    Mem_use                : INTEGER := use_RAM);
   
   PORT (
     clk50MHz    : IN STD_ULOGIC;
@@ -216,7 +218,8 @@ BEGIN  -- beh
       NB_AHB_SLAVE    => NB_AHB_SLAVE,
       NB_APB_SLAVE    => NB_APB_SLAVE,
       ADDRESS_SIZE    => 19,
-      USES_IAP_MEMCTRLR => 1)
+      USES_IAP_MEMCTRLR => 1,
+      BYPASS_EDAC_MEMCTRLR => '1')
     PORT MAP (
       clk    => clk_25,
       reset  => rstn_25,
@@ -259,13 +262,13 @@ BEGIN  -- beh
       pindex           => 6,
       paddr            => 6,
       pmask            => 16#fff#,
-      FIRST_DIVISION   => 374,  -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
+      --FIRST_DIVISION   => 374,  -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
       NB_SECOND_DESYNC => 60)  -- 60 secondes of desynchronization before CoarseTime's MSB is Set
     PORT MAP (
       clk25MHz          => clk_25,
       resetn_25MHz      => rstn_25,      --      TODO
-      clk24_576MHz      => clk_24,          -- 49.152MHz/2
-      resetn_24_576MHz  => rstn_24,      --      TODO
+      --clk24_576MHz      => clk_24,          -- 49.152MHz/2
+      --resetn_24_576MHz  => rstn_24,      --      TODO
       
       grspw_tick    => swno.tickout,
       apbi          => apbi_ext,
@@ -388,7 +391,7 @@ BEGIN  -- beh
 
   lpp_lfr_1 : lpp_lfr
     GENERIC MAP (
-      Mem_use                => use_RAM,
+      Mem_use                => Mem_use,
       nb_data_by_buffer_size => 32,
       --nb_word_by_buffer_size => 30,
       nb_snapshot_param_size => 32,

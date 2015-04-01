@@ -54,7 +54,9 @@ PACKAGE lpp_leon3_soc_pkg IS
       NB_AHB_SLAVE    : INTEGER;
       NB_APB_SLAVE    : INTEGER;
       ADDRESS_SIZE    : INTEGER;
-      USES_IAP_MEMCTRLR : INTEGER
+      USES_IAP_MEMCTRLR : INTEGER;
+      BYPASS_EDAC_MEMCTRLR : STD_LOGIC;
+      SRBANKSZ        : INTEGER := 8
     );
   PORT (
     clk    : IN STD_ULOGIC;

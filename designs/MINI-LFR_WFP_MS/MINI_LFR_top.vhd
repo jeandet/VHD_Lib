@@ -113,6 +113,16 @@ END MINI_LFR_top;
 
 
 ARCHITECTURE beh OF MINI_LFR_top IS
+
+--==========================================================================
+--  USE_IAP_MEMCTRL allow to use the srctrle-0ws on MINILFR board
+--  when enabled, chip enable polarity should be reversed and bank size also
+--  MINILFR      -> 1 bank of 4MBytes   -> SRBANKSZ=9
+--  LFR EQM & FM -> 2 banks of 2MBytes  -> SRBANKSZ=8
+--==========================================================================
+  CONSTANT USE_IAP_MEMCTRL : integer := 1;
+--==========================================================================
+
   SIGNAL clk_50_s    : STD_LOGIC := '0';
   SIGNAL clk_25      : STD_LOGIC := '0';
   SIGNAL clk_24      : STD_LOGIC := '0';
@@ -357,7 +367,8 @@ BEGIN  -- beh
       NB_AHB_SLAVE      => NB_AHB_SLAVE,
       NB_APB_SLAVE      => NB_APB_SLAVE,
       ADDRESS_SIZE      => 20,
-      USES_IAP_MEMCTRLR => 0)
+      USES_IAP_MEMCTRLR => USE_IAP_MEMCTRL,
+      SRBANKSZ          => 9)
     PORT MAP (
       clk         => clk_25,
       reset       => rstn_25,
@@ -375,7 +386,7 @@ BEGIN  -- beh
       nSRAM_WE    => SRAM_nWE,
       nSRAM_CE    => SRAM_CE_s,
       nSRAM_OE    => SRAM_nOE,
-      nSRAM_READY => '0',
+      nSRAM_READY => '1',
       SRAM_MBE    => OPEN,
       apbi_ext    => apbi_ext,
       apbo_ext    => apbo_ext,
@@ -384,7 +395,13 @@ BEGIN  -- beh
       ahbi_m_ext  => ahbi_m_ext,
       ahbo_m_ext  => ahbo_m_ext);
 
-  SRAM_CE <= SRAM_CE_s(0);
+IAP:if USE_IAP_MEMCTRL = 1 GENERATE
+  SRAM_CE <= not SRAM_CE_s(0);
+END GENERATE;
+
+NOIAP:if USE_IAP_MEMCTRL = 0 GENERATE
+  SRAM_CE <=  SRAM_CE_s(0);
+END GENERATE;
 -------------------------------------------------------------------------------
 -- APB_LFR_MANAGEMENT ---------------------------------------------------------
 -------------------------------------------------------------------------------

@@ -80,8 +80,8 @@ set_io	TAG2			-pinname	K12	-fixed	yes	-DIRECTION	Inout
 set_io	TAG3			-pinname	K13	-fixed	yes	-DIRECTION	Inout
 set_io	TAG4			-pinname	L16	-fixed	yes	-DIRECTION	Inout
 #set_io	TAG5			-pinname	L15	-fixed	yes	-DIRECTION	Inout
-#set_io	TAG6			-pinname	M16	-fixed	yes	-DIRECTION	Inout
-#set_io TAG7			-pinname	J14	-fixed	yes	-DIRECTION	Inout
+set_io	TAG6			-pinname	M16	-fixed	yes	-DIRECTION	Inout
+set_io  TAG7			-pinname	J14	-fixed	yes	-DIRECTION	Inout
 set_io	TAG8			-pinname	K15	-fixed	yes	-DIRECTION	Inout
 #set_io	TAG9			-pinname	J17	-fixed	yes	-DIRECTION	Inout
 

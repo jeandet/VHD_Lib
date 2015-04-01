@@ -4,3 +4,4 @@ apb_lfr_management.vhd
 lfr_time_management.vhd
 fine_time_counter.vhd
 coarse_time_counter.vhd
+fine_time_max_value_gen.vhd

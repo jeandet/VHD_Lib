@@ -110,14 +110,15 @@ BEGIN  -- beh
 
   -----------------------------------------------------------------------------
   -- Just to try to limit the constraint
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      set_TCU_reg <= '0';
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      set_TCU_reg <= set_TCU;
-    END IF;
-  END PROCESS;  
+  --PROCESS (clk, rstn)
+  --BEGIN  -- PROCESS
+  --  IF rstn = '0' THEN                  -- asynchronous reset (active low)
+  --    set_TCU_reg <= '0';
+  --  ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+  --    set_TCU_reg <= set_TCU;
+  --  END IF;
+  --END PROCESS;  
   -----------------------------------------------------------------------------
-
+  set_TCU_reg <= set_TCU;
+  
 END beh;

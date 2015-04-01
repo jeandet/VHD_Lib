@@ -35,13 +35,13 @@ PACKAGE lpp_lfr_management IS
       pindex           : INTEGER;
       paddr            : INTEGER;
       pmask            : INTEGER;
-      FIRST_DIVISION   : INTEGER;
+--      FIRST_DIVISION   : INTEGER;
       NB_SECOND_DESYNC : INTEGER);
     PORT (
       clk25MHz         : IN  STD_LOGIC;
       resetn_25MHz     : IN  STD_LOGIC;
-      clk24_576MHz     : IN  STD_LOGIC;
-      resetn_24_576MHz : IN  STD_LOGIC;
+--      clk24_576MHz     : IN  STD_LOGIC;
+--      resetn_24_576MHz : IN  STD_LOGIC;
       grspw_tick       : IN  STD_LOGIC;
       apbi             : IN  apb_slv_in_type;
       apbo             : OUT apb_slv_out_type;
@@ -59,7 +59,7 @@ PACKAGE lpp_lfr_management IS
 
   COMPONENT lfr_time_management
     GENERIC (
-      FIRST_DIVISION   : INTEGER;
+      --FIRST_DIVISION   : INTEGER;
       NB_SECOND_DESYNC : INTEGER);
     PORT (
       clk             : IN  STD_LOGIC;
@@ -92,8 +92,8 @@ PACKAGE lpp_lfr_management IS
 
   COMPONENT fine_time_counter
     GENERIC (
-      WAITING_TIME   : STD_LOGIC_VECTOR(15 DOWNTO 0);
-      FIRST_DIVISION : INTEGER);
+      WAITING_TIME   : STD_LOGIC_VECTOR(15 DOWNTO 0));--;
+--      FIRST_DIVISION : INTEGER);
     PORT (
       clk            : IN  STD_LOGIC;
       rstn           : IN  STD_LOGIC;
@@ -105,7 +105,15 @@ PACKAGE lpp_lfr_management IS
       fine_time      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       fine_time_new  : OUT STD_LOGIC);
   END COMPONENT;
-  
+
+  COMPONENT fine_time_max_value_gen
+    PORT (
+      clk                 : IN  STD_LOGIC;
+      rstn                : IN  STD_LOGIC;
+      tick                : IN  STD_LOGIC;
+      fine_time_add       : IN  STD_LOGIC;
+      fine_time_max_value : OUT STD_LOGIC_VECTOR(8 DOWNTO 0));
+  END COMPONENT;
   
 END lpp_lfr_management;
 

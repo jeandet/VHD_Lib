@@ -25,7 +25,6 @@ USE lpp.lpp_lfr_management.ALL;
 
 ENTITY lfr_time_management IS
   GENERIC (
-    FIRST_DIVISION   : INTEGER := 374;
     NB_SECOND_DESYNC : INTEGER := 60);
   PORT (
     clk  : IN STD_LOGIC;
@@ -83,8 +82,7 @@ BEGIN
   -----------------------------------------------------------------------------
   fine_time_counter_1: fine_time_counter
     GENERIC MAP (
-      WAITING_TIME => X"0040",
-      FIRST_DIVISION => FIRST_DIVISION)
+      WAITING_TIME => X"0040")
     PORT MAP (
       clk            => clk,
       rstn           => rstn,
