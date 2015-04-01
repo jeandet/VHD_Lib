@@ -368,6 +368,7 @@ BEGIN  -- beh
       NB_APB_SLAVE      => NB_APB_SLAVE,
       ADDRESS_SIZE      => 20,
       USES_IAP_MEMCTRLR => USE_IAP_MEMCTRL,
+      BYPASS_EDAC_MEMCTRLR => '1',
       SRBANKSZ          => 9)
     PORT MAP (
       clk         => clk_25,

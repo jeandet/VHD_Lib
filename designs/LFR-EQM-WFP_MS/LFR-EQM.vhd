@@ -45,12 +45,12 @@ USE lpp.general_purpose.ALL;
 USE lpp.lpp_lfr_management.ALL;
 USE lpp.lpp_leon3_soc_pkg.ALL;
 
-library proasic3l;
-use proasic3l.all;
+--library proasic3l;
+--use proasic3l.all;
 
 ENTITY LFR_EQM IS
-  GENERIC (
-    Mem_use                : INTEGER := use_RAM);
+  --GENERIC (
+  --  Mem_use                : INTEGER := use_RAM);
   
   PORT (
     clk50MHz    : IN STD_ULOGIC;
@@ -197,8 +197,8 @@ BEGIN  -- beh
   --
   leon3_soc_1 : leon3_soc
     GENERIC MAP (
-      fabtech         => apa3e,
-      memtech         => apa3e,
+      fabtech         => apa3l,
+      memtech         => apa3l,
       padtech         => inferred,
       clktech         => inferred,
       disas           => 0,
@@ -219,7 +219,8 @@ BEGIN  -- beh
       NB_APB_SLAVE    => NB_APB_SLAVE,
       ADDRESS_SIZE    => 19,
       USES_IAP_MEMCTRLR => 1,
-      BYPASS_EDAC_MEMCTRLR => '1')
+      BYPASS_EDAC_MEMCTRLR => '0',
+      SRBANKSZ          => 8)
     PORT MAP (
       clk    => clk_25,
       reset  => rstn_25,
@@ -258,7 +259,7 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
   apb_lfr_management_1 : apb_lfr_management
     GENERIC MAP (
-      tech             => apa3e,
+      tech             => apa3l,
       pindex           => 6,
       paddr            => 6,
       pmask            => 16#fff#,
@@ -329,7 +330,7 @@ BEGIN  -- beh
   spw_inputloop : FOR j IN 0 TO 1 GENERATE
     spw_phy0 : grspw_phy
       GENERIC MAP(
-        tech         => apa3e,
+        tech         => apa3l,
         rxclkbuftype => 1,
         scantest     => 0)
       PORT MAP(
@@ -344,7 +345,7 @@ BEGIN  -- beh
 
   -- SPW core
   sw0 : grspwm GENERIC MAP(
-    tech         => apa3e,
+    tech         => apa3l,
     hindex       => 1,
     pindex       => 5,
     paddr        => 5,
@@ -361,7 +362,7 @@ BEGIN  -- beh
     netlist      => 0,
     ports        => 2,
     --dmachan => CFG_SPW_DMACHAN, -- not used byt the spw core 1
-    memtech      => apa3e,
+    memtech      => apa3l,
     destkey      => 2,
     spwcore      => 1
     --input_type => CFG_SPW_INPUT, -- not used byt the spw core 1
@@ -391,7 +392,7 @@ BEGIN  -- beh
 
   lpp_lfr_1 : lpp_lfr
     GENERIC MAP (
-      Mem_use                => Mem_use,
+      Mem_use                => use_RAM,
       nb_data_by_buffer_size => 32,
       --nb_word_by_buffer_size => 30,
       nb_snapshot_param_size => 32,
@@ -403,7 +404,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"020144")  -- aa.bb.cc version
+      top_lfr_version        => X"020145")  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             --      0 => MINI_LFR
                                             --      1 => EM
