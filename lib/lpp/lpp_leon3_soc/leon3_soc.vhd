@@ -420,7 +420,7 @@ BEGIN
         banksz   => SRBANKSZ,                  --512k * 32
         rmw      => 1,
         --Aeroflex memory generics:
-        mbpbusy  => BYPASS_EDAC_MEMCTRLR,
+        mbpedac  => BYPASS_EDAC_MEMCTRLR,
         mprog    => 1,          -- program memory by default values after reset
         mpsrate  => 15,                 -- default scrub rate period
         mpb2s    => 14,                  -- default busy to scrub delay
