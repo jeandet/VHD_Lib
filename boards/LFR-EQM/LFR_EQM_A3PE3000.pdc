@@ -1,6 +1,6 @@
 set_io	clk49_152MHz		-pinname	D5	-fixed	yes	-DIRECTION	Inout
 set_io	clk50MHz		-pinname	B3	-fixed	yes	-DIRECTION	Inout
-set_io	reset			-pinname	R4	-fixed	yes	-DIRECTION	Inout
+set_io	reset			-pinname	R4	-fixed	yes	-DIRECTION	Inout -SCHMITT_TRIGGER On
 
 set_io	{address[0]}		-pinname	U3	-fixed	yes	-DIRECTION	Inout
 set_io	{address[1]}		-pinname	V14	-fixed	yes	-DIRECTION	Inout

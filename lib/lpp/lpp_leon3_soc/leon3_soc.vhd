@@ -363,9 +363,12 @@ BEGIN
 
     dsugen : IF CFG_DSU = 1 GENERATE
       dsu0 : dsu3                       -- LEON3 Debug Support Unit
-        GENERIC MAP (hindex => 2, haddr => 16#900#, hmask => 16#F00#,
-                     ncpu   => CFG_NCPU, tbits => 30, tech => memtech, irq => 0, kbytes => CFG_ATBSZ)
-        PORT MAP (rstn, clkm, ahbmi, ahbsi, ahbso(2), dbgo, dbgi, dsui, dsuo);
+        GENERIC MAP (hindex => 0,       --      TODO : hindex => 2
+                     haddr => 16#900#, hmask => 16#F00#,
+                     ncpu   => CFG_NCPU, tbits => 30, tech => memtech,
+                     irq => 0, kbytes => CFG_ATBSZ)
+        PORT MAP (rstn, clkm, ahbmi, ahbsi, ahbso(0),--      TODO :ahbso(2)
+                  dbgo, dbgi, dsui, dsuo);
       dsui.enable <= '1';
       dsui.break  <= '0';
     END GENERATE;
@@ -410,7 +413,7 @@ BEGIN
   IAPMEMCT : IF USES_IAP_MEMCTRLR = 1 GENERATE
     memctrlr : srctrle_0ws
       GENERIC MAP(
-        hindex   => 0,
+        hindex   => 2,                  -- TODO : hindex   => 0
         pindex   => 0,
         paddr    => 0,
         srbanks  => 2,
@@ -429,7 +432,7 @@ BEGIN
         rst       => rstn,
         clk       => clkm,
         ahbsi     => ahbsi,
-        ahbso     => ahbso(0),
+        ahbso     => ahbso(2),          -- TODO :ahbso(0),
         apbi      => apbi,
         apbo      => apbo(0),
         sri       => memi,
