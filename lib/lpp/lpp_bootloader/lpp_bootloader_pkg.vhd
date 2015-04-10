@@ -46,7 +46,7 @@ PACKAGE lpp_bootloader_pkg IS
       ahbso : OUT ahb_slv_out_type);
   END COMPONENT;
   
-  COMPONENT ahbrom
+  COMPONENT bootrom
     GENERIC (
       hindex : INTEGER;
       haddr  : INTEGER;

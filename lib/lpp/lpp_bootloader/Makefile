@@ -1,4 +1,4 @@
-GRLIB=../../..
+#GRLIB=../../..
 CC=gcc
 XCC=sparc-elf-gcc -I$(GRLIB)/software/leon3 $(BOPT)
 XAS=sparc-elf-gcc -c -I. -I$(GRLIB)/software/leon3 $(BOPT)

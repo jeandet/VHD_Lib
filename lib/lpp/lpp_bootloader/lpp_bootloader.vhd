@@ -70,7 +70,7 @@ ARCHITECTURE Beh OF lpp_bootloader IS
     config_wait_on_boot    : STD_LOGIC;
     config_start_execution : STD_LOGIC;
     addr_start_execution   : STD_LOGIC_VECTOR(31 DOWNTO 0);
-    addr_fp                : STD_LOGIC_VECTOR(31 DOWNTO 0);
+--    addr_fp                : STD_LOGIC_VECTOR(31 DOWNTO 0);
   END RECORD;
 
   SIGNAL reg : lpp_bootloader_regs;
@@ -83,7 +83,7 @@ BEGIN  -- Beh
   -----------------------------------------------------------------------------
   -- AHBROM 
   -----------------------------------------------------------------------------
-  ahbrom_1 : ahbrom
+  ahbrom_1 : bootrom
     GENERIC MAP (
       hindex => hindex,
       haddr  => haddr,

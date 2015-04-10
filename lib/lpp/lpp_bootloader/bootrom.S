@@ -134,13 +134,14 @@ _fsrxx:
 	andcc %g3, 0x0f, %g3
 	bne 1f
 
-	set L2MCTRLIO, %g1
+/*	set L2MCTRLIO, %g1
 	set MCFG1, %g2
 	st  %g2, [%g1]
 	set MCFG2, %g2
 	st  %g2, [%g1+4]
 	set MCFG3, %g2
 	st  %g2, [%g1+8]
+	*/
 !	set IRQCTRL, %g1
 !	set 0x0ffff, %g2
 !	st  %g2, [%g1+0x10]
@@ -177,7 +178,16 @@ _fsrxx:
 	ba 2b
 	sub %g3, 1, %g3
 
+3:	set RAMSTART_RAMSIZE-32, %fp
+	sub %fp, %g1, %fp
+	sub %fp, 96, %sp
 
+	set RAMSTART, %g1
+
+	jmp %g1
+	nop
+	
+/*
 3:
 	set REG_BOOTLOADER, %10
 	ld [%10], %11
@@ -200,5 +210,5 @@ RunProg:
 
 	jmp %g1
 	nop
-
+*/
 .align	32

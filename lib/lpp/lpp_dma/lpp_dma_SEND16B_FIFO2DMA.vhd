@@ -147,7 +147,7 @@ BEGIN
           AHB_Master_Out.HTRANS  <= HTRANS_IDLE;
           address_counter_reg <= (OTHERS => '0');
           
-          IF AHB_Master_In.HGRANT(hindex) = '1' THEN
+          IF  AHB_Master_In.HREADY = '1' AND AHB_Master_In.HGRANT(hindex) = '1' THEN
             AHB_Master_Out.HTRANS  <= HTRANS_IDLE;
             state <= s_CTRL;
           END IF;

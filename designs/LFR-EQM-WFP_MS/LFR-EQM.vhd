@@ -28,6 +28,7 @@ USE grlib.stdlib.ALL;
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
 LIBRARY gaisler;
+USE gaisler.sim.ALL;
 USE gaisler.memctrl.ALL;
 USE gaisler.leon3.ALL;
 USE gaisler.uart.ALL;
@@ -44,13 +45,16 @@ USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
 USE lpp.lpp_lfr_management.ALL;
 USE lpp.lpp_leon3_soc_pkg.ALL;
+USE lpp.lpp_bootloader_pkg.ALL;
 
 --library proasic3l;
 --use proasic3l.all;
 
 ENTITY LFR_EQM IS
-  --GENERIC (
-  --  Mem_use                : INTEGER := use_RAM);
+  GENERIC (
+    Mem_use                : INTEGER := use_RAM;
+    USE_BOOTLOADER         : INTEGER := 0
+    );
   
   PORT (
     clk50MHz    : IN STD_ULOGIC;
@@ -392,7 +396,7 @@ BEGIN  -- beh
 
   lpp_lfr_1 : lpp_lfr
     GENERIC MAP (
-      Mem_use                => use_RAM,
+      Mem_use                => Mem_use,
       nb_data_by_buffer_size => 32,
       --nb_word_by_buffer_size => 30,
       nb_snapshot_param_size => 32,
@@ -466,4 +470,24 @@ BEGIN  -- beh
   -----------------------------------------------------------------------------
   ADC_OEB_bar_HK <= ADC_OEB_bar_CH_s(8);
 
+  -----------------------------------------------------------------------------
+  -- 
+  -----------------------------------------------------------------------------
+  inst_bootloader: IF USE_BOOTLOADER = 1 GENERATE
+    lpp_bootloader_1: lpp_bootloader
+      GENERIC MAP (
+        pindex => 13,
+        paddr  => 13,
+        pmask  => 16#fff#,
+        hindex => 3,
+        haddr  => 0,
+        hmask  => 16#fff#)
+      PORT MAP (
+        HCLK    => clk_25,
+        HRESETn => rstn_25,
+        apbi    => apbi_ext,
+        apbo    => apbo_ext(13),
+        ahbsi   => ahbi_s_ext,
+        ahbso   => ahbo_s_ext(3));
+  END GENERATE inst_bootloader;
 END beh;
