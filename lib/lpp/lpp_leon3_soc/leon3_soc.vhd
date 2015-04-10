@@ -375,7 +375,7 @@ BEGIN
   END GENERATE;
 
   nodsu : IF CFG_DSU = 0 GENERATE
-    ahbso(2)    <= ahbs_none;
+    ahbso(0)    <= ahbs_none;
     dsuo.tstop  <= '0';
     dsuo.active <= '0';
   END GENERATE;
@@ -397,12 +397,12 @@ BEGIN
 ----------------------------------------------------------------------
   ESAMEMCT : IF USES_IAP_MEMCTRLR = 0 GENERATE
     memctrlr : mctrl GENERIC MAP (
-      hindex  => 0,
+      hindex  => 2,
       pindex  => 0,
       paddr   => 0,
       srbanks => 1
       )
-      PORT MAP (rstn, clkm, memi, memo, ahbsi, ahbso(0), apbi, apbo(0), wpo, sdo);
+      PORT MAP (rstn, clkm, memi, memo, ahbsi, ahbso(2), apbi, apbo(0), wpo, sdo);
     memi.bexcn <= '1';
     memi.brdyn <= '1';
 
@@ -489,7 +489,7 @@ BEGIN
   ahb0 : ahbctrl                        -- AHB arbiter/multiplexer
     GENERIC MAP (defmast => CFG_DEFMST, split => CFG_SPLIT,
                  rrobin  => CFG_RROBIN, ioaddr => CFG_AHBIO,
-                 ioen    => 0, nahbm => maxahbmsp, nahbs => 8)
+                 ioen    => 0, nahbm => maxahbmsp, nahbs => 8, fixbrst => 0)
     PORT MAP (rstn, clkm, ahbmi, ahbmo, ahbsi, ahbso);
 
 ----------------------------------------------------------------------

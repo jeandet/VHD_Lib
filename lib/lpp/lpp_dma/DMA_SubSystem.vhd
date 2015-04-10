@@ -3,6 +3,7 @@ USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 
 LIBRARY lpp;
+USE lpp.apb_devices_list.ALL;
 USE lpp.lpp_ad_conv.ALL;
 USE lpp.iir_filter.ALL;
 USE lpp.FILTERcfg.ALL;
@@ -25,7 +26,8 @@ USE GRLIB.DMA2AHB_Package.ALL;
 ENTITY DMA_SubSystem IS
   
   GENERIC (
-    hindex : INTEGER := 2);
+    hindex     : INTEGER := 2;
+    CUSTOM_DMA : INTEGER := 1);
 
   PORT (
     clk                            : IN  STD_LOGIC;
@@ -116,25 +118,48 @@ BEGIN  -- beh
   -----------------------------------------------------------------------------
   -- DMA
   -----------------------------------------------------------------------------
-  lpp_dma_singleOrBurst_1 : lpp_dma_singleOrBurst
-    GENERIC MAP (
-      tech   => inferred,
-      hindex => hindex)
-    PORT MAP (
-      HCLK           => clk,
-      HRESETn        => rstn,
-      run            => run,
-      AHB_Master_In  => ahbi,
-      AHB_Master_Out => ahbo,
+  GR_DMA : IF CUSTOM_DMA = 0 GENERATE
+    lpp_dma_singleOrBurst_1 : lpp_dma_singleOrBurst
+      GENERIC MAP (
+        tech   => inferred,
+        hindex => hindex)
+      PORT MAP (
+        HCLK           => clk,
+        HRESETn        => rstn,
+        run            => run,
+        AHB_Master_In  => ahbi,
+        AHB_Master_Out => ahbo,
 
-      send        => dma_send,
-      valid_burst => dma_valid_burst,
-      done        => dma_done,
-      ren         => dma_ren,
-      address     => dma_address,
-      data        => dma_data);
+        send        => dma_send,
+        valid_burst => dma_valid_burst,
+        done        => dma_done,
+        ren         => dma_ren,
+        address     => dma_address,
+        data        => dma_data);
+  END GENERATE GR_DMA;
 
-  
+  LPP_DMA_IP : IF CUSTOM_DMA = 1 GENERATE
+    lpp_dma_SEND16B_FIFO2DMA_1 : lpp_dma_SEND16B_FIFO2DMA
+      GENERIC MAP (
+        hindex   => hindex,
+        vendorid => VENDOR_LPP,
+        deviceid => 10,
+        version  => 0)
+      PORT MAP (
+        clk            => clk,
+        rstn           => rstn,
+        AHB_Master_In  => ahbi,
+        AHB_Master_Out => ahbo,
+
+        ren         => dma_ren,
+        data        => dma_data,
+        send        => dma_send,
+        valid_burst => dma_valid_burst,
+        done        => dma_done,
+        address     => dma_address);
+  END GENERATE LPP_DMA_IP;
+
+
   -----------------------------------------------------------------------------
   -- RoundRobin Selection Channel For DMA
   -----------------------------------------------------------------------------

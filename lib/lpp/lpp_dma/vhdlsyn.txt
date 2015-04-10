@@ -9,3 +9,4 @@ DMA_SubSystem.vhd
 DMA_SubSystem_GestionBuffer.vhd
 DMA_SubSystem_Arbiter.vhd
 DMA_SubSystem_MUX.vhd
+lpp_dma_SEND16B_FIFO2DMA.vhd

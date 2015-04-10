@@ -223,7 +223,8 @@ PACKAGE lpp_dma_pkg IS
   -----------------------------------------------------------------------------
   COMPONENT DMA_SubSystem
     GENERIC (
-      hindex : INTEGER);
+      hindex : INTEGER;
+      CUSTOM_DMA : INTEGER := 1);
     PORT (
       clk              : IN  STD_LOGIC;
       rstn             : IN  STD_LOGIC;
@@ -284,6 +285,25 @@ PACKAGE lpp_dma_pkg IS
       dma_ren         : IN  STD_LOGIC;
       dma_done        : IN  STD_LOGIC;
       grant_error     : OUT STD_LOGIC);
+  END COMPONENT;
+
+  COMPONENT lpp_dma_SEND16B_FIFO2DMA
+    GENERIC (
+      hindex   :    INTEGER;
+      vendorid : in Integer;
+      deviceid : in Integer;
+      version  : in Integer);
+    PORT (
+      clk            : IN  STD_LOGIC;
+      rstn           : IN  STD_LOGIC;
+      AHB_Master_In  : IN  AHB_Mst_In_Type;
+      AHB_Master_Out : OUT AHB_Mst_Out_Type;
+      ren            : OUT STD_LOGIC;
+      data           : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
+      send           : IN  STD_LOGIC;
+      valid_burst    : IN  STD_LOGIC;
+      done           : OUT STD_LOGIC;
+      address        : IN  STD_LOGIC_VECTOR(31 DOWNTO 0));
   END COMPONENT;
   
 END;

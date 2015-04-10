@@ -214,6 +214,8 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   --
   SIGNAL sample_hk : STD_LOGIC_VECTOR(15 DOWNTO 0);
   SIGNAL HK_SEL    : STD_LOGIC_VECTOR(1 DOWNTO 0);
+
+  SIGNAL nSRAM_READY : STD_LOGIC;
   
 BEGIN  -- beh
 
@@ -368,7 +370,7 @@ BEGIN  -- beh
       NB_APB_SLAVE      => NB_APB_SLAVE,
       ADDRESS_SIZE      => 20,
       USES_IAP_MEMCTRLR => USE_IAP_MEMCTRL,
-      BYPASS_EDAC_MEMCTRLR => '1',
+      BYPASS_EDAC_MEMCTRLR => '0',
       SRBANKSZ          => 9)
     PORT MAP (
       clk         => clk_25,
@@ -387,7 +389,7 @@ BEGIN  -- beh
       nSRAM_WE    => SRAM_nWE,
       nSRAM_CE    => SRAM_CE_s,
       nSRAM_OE    => SRAM_nOE,
-      nSRAM_READY => '1',
+      nSRAM_READY => nSRAM_READY,
       SRAM_MBE    => OPEN,
       apbi_ext    => apbi_ext,
       apbo_ext    => apbo_ext,
@@ -396,13 +398,27 @@ BEGIN  -- beh
       ahbi_m_ext  => ahbi_m_ext,
       ahbo_m_ext  => ahbo_m_ext);
 
-IAP:if USE_IAP_MEMCTRL = 1 GENERATE
-  SRAM_CE <= not SRAM_CE_s(0);
-END GENERATE;
+  PROCESS (clk_25, rstn_25)
+  BEGIN  -- PROCESS
+    IF rstn_25 = '0' THEN               -- asynchronous reset (active low)
+      nSRAM_READY <= '1';
+    ELSIF clk_25'event AND clk_25 = '1' THEN  -- rising clock edge
+      nSRAM_READY <= '1';
+      IF IO0 = '1' THEN
+        nSRAM_READY <= '0';
+      END IF;
+    END IF;
+  END PROCESS;
+  
+  
 
-NOIAP:if USE_IAP_MEMCTRL = 0 GENERATE
-  SRAM_CE <=  SRAM_CE_s(0);
-END GENERATE;
+  IAP:if USE_IAP_MEMCTRL = 1 GENERATE
+    SRAM_CE <= not SRAM_CE_s(0);
+  END GENERATE;
+
+  NOIAP:if USE_IAP_MEMCTRL = 0 GENERATE
+    SRAM_CE <=  SRAM_CE_s(0);
+  END GENERATE;
 -------------------------------------------------------------------------------
 -- APB_LFR_MANAGEMENT ---------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -412,13 +428,13 @@ END GENERATE;
       pindex           => 6,
       paddr            => 6,
       pmask            => 16#fff#,
-      FIRST_DIVISION   => 374,      -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
+--      FIRST_DIVISION   => 374,      -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
       NB_SECOND_DESYNC => 60)  -- 60 secondes of desynchronization before CoarseTime's MSB is Set
     PORT MAP (
       clk25MHz         => clk_25,
       resetn_25MHz     => rstn_25,      --      TODO
-      clk24_576MHz     => clk_24,       -- 49.152MHz/2
-      resetn_24_576MHz => rstn_24,      --      TODO
+--      clk24_576MHz     => clk_24,       -- 49.152MHz/2
+--      resetn_24_576MHz => rstn_24,      --      TODO
       grspw_tick       => swno.tickout,
       apbi             => apbi_ext,
       apbo             => apbo_ext(6),
@@ -543,7 +559,7 @@ END GENERATE;
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000144")  -- aa.bb.cc version
+      top_lfr_version        => X"000146")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
@@ -565,7 +581,7 @@ END GENERATE;
   observation_reg(31 DOWNTO 12)     <= (OTHERS => '0');
   observation_vector_0(11 DOWNTO 0) <= lfr_debug_vector;
   observation_vector_1(11 DOWNTO 0) <= lfr_debug_vector;
-  IO0                               <= rstn_25;
+--  IO0                               <= rstn_25;
   IO1                               <= lfr_debug_vector_ms(0);  -- LFR MS FFT data_valid
   IO2                               <= lfr_debug_vector_ms(0);  -- LFR MS FFT ready
   IO3                               <= lfr_debug_vector(0);  -- LFR APBREG error_buffer_full
