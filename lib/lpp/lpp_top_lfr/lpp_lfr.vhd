@@ -265,66 +265,20 @@ BEGIN
       data_shaping_R0  => data_shaping_R0,
       data_shaping_R1  => data_shaping_R1,
       data_shaping_R2  => data_shaping_R2,
-      sample_f0_val    => sample_f_val(0),
-      sample_f1_val    => sample_f_val(1),
-      sample_f2_val    => sample_f_val(2),
-      sample_f3_val    => sample_f_val(3),
-      sample_f0_wdata  => OPEN,
-      sample_f1_wdata  => OPEN,
-      sample_f2_wdata  => OPEN,
-      sample_f3_wdata  => OPEN,
+      sample_f0_val    => sample_f0_val,
+      sample_f1_val    => sample_f1_val,
+      sample_f2_val    => sample_f2_val,
+      sample_f3_val    => sample_f3_val,
+      sample_f0_wdata  => sample_f0_data,
+      sample_f1_wdata  => sample_f1_data,
+      sample_f2_wdata  => sample_f2_data,
+      sample_f3_wdata  => sample_f3_data,
       sample_f0_time   => sample_f0_time, 
       sample_f1_time   => sample_f1_time,
       sample_f2_time   => sample_f2_time,
       sample_f3_time   => sample_f3_time
       );
-  -----------------------------------------------------------------------------
-  ALL_lane: FOR J IN 0 TO 3 GENERATE
-    ALL_channel: FOR I IN 0 TO 5 GENERATE
-      sample_f_data(15 + I*16 + J*6*16 DOWNTO 14 + I*16 + J*6*16) <= STD_LOGIC_VECTOR(to_unsigned(J,2));
-      sample_f_data(13 + I*16 + J*6*16 DOWNTO 11 + I*16 + J*6*16) <= STD_LOGIC_VECTOR(to_unsigned(I,3));
 
-      PROCESS (clk, rstn)
-      BEGIN  -- PROCESS
-        IF rstn = '0' THEN              -- asynchronous reset (active low)
-          sample_f_data(10 + I*16 + J*6*16 DOWNTO 0 + I*16 + J*6*16 ) <= STD_LOGIC_VECTOR(to_unsigned(2**11/6*I,11));
-        ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-          IF sample_f_val(J) = '1' THEN
-            sample_f_data(10 + I*16 + J*6*16 DOWNTO 0 + I*16 + J*6*16) <= STD_LOGIC_VECTOR(to_unsigned(
-              to_integer(UNSIGNED(sample_f_data(10 + I*16 + J*6*16 DOWNTO 0 + I*16 + J*6*16))) + 1,
-              11)); 
-          END IF;
-        END IF;
-      END PROCESS;
-      
-    END GENERATE ALL_channel;
-  END GENERATE ALL_lane;
-
-  PROCESS (clk, rstn)
-  BEGIN  -- PROCESS
-    IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      sample_f0_val <= '0';
-      sample_f1_val <= '0';
-      sample_f2_val <= '0';
-      sample_f3_val <= '0';
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      sample_f0_val <= sample_f_val(0);
-      sample_f1_val <= sample_f_val(1);
-      sample_f2_val <= sample_f_val(2);
-      sample_f3_val <= sample_f_val(3);      
-    END IF;
-  END PROCESS;
-  
-  
-  sample_f0_data <= sample_f_data(1*6*16-1 DOWNTO 0*6*16);
-  sample_f1_data <= sample_f_data(2*6*16-1 DOWNTO 1*6*16);
-  sample_f2_data <= sample_f_data(3*6*16-1 DOWNTO 2*6*16);
-  sample_f3_data <= sample_f_data(4*6*16-1 DOWNTO 3*6*16);  
-  
-  --sample_f0_data <= X"0020" & X"0010" & X"0008" & X"0004" & X"0002" & X"0001";
-  --sample_f1_data <= X"1020" & X"1010" & X"1008" & X"1004" & X"1002" & X"1001";
-  --sample_f2_data <= X"2020" & X"2010" & X"2008" & X"2004" & X"2002" & X"2001";
-  --sample_f3_data <= X"4020" & X"4010" & X"4008" & X"4004" & X"4002" & X"4001";  
   -----------------------------------------------------------------------------
   lpp_lfr_apbreg_1 : lpp_lfr_apbreg
     GENERIC MAP (
