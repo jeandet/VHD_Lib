@@ -178,9 +178,10 @@ BEGIN
           
         WHEN s_DATA =>
           AHB_Master_Out.HBUSREQ <= '0';
-          AHB_Master_Out.HLOCK   <= '0';
+          --AHB_Master_Out.HLOCK   <= '0';
           AHB_Master_Out.HTRANS  <= HTRANS_IDLE;
           IF AHB_Master_In.HREADY = '1' THEN
+            AHB_Master_Out.HLOCK   <= '0';
             state <= IDLE;
             done <= '1';
           END IF;
