@@ -422,7 +422,7 @@ BEGIN
         --Aeroflex memory generics:
         mbpedac  => BYPASS_EDAC_MEMCTRLR,
         mprog    => 1,          -- program memory by default values after reset
-        mpsrate  => 15,                 -- default scrub rate period
+        mpsrate  => 5,                 -- default scrub rate period
         mpb2s    => 14,                  -- default busy to scrub delay
         mpapb    => 1,                  -- instantiate apb register
         mchipcnt => 2,

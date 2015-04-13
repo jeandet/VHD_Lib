@@ -85,6 +85,8 @@ ARCHITECTURE Behavioral OF lpp_dma_SEND16B_FIFO2DMA IS
 
   SIGNAL bus_request : STD_LOGIC;
   SIGNAL bus_lock : STD_LOGIC;
+
+  SIGNAL data_reg : STD_LOGIC_VECTOR(31 DOWNTO 0);
   
 BEGIN
 
@@ -111,8 +113,8 @@ BEGIN
   
   -----------------------------------------------------------------------------
   AHB_Master_Out.HADDR  <= address(31 DOWNTO 6) & address_counter_reg & "00";
-  AHB_Master_Out.HWDATA <= ahbdrivedata(data);
-
+  AHB_Master_Out.HWDATA <= ahbdrivedata(data) WHEN AHB_Master_In.HREADY = '1' ELSE ahbdrivedata(data_reg);
+  
   -----------------------------------------------------------------------------
   --ren <= NOT ((AHB_Master_In.HGRANT(hindex) OR LAST_READ ) AND AHB_Master_In.HREADY );
   --ren <= NOT beat;
@@ -122,12 +124,21 @@ BEGIN
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
       state <= IDLE;
       done <= '0';
+      ren <= '1';      
       address_counter_reg <= (OTHERS => '0');
       AHB_Master_Out.HTRANS  <= HTRANS_IDLE;
       AHB_Master_Out.HBUSREQ <= '0';
       AHB_Master_Out.HLOCK   <= '0';
+      
+      data_reg <= (OTHERS => '0');
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+
+      IF AHB_Master_In.HREADY = '1' AND AHB_Master_In.HGRANT(hindex) = '1'  THEN
+        data_reg <= data;
+      END IF;
+      
       done <= '0';
+      ren <= '1';
       CASE state IS
         WHEN IDLE =>
           AHB_Master_Out.HBUSREQ <= '0';
@@ -159,6 +170,7 @@ BEGIN
           IF AHB_Master_In.HREADY = '1' AND AHB_Master_In.HGRANT(hindex) = '1' THEN
             AHB_Master_Out.HTRANS  <= HTRANS_SEQ;
             state <= s_CTRL_DATA;
+            ren <= '0';
           END IF;
           
         WHEN s_CTRL_DATA =>
@@ -175,6 +187,11 @@ BEGIN
             AHB_Master_Out.HTRANS  <= HTRANS_IDLE;
             state <= s_DATA;
           END IF;
+          
+          IF AHB_Master_In.HREADY = '1' AND AHB_Master_In.HGRANT(hindex) = '1' AND address_counter_reg /= "1111" THEN
+            ren <= '0';            
+          END IF;
+          
           
         WHEN s_DATA =>
           AHB_Master_Out.HBUSREQ <= '0';
@@ -194,7 +211,9 @@ BEGIN
   ctrl_window <= '1' WHEN state = s_CTRL OR state = s_CTRL_DATA ELSE '0';
   data_window <= '1' WHEN state = s_CTRL_DATA OR state = s_DATA ELSE '0';
   -----------------------------------------------------------------------------
-  ren <= NOT(AHB_Master_In.HREADY) WHEN state = s_CTRL_DATA ELSE '1';
+  
+  
+  --ren <= NOT(AHB_Master_In.HREADY) WHEN state = s_CTRL_DATA ELSE '1';
 
   -----------------------------------------------------------------------------
   --PROCESS (clk, rstn)
