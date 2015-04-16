@@ -201,8 +201,8 @@ BEGIN  -- beh
   --
   leon3_soc_1 : leon3_soc
     GENERIC MAP (
-      fabtech         => apa3l,
-      memtech         => apa3l,
+      fabtech         => apa3e,
+      memtech         => apa3e,
       padtech         => inferred,
       clktech         => inferred,
       disas           => 0,
