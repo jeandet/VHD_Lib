@@ -169,14 +169,41 @@ ARCHITECTURE beh OF LFR_EQM IS
   SIGNAL clk_25_int      : STD_LOGIC := '0';
 
   component clkint port(A : in std_ulogic; Y :out std_ulogic); end component;
-  
+
+  SIGNAL rstn_50 : STD_LOGIC;
+  SIGNAL clk_lock : STD_LOGIC;
+  SIGNAL clk_busy_counter : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL nSRAM_BUSY_reg : STD_LOGIC;
 BEGIN  -- beh
 
   -----------------------------------------------------------------------------
+  -- CLK_LOCK
+  -----------------------------------------------------------------------------
+  rst_gen_global : rstgen PORT MAP (reset, clk_50, '1', rstn_50, OPEN);
+
+  PROCESS (clk50MHz_int, rstn_50)
+  BEGIN  -- PROCESS
+    IF rstn_50 = '0' THEN         -- asynchronous reset (active low)
+      clk_lock <= '0';
+      clk_busy_counter <= (OTHERS => '0');
+      nSRAM_BUSY_reg <= '0';
+    ELSIF clk50MHz_int'event AND clk50MHz_int = '1' THEN  -- rising clock edge
+      nSRAM_BUSY_reg <= nSRAM_BUSY;
+      IF nSRAM_BUSY_reg = '1' AND nSRAM_BUSY = '0' THEN
+        IF clk_busy_counter = "1111"  THEN
+          clk_lock = '1';
+        ELSE
+          clk_busy_counter <= STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(clk_busy_counter))+1,4));
+        END IF;
+      END IF;
+    END IF;
+  END PROCESS;
+  
+  -----------------------------------------------------------------------------
   -- CLK
   -----------------------------------------------------------------------------
-  rst_domain25 : rstgen PORT MAP (reset, clk_25, '1', rstn_25, OPEN);
-  rst_domain24 : rstgen PORT MAP (reset, clk_24, '1', rstn_24, OPEN);
+  rst_domain25 : rstgen PORT MAP (reset, clk_25, clk_lock, rstn_25, OPEN);
+  rst_domain24 : rstgen PORT MAP (reset, clk_24, clk_lock, rstn_24, OPEN);
 
   --clk_pad : clkint  port map (A => clk50MHz, Y => clk50MHz_int ); 
   clk50MHz_int <= clk50MHz;
