@@ -41,6 +41,7 @@ vcom -quiet  -93  -work lpp ../../../grlib/lib/../../tortoiseHG_vhdlib/lib/lpp/.
 vcom -quiet  -93  -work lpp ../../../grlib/lib/../../tortoiseHG_vhdlib/lib/lpp/./general_purpose/SYNC_VALID_BIT.vhd
 vcom -quiet  -93  -work lpp ../../../grlib/lib/../../tortoiseHG_vhdlib/lib/lpp/./general_purpose/RR_Arbiter_4.vhd
 vcom -quiet  -93  -work lpp ../../../grlib/lib/../../tortoiseHG_vhdlib/lib/lpp/./general_purpose/general_counter.vhd
+vcom -quiet  -93  -work lpp ../../../grlib/lib/../../tortoiseHG_vhdlib/lib/lpp/./general_purpose/ramp_generator.vhd
 vcom -quiet  -93  -work lpp ../../../grlib/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_amba/apb_devices_list.vhd
 vcom -quiet  -93  -work lpp ../../../grlib/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_amba/lpp_amba.vhd
 vcom -quiet  -93  -work lpp ../../../grlib/lib/../../tortoiseHG_vhdlib/lib/lpp/./dsp/chirp/chirp_pkg.vhd
@@ -187,10 +188,36 @@ vsim work.tb
 #force -freeze sim:/tb/LFR_EQM_1/lpp_lfr_1/DMA_SubSystem_1/LPP_DMA_IP/lpp_dma_SEND16B_FIFO2DMA_1/data 11111111111111111111111111111111 0
 #force -freeze sim:/tb/LFR_EQM_1/inst_bootloader/lpp_bootloader_1/reg.config_wait_on_boot 0 0
 
-force -freeze sim:/tb/LFR_EQM_1/lpp_lfr_1/sample_f0_data 000100000000000100100000000000100001000000000100000100000000100000010000000100000001000000100000 0
-force -freeze sim:/tb/LFR_EQM_1/lpp_lfr_1/sample_f1_data 001000000000000100100000000000100010000000000100001000000000100000100000000100000010000000100000 0
-force -freeze sim:/tb/LFR_EQM_1/lpp_lfr_1/sample_f2_data 010000000000000101000000000000100100000000000100010000000000100001000000000100000100000000100000 0
-force -freeze sim:/tb/LFR_EQM_1/lpp_lfr_1/sample_f3_data 100000000000000110000000000000101000000000000100100000000000100010000000000100001000000000100000 0
+#force -freeze sim:/tb/LFR_EQM_1/lpp_lfr_1/sample_f0_data 000000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000 0
+#force -freeze sim:/tb/LFR_EQM_1/lpp_lfr_1/sample_f1_data 000000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000 0
+#force -freeze sim:/tb/LFR_EQM_1/lpp_lfr_1/sample_f2_data 000000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000 0
+#force -freeze sim:/tb/LFR_EQM_1/lpp_lfr_1/sample_f3_data 000000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000 0
+
+mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_waveform_1/generate_all_fifo(0)/lpp_fifo_1/memRAM/SRAM/inf/x0/rfd
+mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_waveform_1/generate_all_fifo(1)/lpp_fifo_1/memRAM/SRAM/inf/x0/rfd
+mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_waveform_1/generate_all_fifo(2)/lpp_fifo_1/memRAM/SRAM/inf/x0/rfd
+mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_waveform_1/generate_all_fifo(3)/lpp_fifo_1/memRAM/SRAM/inf/x0/rfd
+
+mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_lfr_filter_1/IIR_CEL_f0_to_f1/IIR_CEL_CTRLR_v2_DATAFLOW_1/RAM_CTRLR_v2_1/memRAM/SRAM/inf/x0/rfd
+mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_lfr_filter_1/IIR_CEL_CTRLR_v2_1/IIR_CEL_CTRLR_v2_DATAFLOW_1/RAM_CTRLR_v2_1/memRAM/SRAM/inf/x0/rfd
+mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_lfr_filter_1/IIR_CEL_CTRLR_v3_1/RAM_CTRLR_v2_1/memRAM/SRAM/inf/x0/rfd
+mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_lfr_filter_1/IIR_CEL_CTRLR_v3_1/RAM_CTRLR_v2_2/memRAM/SRAM/inf/x0/rfd
+
+mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_lfr_filter_1/cic_lfr_1/memRAM/SRAM/inf/x0/rfd
+
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/rf0/s1/dp/x0/proa3e/x0/a8/x(1)/u0/u0/VITALBehavior/MEM_512_9
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/rf0/s1/dp/x0/proa3e/x0/a8/x(0)/u0/u0/VITALBehavior/MEM_512_9
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/rf0/s1/dp/x1/proa3e/x0/a8/x(1)/u0/u0/VITALBehavior/MEM_512_9
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/rf0/s1/dp/x1/proa3e/x0/a8/x(0)/u0/u0/VITALBehavior/MEM_512_9
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/cmem0/ime/im0(0)/itags0/proa3e/x0/r2p/u0/a8/x(0)/u0/u0/VITALBehavior/MEM_512_9
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/cmem0/ime/im0(0)/itags0/proa3e/x0/r2p/u0/a8/x(1)/u0/u0/VITALBehavior/MEM_512_9
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/cmem0/ime/im0(0)/idata0/proa3e/x0/rdp/u0/a10/x(0)/u0/u0/VITALBehavior/MEM_512_9
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/cmem0/ime/im0(0)/idata0/proa3e/x0/rdp/u0/a10/x(1)/u0/u0/VITALBehavior/MEM_512_9
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/cmem0/ime/im0(0)/idata0/proa3e/x0/rdp/u0/a10/x(2)/u0/u0/VITALBehavior/MEM_512_9
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/cmem0/ime/im0(0)/idata0/proa3e/x0/rdp/u0/a10/x(3)/u0/u0/VITALBehavior/MEM_512_9
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/cmem0/ime/im0(0)/idata0/proa3e/x0/rdp/u0/a10/x(4)/u0/u0/VITALBehavior/MEM_512_9
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/cmem0/ime/im0(0)/idata0/proa3e/x0/rdp/u0/a10/x(5)/u0/u0/VITALBehavior/MEM_512_9
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/leon3_soc_1/l3/cpu(0)/leon3_non_radhard/u0/cmem0/ime/im0(0)/idata0/proa3e/x0/rdp/u0/a10/x(6)/u0/u0/VITALBehavior/MEM_512_9
 
 log -r *; 
 do wave.do ; 

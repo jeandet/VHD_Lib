@@ -24,6 +24,8 @@ LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 
+LIBRARY techmap;
+USE techmap.gencomp.ALL;
 
 LIBRARY lpp;
 USE lpp.lpp_sim_pkg.ALL;
@@ -65,7 +67,10 @@ ARCHITECTURE beh OF TB IS
   COMPONENT LFR_EQM
     GENERIC (
       Mem_use        : INTEGER;
-      USE_BOOTLOADER : INTEGER);
+      USE_BOOTLOADER : INTEGER;
+      USE_ADCDRIVER  : INTEGER;
+      tech           : INTEGER;
+      tech_leon      : INTEGER);
     PORT (
       clk50MHz       : IN    STD_ULOGIC;
       clk49_152MHz   : IN    STD_ULOGIC;
@@ -215,7 +220,10 @@ BEGIN  -- beh
   LFR_EQM_1 : LFR_EQM
     GENERIC MAP (
       Mem_use        => use_RAM,
-      USE_BOOTLOADER => 0)
+      USE_BOOTLOADER => 0,
+      USE_ADCDRIVER  => 0,
+      tech => apa3e,
+      tech_leon => inferred)
     PORT MAP (
       clk50MHz     => clk50MHz,  --IN    --ok
       clk49_152MHz => clk49_152MHz,  --in    --ok
@@ -316,7 +324,7 @@ BEGIN  -- beh
     reset        <= '0';
     WAIT FOR 500 ns;
     reset        <= '1';
-    WAIT FOR 10000 ns;
+    WAIT FOR 100 us;
     message_simu <= "0 - UART init  ";
     UART_INIT(TXD1, txp);
 
@@ -324,7 +332,7 @@ BEGIN  -- beh
     -- LAUNCH leon 3 software
     ---------------------------------------------------------------------------
     message_simu <= "2- GO Leon3....";
-    
+
     -- bool dsu3plugin::configureTarget() ---------------------------------------------------------------------------------------------------------------------------
     --Force a debug break
     UART_WRITE(TXD1 , txp, ADDR_BASE_DSU & X"0000" & X"0" & "00", X"0000002f"); --WriteRegs(uIntlist()<<,(unsigned int)DSUBASEADDRESS);
@@ -523,18 +531,25 @@ BEGIN  -- beh
 
 
     message_simu <= "4 - GO GO GO !!";
+    data_message <= "---------------";
     UART_WRITE (TXD1 , txp, ADDR_BASE_LFR & ADDR_LFR_WP_START_DATE, X"00000000");
-    UART_WRITE (TXD1 , txp, ADDR_BASE_LFR_2 & ADDR_LFR_WP_START_DATE, X"00000000");
+ --   UART_WRITE (TXD1 , txp, ADDR_BASE_LFR_2 & ADDR_LFR_WP_START_DATE, X"00000000");
 
+
+    data_read_v := (OTHERS => '1');
     READ_STATUS : LOOP
+      data_message <= "---------------";
       WAIT FOR 2 ms;
-      data_message <= "READ_NEW_STATUS";
-      UART_READ(TXD1, RXD1, txp, ADDR_BASE_LFR & ADDR_LFR_SM_STATUS, data_read_v);
-      data_read    <= data_read_v;
+      data_message <= "READ_STATUS_SM_";
+      --UART_READ(TXD1, RXD1, txp, ADDR_BASE_LFR & ADDR_LFR_SM_STATUS, data_read_v);
+      --data_message <= "--------------r";
+      --data_read    <= data_read_v;
       UART_WRITE(TXD1, txp, ADDR_BASE_LFR & ADDR_LFR_SM_STATUS, data_read_v);
 
-      UART_READ(TXD1, RXD1, txp, ADDR_BASE_LFR & ADDR_LFR_WP_STATUS, data_read_v);
-      data_read <= data_read_v;
+      data_message <= "READ_STATUS_WF_";
+      --UART_READ(TXD1, RXD1, txp, ADDR_BASE_LFR & ADDR_LFR_WP_STATUS, data_read_v);
+      --data_message <= "--------------r";
+      --data_read <= data_read_v;
       UART_WRITE(TXD1, txp, ADDR_BASE_LFR & ADDR_LFR_WP_STATUS, data_read_v);
     END LOOP READ_STATUS;
 

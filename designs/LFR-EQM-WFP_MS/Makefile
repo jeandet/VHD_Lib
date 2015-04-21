@@ -16,7 +16,7 @@ SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_const
 VHDLSYNFILES=LFR-EQM.vhd
 VHDLSIMFILES=testbench.vhd
 #SIMTOP=testbench
-PDC=$(VHDLIB)/boards/$(BOARD)/LFR_EQM_A3PE3000.pdc
+PDC=$(VHDLIB)/boards/$(BOARD)/LFR_EQM_A3PE3000_NoADC.pdc
 SDCFILE=$(VHDLIB)/boards/$(BOARD)/LFR_EQM_synthesis.sdc
 SDC=$(VHDLIB)/boards/$(BOARD)/LFR_EQM_place_and_route.sdc
 

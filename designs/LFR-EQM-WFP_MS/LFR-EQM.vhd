@@ -53,7 +53,10 @@ USE lpp.lpp_bootloader_pkg.ALL;
 ENTITY LFR_EQM IS
   GENERIC (
     Mem_use                : INTEGER := use_RAM;
-    USE_BOOTLOADER         : INTEGER := 0
+    USE_BOOTLOADER         : INTEGER := 0;
+    USE_ADCDRIVER          : INTEGER := 0;
+    tech                   : INTEGER := apa3e;
+    tech_leon              : INTEGER := apa3e
     );
   
   PORT (
@@ -179,7 +182,7 @@ BEGIN  -- beh
   -----------------------------------------------------------------------------
   -- CLK_LOCK
   -----------------------------------------------------------------------------
-  rst_gen_global : rstgen PORT MAP (reset, clk_50, '1', rstn_50, OPEN);
+  rst_gen_global : rstgen PORT MAP (reset, clk50MHz, '1', rstn_50, OPEN);
 
   PROCESS (clk50MHz_int, rstn_50)
   BEGIN  -- PROCESS
@@ -191,7 +194,7 @@ BEGIN  -- beh
       nSRAM_BUSY_reg <= nSRAM_BUSY;
       IF nSRAM_BUSY_reg = '1' AND nSRAM_BUSY = '0' THEN
         IF clk_busy_counter = "1111"  THEN
-          clk_lock = '1';
+          clk_lock <= '1';
         ELSE
           clk_busy_counter <= STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(clk_busy_counter))+1,4));
         END IF;
@@ -228,8 +231,8 @@ BEGIN  -- beh
   --
   leon3_soc_1 : leon3_soc
     GENERIC MAP (
-      fabtech         => apa3e,
-      memtech         => apa3e,
+      fabtech         => tech_leon,
+      memtech         => tech_leon,
       padtech         => inferred,
       clktech         => inferred,
       disas           => 0,
@@ -290,7 +293,7 @@ BEGIN  -- beh
 -------------------------------------------------------------------------------
   apb_lfr_management_1 : apb_lfr_management
     GENERIC MAP (
-      tech             => apa3l,
+      tech             => tech,
       pindex           => 6,
       paddr            => 6,
       pmask            => 16#fff#,
@@ -361,7 +364,7 @@ BEGIN  -- beh
   spw_inputloop : FOR j IN 0 TO 1 GENERATE
     spw_phy0 : grspw_phy
       GENERIC MAP(
-        tech         => apa3l,
+        tech         => tech_leon,
         rxclkbuftype => 1,
         scantest     => 0)
       PORT MAP(
@@ -376,7 +379,7 @@ BEGIN  -- beh
 
   -- SPW core
   sw0 : grspwm GENERIC MAP(
-    tech         => apa3l,
+    tech         => tech_leon,
     hindex       => 1,
     pindex       => 5,
     paddr        => 5,
@@ -393,7 +396,7 @@ BEGIN  -- beh
     netlist      => 0,
     ports        => 2,
     --dmachan => CFG_SPW_DMACHAN, -- not used byt the spw core 1
-    memtech      => apa3l,
+    memtech      => tech_leon,
     destkey      => 2,
     spwcore      => 1
     --input_type => CFG_SPW_INPUT, -- not used byt the spw core 1
@@ -468,23 +471,66 @@ BEGIN  -- beh
   -----------------------------------------------------------------------------
   -- 
   -----------------------------------------------------------------------------
-  top_ad_conv_RHF1401_withFilter_1 : top_ad_conv_RHF1401_withFilter
-    GENERIC MAP (
-      ChanelCount     => 9,
-      ncycle_cnv_high => 13,
-      ncycle_cnv      => 25,
-      FILTER_ENABLED  => 16#FF#)
-    PORT MAP (
-      cnv_clk    => clk_24,
-      cnv_rstn   => rstn_24,
-      cnv        => ADC_smpclk_s,
-      clk        => clk_25,
-      rstn       => rstn_25,
-      ADC_data   => ADC_data,
-      ADC_nOE    => ADC_OEB_bar_CH_s,
-      sample     => sample,
-      sample_val => sample_val);    
+  USE_ADCDRIVER_true: IF USE_ADCDRIVER = 1 GENERATE
+    top_ad_conv_RHF1401_withFilter_1 : top_ad_conv_RHF1401_withFilter
+      GENERIC MAP (
+        ChanelCount     => 9,
+        ncycle_cnv_high => 13,
+        ncycle_cnv      => 25,
+        FILTER_ENABLED  => 16#FF#)
+      PORT MAP (
+        cnv_clk    => clk_24,
+        cnv_rstn   => rstn_24,
+        cnv        => ADC_smpclk_s,
+        clk        => clk_25,
+        rstn       => rstn_25,
+        ADC_data   => ADC_data,
+        ADC_nOE    => ADC_OEB_bar_CH_s,
+        sample     => sample,
+        sample_val => sample_val);    
+    
+  END GENERATE USE_ADCDRIVER_true;
+  
+  USE_ADCDRIVER_false: IF USE_ADCDRIVER = 0 GENERATE
+    top_ad_conv_RHF1401_withFilter_1 : top_ad_conv_RHF1401_withFilter
+      GENERIC MAP (
+        ChanelCount     => 9,
+        ncycle_cnv_high => 13,
+        ncycle_cnv      => 25,
+        FILTER_ENABLED  => 16#FF#)
+      PORT MAP (
+        cnv_clk    => clk_24,
+        cnv_rstn   => rstn_24,
+        cnv        => ADC_smpclk_s,
+        clk        => clk_25,
+        rstn       => rstn_25,
+        ADC_data   => ADC_data,
+        ADC_nOE    => OPEN,
+        sample     => OPEN,
+        sample_val => sample_val);
+    
+    ADC_OEB_bar_CH_s(8 DOWNTO 0) <= (OTHERS => '1');
 
+    all_sample: FOR I IN 8 DOWNTO 0 GENERATE
+      ramp_generator_1: ramp_generator
+        GENERIC MAP (
+          DATA_SIZE           => 14,
+          VALUE_UNSIGNED_INIT => 2**I,
+          VALUE_UNSIGNED_INCR => 0,
+          VALUE_UNSIGNED_MASK => 16#3FFF#)
+        PORT MAP (
+          clk         => clk_25,
+          rstn        => rstn_25,
+          new_data    => sample_val,
+          output_data => sample(I) );
+    END GENERATE all_sample;
+    
+    
+  END GENERATE USE_ADCDRIVER_false;
+  
+  
+
+  
   ADC_OEB_bar_CH <= ADC_OEB_bar_CH_s(7 DOWNTO 0);
   
   ADC_smpclk <= ADC_smpclk_s;

@@ -51,17 +51,17 @@ PACKAGE general_purpose IS
   COMPONENT Clk_divider IS
     GENERIC(OSC_freqHz    : INTEGER := 50000000;
             TargetFreq_Hz : INTEGER := 50000);
-    PORT (clk          : IN  STD_LOGIC;
-           reset       : IN  STD_LOGIC;
-           clk_divided : OUT STD_LOGIC);
+    PORT (clk         : IN  STD_LOGIC;
+          reset       : IN  STD_LOGIC;
+          clk_divided : OUT STD_LOGIC);
   END COMPONENT;
 
 
   COMPONENT Clk_divider2 IS
-    generic(N : integer := 16);
-    port(
-    clk_in  :   in  std_logic;
-    clk_out :   out std_logic);
+    GENERIC(N : INTEGER := 16);
+    PORT(
+      clk_in  : IN  STD_LOGIC;
+      clk_out : OUT STD_LOGIC);
   END COMPONENT;
 
   COMPONENT Adder IS
@@ -74,7 +74,7 @@ PACKAGE general_purpose IS
       clk   : IN  STD_LOGIC;
       reset : IN  STD_LOGIC;
       clr   : IN  STD_LOGIC;
-      load  : IN STD_LOGIC;
+      load  : IN  STD_LOGIC;
       add   : IN  STD_LOGIC;
       OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
       OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
@@ -82,22 +82,22 @@ PACKAGE general_purpose IS
       );
   END COMPONENT;
 
-COMPONENT Adder_V0 is
-generic(
-    Input_SZ_A     :   integer := 16;
-    Input_SZ_B     :   integer := 16
+  COMPONENT Adder_V0 IS
+    GENERIC(
+      Input_SZ_A : INTEGER := 16;
+      Input_SZ_B : INTEGER := 16
 
-);
-port(
-    clk     :   in  std_logic;
-    reset   :   in  std_logic;
-    clr     :   in  std_logic;
-    add     :   in  std_logic;
-    OP1     :   in  std_logic_vector(Input_SZ_A-1 downto 0);
-    OP2     :   in  std_logic_vector(Input_SZ_B-1 downto 0);
-    RES     :   out std_logic_vector(Input_SZ_A-1 downto 0)
-);
-end COMPONENT;
+      );
+    PORT(
+      clk   : IN  STD_LOGIC;
+      reset : IN  STD_LOGIC;
+      clr   : IN  STD_LOGIC;
+      add   : IN  STD_LOGIC;
+      OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+      OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
+      RES   : OUT STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0)
+      );
+  END COMPONENT;
 
   COMPONENT ADDRcntr IS
     PORT(
@@ -115,77 +115,77 @@ end COMPONENT;
       Logic_en   : INTEGER := 1;
       Input_SZ_1 : INTEGER := 16;
       Input_SZ_2 : INTEGER := 9;
-      COMP_EN    : INTEGER := 0 -- 1 =>  No Comp
+      COMP_EN    : INTEGER := 0         -- 1 =>  No Comp
 
       );
     PORT(
       clk   : IN  STD_LOGIC;
       reset : IN  STD_LOGIC;
-      ctrl  : IN  STD_LOGIC_VECTOR(2 downto 0);
-      comp  : IN  STD_LOGIC_VECTOR(1 downto 0);
+      ctrl  : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+      comp  : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
       OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
       OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_2-1 DOWNTO 0);
       RES   : OUT STD_LOGIC_VECTOR(Input_SZ_1+Input_SZ_2-1 DOWNTO 0)
       );
   END COMPONENT;
 
-COMPONENT ALU_V0 IS
-  GENERIC(
-    Arith_en   : INTEGER := 1;
-    Logic_en   : INTEGER := 1;
-    Input_SZ_1 : INTEGER := 16;
-    Input_SZ_2 : INTEGER := 9
+  COMPONENT ALU_V0 IS
+    GENERIC(
+      Arith_en   : INTEGER := 1;
+      Logic_en   : INTEGER := 1;
+      Input_SZ_1 : INTEGER := 16;
+      Input_SZ_2 : INTEGER := 9
 
-    );
-  PORT(
-    clk   : IN  STD_LOGIC;
-    reset : IN  STD_LOGIC;
-    ctrl  : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
-    OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
-    OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_2-1 DOWNTO 0);
-    RES   : OUT STD_LOGIC_VECTOR(Input_SZ_1+Input_SZ_2-1 DOWNTO 0)
-    );
-END COMPONENT;
+      );
+    PORT(
+      clk   : IN  STD_LOGIC;
+      reset : IN  STD_LOGIC;
+      ctrl  : IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+      OP1   : IN  STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
+      OP2   : IN  STD_LOGIC_VECTOR(Input_SZ_2-1 DOWNTO 0);
+      RES   : OUT STD_LOGIC_VECTOR(Input_SZ_1+Input_SZ_2-1 DOWNTO 0)
+      );
+  END COMPONENT;
 
-COMPONENT MAC_V0 is
-generic(
-    Input_SZ_A     :   integer := 8;
-    Input_SZ_B     :   integer := 8
+  COMPONENT MAC_V0 IS
+    GENERIC(
+      Input_SZ_A : INTEGER := 8;
+      Input_SZ_B : INTEGER := 8
 
-);
-port(
-    clk     :   in  std_logic;
-    reset   :   in  std_logic;
-    clr_MAC :   in  std_logic;
-    MAC_MUL_ADD :   in  std_logic_vector(1 downto 0);
-    OP1     :   in  std_logic_vector(Input_SZ_A-1 downto 0);
-    OP2     :   in  std_logic_vector(Input_SZ_B-1 downto 0);
-    RES     :   out std_logic_vector(Input_SZ_A+Input_SZ_B-1 downto 0)
-);
-end COMPONENT;
+      );
+    PORT(
+      clk         : IN  STD_LOGIC;
+      reset       : IN  STD_LOGIC;
+      clr_MAC     : IN  STD_LOGIC;
+      MAC_MUL_ADD : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+      OP1         : IN  STD_LOGIC_VECTOR(Input_SZ_A-1 DOWNTO 0);
+      OP2         : IN  STD_LOGIC_VECTOR(Input_SZ_B-1 DOWNTO 0);
+      RES         : OUT STD_LOGIC_VECTOR(Input_SZ_A+Input_SZ_B-1 DOWNTO 0)
+      );
+  END COMPONENT;
 
 ---------------------------------------------------------
 -------- // Sélection grace a l'entrée "ctrl" \\ --------
 ---------------------------------------------------------
-Constant ctrl_IDLE   : std_logic_vector(2 downto 0) := "000";
-Constant ctrl_MAC    : std_logic_vector(2 downto 0) := "001";
-Constant ctrl_MULT   : std_logic_vector(2 downto 0) := "010";
-Constant ctrl_ADD    : std_logic_vector(2 downto 0) := "011";
-Constant ctrl_CLRMAC : std_logic_vector(2 downto 0) := "100";
+  CONSTANT ctrl_IDLE   : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
+  CONSTANT ctrl_MAC    : STD_LOGIC_VECTOR(2 DOWNTO 0) := "001";
+  CONSTANT ctrl_MULT   : STD_LOGIC_VECTOR(2 DOWNTO 0) := "010";
+  CONSTANT ctrl_ADD    : STD_LOGIC_VECTOR(2 DOWNTO 0) := "011";
+  CONSTANT ctrl_CLRMAC : STD_LOGIC_VECTOR(2 DOWNTO 0) := "100";
 
 
-Constant IDLE_V0    : std_logic_vector(3 downto 0) := "0000";
-Constant MAC_op_V0  : std_logic_vector(3 downto 0) := "0001";
-Constant MULT_V0    : std_logic_vector(3 downto 0) := "0010";
-Constant ADD_V0     : std_logic_vector(3 downto 0) := "0011";
-Constant CLR_MAC_V0 : std_logic_vector(3 downto 0) := "0100";
+  CONSTANT IDLE_V0    : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";
+  CONSTANT MAC_op_V0  : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0001";
+  CONSTANT MULT_V0    : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0010";
+  CONSTANT ADD_V0     : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0011";
+  CONSTANT CLR_MAC_V0 : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0100";
 ---------------------------------------------------------
 
   COMPONENT MAC IS
     GENERIC(
       Input_SZ_A : INTEGER := 8;
       Input_SZ_B : INTEGER := 8;
-      COMP_EN    : INTEGER := 0 -- 1 =>  No Comp
+      COMP_EN    : INTEGER := 0         -- 1 =>  No Comp
       );
     PORT(
       clk         : IN  STD_LOGIC;
@@ -199,18 +199,18 @@ Constant CLR_MAC_V0 : std_logic_vector(3 downto 0) := "0100";
       );
   END COMPONENT;
 
-  COMPONENT TwoComplementer is
-  generic(
-      Input_SZ : integer := 16);
-  port(
-      clk     : in  std_logic;                                --! Horloge du composant
-      reset   : in  std_logic;                                --! Reset general du composant
-      clr     : in  std_logic;                                --! Un reset spécifique au programme
-      TwoComp : in  std_logic;                                --! Autorise l'utilisation du complément
-      OP      : in  std_logic_vector(Input_SZ-1 downto 0);    --! Opérande d'entrée
-      RES     : out std_logic_vector(Input_SZ-1 downto 0)     --! Résultat, opérande complémenté ou non
-  );
-  end COMPONENT;
+  COMPONENT TwoComplementer IS
+    GENERIC(
+      Input_SZ : INTEGER := 16);
+    PORT(
+      clk     : IN  STD_LOGIC;          --! Horloge du composant
+      reset   : IN  STD_LOGIC;          --! Reset general du composant
+      clr     : IN  STD_LOGIC;          --! Un reset spécifique au programme
+      TwoComp : IN  STD_LOGIC;  --! Autorise l'utilisation du complément
+      OP      : IN  STD_LOGIC_VECTOR(Input_SZ-1 DOWNTO 0);  --! Opérande d'entrée
+      RES     : OUT STD_LOGIC_VECTOR(Input_SZ-1 DOWNTO 0)  --! Résultat, opérande complémenté ou non
+      );
+  END COMPONENT;
 
   COMPONENT MAC_CONTROLER IS
     PORT(
@@ -275,19 +275,19 @@ Constant CLR_MAC_V0 : std_logic_vector(3 downto 0) := "0100";
 
   TYPE MUX_INPUT_TYPE IS ARRAY (NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
   TYPE MUX_OUTPUT_TYPE IS ARRAY (NATURAL RANGE <>) OF STD_LOGIC;
-  
+
   COMPONENT MUXN
     GENERIC (
       Input_SZ : INTEGER;
       NbStage  : INTEGER);
     PORT (
       sel   : IN  STD_LOGIC_VECTOR(NbStage-1 DOWNTO 0);
-      INPUT : IN  MUX_INPUT_TYPE(0 TO (2**NbStage)-1,Input_SZ-1 DOWNTO 0);
+      INPUT : IN  MUX_INPUT_TYPE(0 TO (2**NbStage)-1, Input_SZ-1 DOWNTO 0);
       --INPUT : IN  ARRAY (0 TO (2**NbStage)-1) OF STD_LOGIC_VECTOR(Input_SZ-1 DOWNTO 0);
       RES   : OUT MUX_OUTPUT_TYPE(Input_SZ-1 DOWNTO 0));
   END COMPONENT;
 
-  
+
 
   COMPONENT Multiplier IS
     GENERIC(
@@ -365,7 +365,7 @@ Constant CLR_MAC_V0 : std_logic_vector(3 downto 0) := "0100";
       sin  : IN  STD_LOGIC;
       sout : OUT STD_LOGIC);
   END COMPONENT;
-  
+
   --COMPONENT SYNC_VALID_BIT
   --  GENERIC (
   --    NB_FF_OF_SYNC : INTEGER);
@@ -397,11 +397,24 @@ Constant CLR_MAC_V0 : std_logic_vector(3 downto 0) := "0100";
       out_grant : OUT STD_LOGIC_VECTOR(3 DOWNTO 0));
   END COMPONENT;
 
-COMPONENT Clock_Divider is
-generic(N :integer := 10);
-port( 
-    clk, rst   : in std_logic;
-    sclk       : out std_logic);
-end COMPONENT;
+  COMPONENT Clock_Divider IS
+    GENERIC(N : INTEGER := 10);
+    PORT(
+      clk, rst : IN  STD_LOGIC;
+      sclk     : OUT STD_LOGIC);
+  END COMPONENT;
+
+  COMPONENT ramp_generator
+    GENERIC (
+      DATA_SIZE           : INTEGER;
+      VALUE_UNSIGNED_INIT : INTEGER;
+      VALUE_UNSIGNED_INCR : INTEGER;
+      VALUE_UNSIGNED_MASK : INTEGER);
+    PORT (
+      clk         : IN  STD_LOGIC;
+      rstn        : IN  STD_LOGIC;
+      new_data    : IN  STD_LOGIC;
+      output_data : OUT STD_LOGIC_VECTOR(DATA_SIZE-1 DOWNTO 0));
+  END COMPONENT;
 
 END;
