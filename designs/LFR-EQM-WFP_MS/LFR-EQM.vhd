@@ -56,7 +56,9 @@ ENTITY LFR_EQM IS
     USE_BOOTLOADER         : INTEGER := 0;
     USE_ADCDRIVER          : INTEGER := 0;
     tech                   : INTEGER := apa3e;
-    tech_leon              : INTEGER := apa3e
+    tech_leon              : INTEGER := apa3e;
+    DEBUG_FORCE_DATA_DMA   : INTEGER := 1;
+    USE_DEBUG_VECTOR       : INTEGER := 1
     );
   
   PORT (
@@ -64,12 +66,14 @@ ENTITY LFR_EQM IS
     clk49_152MHz : IN STD_ULOGIC;
     reset        : IN STD_ULOGIC;
 
+    TAG          : INOUT STD_LOGIC_VECTOR(9 DOWNTO 1);
+    
     -- TAG --------------------------------------------------------------------
-    TAG1           : IN    STD_ULOGIC;  -- DSU rx data   
-    TAG3           : OUT   STD_ULOGIC;  -- DSU tx data  
+    --TAG1           : IN    STD_ULOGIC;  -- DSU rx data   
+    --TAG3           : OUT   STD_ULOGIC;  -- DSU tx data  
     -- UART APB ---------------------------------------------------------------
-    TAG2           : IN    STD_ULOGIC;  -- UART1 rx data 
-    TAG4           : OUT   STD_ULOGIC;  -- UART1 tx data   
+    --TAG2           : IN    STD_ULOGIC;  -- UART1 rx data 
+    --TAG4           : OUT   STD_ULOGIC;  -- UART1 tx data   
     -- RAM --------------------------------------------------------------------
     address        : OUT   STD_LOGIC_VECTOR(18 DOWNTO 0);
     data           : INOUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -105,9 +109,9 @@ ENTITY LFR_EQM IS
     -- HK ---------------------------------------------------------------------
     HK_smpclk      : OUT   STD_LOGIC;
     ADC_OEB_bar_HK : OUT   STD_LOGIC;
-    HK_SEL         : OUT   STD_LOGIC_VECTOR(1 DOWNTO 0);
+    HK_SEL         : OUT   STD_LOGIC_VECTOR(1 DOWNTO 0)--;
     ---------------------------------------------------------------------------
-    TAG8           : OUT   STD_LOGIC
+--    TAG8           : OUT   STD_LOGIC
     );
 
 END LFR_EQM;
@@ -177,6 +181,12 @@ ARCHITECTURE beh OF LFR_EQM IS
   SIGNAL clk_lock : STD_LOGIC;
   SIGNAL clk_busy_counter : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL nSRAM_BUSY_reg : STD_LOGIC;
+
+  SIGNAL debug_vector : STD_LOGIC_VECTOR(11 DOWNTO 0);
+  SIGNAL     ahbrxd: STD_LOGIC;
+  SIGNAL     ahbtxd: STD_LOGIC;
+  SIGNAL     urxd1 : STD_LOGIC;
+  SIGNAL     utxd1 : STD_LOGIC;
 BEGIN  -- beh
 
   -----------------------------------------------------------------------------
@@ -260,10 +270,10 @@ BEGIN  -- beh
       reset  => rstn_25,
       errorn => OPEN,
 
-      ahbrxd => TAG1,
-      ahbtxd => TAG3,
-      urxd1  => TAG2,
-      utxd1  => TAG4,
+      ahbrxd => ahbrxd,                   -- INPUT
+      ahbtxd => ahbtxd,                   -- OUTPUT
+      urxd1  => urxd1,                   -- INPUT
+      utxd1  => utxd1,                   -- OUTPUT
 
       address   => address,
       data      => data,
@@ -427,6 +437,7 @@ BEGIN  -- beh
   lpp_lfr_1 : lpp_lfr
     GENERIC MAP (
       Mem_use                => Mem_use,
+      tech                   => tech,
       nb_data_by_buffer_size => 32,
       --nb_word_by_buffer_size => 30,
       nb_snapshot_param_size => 32,
@@ -438,11 +449,12 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"020147")  -- aa.bb.cc version
+      top_lfr_version        => X"020148",  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             --      0 => MINI_LFR
                                             --      1 => EM
                                             --      2 => EQM (with A3PE3000)
+      DEBUG_FORCE_DATA_DMA  => DEBUG_FORCE_DATA_DMA)
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
@@ -456,7 +468,7 @@ BEGIN  -- beh
       coarse_time     => coarse_time,
       fine_time       => fine_time,
       data_shaping_BW => bias_fail_sw,
-      debug_vector    => OPEN,
+      debug_vector    => debug_vector,
       debug_vector_ms => OPEN);     --,
   --observation_vector_0 => OPEN,
   --observation_vector_1 => OPEN,
@@ -536,7 +548,6 @@ BEGIN  -- beh
   ADC_smpclk <= ADC_smpclk_s;
   HK_smpclk  <= ADC_smpclk_s;
 
-  TAG8 <= nSRAM_BUSY;
 
   -----------------------------------------------------------------------------
   -- HK
@@ -563,4 +574,29 @@ BEGIN  -- beh
         ahbsi   => ahbi_s_ext,
         ahbso   => ahbo_s_ext(3));
   END GENERATE inst_bootloader;
+
+  -----------------------------------------------------------------------------
+  -- 
+  -----------------------------------------------------------------------------
+  USE_DEBUG_VECTOR_IF: IF USE_DEBUG_VECTOR = 1 GENERATE
+    PROCESS (clk_25, rstn_25)
+    BEGIN  -- PROCESS
+      IF rstn_25 = '0' THEN             -- asynchronous reset (active low)
+        TAG <= (OTHERS => '0');
+      ELSIF clk_25'event AND clk_25 = '1' THEN  -- rising clock edge
+        TAG <= debug_vector(8 DOWNTO 2) & nSRAM_BUSY & debug_vector(0);
+      END IF;
+    END PROCESS;
+    
+    
+  END GENERATE USE_DEBUG_VECTOR_IF;
+
+  USE_DEBUG_VECTOR_IF2: IF USE_DEBUG_VECTOR = 0 GENERATE
+    ahbrxd <= TAG(1);
+    TAG(3) <= ahbtxd;
+    urxd1  <= TAG(2);
+    TAG(4) <= utxd1;
+    TAG(8) <= nSRAM_BUSY;
+  END GENERATE USE_DEBUG_VECTOR_IF2;
+  
 END beh;

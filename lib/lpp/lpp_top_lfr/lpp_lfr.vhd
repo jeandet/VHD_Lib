@@ -25,11 +25,12 @@ USE GRLIB.DMA2AHB_Package.ALL;
 ENTITY lpp_lfr IS
   GENERIC (
     Mem_use                : INTEGER := use_RAM;
+    tech                   : INTEGER := inferred;
     nb_data_by_buffer_size : INTEGER := 11;
     nb_snapshot_param_size : INTEGER := 11;
     delta_vector_size      : INTEGER := 20;
     delta_vector_size_f0_2 : INTEGER := 7;
-
+    
     pindex   : INTEGER := 4;
     paddr    : INTEGER := 4;
     pmask    : INTEGER := 16#fff#;
@@ -38,8 +39,10 @@ ENTITY lpp_lfr IS
 
     hindex : INTEGER := 2;
 
-    top_lfr_version : STD_LOGIC_VECTOR(23 DOWNTO 0) := (OTHERS => '0')
+    top_lfr_version : STD_LOGIC_VECTOR(23 DOWNTO 0) := (OTHERS => '0');
 
+    DEBUG_FORCE_DATA_DMA : INTEGER := 0
+    
     );
   PORT (
     clk             : IN  STD_LOGIC;
@@ -221,6 +224,9 @@ ARCHITECTURE beh OF lpp_lfr IS
   -----------------------------------------------------------------------------
   SIGNAL dma_fifo_burst_valid : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL dma_fifo_data        : STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);
+  SIGNAL dma_fifo_data_forced_gen : STD_LOGIC_VECTOR(32-1 DOWNTO 0);      --21-04-2015
+  SIGNAL dma_fifo_data_forced : STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);      --21-04-2015
+  SIGNAL dma_fifo_data_debug  : STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);      --21-04-2015
   SIGNAL dma_fifo_ren         : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL dma_buffer_new       : STD_LOGIC_VECTOR(4 DOWNTO 0);
   SIGNAL dma_buffer_addr      : STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);
@@ -239,7 +245,7 @@ ARCHITECTURE beh OF lpp_lfr IS
   
 BEGIN
 
-  debug_vector <= apb_reg_debug_vector;
+  --apb_reg_debug_vector;
   -----------------------------------------------------------------------------
   
   sample_s(4 DOWNTO 0) <= sample_E(4 DOWNTO 0);
@@ -369,7 +375,7 @@ BEGIN
   -----------------------------------------------------------------------------
   lpp_waveform_1 : lpp_waveform
     GENERIC MAP (
-      tech                   => inferred,
+      tech                   => tech,
       data_size              => 6*16,
       nb_data_by_buffer_size => nb_data_by_buffer_size,
       nb_snapshot_param_size => nb_snapshot_param_size,
@@ -449,6 +455,7 @@ BEGIN
   sample_f2_wen <= NOT(sample_f2_val) & NOT(sample_f2_val) & NOT(sample_f2_val) &
                    NOT(sample_f2_val) & NOT(sample_f2_val);
 
+  
   sample_f0_wdata <= sample_f0_data((3*16)-1 DOWNTO (1*16)) & sample_f0_data((6*16)-1 DOWNTO (3*16));  -- (MSB) E2 E1 B2 B1 B0 (LSB)
   sample_f1_wdata <= sample_f1_data((3*16)-1 DOWNTO (1*16)) & sample_f1_data((6*16)-1 DOWNTO (3*16));
   sample_f2_wdata <= sample_f2_data((3*16)-1 DOWNTO (1*16)) & sample_f2_data((6*16)-1 DOWNTO (3*16));
@@ -519,11 +526,34 @@ BEGIN
       debug_vector   => debug_vector_ms);
 
   -----------------------------------------------------------------------------
-  --run_dma <= run_ms OR run;
+  PROCESS (clk, rstn)
+  BEGIN 
+    IF rstn = '0' THEN 
+      dma_fifo_data_forced_gen <= X"00040003";
+    ELSIF clk'event AND clk = '1' THEN
+      IF dma_fifo_ren(0) = '0' THEN
+        CASE dma_fifo_data_forced_gen IS
+          WHEN X"00040003" => dma_fifo_data_forced_gen <= X"00050002";
+          WHEN X"00050002" => dma_fifo_data_forced_gen <= X"00060001";
+          WHEN X"00060001" => dma_fifo_data_forced_gen <= X"00040003";
+          WHEN OTHERS => NULL;
+        END CASE;
+      END IF;
+    END IF;
+  END PROCESS;
+  
+  dma_fifo_data_forced(32 * 1 -1 DOWNTO 32 * 0) <= dma_fifo_data_forced_gen;
+  dma_fifo_data_forced(32 * 2 -1 DOWNTO 32 * 1) <= X"A0000100";
+  dma_fifo_data_forced(32 * 3 -1 DOWNTO 32 * 2) <= X"08001000";
+  dma_fifo_data_forced(32 * 4 -1 DOWNTO 32 * 3) <= X"80007000";
+  dma_fifo_data_forced(32 * 5 -1 DOWNTO 32 * 4) <= X"0A000B00";
+  
+  dma_fifo_data_debug <= dma_fifo_data WHEN DEBUG_FORCE_DATA_DMA = 0 ELSE dma_fifo_data_forced;
   
   DMA_SubSystem_1 : DMA_SubSystem
     GENERIC MAP (
-      hindex => hindex)
+      hindex     => hindex,
+      CUSTOM_DMA => 1)
     PORT MAP (
       clk  => clk,
       rstn => rstn,
@@ -532,7 +562,7 @@ BEGIN
       ahbo => ahbo,
 
       fifo_burst_valid => dma_fifo_burst_valid,  --fifo_burst_valid,
-      fifo_data        => dma_fifo_data,         --fifo_data,
+      fifo_data        => dma_fifo_data_debug,         --fifo_data,
       fifo_ren         => dma_fifo_ren,          --fifo_ren,
 
       buffer_new      => dma_buffer_new,       --buffer_new,
@@ -540,6 +570,10 @@ BEGIN
       buffer_length   => dma_buffer_length,    --buffer_length,
       buffer_full     => dma_buffer_full,      --buffer_full,
       buffer_full_err => dma_buffer_full_err,  --buffer_full_err,
-      grant_error     => dma_grant_error);     --grant_error);
+      grant_error     => dma_grant_error,
+      debug_vector    => debug_vector(8 DOWNTO 0)
+      );     --grant_error);
 
+  
+  
 END beh;

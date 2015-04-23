@@ -193,10 +193,10 @@ vsim work.tb
 #force -freeze sim:/tb/LFR_EQM_1/lpp_lfr_1/sample_f2_data 000000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000 0
 #force -freeze sim:/tb/LFR_EQM_1/lpp_lfr_1/sample_f3_data 000000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000 0
 
-mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_waveform_1/generate_all_fifo(0)/lpp_fifo_1/memRAM/SRAM/inf/x0/rfd
-mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_waveform_1/generate_all_fifo(1)/lpp_fifo_1/memRAM/SRAM/inf/x0/rfd
-mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_waveform_1/generate_all_fifo(2)/lpp_fifo_1/memRAM/SRAM/inf/x0/rfd
-mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_waveform_1/generate_all_fifo(3)/lpp_fifo_1/memRAM/SRAM/inf/x0/rfd
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_waveform_1/generate_all_fifo(0)/lpp_fifo_1/memRAM/SRAM/inf/x0/rfd
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_waveform_1/generate_all_fifo(1)/lpp_fifo_1/memRAM/SRAM/inf/x0/rfd
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_waveform_1/generate_all_fifo(2)/lpp_fifo_1/memRAM/SRAM/inf/x0/rfd
+#mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_waveform_1/generate_all_fifo(3)/lpp_fifo_1/memRAM/SRAM/inf/x0/rfd
 
 mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_lfr_filter_1/IIR_CEL_f0_to_f1/IIR_CEL_CTRLR_v2_DATAFLOW_1/RAM_CTRLR_v2_1/memRAM/SRAM/inf/x0/rfd
 mem load -skip 0 -filltype value -filldata 0 -fillradix symbolic /tb/LFR_EQM_1/lpp_lfr_1/lpp_lfr_filter_1/IIR_CEL_CTRLR_v2_1/IIR_CEL_CTRLR_v2_DATAFLOW_1/RAM_CTRLR_v2_1/memRAM/SRAM/inf/x0/rfd

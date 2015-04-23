@@ -47,7 +47,9 @@ ENTITY DMA_SubSystem IS
     buffer_full                    : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
     buffer_full_err                : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
     ---------------------------------------------------------------------------
-    grant_error : OUT STD_LOGIC                               --
+    grant_error                    : OUT STD_LOGIC;
+    ---------------------------------------------------------------------------
+    debug_vector                   : OUT STD_LOGIC_VECTOR(8 DOWNTO 0)
 
     );
 
@@ -109,12 +111,24 @@ ARCHITECTURE beh OF DMA_SubSystem IS
   SIGNAL dma_address     : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL dma_data        : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL burst_send      : STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL fifo_grant      :  STD_LOGIC_VECTOR(4 DOWNTO 0);
-  SIGNAL fifo_address    :   STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);  --
+  SIGNAL fifo_grant      : STD_LOGIC_VECTOR(4 DOWNTO 0);
+  SIGNAL fifo_address    : STD_LOGIC_VECTOR(32*5-1 DOWNTO 0);  --
   
-  
+  SIGNAL ahbo_s          : AHB_Mst_Out_Type;
+  SIGNAL fifo_ren_s      : STD_LOGIC_VECTOR(4 DOWNTO 0);
 BEGIN  -- beh
 
+
+  debug_vector <= fifo_ren_s(0) &
+                  dma_data(1 DOWNTO 0) &
+                  ahbi.HREADY &
+                  ahbo_s.HWDATA(1 DOWNTO 0) &
+                  ahbi.HGRANT(hindex) &
+                  ahbo_s.HTRANS(0) &
+                  ahbo_s.HLOCK;
+
+  ahbo     <= ahbo_s;
+  fifo_ren <= fifo_ren_s;
   -----------------------------------------------------------------------------
   -- DMA
   -----------------------------------------------------------------------------
@@ -128,7 +142,7 @@ BEGIN  -- beh
         HRESETn        => rstn,
         run            => run,
         AHB_Master_In  => ahbi,
-        AHB_Master_Out => ahbo,
+        AHB_Master_Out => ahbo_s,
 
         send        => dma_send,
         valid_burst => dma_valid_burst,
@@ -149,7 +163,7 @@ BEGIN  -- beh
         clk            => clk,
         rstn           => rstn,
         AHB_Master_In  => ahbi,
-        AHB_Master_Out => ahbo,
+        AHB_Master_Out => ahbo_s,
 
         ren         => dma_ren,
         data        => dma_data,
@@ -184,7 +198,7 @@ BEGIN  -- beh
       fifo_grant      => fifo_grant,
       fifo_data       => fifo_data,
       fifo_address    => fifo_address,
-      fifo_ren        => fifo_ren,
+      fifo_ren        => fifo_ren_s,
       fifo_burst_done => burst_send,
       
       dma_send        => dma_send,

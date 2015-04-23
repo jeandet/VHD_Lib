@@ -74,7 +74,7 @@ ARCHITECTURE Behavioral OF lpp_dma_SEND16B_FIFO2DMA IS
     0      => ahb_device_reg(vendorid, deviceid, 0, version, 0),
     OTHERS => (OTHERS => '0'));
 
-  TYPE AHB_DMA_FSM_STATE IS (IDLE, s_ARBITER ,s_CTRL, s_CTRL_DATA, s_DATA);
+  TYPE AHB_DMA_FSM_STATE IS (IDLE, s_INIT_TRANS, s_ARBITER ,s_CTRL, s_CTRL_DATA, s_DATA);
   SIGNAL state : AHB_DMA_FSM_STATE;
   
   SIGNAL address_counter_reg : STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -87,6 +87,11 @@ ARCHITECTURE Behavioral OF lpp_dma_SEND16B_FIFO2DMA IS
   SIGNAL bus_lock : STD_LOGIC;
 
   SIGNAL data_reg : STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+  SIGNAL HREADY_pre : STD_LOGIC;
+  SIGNAL HREADY_falling : STD_LOGIC;
+
+  SIGNAL inhib_ren : STD_LOGIC;
   
 BEGIN
 
@@ -119,6 +124,10 @@ BEGIN
   --ren <= NOT ((AHB_Master_In.HGRANT(hindex) OR LAST_READ ) AND AHB_Master_In.HREADY );
   --ren <= NOT beat;
   -----------------------------------------------------------------------------
+
+  HREADY_falling <= inhib_ren WHEN AHB_Master_In.HREADY = '0' AND HREADY_pre = '1' ELSE '1';
+  
+  
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
@@ -131,14 +140,19 @@ BEGIN
       AHB_Master_Out.HLOCK   <= '0';
       
       data_reg <= (OTHERS => '0');
-    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
 
+      HREADY_pre <= '0';
+      inhib_ren <= '0';
+    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      HREADY_pre <= AHB_Master_In.HREADY;      
+      
       IF AHB_Master_In.HREADY = '1' AND AHB_Master_In.HGRANT(hindex) = '1'  THEN
         data_reg <= data;
       END IF;
       
       done <= '0';
       ren <= '1';
+      inhib_ren <= '0';
       CASE state IS
         WHEN IDLE =>
           AHB_Master_Out.HBUSREQ <= '0';
@@ -146,12 +160,15 @@ BEGIN
           AHB_Master_Out.HTRANS  <= HTRANS_IDLE;
           address_counter_reg <= (OTHERS => '0');
           IF send = '1' THEN
-            AHB_Master_Out.HBUSREQ <= '1';
-            AHB_Master_Out.HLOCK   <= '1';
-            AHB_Master_Out.HTRANS  <= HTRANS_IDLE;
-            state <= s_ARBITER;
+            state <= s_INIT_TRANS;
           END IF;
-          
+
+        WHEN s_INIT_TRANS =>
+          AHB_Master_Out.HBUSREQ <= '1';
+          AHB_Master_Out.HLOCK   <= '1';
+          AHB_Master_Out.HTRANS  <= HTRANS_IDLE;
+          state <= s_ARBITER;
+                    
         WHEN s_ARBITER =>
           AHB_Master_Out.HBUSREQ <= '1';
           AHB_Master_Out.HLOCK   <= '1';
@@ -164,13 +181,14 @@ BEGIN
           END IF;
           
         WHEN s_CTRL =>
+          inhib_ren              <= '1';
           AHB_Master_Out.HBUSREQ <= '1';
           AHB_Master_Out.HLOCK   <= '1';
           AHB_Master_Out.HTRANS  <= HTRANS_NONSEQ;
           IF AHB_Master_In.HREADY = '1' AND AHB_Master_In.HGRANT(hindex) = '1' THEN
-            AHB_Master_Out.HTRANS  <= HTRANS_SEQ;
+            --AHB_Master_Out.HTRANS  <= HTRANS_SEQ;
             state <= s_CTRL_DATA;
-            ren <= '0';
+            --ren <= '0';
           END IF;
           
         WHEN s_CTRL_DATA =>
@@ -188,12 +206,16 @@ BEGIN
             state <= s_DATA;
           END IF;
           
-          IF AHB_Master_In.HREADY = '1' AND AHB_Master_In.HGRANT(hindex) = '1' AND address_counter_reg /= "1111" THEN
-            ren <= '0';            
-          END IF;
+          ren <= HREADY_falling;
+          
+          --IF AHB_Master_In.HREADY = '1' AND AHB_Master_In.HGRANT(hindex) = '1' AND address_counter_reg /= "1111" THEN
+          --  ren <= '0';            
+          --END IF;
           
           
         WHEN s_DATA =>
+          ren <= HREADY_falling;
+          
           AHB_Master_Out.HBUSREQ <= '0';
           --AHB_Master_Out.HLOCK   <= '0';
           AHB_Master_Out.HTRANS  <= HTRANS_IDLE;

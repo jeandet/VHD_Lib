@@ -239,7 +239,9 @@ PACKAGE lpp_dma_pkg IS
       buffer_length    : IN  STD_LOGIC_VECTOR(26*5-1 DOWNTO 0);
       buffer_full      : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
       buffer_full_err  : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-      grant_error      : OUT STD_LOGIC);
+      grant_error      : OUT STD_LOGIC;
+      debug_vector                   : OUT STD_LOGIC_VECTOR(8 DOWNTO 0)
+      );
   END COMPONENT;
   
   COMPONENT DMA_SubSystem_GestionBuffer

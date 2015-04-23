@@ -61,6 +61,8 @@ ENTITY TB IS
 END TB;
 
 ARCHITECTURE beh OF TB IS
+--  CONSTANT sramfile  : STRING  := "prom.srec";
+  CONSTANT sramfile  : STRING;
 
   CONSTANT USE_ESA_MEMCTRL : INTEGER := 0;
   
@@ -70,15 +72,18 @@ ARCHITECTURE beh OF TB IS
       USE_BOOTLOADER : INTEGER;
       USE_ADCDRIVER  : INTEGER;
       tech           : INTEGER;
-      tech_leon      : INTEGER);
+      tech_leon      : INTEGER;
+      DEBUG_FORCE_DATA_DMA   : INTEGER;
+      USE_DEBUG_VECTOR       : INTEGER );
     PORT (
       clk50MHz       : IN    STD_ULOGIC;
       clk49_152MHz   : IN    STD_ULOGIC;
       reset          : IN    STD_ULOGIC;
-      TAG1           : IN    STD_ULOGIC;
-      TAG3           : OUT   STD_ULOGIC;
-      TAG2           : IN    STD_ULOGIC;
-      TAG4           : OUT   STD_ULOGIC;
+      --TAG1           : IN    STD_ULOGIC;
+      --TAG3           : OUT   STD_ULOGIC;
+      --TAG2           : IN    STD_ULOGIC;
+      --TAG4           : OUT   STD_ULOGIC;
+      TAG          : INOUT STD_LOGIC_VECTOR(9 DOWNTO 1);
       address        : OUT   STD_LOGIC_VECTOR(18 DOWNTO 0);
       data           : INOUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       nSRAM_MBE      : INOUT STD_LOGIC;
@@ -107,17 +112,16 @@ ARCHITECTURE beh OF TB IS
       DAC_CAL_EN     : OUT   STD_LOGIC;
       HK_smpclk      : OUT   STD_LOGIC;
       ADC_OEB_bar_HK : OUT   STD_LOGIC;
-      HK_SEL         : OUT   STD_LOGIC_VECTOR(1 DOWNTO 0);
-      TAG8           : OUT   STD_LOGIC);
+      HK_SEL         : OUT   STD_LOGIC_VECTOR(1 DOWNTO 0));
   END COMPONENT;
 
   SIGNAL clk50MHz       : STD_ULOGIC := '0';
   SIGNAL clk49_152MHz   : STD_ULOGIC := '0';
   SIGNAL reset          : STD_ULOGIC;
-  SIGNAL TAG1           : STD_ULOGIC := '1';
-  SIGNAL TAG3           : STD_ULOGIC;
-  SIGNAL TAG2           : STD_ULOGIC := '1';
-  SIGNAL TAG4           : STD_ULOGIC;
+  SIGNAL TAG            : STD_LOGIC_VECTOR(9 DOWNTO 1);
+  --SIGNAL TAG3           : STD_ULOGIC;
+  --SIGNAL TAG2           : STD_ULOGIC := '1';
+  --SIGNAL TAG4           : STD_ULOGIC;
   SIGNAL address        : STD_LOGIC_VECTOR(18 DOWNTO 0);
   SIGNAL data           : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL nSRAM_MBE      : STD_LOGIC;
@@ -147,7 +151,7 @@ ARCHITECTURE beh OF TB IS
   SIGNAL HK_smpclk      : STD_LOGIC;
   SIGNAL ADC_OEB_bar_HK : STD_LOGIC;
   SIGNAL HK_SEL         : STD_LOGIC_VECTOR(1 DOWNTO 0);
-  SIGNAL TAG8           : STD_LOGIC;
+--  SIGNAL TAG8           : STD_LOGIC;
 
   CONSTANT SCRUB_RATE_PERIOD    : INTEGER := 1800/20;
   CONSTANT SCRUB_PERIOD         : INTEGER :=  200/20;
@@ -211,7 +215,6 @@ ARCHITECTURE beh OF TB IS
   CONSTANT srambanks : INTEGER := 2;
   CONSTANT sramwidth : INTEGER := 32;
   CONSTANT sramdepth : INTEGER := 19;
-  CONSTANT sramfile  : STRING  := "prom.srec";
   SIGNAL   ramsn     : STD_LOGIC_VECTOR(srambanks-1 DOWNTO 0);
   -----------------------------------------------------------------------------
   
@@ -219,20 +222,23 @@ BEGIN  -- beh
 
   LFR_EQM_1 : LFR_EQM
     GENERIC MAP (
-      Mem_use        => use_RAM,
-      USE_BOOTLOADER => 0,
-      USE_ADCDRIVER  => 0,
-      tech => apa3e,
-      tech_leon => inferred)
+      Mem_use           => use_RAM,
+      USE_BOOTLOADER    => 0,
+      USE_ADCDRIVER     => 0,
+      tech              => apa3e,
+      tech_leon         => apa3e,
+      DEBUG_FORCE_DATA_DMA   => 1,
+      USE_DEBUG_VECTOR => 0)
     PORT MAP (
       clk50MHz     => clk50MHz,  --IN    --ok
       clk49_152MHz => clk49_152MHz,  --in    --ok
       reset        => reset,  --IN    --ok
 
-      TAG1 => TAG1,                     --in
-      TAG3 => TAG3,                     --out
-      TAG2 => TAG2,  --IN    --ok
-      TAG4 => TAG4,  --out   --ok
+      TAG => TAG,
+      --TAG1 => TAG1,                     --in
+      --TAG3 => TAG3,                     --out
+      --TAG2 => TAG2,  --IN    --ok
+      --TAG4 => TAG4,  --out   --ok
 
       address    => address,            --out
       data       => data,               --inout
@@ -268,8 +274,7 @@ BEGIN  -- beh
 
       HK_smpclk      => HK_smpclk,  --out   --ok
       ADC_OEB_bar_HK => ADC_OEB_bar_HK,  --out   --ok
-      HK_SEL         => HK_SEL,  --out   --ok
-      TAG8           => TAG8);          --out   --ok
+      HK_SEL         => HK_SEL);          --out   --ok
 
 
   -----------------------------------------------------------------------------
@@ -313,8 +318,9 @@ BEGIN  -- beh
   -----------------------------------------------------------------------------
   -- TB
   -----------------------------------------------------------------------------
-  TAG1 <= TXD1;
-  RXD1 <= TAG3;
+  TAG(1) <= TXD1;
+  TAG(2) <= '1';
+  RXD1   <= TAG(3);
 
   PROCESS
     CONSTANT txp         : TIME := 320 ns;
@@ -528,6 +534,7 @@ BEGIN  -- beh
 
     ---------------------------------------------------------------------------
     ---------------------------------------------------------------------------
+    UART_WRITE (TXD1 , txp, ADDR_BASE_LFR & X"58", X"FFFFFFFF");
 
 
     message_simu <= "4 - GO GO GO !!";

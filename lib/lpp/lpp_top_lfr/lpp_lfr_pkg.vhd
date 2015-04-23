@@ -197,6 +197,7 @@ PACKAGE lpp_lfr_pkg IS
   COMPONENT lpp_lfr
     GENERIC (
       Mem_use                : INTEGER;
+      tech                   : INTEGER;
       nb_data_by_buffer_size : INTEGER;
 --      nb_word_by_buffer_size : INTEGER;
       nb_snapshot_param_size : INTEGER;
@@ -208,7 +209,8 @@ PACKAGE lpp_lfr_pkg IS
       pirq_ms                : INTEGER;
       pirq_wfp               : INTEGER;
       hindex                 : INTEGER;
-      top_lfr_version        : STD_LOGIC_VECTOR(23 DOWNTO 0)
+      top_lfr_version        : STD_LOGIC_VECTOR(23 DOWNTO 0);
+      DEBUG_FORCE_DATA_DMA   : INTEGER
       );
     PORT (
       clk             : IN  STD_LOGIC;
