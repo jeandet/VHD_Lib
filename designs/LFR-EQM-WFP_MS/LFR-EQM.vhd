@@ -54,7 +54,7 @@ ENTITY LFR_EQM IS
   GENERIC (
     Mem_use                : INTEGER := use_RAM;
     USE_BOOTLOADER         : INTEGER := 0;
-    USE_ADCDRIVER          : INTEGER := 0;
+    USE_ADCDRIVER          : INTEGER := 1;
     tech                   : INTEGER := apa3e;
     tech_leon              : INTEGER := apa3e;
     DEBUG_FORCE_DATA_DMA   : INTEGER := 1;

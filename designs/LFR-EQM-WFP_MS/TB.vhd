@@ -61,8 +61,8 @@ ENTITY TB IS
 END TB;
 
 ARCHITECTURE beh OF TB IS
---  CONSTANT sramfile  : STRING  := "prom.srec";
-  CONSTANT sramfile  : STRING;
+  CONSTANT sramfile  : STRING  := "prom.srec";
+--  CONSTANT sramfile  : STRING;
 
   CONSTANT USE_ESA_MEMCTRL : INTEGER := 0;
   
@@ -224,7 +224,7 @@ BEGIN  -- beh
     GENERIC MAP (
       Mem_use           => use_RAM,
       USE_BOOTLOADER    => 0,
-      USE_ADCDRIVER     => 0,
+      USE_ADCDRIVER     => 1,
       tech              => apa3e,
       tech_leon         => apa3e,
       DEBUG_FORCE_DATA_DMA   => 1,
@@ -534,7 +534,7 @@ BEGIN  -- beh
 
     ---------------------------------------------------------------------------
     ---------------------------------------------------------------------------
-    UART_WRITE (TXD1 , txp, ADDR_BASE_LFR & X"58", X"FFFFFFFF");
+    UART_WRITE (TXD1 , txp, ADDR_BASE_LFR & X"5" & "10", X"FFFFFFFF");
 
 
     message_simu <= "4 - GO GO GO !!";
