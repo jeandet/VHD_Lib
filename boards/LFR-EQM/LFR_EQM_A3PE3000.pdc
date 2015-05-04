@@ -75,15 +75,15 @@ set_io	spw2_sin		-pinname	C15	-fixed	yes	-DIRECTION	Inout
 set_io	spw2_dout		-pinname	B7	-fixed	yes	-DIRECTION	Inout
 set_io	spw2_sout		-pinname	D7	-fixed	yes	-DIRECTION	Inout
 
-set_io	TAG1    		-pinname	J12	-fixed	yes	-DIRECTION	Inout
-set_io	TAG2			-pinname	K12	-fixed	yes	-DIRECTION	Inout
-set_io	TAG3			-pinname	K13	-fixed	yes	-DIRECTION	Inout
-set_io	TAG4			-pinname	L16	-fixed	yes	-DIRECTION	Inout
-#set_io	TAG5			-pinname	L15	-fixed	yes	-DIRECTION	Inout
-#set_io	TAG6			-pinname	M16	-fixed	yes	-DIRECTION	Inout
-#set_io TAG7			-pinname	J14	-fixed	yes	-DIRECTION	Inout
-set_io	TAG8			-pinname	K15	-fixed	yes	-DIRECTION	Inout
-#set_io	TAG9			-pinname	J17	-fixed	yes	-DIRECTION	Inout
+set_io	{TAG[1]}    		-pinname	J12	-fixed	yes	-DIRECTION	Inout
+set_io	{TAG[2]}		-pinname	K12	-fixed	yes	-DIRECTION	Inout
+set_io	{TAG[3]}		-pinname	K13	-fixed	yes	-DIRECTION	Inout
+set_io	{TAG[4]}		-pinname	L16	-fixed	yes	-DIRECTION	Inout
+#set_io	{TAG[5]}		-pinname	L15	-fixed	yes	-DIRECTION	Inout
+#set_io	{TAG[6]}		-pinname	M16	-fixed	yes	-DIRECTION	Inout
+#set_io	{TAG[7]}		-pinname	J14	-fixed	yes	-DIRECTION	Inout
+set_io	{TAG[8]}		-pinname	K15	-fixed	yes	-DIRECTION	Inout
+#set_io	{TAG[9]}		-pinname	J17	-fixed	yes	-DIRECTION	Inout
 
 set_io bias_fail_sw 		-pinname 	A3 	-fixed	yes	-DIRECTION	Inout
 
