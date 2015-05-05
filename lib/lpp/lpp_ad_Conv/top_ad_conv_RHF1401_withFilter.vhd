@@ -66,7 +66,7 @@ ARCHITECTURE ar_top_ad_conv_RHF1401 OF top_ad_conv_RHF1401_withFilter IS
   SIGNAL ADC_data_valid            : STD_LOGIC;
   SIGNAL ADC_data_reg              : Samples14;
   -----------------------------------------------------------------------------
-  CONSTANT SAMPLE_DIVISION : INTEGER := 2;
+  CONSTANT SAMPLE_DIVISION : INTEGER := 5;
   SIGNAL sample_val_s : STD_LOGIC;
   SIGNAL sample_val_counter : INTEGER RANGE 0 TO SAMPLE_DIVISION;
 BEGIN
@@ -149,6 +149,7 @@ BEGIN
       ADC_data_reg              <= (OTHERS => '0');
       all_channel_sample_reg_init: FOR I IN 0 TO ChanelCount-1 LOOP
         sample_reg(I) <= (OTHERS => '0');
+        sample(I)     <= (OTHERS => '0');
       END LOOP all_channel_sample_reg_init;
       sample_val     <= '0';
       sample_val_s     <= '0';
@@ -201,6 +202,7 @@ BEGIN
         IF sample_val_counter = SAMPLE_DIVISION-1 THEN
           sample_val_counter <= 0;
           sample_val         <= '1';            -- TODO
+          sample <= sample_reg;
         ELSE
           sample_val_counter <= sample_val_counter + 1;
           sample_val         <= '0';
@@ -228,7 +230,7 @@ BEGIN
     signed( ADC_data_reg(13)      & ADC_data_reg)
     ));
   
-  sample <= sample_reg;
+--  sample <= sample_reg;
   
 END ar_top_ad_conv_RHF1401;
 

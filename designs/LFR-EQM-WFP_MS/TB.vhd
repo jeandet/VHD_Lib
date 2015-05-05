@@ -141,7 +141,9 @@ ARCHITECTURE beh OF TB IS
   SIGNAL spw2_dout      : STD_LOGIC;
   SIGNAL spw2_sout      : STD_LOGIC;
   SIGNAL bias_fail_sw   : STD_LOGIC;
-  SIGNAL ADC_OEB_bar_CH : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL ADC_OEB_bar_CH   : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL ADC_OEB_bar_CH_r : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL ADC_OEB_bar_CH_s : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL ADC_smpclk     : STD_LOGIC;
   SIGNAL ADC_data       : STD_LOGIC_VECTOR(13 DOWNTO 0);
   SIGNAL DAC_SDO        : STD_LOGIC;
@@ -281,7 +283,7 @@ BEGIN  -- beh
   clk49_152MHz <= NOT clk49_152MHz AFTER 10173 ps;  -- 49.152/2 MHz
   clk50MHz     <= NOT clk50MHz     AFTER 10 ns;     -- 50 MHz
   -----------------------------------------------------------------------------
-
+    
   MODULE_RHF1401 : FOR I IN 0 TO 7 GENERATE
     TestModule_RHF1401_1 : TestModule_RHF1401
       GENERIC MAP (

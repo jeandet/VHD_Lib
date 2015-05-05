@@ -110,6 +110,8 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
   SIGNAL sample_filter_in         : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
   --SIGNAL sample_filter_out        : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
   --
+  SIGNAL sample_filter_v2_out_sim     : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
+  
   SIGNAL sample_filter_v2_out_val : STD_LOGIC;
   SIGNAL sample_filter_v2_out     : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
   -----------------------------------------------------------------------------
@@ -294,6 +296,23 @@ BEGIN
     END IF;
   END PROCESS;
   ----------
+
+  --for simulation/observation-------------------------------------------------
+  ALL_channel_f0_sim: FOR I IN 0 TO ChanelCount-1 GENERATE
+    all_bit: FOR J IN 0 TO 17 GENERATE
+      PROCESS (clk, rstn)
+      BEGIN  -- PROCESS
+        IF rstn = '0' THEN                  -- asynchronous reset (active low)
+          sample_filter_v2_out_sim(I,J) <= '0';
+        ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+          IF sample_filter_v2_out_val = '1' THEN
+            sample_filter_v2_out_sim(I,J) <= sample_filter_v2_out(I,J);          
+          END IF;
+        END IF;
+      END PROCESS;  
+    END GENERATE all_bit;
+  END GENERATE ALL_channel_f0_sim;
+  -----------------------------------------------------------------------------
   
 
   -----------------------------------------------------------------------------
