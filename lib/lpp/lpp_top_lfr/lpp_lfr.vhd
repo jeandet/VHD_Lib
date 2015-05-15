@@ -94,6 +94,11 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL sample_f2_data   : STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);
   SIGNAL sample_f3_data   : STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);
   --
+  SIGNAL sample_f0_data_sim : Samples(5 DOWNTO 0);
+  SIGNAL sample_f1_data_sim : Samples(5 DOWNTO 0);
+  SIGNAL sample_f2_data_sim : Samples(5 DOWNTO 0);
+  SIGNAL sample_f3_data_sim : Samples(5 DOWNTO 0);
+  --
   SIGNAL sample_f0_wdata  : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   SIGNAL sample_f1_wdata  : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
   SIGNAL sample_f2_wdata  : STD_LOGIC_VECTOR((5*16)-1 DOWNTO 0);
@@ -574,6 +579,24 @@ BEGIN
       debug_vector    => debug_vector(8 DOWNTO 0)
       );     --grant_error);
 
-  
+  -----------------------------------------------------------------------------
+  -- OBSERVATION for SIMULATION
+  all_channel_sim: FOR I IN 0 TO 5 GENERATE
+    PROCESS (clk, rstn)
+    BEGIN  -- PROCESS
+      IF rstn = '0' THEN                  -- asynchronous reset (active low)
+        sample_f0_data_sim(I) <= (OTHERS => '0');
+        sample_f1_data_sim(I) <= (OTHERS => '0');
+        sample_f2_data_sim(I) <= (OTHERS => '0');
+        sample_f3_data_sim(I) <= (OTHERS => '0');
+      ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+        IF sample_f0_val = '1' THEN sample_f0_data_sim(I) <= sample_f0_data(((I+1)*16)-1 DOWNTO (I*16)); END IF;
+        IF sample_f1_val = '1' THEN sample_f1_data_sim(I) <= sample_f1_data(((I+1)*16)-1 DOWNTO (I*16)); END IF;
+        IF sample_f2_val = '1' THEN sample_f2_data_sim(I) <= sample_f2_data(((I+1)*16)-1 DOWNTO (I*16)); END IF;
+        IF sample_f3_val = '1' THEN sample_f3_data_sim(I) <= sample_f3_data(((I+1)*16)-1 DOWNTO (I*16)); END IF;  
+      END IF;
+    END PROCESS;
+  END GENERATE all_channel_sim;
+  -----------------------------------------------------------------------------
   
 END beh;

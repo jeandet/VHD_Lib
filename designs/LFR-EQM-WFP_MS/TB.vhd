@@ -146,6 +146,7 @@ ARCHITECTURE beh OF TB IS
   SIGNAL ADC_OEB_bar_CH_s : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL ADC_smpclk     : STD_LOGIC;
   SIGNAL ADC_data       : STD_LOGIC_VECTOR(13 DOWNTO 0);
+  SIGNAL ADC_data_s     : STD_LOGIC_VECTOR(13 DOWNTO 0);
   SIGNAL DAC_SDO        : STD_LOGIC;
   SIGNAL DAC_SCK        : STD_LOGIC;
   SIGNAL DAC_SYNC       : STD_LOGIC;
@@ -229,7 +230,7 @@ BEGIN  -- beh
       USE_ADCDRIVER     => 1,
       tech              => apa3e,
       tech_leon         => apa3e,
-      DEBUG_FORCE_DATA_DMA   => 1,
+      DEBUG_FORCE_DATA_DMA   => 0,
       USE_DEBUG_VECTOR => 0)
     PORT MAP (
       clk50MHz     => clk50MHz,  --IN    --ok
@@ -287,15 +288,17 @@ BEGIN  -- beh
   MODULE_RHF1401 : FOR I IN 0 TO 7 GENERATE
     TestModule_RHF1401_1 : TestModule_RHF1401
       GENERIC MAP (
-        freq      => 24*(I+1),
-        amplitude => 8000/(I+1),
+        freq      => 240*(I*5+1),
+        amplitude => 8000/(I*5+1),
         impulsion => 0)
       PORT MAP (
         ADC_smpclk  => ADC_smpclk,
-        ADC_OEB_bar => ADC_OEB_bar_CH(I),
-        ADC_data    => ADC_data);
+        ADC_OEB_bar => ADC_OEB_bar_CH_s(I),
+        ADC_data    => ADC_data_s);
   END GENERATE MODULE_RHF1401;
 
+  ADC_OEB_bar_CH_s <= TRANSPORT ADC_OEB_bar_CH AFTER 10 ns;
+  ADC_data         <= TRANSPORT ADC_data_s AFTER 60 ns;
   -----------------------------------------------------------------------------
   PROCESS (clk50MHz, reset)
   BEGIN  -- PROCESS

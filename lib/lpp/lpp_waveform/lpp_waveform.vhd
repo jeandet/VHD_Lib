@@ -401,7 +401,7 @@ BEGIN  -- beh
   generate_all_fifo: FOR I IN 0 TO 3 GENERATE
     lpp_fifo_1: lpp_fifo
       GENERIC MAP (
-        tech                  => tech,
+        tech                  => 0,
         Mem_use               => use_RAM,
         EMPTY_THRESHOLD_LIMIT => 15,
         FULL_THRESHOLD_LIMIT  => 3,

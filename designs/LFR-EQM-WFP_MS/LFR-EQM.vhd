@@ -120,7 +120,7 @@ END LFR_EQM;
 ARCHITECTURE beh OF LFR_EQM IS
   
   SIGNAL clk_25      : STD_LOGIC := '0';
-  SIGNAL clk_49      : STD_LOGIC := '0';
+  SIGNAL clk_24      : STD_LOGIC := '0';
   -----------------------------------------------------------------------------
   SIGNAL coarse_time : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL fine_time   : STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -163,7 +163,7 @@ ARCHITECTURE beh OF LFR_EQM IS
 
   -----------------------------------------------------------------------------
   SIGNAL rstn_25 : STD_LOGIC;
-  SIGNAL rstn_49 : STD_LOGIC;
+  SIGNAL rstn_24 : STD_LOGIC;
 
   SIGNAL LFR_soft_rstn : STD_LOGIC;
   SIGNAL LFR_rstn      : STD_LOGIC;
@@ -216,7 +216,7 @@ BEGIN  -- beh
   -- CLK
   -----------------------------------------------------------------------------
   rst_domain25 : rstgen PORT MAP (reset, clk_25, clk_lock, rstn_25, OPEN);
-  rst_domain24 : rstgen PORT MAP (reset, clk_49, clk_lock, rstn_49, OPEN);
+  rst_domain24 : rstgen PORT MAP (reset, clk_24, clk_lock, rstn_24, OPEN);
 
   --clk_pad : clkint  port map (A => clk50MHz, Y => clk50MHz_int ); 
   clk50MHz_int <= clk50MHz;
@@ -230,13 +230,13 @@ BEGIN  -- beh
   END PROCESS;
   --clk_pad_25 : clkint  port map (A => clk_25_int, Y => clk_25 ); 
 
-  --PROCESS(clk49_152MHz)
-  --BEGIN
-  --  IF clk49_152MHz'EVENT AND clk49_152MHz = '1' THEN
-  --    clk_24 <= NOT clk_24;
-  --  END IF;
-  --END PROCESS;
-  clk_49 <= clk49_152MHz;
+  PROCESS(clk49_152MHz)
+  BEGIN
+    IF clk49_152MHz'EVENT AND clk49_152MHz = '1' THEN
+      clk_24 <= NOT clk_24;
+    END IF;
+  END PROCESS;
+--  clk_49 <= clk49_152MHz;
 
   -----------------------------------------------------------------------------
   --
@@ -488,12 +488,12 @@ BEGIN  -- beh
     top_ad_conv_RHF1401_withFilter_1 : top_ad_conv_RHF1401_withFilter
       GENERIC MAP (
         ChanelCount     => 9,
-        ncycle_cnv_high => 50,
-        ncycle_cnv      => 100,
+        ncycle_cnv_high => 25,
+        ncycle_cnv      => 50,
         FILTER_ENABLED  => 16#FF#)
       PORT MAP (
-        cnv_clk    => clk_49,
-        cnv_rstn   => rstn_49,
+        cnv_clk    => clk_24,
+        cnv_rstn   => rstn_24,
         cnv        => ADC_smpclk_s,
         clk        => clk_25,
         rstn       => rstn_25,
@@ -512,8 +512,8 @@ BEGIN  -- beh
         ncycle_cnv      => 50,
         FILTER_ENABLED  => 16#FF#)
       PORT MAP (
-        cnv_clk    => clk_49,
-        cnv_rstn   => rstn_49,
+        cnv_clk    => clk_24,
+        cnv_rstn   => rstn_24,
         cnv        => ADC_smpclk_s,
         clk        => clk_25,
         rstn       => rstn_25,

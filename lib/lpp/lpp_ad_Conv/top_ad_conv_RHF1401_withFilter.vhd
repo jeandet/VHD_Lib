@@ -35,7 +35,7 @@ ARCHITECTURE ar_top_ad_conv_RHF1401 OF top_ad_conv_RHF1401_withFilter IS
   SIGNAL cnv_s_reg         : STD_LOGIC;
   SIGNAL cnv_sync          : STD_LOGIC;
   SIGNAL cnv_sync_reg      : STD_LOGIC;
-  SIGNAL cnv_sync_rising   : STD_LOGIC;
+  SIGNAL cnv_sync_falling   : STD_LOGIC;
 
   SIGNAL ADC_nOE_reg : STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0);
   SIGNAL enable_ADC : STD_LOGIC;
@@ -132,7 +132,7 @@ BEGIN
     END IF;
   END PROCESS;
   
-  cnv_sync_rising <= '1' WHEN cnv_sync = '1' AND cnv_sync_reg = '0' ELSE '0';
+  cnv_sync_falling <= '1' WHEN cnv_sync = '0' AND cnv_sync_reg = '1' ELSE '0';
   
   -----------------------------------------------------------------------------
   -- GEN OutPut Enable
@@ -161,7 +161,7 @@ BEGIN
       ADC_nOE        <= (OTHERS => '1');
       CASE state_GEN_OEn IS
         WHEN IDLE =>
-          IF cnv_sync_rising = '1' THEN
+          IF cnv_sync_falling = '1' THEN
             ADC_nOE(0)                <= '0';
             state_GEN_OEn             <= GEN_OE;
             ADC_current               <= 0;
@@ -233,7 +233,6 @@ BEGIN
 --  sample <= sample_reg;
   
 END ar_top_ad_conv_RHF1401;
-
 
 
 

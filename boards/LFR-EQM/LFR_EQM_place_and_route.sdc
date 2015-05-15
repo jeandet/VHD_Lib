@@ -20,7 +20,7 @@ create_clock  -name { clk49_152MHz } -period 20.345 -waveform { 0.000 10.172  } 
 
 create_clock  -name { clk_25:Q } -period 40.000 -waveform { 0.000 20.000  }  { clk_25:Q  } 
 
-#create_clock  -name { clk_24:Q } -period 40.690 -waveform { 0.000 20.345  }  { clk_24:Q  } 
+create_clock  -name { clk_24:Q } -period 40.690 -waveform { 0.000 20.345  }  { clk_24:Q  } 
 
 create_clock  -name { spw_inputloop.1.spw_phy0/rxclki_RNO:Y } -period 100.000 -waveform { 0.000 50.000  }  { spw_inputloop.1.spw_phy0/rxclki_RNO:Y  } 
 
