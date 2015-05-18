@@ -231,7 +231,7 @@ BEGIN  -- beh
       tech              => apa3e,
       tech_leon         => apa3e,
       DEBUG_FORCE_DATA_DMA   => 0,
-      USE_DEBUG_VECTOR => 0)
+      USE_DEBUG_VECTOR       => 0)
     PORT MAP (
       clk50MHz     => clk50MHz,  --IN    --ok
       clk49_152MHz => clk49_152MHz,  --in    --ok
@@ -288,13 +288,14 @@ BEGIN  -- beh
   MODULE_RHF1401 : FOR I IN 0 TO 7 GENERATE
     TestModule_RHF1401_1 : TestModule_RHF1401
       GENERIC MAP (
-        freq      => 240*(I*5+1),
-        amplitude => 8000/(I*5+1),
+        freq      => 2400,--24*(I*5+1),
+        amplitude => 4000,--8000/(I*5+1),
         impulsion => 0)
       PORT MAP (
         ADC_smpclk  => ADC_smpclk,
         ADC_OEB_bar => ADC_OEB_bar_CH_s(I),
         ADC_data    => ADC_data_s);
+    --ADC_data_s <= "00" & X"190";
   END GENERATE MODULE_RHF1401;
 
   ADC_OEB_bar_CH_s <= TRANSPORT ADC_OEB_bar_CH AFTER 10 ns;
