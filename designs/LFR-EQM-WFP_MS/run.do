@@ -180,6 +180,8 @@ vcom -quiet  -93  -work lpp ../../../grlib/lib/../../tortoiseHG_vhdlib/lib/lpp/.
 vcom -quiet  -93  -work lpp ../../lib/lpp/lpp_dma/lpp_dma_SEND16B_FIFO2DMA.vhd
 vcom -quiet  -93  -work lpp ../../lib/lpp/lpp_leon3_soc/leon3_soc.vhd
 vcom -quiet  -93  -work iap ../../../grlib/lib/../../VHDLIB_non_free/lib/iap/./memctrlr/srctrle-0ws.vhd
+vcom -quiet  -93  -work lpp ../../../grlib/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_ad_Conv/top_ad_conv_RHF1401_withFilter.vhd
+vcom -quiet  -93  -work lpp ../../../grlib/lib/../../tortoiseHG_vhdlib/lib/lpp/./lpp_ad_Conv/top_ad_conv_RHF1401_withFilter.vhd
 vcom -quiet  -93  -work work LFR-EQM.vhd
 vcom -quiet  -93  -work work TB.vhd
 

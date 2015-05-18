@@ -55,19 +55,21 @@ ARCHITECTURE ar_top_ad_conv_RHF1401 OF top_ad_conv_RHF1401_withFilter IS
   CONSTANT FILTER_ENABLED_STDLOGIC : STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0) := STD_LOGIC_VECTOR(to_unsigned(FILTER_ENABLED,ChanelCount));
 
   -----------------------------------------------------------------------------
-  CONSTANT OE_NB_CYCLE_ENABLED : INTEGER := 2;
-  CONSTANT DATA_CYCLE_VALID    : INTEGER := 3;
+  CONSTANT OE_NB_CYCLE_ENABLED : INTEGER := 1;
+  CONSTANT DATA_CYCLE_VALID    : INTEGER := 1;
   
   -- GEN OutPut Enable
   TYPE FSM_GEN_OEn_state IS (IDLE, GEN_OE, WAIT_CYCLE);
   SIGNAL state_GEN_OEn             : FSM_GEN_OEn_state;
   SIGNAL ADC_current               : INTEGER RANGE 0 TO ChanelCount-1;
-  SIGNAL ADC_current_cycle_enabled : INTEGER RANGE 0 TO OE_NB_CYCLE_ENABLED + 1;
+  SIGNAL ADC_current_cycle_enabled : INTEGER RANGE 0 TO OE_NB_CYCLE_ENABLED + 1 ;
   SIGNAL ADC_data_valid            : STD_LOGIC;
+  SIGNAL ADC_data_valid_s          : STD_LOGIC;
   SIGNAL ADC_data_reg              : Samples14;
   -----------------------------------------------------------------------------
-  CONSTANT SAMPLE_DIVISION : INTEGER := 5;
-  SIGNAL sample_val_s : STD_LOGIC;
+  CONSTANT SAMPLE_DIVISION  : INTEGER := 10;
+  SIGNAL sample_val_s       : STD_LOGIC;
+  SIGNAL sample_val_s2       : STD_LOGIC;
   SIGNAL sample_val_counter : INTEGER RANGE 0 TO SAMPLE_DIVISION;
 BEGIN
 
@@ -162,7 +164,7 @@ BEGIN
       CASE state_GEN_OEn IS
         WHEN IDLE =>
           IF cnv_sync_falling = '1' THEN
-            ADC_nOE(0)                <= '0';
+            --ADC_nOE(0)                <= '1';
             state_GEN_OEn             <= GEN_OE;
             ADC_current               <= 0;
             ADC_current_cycle_enabled <= 1;
@@ -170,13 +172,15 @@ BEGIN
           
         WHEN GEN_OE =>
           ADC_nOE(ADC_current) <= '0';
+          
           ADC_current_cycle_enabled <= ADC_current_cycle_enabled + 1;
-          IF ADC_current_cycle_enabled = OE_NB_CYCLE_ENABLED THEN
+          
+          IF ADC_current_cycle_enabled = OE_NB_CYCLE_ENABLED  THEN
             state_GEN_OEn             <= WAIT_CYCLE;
           END IF;
           
         WHEN WAIT_CYCLE =>
-          ADC_current_cycle_enabled <= 0;
+          ADC_current_cycle_enabled <= 1;
           IF ADC_current = ChanelCount-1 THEN
             state_GEN_OEn <= IDLE;
             sample_val_s     <= '1';
@@ -198,11 +202,11 @@ BEGIN
       END LOOP all_channel_sample_reg;
       -------------------------------------------------------------------------
       sample_val         <= '0';
-      IF sample_val_s = '1' THEN
+      IF sample_val_s2 = '1' THEN
         IF sample_val_counter = SAMPLE_DIVISION-1 THEN
           sample_val_counter <= 0;
           sample_val         <= '1';            -- TODO
-          sample <= sample_reg;
+          sample             <= sample_reg;
         ELSE
           sample_val_counter <= sample_val_counter + 1;
           sample_val         <= '0';
@@ -212,7 +216,28 @@ BEGIN
     END IF;
   END PROCESS;
 
-  ADC_data_valid <= '1' WHEN ADC_current_cycle_enabled = DATA_CYCLE_VALID ELSE '0';
+
+  ADC_data_valid_s <= '1' WHEN ADC_current_cycle_enabled = DATA_CYCLE_VALID + 1 ELSE '0';
+  
+  REG_ADC_DATA_valid: IF DATA_CYCLE_VALID = OE_NB_CYCLE_ENABLED GENERATE
+    PROCESS (clk, rstn)
+    BEGIN  -- PROCESS
+      IF rstn = '0' THEN                -- asynchronous reset (active low)
+        ADC_data_valid <= '0';
+        sample_val_s2  <= '0';
+      ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+        ADC_data_valid <= ADC_data_valid_s;
+        sample_val_s2  <= sample_val_s;
+      END IF;
+    END PROCESS;
+    
+  END GENERATE REG_ADC_DATA_valid;
+
+  noREG_ADC_DATA_valid: IF DATA_CYCLE_VALID < OE_NB_CYCLE_ENABLED GENERATE
+    ADC_data_valid <= ADC_data_valid_s; 
+    sample_val_s2  <= sample_val_s;
+  END GENERATE noREG_ADC_DATA_valid;
+  
 
   WITH ADC_current SELECT
     ADC_data_selected <= sample_reg(0) WHEN 0,

@@ -450,7 +450,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"020151",  -- aa.bb.cc version
+      top_lfr_version        => X"020152",  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             --      0 => MINI_LFR
                                             --      1 => EM
@@ -488,8 +488,8 @@ BEGIN  -- beh
     top_ad_conv_RHF1401_withFilter_1 : top_ad_conv_RHF1401_withFilter
       GENERIC MAP (
         ChanelCount     => 9,
-        ncycle_cnv_high => 25,
-        ncycle_cnv      => 50,
+        ncycle_cnv_high => 12,
+        ncycle_cnv      => 25,
         FILTER_ENABLED  => 16#FF#)
       PORT MAP (
         cnv_clk    => clk_24,
