@@ -56,7 +56,7 @@ ARCHITECTURE ar_top_ad_conv_RHF1401 OF top_ad_conv_RHF1401_withFilter IS
 
   -----------------------------------------------------------------------------
   CONSTANT OE_NB_CYCLE_ENABLED : INTEGER := 1;
-  CONSTANT DATA_CYCLE_VALID    : INTEGER := 1;
+  CONSTANT DATA_CYCLE_VALID    : INTEGER := 2;
   
   -- GEN OutPut Enable
   TYPE FSM_GEN_OEn_state IS (IDLE, GEN_OE, WAIT_CYCLE);
@@ -69,7 +69,7 @@ ARCHITECTURE ar_top_ad_conv_RHF1401 OF top_ad_conv_RHF1401_withFilter IS
   -----------------------------------------------------------------------------
   CONSTANT SAMPLE_DIVISION  : INTEGER := 10;
   SIGNAL sample_val_s       : STD_LOGIC;
-  SIGNAL sample_val_s2       : STD_LOGIC;
+  SIGNAL sample_val_s2      : STD_LOGIC;
   SIGNAL sample_val_counter : INTEGER RANGE 0 TO SAMPLE_DIVISION;
 BEGIN
 
@@ -217,9 +217,10 @@ BEGIN
   END PROCESS;
 
 
-  ADC_data_valid_s <= '1' WHEN ADC_current_cycle_enabled = DATA_CYCLE_VALID + 1 ELSE '0';
   
   REG_ADC_DATA_valid: IF DATA_CYCLE_VALID = OE_NB_CYCLE_ENABLED GENERATE
+    ADC_data_valid_s <= '1' WHEN ADC_current_cycle_enabled = DATA_CYCLE_VALID + 1 ELSE '0';
+    
     PROCESS (clk, rstn)
     BEGIN  -- PROCESS
       IF rstn = '0' THEN                -- asynchronous reset (active low)
@@ -234,9 +235,35 @@ BEGIN
   END GENERATE REG_ADC_DATA_valid;
 
   noREG_ADC_DATA_valid: IF DATA_CYCLE_VALID < OE_NB_CYCLE_ENABLED GENERATE
+    ADC_data_valid_s <= '1' WHEN ADC_current_cycle_enabled = DATA_CYCLE_VALID + 1 ELSE '0';
+  
     ADC_data_valid <= ADC_data_valid_s; 
     sample_val_s2  <= sample_val_s;
   END GENERATE noREG_ADC_DATA_valid;
+  
+  REGm_ADC_DATA_valid: IF DATA_CYCLE_VALID > OE_NB_CYCLE_ENABLED GENERATE
+    
+    ADC_data_valid_s <= '1' WHEN ADC_current_cycle_enabled = OE_NB_CYCLE_ENABLED + 1 ELSE '0';
+  
+    REG_1: SYNC_FF
+      GENERIC MAP (
+        NB_FF_OF_SYNC => DATA_CYCLE_VALID-OE_NB_CYCLE_ENABLED+1)
+      PORT MAP (
+        clk    => clk,
+        rstn   => rstn,
+        A      => ADC_data_valid_s,
+        A_sync => ADC_data_valid);
+    
+    REG_2: SYNC_FF
+      GENERIC MAP (
+        NB_FF_OF_SYNC => DATA_CYCLE_VALID-OE_NB_CYCLE_ENABLED+1)
+      PORT MAP (
+        clk    => clk,
+        rstn   => rstn,
+        A      => sample_val_s,
+        A_sync => sample_val_s2);    
+  END GENERATE REGm_ADC_DATA_valid;
+
   
 
   WITH ADC_current SELECT

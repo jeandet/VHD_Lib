@@ -124,6 +124,10 @@ add wave -noupdate -expand -group ALL -radix hexadecimal /tb/LFR_EQM_1/USE_ADCDR
 add wave -noupdate -expand -group ALL -radix hexadecimal /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/rstn
 add wave -noupdate -expand -group ALL -radix hexadecimal /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/clk
 add wave -noupdate -expand -group ALL -radix hexadecimal /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_data
+add wave -noupdate -expand -group ALL -radix hexadecimal /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_data_reg
+add wave -noupdate -expand -group ALL /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_data_valid_s
+add wave -noupdate -expand -group ALL /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_data_valid
+add wave -noupdate -expand -group ALL /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_val_s2
 add wave -noupdate -expand -group ALL -radix hexadecimal -childformat {{/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(8) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(7) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(6) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(5) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(4) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(3) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(2) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(1) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(0) -radix hexadecimal}} -subitemconfig {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(8) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(7) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(6) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(5) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(4) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(3) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(2) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(1) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(0) {-height 15 -radix hexadecimal}} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE
 add wave -noupdate -expand -group ALL -radix hexadecimal /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(8)
 add wave -noupdate -expand -group ALL -radix hexadecimal /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_nOE(7)
@@ -145,7 +149,6 @@ add wave -noupdate -expand -group ALL /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_co
 add wave -noupdate -expand -group ALL /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_current_cycle_enabled
 add wave -noupdate -expand -group ALL /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_data_valid
 add wave -noupdate -expand -group ALL /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_data
-add wave -noupdate -expand -group ALL /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_data_reg
 add wave -noupdate -expand -group ALL /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/ADC_data_selected
 add wave -noupdate -expand -group ALL -radix hexadecimal -childformat {{/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(8) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(7) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(6) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(5) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(4) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(3) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(2) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(1) -radix hexadecimal} {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(0) -radix hexadecimal}} -subitemconfig {/tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(8) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(7) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(6) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(5) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(4) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(3) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(2) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(1) {-height 15 -radix hexadecimal} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg(0) {-height 15 -radix hexadecimal}} /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_reg
 add wave -noupdate -expand -group ALL -radix hexadecimal /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample
@@ -194,8 +197,8 @@ add wave -noupdate -expand /tb/LFR_EQM_1/lpp_lfr_1/DMA_SubSystem_1/fifo_ren
 add wave -noupdate /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample
 add wave -noupdate /tb/LFR_EQM_1/USE_ADCDRIVER_true/top_ad_conv_RHF1401_withFilter_1/sample_val
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {33906609 ps} 0} {{Cursor 2} {33050000 ps} 0} {{Cursor 3} {42930000 ps} 0} {{Cursor 4} {8300650000 ps} 0}
-quietly wave cursor active 3
+WaveRestoreCursors {{Cursor 1} {42970000 ps} 0} {{Cursor 2} {33108681 ps} 0} {{Cursor 3} {515290000 ps} 0} {{Cursor 4} {8300650000 ps} 0}
+quietly wave cursor active 1
 configure wave -namecolwidth 619
 configure wave -valuecolwidth 311
 configure wave -justifyvalue left
@@ -210,4 +213,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {41901608 ps} {45906411 ps}
+WaveRestoreZoom {31103383 ps} {50275736 ps}

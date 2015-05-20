@@ -299,7 +299,7 @@ BEGIN  -- beh
   END GENERATE MODULE_RHF1401;
 
   ADC_OEB_bar_CH_s <= TRANSPORT ADC_OEB_bar_CH AFTER 10 ns;
-  ADC_data         <= TRANSPORT ADC_data_s     AFTER 20 ns;
+  ADC_data         <= TRANSPORT ADC_data_s     AFTER 35 ns;
   -----------------------------------------------------------------------------
   PROCESS (clk50MHz, reset)
   BEGIN  -- PROCESS

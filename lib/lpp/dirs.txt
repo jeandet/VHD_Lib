@@ -9,6 +9,7 @@
 ./dsp/cic
 ./dsp/lpp_downsampling
 ./dsp/lpp_fft_rtax
+./dsp/window_function
 ./lpp_memory
 ./dsp/lpp_fft
 ./lpp_cna

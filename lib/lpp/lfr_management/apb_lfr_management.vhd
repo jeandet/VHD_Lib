@@ -184,6 +184,7 @@ BEGIN
       DAC_CFG                <= (OTHERS => '0');
       --
       DAC_CAL_EN_s           <= '0';
+      force_reset            <= '0';
     ELSIF clk25MHz'EVENT AND clk25MHz = '1' THEN
       coarsetime_reg_updated <= '0';
 
