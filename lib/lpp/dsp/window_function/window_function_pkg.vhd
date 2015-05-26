@@ -19,17 +19,26 @@
 --                    Author : Jean-christophe Pellion
 --                    Mail   : jean-christophe.pellion@lpp.polytechnique.fr
 --                             jean-christophe.pellion@easii-ic.com
--------------------------------------------------------------------------------
-
+----------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
 
-PACKAGE data_type_pkg IS
-
-  TYPE array_integer IS ARRAY (NATURAL RANGE <>) OF INTEGER;
-  TYPE array_real    IS ARRAY (NATURAL RANGE <>) OF REAL;
-  TYPE array_std_logic_vector_16b IS ARRAY (NATURAL RANGE <>) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
+PACKAGE window_function_pkg IS
   
-  TYPE sample_vector IS ARRAY(NATURAL RANGE <>, NATURAL RANGE <>) OF STD_LOGIC;
+  COMPONENT window_function
+    GENERIC (
+      DATA_SIZE : INTEGER;
+      PARAM_SIZE : INTEGER);
+    PORT (
+      clk            : IN  STD_LOGIC;
+      rstn           : IN  STD_LOGIC;
+      restart_window : IN  STD_LOGIC;
+      data_in        : IN  STD_LOGIC_VECTOR(DATA_SIZE-1 DOWNTO 0);
+      data_in_valid  : IN  STD_LOGIC;
+      data_out       : OUT STD_LOGIC_VECTOR(DATA_SIZE-1 DOWNTO 0);
+      data_out_valid : OUT STD_LOGIC);
+  END COMPONENT;
   
-END data_type_pkg;
+  
+END window_function_pkg;

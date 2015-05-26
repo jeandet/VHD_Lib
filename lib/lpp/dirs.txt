@@ -30,3 +30,4 @@
 ./lpp_debug_lfr
 ./lpp_sim/CY7C1061DV33
 ./lpp_sim
+./lpp_file
