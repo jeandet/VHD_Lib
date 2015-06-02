@@ -35,14 +35,14 @@ PACKAGE reader_pkg IS
 
   CONSTANT CHARACTER_COMMENT : CHARACTER := '#';
 
-  FUNCTION get_array_real (
-    file_in      : TEXT;
-    nb_data_read : INTEGER)
+  IMPURE FUNCTION get_array_real (
+    file_name    : STRING;
+    nb_data_to_read : INTEGER)
     RETURN array_real;
   
-  FUNCTION get_array_integer (
-    file_in      : TEXT;
-    nb_data_read : INTEGER)
+  IMPURE FUNCTION get_array_integer (
+    file_name    : STRING;
+    nb_data_to_read : INTEGER)
     RETURN array_integer;
 
   
@@ -50,12 +50,13 @@ END reader_pkg;
 
 PACKAGE BODY reader_pkg IS
   
-  FUNCTION get_array_real (
+  IMPURE FUNCTION get_array_real (
     file_name       : STRING;
     nb_data_to_read : INTEGER)
     RETURN array_real
   IS
-  	VARIABLE GOOD : BOOLEAN;
+    
+    VARIABLE GOOD : BOOLEAN;
     VARIABLE array_real_v : array_real(0 TO nb_data_to_read-1);
     VARIABLE real_p : REAL;
     VARIABLE nb_data_read : INTEGER := 0;
@@ -80,7 +81,7 @@ PACKAGE BODY reader_pkg IS
     RETURN array_real_v;    
   END get_array_real;
   
-  FUNCTION get_array_integer (
+  IMPURE FUNCTION get_array_integer (
     file_name       : STRING;
     nb_data_to_read : INTEGER)
     RETURN array_integer

@@ -92,7 +92,7 @@ ENTITY LFR_em IS
     ADC_OEB_bar_HK : OUT   STD_LOGIC;
     HK_SEL         : OUT   STD_LOGIC_VECTOR(1 DOWNTO 0);
     ---------------------------------------------------------------------------
-    TAG8           : OUT   STD_LOGIC;
+    TAG8           : IN   STD_LOGIC;
     led            : OUT   STD_LOGIC_VECTOR(2 DOWNTO 0)
     );
 
@@ -100,6 +100,16 @@ END LFR_em;
 
 
 ARCHITECTURE beh OF LFR_em IS
+
+--==========================================================================
+--  USE_IAP_MEMCTRL allow to use the srctrle-0ws on MINILFR board
+--  when enabled, chip enable polarity should be reversed and bank size also
+--  MINILFR      -> 1 bank of 4MBytes   -> SRBANKSZ=9
+--  LFR EQM & FM -> 2 banks of 2MBytes  -> SRBANKSZ=8
+--==========================================================================
+  CONSTANT USE_IAP_MEMCTRL : integer := 1;
+--==========================================================================
+
   SIGNAL clk_50_s    : STD_LOGIC := '0';
   SIGNAL clk_25      : STD_LOGIC := '0';
   SIGNAL clk_24      : STD_LOGIC := '0';
@@ -153,6 +163,7 @@ ARCHITECTURE beh OF LFR_em IS
   SIGNAL ADC_smpclk_s : STD_LOGIC;
   ----------------------------------------------------------------------------
   SIGNAL nSRAM_CE_s : STD_LOGIC_VECTOR(1 DOWNTO 0);
+  SIGNAL nSRAM_READY : STD_LOGIC;
 
 BEGIN  -- beh
 
@@ -222,7 +233,9 @@ BEGIN  -- beh
       NB_AHB_SLAVE    => NB_AHB_SLAVE,
       NB_APB_SLAVE    => NB_APB_SLAVE,
       ADDRESS_SIZE    => 20,
-      USES_IAP_MEMCTRLR => 0)
+      USES_IAP_MEMCTRLR => USE_IAP_MEMCTRL,
+      BYPASS_EDAC_MEMCTRLR => '0',
+      SRBANKSZ          => 8)
     PORT MAP (
       clk    => clk_25,
       reset  => rstn_25,
@@ -242,7 +255,7 @@ BEGIN  -- beh
       nSRAM_WE  => nSRAM_WE,
       nSRAM_CE  => nSRAM_CE_s,
       nSRAM_OE  => nSRAM_OE,
-      nSRAM_READY => '0',
+      nSRAM_READY => nSRAM_READY,
       SRAM_MBE    => OPEN,
 
       apbi_ext   => apbi_ext,
@@ -252,8 +265,25 @@ BEGIN  -- beh
       ahbi_m_ext => ahbi_m_ext,
       ahbo_m_ext => ahbo_m_ext);
 
+  PROCESS (clk_25, rstn_25)
+  BEGIN  -- PROCESS
+    IF rstn_25 = '0' THEN               -- asynchronous reset (active low)
+      nSRAM_READY <= '1';
+    ELSIF clk_25'event AND clk_25 = '1' THEN  -- rising clock edge
+      nSRAM_READY <= '1';
+      IF TAG8 = '1' THEN
+        nSRAM_READY <= '0';
+      END IF;
+    END IF;
+  END PROCESS;
 
-  nSRAM_CE <= nSRAM_CE_s(0);
+  IAP:if USE_IAP_MEMCTRL = 1 GENERATE
+    nSRAM_CE <= not nSRAM_CE_s(0);
+  END GENERATE;
+
+  NOIAP:if USE_IAP_MEMCTRL = 0 GENERATE
+    nSRAM_CE <=  nSRAM_CE_s(0);
+  END GENERATE;
 
 -------------------------------------------------------------------------------
 -- APB_LFR_TIME_MANAGEMENT ----------------------------------------------------
@@ -264,13 +294,13 @@ BEGIN  -- beh
       pindex           => 6,
       paddr            => 6,
       pmask            => 16#fff#,
-      FIRST_DIVISION   => 374,  -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
+--      FIRST_DIVISION   => 374,  -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
       NB_SECOND_DESYNC => 60)  -- 60 secondes of desynchronization before CoarseTime's MSB is Set
     PORT MAP (
       clk25MHz          => clk_25,
       resetn_25MHz      => rstn_25,      --      TODO
-      clk24_576MHz      => clk_24,          -- 49.152MHz/2
-      resetn_24_576MHz  => rstn_24,      --      TODO
+--      clk24_576MHz      => clk_24,          -- 49.152MHz/2
+--      resetn_24_576MHz  => rstn_24,      --      TODO
    
       grspw_tick    => swno.tickout,
       apbi          => apbi_ext,
@@ -384,6 +414,7 @@ BEGIN  -- beh
   lpp_lfr_1 : lpp_lfr
     GENERIC MAP (
       Mem_use                => use_RAM,
+      tech                   => inferred,
       nb_data_by_buffer_size => 32,
       --nb_word_by_buffer_size => 30,
       nb_snapshot_param_size => 32,
@@ -395,7 +426,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"010144")  -- aa.bb.cc version
+      top_lfr_version        => X"010153")  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             --      0 => MINI_LFR
                                             --      1 => EM
@@ -430,7 +461,7 @@ BEGIN  -- beh
   top_ad_conv_RHF1401_withFilter_1 : top_ad_conv_RHF1401_withFilter
     GENERIC MAP (
       ChanelCount     => 9,
-      ncycle_cnv_high => 13,
+      ncycle_cnv_high => 12,
       ncycle_cnv      => 25,
       FILTER_ENABLED  => 16#FF#)
     PORT MAP (
@@ -449,7 +480,7 @@ BEGIN  -- beh
   ADC_smpclk <= ADC_smpclk_s;
   HK_smpclk  <= ADC_smpclk_s;
 
-  TAG8 <= ADC_smpclk_s;
+--  TAG8 <= ADC_smpclk_s;
 
   -----------------------------------------------------------------------------
   -- HK

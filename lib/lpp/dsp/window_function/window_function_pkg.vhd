@@ -24,12 +24,17 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 
+LIBRARY lpp;
+USE lpp.data_type_pkg.ALL;
+
 PACKAGE window_function_pkg IS
   
   COMPONENT window_function
     GENERIC (
       DATA_SIZE : INTEGER;
-      PARAM_SIZE : INTEGER);
+      PARAM_SIZE : INTEGER;
+      WINDOWS_PARAM : array_std_logic_vector_16b(0 TO 255)
+      );
     PORT (
       clk            : IN  STD_LOGIC;
       rstn           : IN  STD_LOGIC;
