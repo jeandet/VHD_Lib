@@ -1,2 +1,4 @@
 window_function_pkg.vhd
 window_function.vhd
+WF_processing.vhd
+WF_rom.vhd

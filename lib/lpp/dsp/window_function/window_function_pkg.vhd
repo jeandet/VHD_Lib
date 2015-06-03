@@ -24,26 +24,49 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 
-LIBRARY lpp;
-USE lpp.data_type_pkg.ALL;
-
 PACKAGE window_function_pkg IS
-  
+
   COMPONENT window_function
     GENERIC (
-      DATA_SIZE : INTEGER;
-      PARAM_SIZE : INTEGER;
-      WINDOWS_PARAM : array_std_logic_vector_16b(0 TO 255)
-      );
+      SIZE_DATA          : INTEGER;
+      SIZE_PARAM         : INTEGER;
+      NB_POINT_BY_WINDOW : INTEGER);
     PORT (
       clk            : IN  STD_LOGIC;
       rstn           : IN  STD_LOGIC;
       restart_window : IN  STD_LOGIC;
-      data_in        : IN  STD_LOGIC_VECTOR(DATA_SIZE-1 DOWNTO 0);
+      data_in        : IN  STD_LOGIC_VECTOR(SIZE_DATA-1 DOWNTO 0);
       data_in_valid  : IN  STD_LOGIC;
-      data_out       : OUT STD_LOGIC_VECTOR(DATA_SIZE-1 DOWNTO 0);
-      data_out_valid : OUT STD_LOGIC);
+      data_out       : OUT STD_LOGIC_VECTOR(SIZE_DATA-1 DOWNTO 0);
+      data_out_valid : OUT STD_LOGIC
+      );
   END COMPONENT;
-  
+
+  COMPONENT WF_processing
+    GENERIC (
+      SIZE_DATA          : INTEGER;
+      SIZE_PARAM         : INTEGER;
+      NB_POINT_BY_WINDOW : INTEGER);
+    PORT (
+      clk            : IN  STD_LOGIC;
+      rstn           : IN  STD_LOGIC;
+      restart_window : IN  STD_LOGIC;
+      data_in        : IN  STD_LOGIC_VECTOR(SIZE_DATA-1 DOWNTO 0);
+      data_in_valid  : IN  STD_LOGIC;
+      data_out       : OUT STD_LOGIC_VECTOR(SIZE_DATA-1 DOWNTO 0);
+      data_out_valid : OUT STD_LOGIC;
+      param_in       : IN  STD_LOGIC_VECTOR(SIZE_PARAM-1 DOWNTO 0);
+      param_index    : OUT INTEGER RANGE 0 TO NB_POINT_BY_WINDOW-1
+      );
+  END COMPONENT;
+
+  COMPONENT WF_rom
+    GENERIC (
+      SIZE_PARAM         : INTEGER;
+      NB_POINT_BY_WINDOW : INTEGER);
+    PORT (
+      data  : OUT STD_LOGIC_VECTOR(SIZE_PARAM-1 DOWNTO 0);
+      index : IN  INTEGER RANGE 0 TO NB_POINT_BY_WINDOW-1);
+  END COMPONENT;  
   
 END window_function_pkg;

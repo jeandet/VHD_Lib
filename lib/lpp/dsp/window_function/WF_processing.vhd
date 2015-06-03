@@ -23,16 +23,18 @@
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+use ieee.math_real.all;
 USE ieee.numeric_std.ALL;
 
 LIBRARY lpp;
+USE lpp.general_purpose.ALL;
 USE lpp.window_function_pkg.ALL;
 
-ENTITY window_function IS
+ENTITY WF_processing IS
   GENERIC (
     SIZE_DATA  : INTEGER := 16;
     SIZE_PARAM : INTEGER := 10;
-    NB_POINT_BY_WINDOW : INTEGER := 256
+    NB_POINT_BY_WINDOW : INTEGER := 256    
     );
 
   PORT (
@@ -45,40 +47,62 @@ ENTITY window_function IS
     data_in_valid : IN STD_LOGIC;
     --data_out
     data_out       : OUT STD_LOGIC_VECTOR(SIZE_DATA-1 DOWNTO 0);
-    data_out_valid : OUT STD_LOGIC
+    data_out_valid : OUT STD_LOGIC;
+    
+    --window parameter interface
+    param_in    : IN STD_LOGIC_VECTOR(SIZE_PARAM-1 DOWNTO 0);
+    param_index : OUT INTEGER RANGE 0 TO NB_POINT_BY_WINDOW-1 
     );
 
-END window_function;
+END WF_processing;
 
-ARCHITECTURE beh OF window_function IS
+ARCHITECTURE beh OF WF_processing IS
+  CONSTANT NB_BITS_COUNTER : INTEGER := INTEGER(ceil(log2(REAL(NB_POINT_BY_WINDOW))));
   
-  SIGNAL param_in       : STD_LOGIC_VECTOR(SIZE_PARAM-1 DOWNTO 0);
-  SIGNAL param_index    : INTEGER RANGE 0 TO NB_POINT_BY_WINDOW-1;
+  SIGNAL data_x_param      : STD_LOGIC_VECTOR(SIZE_DATA + SIZE_PARAM - 1 DOWNTO 0);
+  SIGNAL windows_counter_s : STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0);
   
 BEGIN
 
-  WF_rom_1: WF_rom
+  WINDOWS_counter: general_counter
     GENERIC MAP (
-      SIZE_PARAM         => SIZE_PARAM,
-      NB_POINT_BY_WINDOW => NB_POINT_BY_WINDOW)
+      CYCLIC          => '1',
+      NB_BITS_COUNTER => NB_BITS_COUNTER,
+      RST_VALUE       => 0)
     PORT MAP (
-      data  => param_in,
-      index => param_index);
+      clk       => clk,
+      rstn      => rstn,
+      MAX_VALUE => STD_LOGIC_VECTOR(to_unsigned(NB_POINT_BY_WINDOW-1, NB_BITS_COUNTER)),
+      set       => restart_window,
+      set_value => STD_LOGIC_VECTOR(to_unsigned(0, NB_BITS_COUNTER)),
+      add1      => data_in_valid,
+      counter   => windows_counter_s);
   
-  WF_processing_1: WF_processing
+  param_index <= to_integer(UNSIGNED(windows_counter_s));
+
+  WINDOWS_Multiplier : Multiplier
     GENERIC MAP (
-      SIZE_DATA          => SIZE_DATA,
-      SIZE_PARAM         => SIZE_PARAM,
-      NB_POINT_BY_WINDOW => NB_POINT_BY_WINDOW)
+      Input_SZ_A => SIZE_DATA,
+      Input_SZ_B => SIZE_PARAM)
     PORT MAP (
-      clk            => clk,
-      rstn           => rstn,
-      restart_window => restart_window,
-      data_in        => data_in,
-      data_in_valid  => data_in_valid,
-      data_out       => data_out,
-      data_out_valid => data_out_valid,
-      param_in       => param_in,
-      param_index    => param_index);
+      clk   => clk,
+      reset => rstn,
+      
+      mult  => data_in_valid,
+      OP1   => data_in,
+      OP2   => param_in,
+      
+      RES   => data_x_param);
+
+  data_out <= data_x_param(SIZE_DATA + SIZE_PARAM-1 DOWNTO SIZE_PARAM);
+
+  WINDOWS_REG: SYNC_FF
+    GENERIC MAP (
+      NB_FF_OF_SYNC => 1)
+    PORT MAP (
+      clk    => clk,
+      rstn   => rstn,
+      A      => data_in_valid,
+      A_sync => data_out_valid);
   
 END beh;
