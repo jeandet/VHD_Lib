@@ -92,7 +92,7 @@ ENTITY LFR_em IS
     ADC_OEB_bar_HK : OUT   STD_LOGIC;
     HK_SEL         : OUT   STD_LOGIC_VECTOR(1 DOWNTO 0);
     ---------------------------------------------------------------------------
-    TAG8           : IN   STD_LOGIC;
+    TAG8           : OUT   STD_LOGIC;
     led            : OUT   STD_LOGIC_VECTOR(2 DOWNTO 0)
     );
 
@@ -235,7 +235,7 @@ BEGIN  -- beh
       ADDRESS_SIZE    => 20,
       USES_IAP_MEMCTRLR => USE_IAP_MEMCTRL,
       BYPASS_EDAC_MEMCTRLR => '0',
-      SRBANKSZ          => 8)
+      SRBANKSZ          => 9)
     PORT MAP (
       clk    => clk_25,
       reset  => rstn_25,
@@ -256,7 +256,7 @@ BEGIN  -- beh
       nSRAM_CE  => nSRAM_CE_s,
       nSRAM_OE  => nSRAM_OE,
       nSRAM_READY => nSRAM_READY,
-      SRAM_MBE    => OPEN,
+      SRAM_MBE    => '0',
 
       apbi_ext   => apbi_ext,
       apbo_ext   => apbo_ext,
@@ -271,9 +271,6 @@ BEGIN  -- beh
       nSRAM_READY <= '1';
     ELSIF clk_25'event AND clk_25 = '1' THEN  -- rising clock edge
       nSRAM_READY <= '1';
-      IF TAG8 = '1' THEN
-        nSRAM_READY <= '0';
-      END IF;
     END IF;
   END PROCESS;
 
@@ -426,10 +423,11 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"010153")  -- aa.bb.cc version
+      top_lfr_version        => X"010153",  -- aa.bb.cc version
                                             -- AA : BOARD NUMBER
                                             --      0 => MINI_LFR
                                             --      1 => EM
+      DEBUG_FORCE_DATA_DMA  => 0)      
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
@@ -480,7 +478,7 @@ BEGIN  -- beh
   ADC_smpclk <= ADC_smpclk_s;
   HK_smpclk  <= ADC_smpclk_s;
 
---  TAG8 <= ADC_smpclk_s;
+  TAG8 <= ADC_smpclk_s;
 
   -----------------------------------------------------------------------------
   -- HK
