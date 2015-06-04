@@ -13,6 +13,7 @@ USE lpp.lpp_matrix.ALL;
 USE lpp.lpp_lfr_pkg.ALL;
 USE lpp.lpp_fft.ALL;
 USE lpp.fft_components.ALL;
+USE lpp.window_function_pkg.ALL;
 
 ENTITY lpp_lfr_ms_FFT IS
   PORT (
@@ -36,8 +37,27 @@ END;
 
 ARCHITECTURE Behavioral OF lpp_lfr_ms_FFT IS
 
+  SIGNAL data_win       : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_win_valid : STD_LOGIC;
+
 BEGIN
 
+  window_hanning: window_function
+    GENERIC MAP (
+      SIZE_DATA          => 16,
+      SIZE_PARAM         => 15,
+      NB_POINT_BY_WINDOW => 256)
+    PORT MAP (
+      clk            => clk,
+      rstn           => rstn,
+      
+      restart_window => '0',
+      data_in        => sample_data,
+      data_in_valid  => sample_valid,
+      
+      data_out       => data_win,
+      data_out_valid => data_win_valid);
+  
   -----------------------------------------------------------------------------
   -- FFT
   -----------------------------------------------------------------------------
@@ -59,10 +79,10 @@ BEGIN
       ifiStart  => '0',                 -- '1'
       ifiNreset => rstn,
 
-      ifiD_valid => sample_valid,       -- IN
+      ifiD_valid => data_win_valid,       -- IN
       ifiRead_y  => fft_read,
       ifiD_im    => (OTHERS => '0'),    -- IN
-      ifiD_re    => sample_data,        -- IN
+      ifiD_re    => data_win,        -- IN
       ifoLoad    => sample_load,        -- IN
 
       ifoPong    => fft_pong,
