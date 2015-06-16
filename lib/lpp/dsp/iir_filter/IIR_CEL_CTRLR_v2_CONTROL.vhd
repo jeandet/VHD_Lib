@@ -68,7 +68,7 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v2_CONTROL OF IIR_CEL_CTRLR_v2_CONTROL IS
                         wait_valid_last_output_2);
   SIGNAL IIR_CEL_STATE : fsmIIR_CEL_T;
 
-  SIGNAL alu_selected_coeff : INTEGER;
+  SIGNAL alu_selected_coeff : INTEGER RANGE 0 TO 2**Coef_sel_SZ-1;
   SIGNAL Chanel_ongoing     : INTEGER;
   SIGNAL Cel_ongoing        : INTEGER;
   

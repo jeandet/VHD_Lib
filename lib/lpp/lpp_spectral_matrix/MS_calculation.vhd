@@ -63,9 +63,6 @@ ARCHITECTURE beh OF MS_calculation IS
 
   SIGNAL fifo_in_ren_s : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
-
-  SIGNAL fifo_in_empty_reg : STD_LOGIC_VECTOR(1 DOWNTO 0);
-
   
 BEGIN
 
@@ -94,7 +91,6 @@ BEGIN
       select_op1  <= select_R0(0);
       select_op2  <= select_R0;
       res_wen <= '1';
-      fifo_in_empty_reg <= "11";
       
     ELSIF clk'EVENT AND clk = '1' THEN
       select_ctrl <= select_ctrl_NOP;
@@ -103,7 +99,6 @@ BEGIN
       fifo_in_ren_s <= "11";
       res_wen <= '1';
       correlation_done <= '0';
-      fifo_in_empty_reg <= fifo_in_empty;
       CASE state IS
         WHEN IDLE =>
           IF correlation_start = '1' THEN

@@ -19,81 +19,82 @@
 --                    Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@member.fsf.org
 ------------------------------------------------------------------------------
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
 
-entity dynamic_freq_div is
-    generic(
-        PRESZ  :  integer range 1 to 32:=4;
-        PREMAX :  integer := 16#FFFFFF#;
-        CPTSZ  :  integer range 1 to 32:=16
-     );
-    Port ( 
-        clk     : in  STD_LOGIC;
-        rstn    : in  STD_LOGIC;
-        pre     : in  STD_LOGIC_VECTOR(PRESZ-1 downto 0);
-        N       : in  STD_LOGIC_VECTOR(CPTSZ-1 downto 0);
-        Reload  : in  std_logic;
-        clk_out : out STD_LOGIC
-        );
-end dynamic_freq_div;
+ENTITY dynamic_freq_div IS
+  GENERIC(
+    PRESZ  : INTEGER RANGE 1 TO 32 := 4;
+    PREMAX : INTEGER               := 16#FFFFFF#;
+    CPTSZ  : INTEGER RANGE 1 TO 32 := 16
+    );
+  PORT (
+    clk     : IN  STD_LOGIC;
+    rstn    : IN  STD_LOGIC;
+    pre     : IN  STD_LOGIC_VECTOR(PRESZ-1 DOWNTO 0);
+    N       : IN  STD_LOGIC_VECTOR(CPTSZ-1 DOWNTO 0);
+    Reload  : IN  STD_LOGIC;
+    clk_out : OUT STD_LOGIC
+    );
+END dynamic_freq_div;
 
-architecture Behavioral of dynamic_freq_div is
-constant prescaller_reg_sz : integer := 2**PRESZ;
-constant PREMAX_max        : STD_LOGIC_VECTOR(PRESZ-1 downto 0):=(others => '1');
-signal cpt_reg             : std_logic_vector(CPTSZ-1 downto 0):=(others => '0');
-signal prescaller_reg      : std_logic_vector(prescaller_reg_sz-1 downto 0);--:=(others => '0');
-signal internal_clk        : std_logic:='0';
-signal internal_clk_reg    : std_logic:='0';
-signal clk_out_reg         : std_logic:='0';
+ARCHITECTURE Behavioral OF dynamic_freq_div IS
+  CONSTANT prescaller_reg_sz : INTEGER                            := 2**PRESZ;
+  CONSTANT PREMAX_max        : STD_LOGIC_VECTOR(PRESZ-1 DOWNTO 0) := (OTHERS => '1');
+  SIGNAL   cpt_reg           : STD_LOGIC_VECTOR(CPTSZ-1 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL   prescaller_reg    : STD_LOGIC_VECTOR(prescaller_reg_sz-1 DOWNTO 0);  --:=(others => '0');
+  SIGNAL   internal_clk      : STD_LOGIC                          := '0';
+  SIGNAL   internal_clk_reg  : STD_LOGIC                          := '0';
+  SIGNAL   clk_out_reg       : STD_LOGIC                          := '0';
 
-begin
+BEGIN
 
-max0: if (UNSIGNED(PREMAX_max) < PREMAX) generate
+  max0 : IF (UNSIGNED(PREMAX_max) < PREMAX) GENERATE
 
-internal_clk <= prescaller_reg(to_integer(unsigned(pre))) when (to_integer(unsigned(pre))<=UNSIGNED(PREMAX_max)) else
+    internal_clk <= prescaller_reg(to_integer(UNSIGNED(pre))) WHEN (to_integer(UNSIGNED(pre)) <= UNSIGNED(PREMAX_max)) ELSE
                     prescaller_reg(to_integer(UNSIGNED(PREMAX_max)));
-end generate;
-max1: if UNSIGNED(PREMAX_max) > PREMAX generate
-internal_clk <= prescaller_reg(to_integer(unsigned(pre))) when (to_integer(unsigned(pre))<=PREMAX) else
+  END GENERATE;
+
+  max1 : IF UNSIGNED(PREMAX_max) > PREMAX GENERATE
+    internal_clk <= prescaller_reg(to_integer(UNSIGNED(pre))) WHEN (to_integer(UNSIGNED(pre)) <= PREMAX) ELSE
                     prescaller_reg(PREMAX);
-end generate;
+  END GENERATE;
 
 
-                
-prescaller: process(rstn, clk)
-begin
-if rstn='0' then
-    prescaller_reg    <= (others => '0');
-elsif clk'event and clk = '1' then
-    prescaller_reg <= std_logic_vector(UNSIGNED(prescaller_reg) + 1);
-end if;
-end process;
+
+  prescaller : PROCESS(rstn, clk)
+  BEGIN
+    IF rstn = '0' then
+      prescaller_reg <= (OTHERS => '0');
+    ELSIF clk'EVENT AND clk = '1' THEN
+      prescaller_reg <= STD_LOGIC_VECTOR(UNSIGNED(prescaller_reg) + 1);
+    END IF;
+  END PROCESS;
 
 
-clk_out <= clk_out_reg;
+  clk_out <= clk_out_reg;
 
-counter: process(rstn, clk)
-begin
-if rstn='0' then
-    cpt_reg    <= (others => '0');
-    internal_clk_reg <= '0';
-    clk_out_reg <= '0';
-elsif clk'event and clk = '1' then
-    internal_clk_reg  <= internal_clk;
-    if Reload = '1' then
+  counter : PROCESS(rstn, clk)
+  BEGIN
+    IF rstn = '0' then
+      cpt_reg          <= (OTHERS => '0');
+      internal_clk_reg <= '0';
+      clk_out_reg      <= '0';
+    ELSIF clk'EVENT AND clk = '1' THEN
+      internal_clk_reg <= internal_clk;
+      IF Reload = '1' THEN
         clk_out_reg <= '0';
-        cpt_reg     <= (others => '0');
-    elsif (internal_clk = '1' and internal_clk_reg = '0')  then 
-        if cpt_reg = N then
-            clk_out_reg <= not clk_out_reg;
-            cpt_reg     <= (others => '0');
-        else 
-            cpt_reg     <= std_logic_vector(UNSIGNED(cpt_reg) + 1);
-        end if;
-    end if;
-end if;
-end process;
+        cpt_reg     <= (OTHERS => '0');
+      ELSIF (internal_clk = '1' AND internal_clk_reg = '0') THEN
+        IF cpt_reg = N THEN
+          clk_out_reg <= NOT clk_out_reg;
+          cpt_reg     <= (OTHERS => '0');
+        ELSE
+          cpt_reg <= STD_LOGIC_VECTOR(UNSIGNED(cpt_reg) + 1);
+        END IF;
+      END IF;
+    END IF;
+  END PROCESS;
 
-end Behavioral;
+END Behavioral;

@@ -34,7 +34,7 @@ ENTITY cic_lfr_control_r2 IS
   PORT (
     clk                : IN  STD_LOGIC;
     rstn               : IN  STD_LOGIC;
-    run                : IN  STD_LOGIC;
+--    run                : IN  STD_LOGIC;
     --
     data_in_valid      : IN  STD_LOGIC;
     data_out_16_valid  : OUT STD_LOGIC;
@@ -55,7 +55,7 @@ ARCHITECTURE beh OF cic_lfr_control_r2 IS
 
   SIGNAL STATE_CIC_LFR : STATE_CIC_LFR_TYPE;
 
-  SIGNAL nb_data_receipt : INTEGER := 0;
+  SIGNAL nb_data_receipt : INTEGER RANGE 0 TO 255:= 0;
   SIGNAL current_cmd     : INTEGER := 0;
   SIGNAL current_channel : INTEGER := 0;
   SIGNAL sample_16_odd   : STD_LOGIC;

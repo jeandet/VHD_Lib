@@ -30,7 +30,7 @@ END top_ad_conv_RHF1401_withFilter;
 
 ARCHITECTURE ar_top_ad_conv_RHF1401 OF top_ad_conv_RHF1401_withFilter IS
   
-  SIGNAL cnv_cycle_counter : INTEGER;
+  SIGNAL cnv_cycle_counter : INTEGER RANGE 0 TO ncycle_cnv-1;
   SIGNAL cnv_s             : STD_LOGIC;
   SIGNAL cnv_s_reg         : STD_LOGIC;
   SIGNAL cnv_sync          : STD_LOGIC;
@@ -211,7 +211,6 @@ BEGIN
   sample <= sample_reg;
   
 END ar_top_ad_conv_RHF1401;
-
 
 
 

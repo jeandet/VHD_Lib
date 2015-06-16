@@ -78,13 +78,9 @@ ARCHITECTURE Behavioral OF lpp_dma_SEND16B_FIFO2DMA IS
   SIGNAL state : AHB_DMA_FSM_STATE;
   
   SIGNAL address_counter_reg : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL address_counter     : STD_LOGIC_VECTOR(3 DOWNTO 0);
 
   SIGNAL data_window : STD_LOGIC;
   SIGNAL ctrl_window : STD_LOGIC;
-
-  SIGNAL bus_request : STD_LOGIC;
-  SIGNAL bus_lock : STD_LOGIC;
 
   SIGNAL data_reg : STD_LOGIC_VECTOR(31 DOWNTO 0);
 

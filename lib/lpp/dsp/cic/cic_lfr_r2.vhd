@@ -280,7 +280,7 @@ BEGIN
     PORT MAP (
       clk                => clk,
       rstn               => rstn,
-      run                => run,
+--      run                => run,
       data_in_valid      => data_in_valid,
       data_out_16_valid  => data_out_16_valid_s,
       data_out_256_valid => data_out_256_valid_s,

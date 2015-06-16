@@ -139,7 +139,7 @@ PACKAGE cic_pkg IS
     PORT (
       clk                : IN  STD_LOGIC;
       rstn               : IN  STD_LOGIC;
-      run                : IN  STD_LOGIC;
+--      run                : IN  STD_LOGIC;
       data_in_valid      : IN  STD_LOGIC;
       data_out_16_valid  : OUT STD_LOGIC;
       data_out_256_valid : OUT STD_LOGIC;

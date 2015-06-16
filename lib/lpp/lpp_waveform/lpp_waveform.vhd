@@ -153,11 +153,7 @@ ARCHITECTURE beh OF lpp_waveform IS
   SIGNAL valid_in                   : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL valid_out                  : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL valid_ack                  : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL time_ready                 : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL data_ready                 : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL ready_arb                  : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL data_wen                   : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL time_wen                   : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL wdata                      : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL full_almost                : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL full                       : STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -165,9 +161,6 @@ ARCHITECTURE beh OF lpp_waveform IS
   SIGNAL empty                      : STD_LOGIC_VECTOR(3 DOWNTO 0);
   --
   SIGNAL data_ren                   : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL time_ren                   : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL rdata                      : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL enable                     : STD_LOGIC_VECTOR(3 DOWNTO 0);
   --
   SIGNAL run                        : STD_LOGIC;
   --

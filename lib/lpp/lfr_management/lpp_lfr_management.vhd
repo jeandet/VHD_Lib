@@ -114,6 +114,31 @@ PACKAGE lpp_lfr_management IS
       fine_time_add       : IN  STD_LOGIC;
       fine_time_max_value : OUT STD_LOGIC_VECTOR(8 DOWNTO 0));
   END COMPONENT;
+
+  COMPONENT apb_lfr_management_nocal
+    GENERIC (
+      tech             : INTEGER;
+      pindex           : INTEGER;
+      paddr            : INTEGER;
+      pmask            : INTEGER;
+      NB_SECOND_DESYNC : INTEGER);
+    PORT (
+      clk25MHz      : IN  STD_LOGIC;
+      resetn_25MHz  : IN  STD_LOGIC;
+      grspw_tick    : IN  STD_LOGIC;
+      apbi          : IN  apb_slv_in_type;
+      apbo          : OUT apb_slv_out_type;
+      HK_sample     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+      HK_val        : IN  STD_LOGIC;
+      HK_sel        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+      DAC_SDO       : OUT STD_LOGIC;
+      DAC_SCK       : OUT STD_LOGIC;
+      DAC_SYNC      : OUT STD_LOGIC;
+      DAC_CAL_EN    : OUT STD_LOGIC;
+      coarse_time   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+      fine_time     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      LFR_soft_rstn : OUT STD_LOGIC);
+  END COMPONENT;
   
 END lpp_lfr_management;
 

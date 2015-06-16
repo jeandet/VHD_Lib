@@ -65,7 +65,7 @@ ARCHITECTURE beh OF DMA_SubSystem IS
     PORT (
       clk             : IN  STD_LOGIC;
       rstn            : IN  STD_LOGIC;
-      run             : IN  STD_LOGIC;
+--      run             : IN  STD_LOGIC;
       buffer_new      : IN  STD_LOGIC;
       buffer_addr     : IN  STD_LOGIC_VECTOR(BUFFER_ADDR_SIZE-1 DOWNTO 0);
       buffer_length   : IN  STD_LOGIC_VECTOR(BUFFER_LENGTH_SIZE-1 DOWNTO 0);
@@ -222,7 +222,7 @@ BEGIN  -- beh
       PORT MAP (
         clk  => clk,
         rstn => rstn,
-        run  => run,
+--        run  => run,
 
         buffer_new      => buffer_new(I),
         buffer_addr     => buffer_addr(32*(I+1)-1 DOWNTO I*32),

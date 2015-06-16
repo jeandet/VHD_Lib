@@ -46,8 +46,8 @@ USE iap.memctrl.ALL;
 
 ENTITY leon3_soc IS
   GENERIC (
-    fabtech           : INTEGER := apa3e;
-    memtech           : INTEGER := apa3e;
+    fabtech           : INTEGER := axcel;--apa3e;
+    memtech           : INTEGER := axcel;--apa3e;
     padtech           : INTEGER := inferred;
     clktech           : INTEGER := inferred;
     disas             : INTEGER := 0;      -- Enable disassembly to console
@@ -56,11 +56,11 @@ ENTITY leon3_soc IS
     --
     clk_freq          : INTEGER := 25000;  --kHz
     --
-    IS_RADHARD        : INTEGER := 0;
+    IS_RADHARD        : INTEGER := 1;
     --
     NB_CPU            : INTEGER := 1;
     ENABLE_FPU        : INTEGER := 1;
-    FPU_NETLIST       : INTEGER := 1;
+    FPU_NETLIST       : INTEGER := 0;
     ENABLE_DSU        : INTEGER := 1;
     ENABLE_AHB_UART   : INTEGER := 1;
     ENABLE_APB_UART   : INTEGER := 1;
@@ -71,8 +71,8 @@ ENTITY leon3_soc IS
     NB_AHB_SLAVE      : INTEGER := 1;
     NB_APB_SLAVE      : INTEGER := 1;
     --
-    ADDRESS_SIZE      : INTEGER := 20;
-    USES_IAP_MEMCTRLR : INTEGER := 0;
+    ADDRESS_SIZE      : INTEGER := 19;
+    USES_IAP_MEMCTRLR : INTEGER := 1;
     BYPASS_EDAC_MEMCTRLR : STD_LOGIC := '0';
     SRBANKSZ          : INTEGER := 8
 
@@ -276,7 +276,7 @@ BEGIN
   l3 : IF CFG_LEON3 = 1 GENERATE
     cpu : FOR i IN 0 TO CFG_NCPU-1 GENERATE
       leon3_non_radhard : IF IS_RADHARD = 0 GENERATE
-        u0 : ENTITY gaisler.leon3s                       -- LEON3 processor      
+        u0 : leon3s                       -- LEON3 processor      
           GENERIC MAP (i, fabtech, memtech, CFG_NWIN, CFG_DSU, CFG_FPU, CFG_V8,
                        0, CFG_MAC, pclow, 0, CFG_NWP, CFG_ICEN, CFG_IREPL, CFG_ISETS, CFG_ILINE,
                        CFG_ISETSZ, CFG_ILOCK, CFG_DCEN, CFG_DREPL, CFG_DSETS, CFG_DLINE, CFG_DSETSZ,
@@ -288,7 +288,7 @@ BEGIN
       END GENERATE leon3_non_radhard;
       
       leon3_radhard_i : IF IS_RADHARD = 1 GENERATE
-        cpu : ENTITY gaisler.leon3ft
+        cpu : leon3ft
           GENERIC MAP (
             HINDEX     => i,  --: integer;             --CPU_HINDEX,
             FABTECH    => fabtech,        --CFG_TECH,

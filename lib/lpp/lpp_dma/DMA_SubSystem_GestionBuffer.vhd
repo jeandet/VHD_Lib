@@ -10,7 +10,7 @@ ENTITY DMA_SubSystem_GestionBuffer IS
   PORT (
     clk  : IN STD_LOGIC;
     rstn : IN STD_LOGIC;
-    run  : IN STD_LOGIC;
+--    run  : IN STD_LOGIC;
     --
     buffer_new      : IN STD_LOGIC;
     buffer_addr     : IN STD_LOGIC_VECTOR(BUFFER_ADDR_SIZE-1   DOWNTO 0);

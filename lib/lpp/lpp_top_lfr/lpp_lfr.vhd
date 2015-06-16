@@ -26,20 +26,20 @@ ENTITY lpp_lfr IS
   GENERIC (
     Mem_use                : INTEGER := use_RAM;
     tech                   : INTEGER := inferred;
-    nb_data_by_buffer_size : INTEGER := 11;
-    nb_snapshot_param_size : INTEGER := 11;
-    delta_vector_size      : INTEGER := 20;
+    nb_data_by_buffer_size : INTEGER := 32;
+    nb_snapshot_param_size : INTEGER := 32;
+    delta_vector_size      : INTEGER := 32;
     delta_vector_size_f0_2 : INTEGER := 7;
     
-    pindex   : INTEGER := 4;
-    paddr    : INTEGER := 4;
+    pindex   : INTEGER := 15;
+    paddr    : INTEGER := 15;
     pmask    : INTEGER := 16#fff#;
-    pirq_ms  : INTEGER := 0;
-    pirq_wfp : INTEGER := 1;
+    pirq_ms  : INTEGER := 6;
+    pirq_wfp : INTEGER := 14;
 
     hindex : INTEGER := 2;
 
-    top_lfr_version : STD_LOGIC_VECTOR(23 DOWNTO 0) := (OTHERS => '0');
+    top_lfr_version : STD_LOGIC_VECTOR(23 DOWNTO 0) := X"020153";
 
     DEBUG_FORCE_DATA_DMA : INTEGER := 0
     
@@ -85,9 +85,6 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL sample_f1_val    : STD_LOGIC;
   SIGNAL sample_f2_val    : STD_LOGIC;
   SIGNAL sample_f3_val    : STD_LOGIC;
-  --
-  SIGNAL sample_f_val       : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  SIGNAL sample_f_data      : STD_LOGIC_VECTOR((6*16)*4-1 DOWNTO 0);
   --
   SIGNAL sample_f0_data   : STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);
   SIGNAL sample_f1_data   : STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);

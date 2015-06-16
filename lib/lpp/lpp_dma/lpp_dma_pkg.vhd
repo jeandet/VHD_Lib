@@ -251,7 +251,7 @@ PACKAGE lpp_dma_pkg IS
     PORT (
       clk             : IN  STD_LOGIC;
       rstn            : IN  STD_LOGIC;
-      run             : IN  STD_LOGIC;
+--      run             : IN  STD_LOGIC;
       buffer_new      : IN  STD_LOGIC;
       buffer_addr     : IN  STD_LOGIC_VECTOR(BUFFER_ADDR_SIZE-1 DOWNTO 0);
       buffer_length   : IN  STD_LOGIC_VECTOR(BUFFER_LENGTH_SIZE-1 DOWNTO 0);

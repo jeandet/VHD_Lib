@@ -123,7 +123,7 @@ ARCHITECTURE Behavioral OF apb_lfr_management IS
   SIGNAL force_reset          : STD_LOGIC;
   SIGNAL previous_force_reset : STD_LOGIC;
   SIGNAL soft_reset           : STD_LOGIC;
-  SIGNAL soft_reset_sync      : STD_LOGIC;
+
   -----------------------------------------------------------------------------
   SIGNAL HK_sel_s             : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
@@ -521,4 +521,5 @@ BEGIN
       );
 
   DAC_CAL_EN <= DAC_CAL_EN_s;
+  
 END Behavioral;

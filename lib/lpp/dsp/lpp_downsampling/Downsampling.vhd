@@ -44,7 +44,7 @@ END Downsampling;
 
 ARCHITECTURE beh OF Downsampling IS
 
-  SIGNAL counter : INTEGER;
+  SIGNAL counter : INTEGER RANGE 0 TO DivideParam-1;
   
 BEGIN  -- beh
 
