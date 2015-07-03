@@ -42,11 +42,13 @@ ENTITY SPI_DAC_DRIVER IS
 END ENTITY SPI_DAC_DRIVER;
 
 ARCHITECTURE behav OF SPI_DAC_DRIVER IS
-  SIGNAL SHIFTREG   : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL INPUTREG   : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL SMP_CLK_R  : STD_LOGIC                              := '0';
-  SIGNAL shiftcnt   : INTEGER                                := 0;
-  SIGNAL shifting   : STD_LOGIC                              := '0';
+  SIGNAL SHIFTREG  : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL INPUTREG  : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL SMP_CLK_R : STD_LOGIC                              := '0';
+  SIGNAL shiftcnt  : INTEGER                                := 0;
+  SIGNAL shifting  : STD_LOGIC                              := '0';
+
+  SIGNAL SCLK_s : STD_LOGIC;
 BEGIN
 
 
@@ -58,7 +60,16 @@ BEGIN
     INPUTREG(datawidth-1 DOWNTO 0) <= DATA(0 TO datawidth-1);
   END GENERATE;
 
-  SCLK <= clk;
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS
+    IF rstn = '0' THEN                  -- asynchronous reset (active low)
+      SCLK_s <= '0';
+    ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
+      SCLK_s <= NOT SCLK_s;
+      
+    END IF;
+  END PROCESS;
+  SCLK <= SCLK_s;
 
   PROCESS(clk, rstn)
   BEGIN

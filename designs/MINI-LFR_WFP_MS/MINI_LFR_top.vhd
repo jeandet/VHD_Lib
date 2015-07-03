@@ -316,8 +316,8 @@ BEGIN  -- beh
       ENABLE_FPU        => 1,
       FPU_NETLIST       => 0,
       ENABLE_DSU        => 1,
-      ENABLE_AHB_UART   => 1,
-      ENABLE_APB_UART   => 1,
+      ENABLE_AHB_UART   => 0,
+      ENABLE_APB_UART   => 0,
       ENABLE_IRQMP      => 1,
       ENABLE_GPT        => 1,
       NB_AHB_MASTER     => NB_AHB_MASTER,
@@ -514,7 +514,7 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"000146")  -- aa.bb.cc version
+      top_lfr_version        => X"000154")  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,

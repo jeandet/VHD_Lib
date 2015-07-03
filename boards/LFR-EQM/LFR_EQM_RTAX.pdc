@@ -58,7 +58,7 @@ set_io	{data[31]}		-pinname	214	-fixed	yes	-DIRECTION	Inout
 set_io	nSRAM_MBE		-pinname	9	-fixed	yes	-DIRECTION	Inout
 set_io	nSRAM_E1		-pinname	20	-fixed	yes	-DIRECTION	Inout
 set_io	nSRAM_E2		-pinname	15	-fixed	yes	-DIRECTION	Inout
-set_io	nSRAM_SCRUB		-pinname	14	-fixed	yes	-DIRECTION	Inout
+#set_io	nSRAM_SCRUB		-pinname	14	-fixed	yes	-DIRECTION	Inout
 set_io	nSRAM_W			-pinname	8	-fixed	yes	-DIRECTION	Inout
 set_io	nSRAM_G			-pinname	21	-fixed	yes	-DIRECTION	Inout
 set_io	nSRAM_BUSY		-pinname	24	-fixed	yes	-DIRECTION	Inout
@@ -75,15 +75,15 @@ set_io	spw2_sin		-pinname	304	-fixed	yes	-DIRECTION	Inout
 set_io	spw2_dout		-pinname	335	-fixed	yes	-DIRECTION	Inout
 set_io	spw2_sout		-pinname	330	-fixed	yes	-DIRECTION	Inout
 
-set_io	TAG1    		-pinname	195	-fixed	yes	-DIRECTION	Inout
-set_io	TAG2			-pinname	190	-fixed	yes	-DIRECTION	Inout
-set_io	TAG3			-pinname	189	-fixed	yes	-DIRECTION	Inout
-set_io	TAG4			-pinname	188	-fixed	yes	-DIRECTION	Inout
-#set_io	TAG5			-pinname	187	-fixed	yes	-DIRECTION	Inout
-#set_io	TAG6			-pinname	184	-fixed	yes	-DIRECTION	Inout
-#set_io TAG7			-pinname	200	-fixed	yes	-DIRECTION	Inout
-set_io	TAG8			-pinname	199	-fixed	yes	-DIRECTION	Inout
-#set_io	TAG9			-pinname	196	-fixed	yes	-DIRECTION	Inout
+set_io	{TAG[1]}    		-pinname	195	-fixed	yes	-DIRECTION	Inout
+#set_io	{TAG[2]}			-pinname	190	-fixed	yes	-DIRECTION	Inout
+set_io	{TAG[3]}			-pinname	189	-fixed	yes	-DIRECTION	Inout
+#set_io	{TAG[4]}			-pinname	188	-fixed	yes	-DIRECTION	Inout
+#set_io	{TAG[5]}			-pinname	187	-fixed	yes	-DIRECTION	Inout
+#set_io	{TAG[6]}			-pinname	184	-fixed	yes	-DIRECTION	Inout
+#set_io {TAG[7]}			-pinname	200	-fixed	yes	-DIRECTION	Inout
+#set_io	{TAG[8]}			-pinname	199	-fixed	yes	-DIRECTION	Inout
+#set_io	{TAG[9]}			-pinname	196	-fixed	yes	-DIRECTION	Inout
 
 set_io bias_fail_sw 		-pinname 	342 	-fixed	yes	-DIRECTION	Inout
 

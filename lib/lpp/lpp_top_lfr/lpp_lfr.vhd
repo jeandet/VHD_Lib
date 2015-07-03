@@ -140,21 +140,6 @@ ARCHITECTURE beh OF lpp_lfr IS
   -----------------------------------------------------------------------------
   -- 
   -----------------------------------------------------------------------------
---  SIGNAL data_f0_addr_out_s             : STD_LOGIC_VECTOR(31 DOWNTO 0);
---  SIGNAL data_f0_data_out_valid_s       : STD_LOGIC;
---  SIGNAL data_f0_data_out_valid_burst_s : STD_LOGIC;
-  --f1
---  SIGNAL data_f1_addr_out_s             : STD_LOGIC_VECTOR(31 DOWNTO 0);
---  SIGNAL data_f1_data_out_valid_s       : STD_LOGIC;
---  SIGNAL data_f1_data_out_valid_burst_s : STD_LOGIC;
-  --f2
---  SIGNAL data_f2_addr_out_s             : STD_LOGIC_VECTOR(31 DOWNTO 0);
---  SIGNAL data_f2_data_out_valid_s       : STD_LOGIC;
---  SIGNAL data_f2_data_out_valid_burst_s : STD_LOGIC;
-  --f3
---  SIGNAL data_f3_addr_out_s             : STD_LOGIC_VECTOR(31 DOWNTO 0);
---  SIGNAL data_f3_data_out_valid_s       : STD_LOGIC;
---  SIGNAL data_f3_data_out_valid_burst_s : STD_LOGIC;
 
   SIGNAL wfp_status_buffer_ready : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL wfp_addr_buffer         : STD_LOGIC_VECTOR(32*4-1 DOWNTO 0);
@@ -162,66 +147,14 @@ ARCHITECTURE beh OF lpp_lfr IS
   SIGNAL wfp_ready_buffer        : STD_LOGIC_VECTOR(3 DOWNTO 0);
   SIGNAL wfp_buffer_time         : STD_LOGIC_VECTOR(48*4-1 DOWNTO 0);
   SIGNAL wfp_error_buffer_full   : STD_LOGIC_VECTOR(3 DOWNTO 0);
-  -----------------------------------------------------------------------------
-  -- DMA RR
-  -----------------------------------------------------------------------------
---  SIGNAL dma_sel_valid   : STD_LOGIC;
---  SIGNAL dma_rr_valid    : STD_LOGIC_VECTOR(3 DOWNTO 0);
---  SIGNAL dma_rr_grant_s  : STD_LOGIC_VECTOR(3 DOWNTO 0);
---  SIGNAL dma_rr_grant_ms : STD_LOGIC_VECTOR(3 DOWNTO 0);
---  SIGNAL dma_rr_valid_ms : STD_LOGIC_VECTOR(3 DOWNTO 0);
-
---  SIGNAL dma_rr_grant : STD_LOGIC_VECTOR(4 DOWNTO 0);
---  SIGNAL dma_sel      : STD_LOGIC_VECTOR(4 DOWNTO 0);
-
-  -----------------------------------------------------------------------------
-  -- DMA_REG
-  -----------------------------------------------------------------------------
---  SIGNAL ongoing_reg         : STD_LOGIC;
---  SIGNAL dma_sel_reg         : STD_LOGIC_VECTOR(3 DOWNTO 0);
---  SIGNAL dma_send_reg        : STD_LOGIC;
---  SIGNAL dma_valid_burst_reg : STD_LOGIC;  -- (1 => BURST , 0 => SINGLE)
---  SIGNAL dma_address_reg     : STD_LOGIC_VECTOR(31 DOWNTO 0);
---  SIGNAL dma_data_reg        : STD_LOGIC_VECTOR(31 DOWNTO 0);
-
-
-  -----------------------------------------------------------------------------
-  -- DMA
-  -----------------------------------------------------------------------------
---  SIGNAL dma_send        : STD_LOGIC;
---  SIGNAL dma_valid_burst : STD_LOGIC;   -- (1 => BURST , 0 => SINGLE)
---  SIGNAL dma_done        : STD_LOGIC;
---  SIGNAL dma_ren         : STD_LOGIC;
---  SIGNAL dma_address     : STD_LOGIC_VECTOR(31 DOWNTO 0);
---  SIGNAL dma_data        : STD_LOGIC_VECTOR(31 DOWNTO 0);
---  SIGNAL dma_data_2      : STD_LOGIC_VECTOR(31 DOWNTO 0);
-
-  -----------------------------------------------------------------------------
-  -- MS
-  -----------------------------------------------------------------------------
-
---  SIGNAL data_ms_addr        : STD_LOGIC_VECTOR(31 DOWNTO 0);
---  SIGNAL data_ms_data        : STD_LOGIC_VECTOR(31 DOWNTO 0);
---  SIGNAL data_ms_valid       : STD_LOGIC;
---  SIGNAL data_ms_valid_burst : STD_LOGIC;
---  SIGNAL data_ms_ren         : STD_LOGIC;
---  SIGNAL data_ms_done        : STD_LOGIC;
---  SIGNAL dma_ms_ongoing      : STD_LOGIC;
-
---  SIGNAL run_ms              : STD_LOGIC;
---  SIGNAL ms_softandhard_rstn : STD_LOGIC;
 
   SIGNAL matrix_time_f0 : STD_LOGIC_VECTOR(47 DOWNTO 0);
---  SIGNAL matrix_time_f0_1    : STD_LOGIC_VECTOR(47 DOWNTO 0);
   SIGNAL matrix_time_f1 : STD_LOGIC_VECTOR(47 DOWNTO 0);
   SIGNAL matrix_time_f2 : STD_LOGIC_VECTOR(47 DOWNTO 0);
 
 
   SIGNAL error_buffer_full      : STD_LOGIC;
   SIGNAL error_input_fifo_write : STD_LOGIC_VECTOR(2 DOWNTO 0);
-
---  SIGNAL debug_ms : STD_LOGIC_VECTOR(31 DOWNTO 0);
---  SIGNAL debug_signal : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
   -----------------------------------------------------------------------------
   SIGNAL dma_fifo_burst_valid : STD_LOGIC_VECTOR(4 DOWNTO 0);
@@ -247,17 +180,12 @@ ARCHITECTURE beh OF lpp_lfr IS
   
 BEGIN
 
-  --apb_reg_debug_vector;
   -----------------------------------------------------------------------------
   
   sample_s(4 DOWNTO 0) <= sample_E(4 DOWNTO 0);
   sample_s(7 DOWNTO 5) <= sample_B(2 DOWNTO 0);
   sample_time <= coarse_time & fine_time;
   
-  --all_channel : FOR i IN 7 DOWNTO 0 GENERATE
-  --  sample_s(i) <= sample(i)(13) & sample(i)(13) & sample(i);
-  --END GENERATE all_channel;
-
   -----------------------------------------------------------------------------
   lpp_lfr_filter_1 : lpp_lfr_filter
     GENERIC MAP (
@@ -291,7 +219,6 @@ BEGIN
   lpp_lfr_apbreg_1 : lpp_lfr_apbreg
     GENERIC MAP (
       nb_data_by_buffer_size => nb_data_by_buffer_size,
---      nb_word_by_buffer_size => nb_word_by_buffer_size, -- TODO
       nb_snapshot_param_size => nb_snapshot_param_size,
       delta_vector_size      => delta_vector_size,
       delta_vector_size_f0_2 => delta_vector_size_f0_2,
@@ -312,8 +239,8 @@ BEGIN
       ready_matrix_f0        => ready_matrix_f0,
       ready_matrix_f1        => ready_matrix_f1,
       ready_matrix_f2        => ready_matrix_f2,
-      error_buffer_full      => error_buffer_full,       -- TODO
-      error_input_fifo_write => error_input_fifo_write,  -- TODO
+      error_buffer_full      => error_buffer_full,       
+      error_input_fifo_write => error_input_fifo_write,  
       status_ready_matrix_f0 => status_ready_matrix_f0,
       status_ready_matrix_f1 => status_ready_matrix_f1,
       status_ready_matrix_f2 => status_ready_matrix_f2,
@@ -329,10 +256,6 @@ BEGIN
       length_matrix_f0  => length_matrix_f0,
       length_matrix_f1  => length_matrix_f1,
       length_matrix_f2  => length_matrix_f2,
-      -------------------------------------------------------------------------
-      --status_full       => status_full,       --      TODo
-      --status_full_ack   => status_full_ack,   --      TODo
-      --status_full_err   => status_full_err,   --      TODo
       status_new_err    => status_new_err,
       data_shaping_BW   => data_shaping_BW,
       data_shaping_SP0  => data_shaping_SP0,
@@ -346,7 +269,6 @@ BEGIN
       delta_f1          => delta_f1,
       delta_f2          => delta_f2,
       nb_data_by_buffer => nb_data_by_buffer,
---      nb_word_by_buffer => nb_word_by_buffer, -- TODO
       nb_snapshot_param => nb_snapshot_param,
       enable_f0         => enable_f0,
       enable_f1         => enable_f1,
@@ -355,16 +277,15 @@ BEGIN
       burst_f0          => burst_f0,
       burst_f1          => burst_f1,
       burst_f2          => burst_f2,
-      run               => OPEN, --run,
+      run               => OPEN,
       start_date        => start_date,
---      debug_signal      => debug_signal,
-      wfp_status_buffer_ready => wfp_status_buffer_ready,-- TODO
-      wfp_addr_buffer         => wfp_addr_buffer,-- TODO
-      wfp_length_buffer       => wfp_length_buffer,-- TODO
+      wfp_status_buffer_ready => wfp_status_buffer_ready,
+      wfp_addr_buffer         => wfp_addr_buffer,
+      wfp_length_buffer       => wfp_length_buffer,
     
-      wfp_ready_buffer        => wfp_ready_buffer,-- TODO
-      wfp_buffer_time         => wfp_buffer_time,-- TODO
-      wfp_error_buffer_full   => wfp_error_buffer_full, -- TODO
+      wfp_ready_buffer        => wfp_ready_buffer,
+      wfp_buffer_time         => wfp_buffer_time,
+      wfp_error_buffer_full   => wfp_error_buffer_full,
       -------------------------------------------------------------------------
       sample_f3_v     => sample_f3_data(1*16-1 DOWNTO 0*16),
       sample_f3_e1    => sample_f3_data(2*16-1 DOWNTO 1*16),
@@ -462,17 +383,12 @@ BEGIN
   sample_f1_wdata <= sample_f1_data((3*16)-1 DOWNTO (1*16)) & sample_f1_data((6*16)-1 DOWNTO (3*16));
   sample_f2_wdata <= sample_f2_data((3*16)-1 DOWNTO (1*16)) & sample_f2_data((6*16)-1 DOWNTO (3*16));
 
-  -------------------------------------------------------------------------------
-
-  --ms_softandhard_rstn <= rstn AND run_ms AND run;
-
   -----------------------------------------------------------------------------
   lpp_lfr_ms_1 : lpp_lfr_ms
     GENERIC MAP (
       Mem_use => Mem_use)
     PORT MAP (
       clk  => clk,
-      --rstn => ms_softandhard_rstn,      --rstn,
       rstn => rstn,
       
       run  => '1',--run_ms,

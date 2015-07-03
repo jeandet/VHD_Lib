@@ -122,38 +122,26 @@ BEGIN
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      state <= DESYNC;
+      state   <= DESYNC;
+      set_TCU <= '0';
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
-      --CT_add1 <= '0';
       set_TCU <= '0';
       CASE state IS
         WHEN DESYNC =>
           IF tick = '1' THEN
             state <= SYNC;
             set_TCU <= new_coarsetime_reg;
-            --IF new_coarsetime = '0' AND FT_half = '1' THEN
-            --  CT_add1 <= '1';
-            --END IF;
-          --ELSIF FT_max = '1' THEN
-          --  CT_add1 <= '1';
           END IF;
         WHEN TRANSITION => 
           IF tick = '1' THEN
             state         <= SYNC;
             set_TCU       <= new_coarsetime_reg;
-            --IF new_coarsetime = '0' THEN
-            --  CT_add1 <= '1';
-            --END IF;
           ELSIF FT_wait = '1' THEN
-            --CT_add1 <= '1';
             state         <= DESYNC;
           END IF;
         WHEN SYNC =>
           IF tick = '1' THEN
             set_TCU       <= new_coarsetime_reg;
-            --IF new_coarsetime = '0' THEN
-            --  CT_add1 <= '1';
-            --END IF;
           ELSIF FT_max = '1' THEN
             state         <= TRANSITION;
           END IF;
