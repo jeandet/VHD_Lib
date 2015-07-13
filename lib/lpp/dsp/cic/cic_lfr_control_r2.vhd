@@ -180,7 +180,12 @@ BEGIN
             STATE_CIC_LFR   <= RUN_PROG_I;
             current_cmd     <= PROG_START_I;
             current_channel <= 0;
-            nb_data_receipt <= nb_data_receipt + 1;
+            IF nb_data_receipt = 255 THEN
+              nb_data_receipt <= 0;
+            ELSE
+              nb_data_receipt <= nb_data_receipt + 1;
+            END IF;
+            
           END IF;
           
         WHEN RUN_PROG_I =>

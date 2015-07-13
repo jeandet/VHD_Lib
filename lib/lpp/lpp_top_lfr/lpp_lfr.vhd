@@ -234,7 +234,7 @@ BEGIN
       apbi    => apbi,
       apbo    => apbo,
 
-      run_ms => OPEN,--run_ms,
+--      run_ms => OPEN,--run_ms,
 
       ready_matrix_f0        => ready_matrix_f0,
       ready_matrix_f1        => ready_matrix_f1,

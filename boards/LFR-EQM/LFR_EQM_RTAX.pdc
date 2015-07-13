@@ -75,10 +75,10 @@ set_io	spw2_sin		-pinname	304	-fixed	yes	-DIRECTION	Inout
 set_io	spw2_dout		-pinname	335	-fixed	yes	-DIRECTION	Inout
 set_io	spw2_sout		-pinname	330	-fixed	yes	-DIRECTION	Inout
 
-set_io	{TAG[1]}    		-pinname	195	-fixed	yes	-DIRECTION	Inout
-#set_io	{TAG[2]}			-pinname	190	-fixed	yes	-DIRECTION	Inout
-set_io	{TAG[3]}			-pinname	189	-fixed	yes	-DIRECTION	Inout
-#set_io	{TAG[4]}			-pinname	188	-fixed	yes	-DIRECTION	Inout
+#set_io	{TAG[1]}    		-pinname	195	-fixed	yes	-DIRECTION	Inout
+set_io	{TAG[2]}			-pinname	190	-fixed	yes	-DIRECTION	Inout
+#set_io	{TAG[3]}			-pinname	189	-fixed	yes	-DIRECTION	Inout
+set_io	{TAG[4]}			-pinname	188	-fixed	yes	-DIRECTION	Inout
 #set_io	{TAG[5]}			-pinname	187	-fixed	yes	-DIRECTION	Inout
 #set_io	{TAG[6]}			-pinname	184	-fixed	yes	-DIRECTION	Inout
 #set_io {TAG[7]}			-pinname	200	-fixed	yes	-DIRECTION	Inout

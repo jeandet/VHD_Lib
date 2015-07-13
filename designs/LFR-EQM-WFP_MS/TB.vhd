@@ -143,8 +143,7 @@ ARCHITECTURE beh OF TB IS
   SIGNAL spw2_sout      : STD_LOGIC;
   SIGNAL bias_fail_sw   : STD_LOGIC;
   SIGNAL ADC_OEB_bar_CH   : STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL ADC_OEB_bar_CH_r : STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL ADC_OEB_bar_CH_s : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL ADC_OEB_bar_CH_s : STD_LOGIC_VECTOR(8 DOWNTO 0);
   SIGNAL ADC_smpclk     : STD_LOGIC;
   SIGNAL ADC_data       : STD_LOGIC_VECTOR(13 DOWNTO 0);
   SIGNAL ADC_data_s     : STD_LOGIC_VECTOR(13 DOWNTO 0);
@@ -286,7 +285,7 @@ BEGIN  -- beh
   clk50MHz     <= NOT clk50MHz     AFTER 10 ns;     -- 50 MHz
   -----------------------------------------------------------------------------
     
-  MODULE_RHF1401 : FOR I IN 0 TO 7 GENERATE
+  MODULE_RHF1401 : FOR I IN 0 TO 8 GENERATE
     TestModule_RHF1401_1 : TestModule_RHF1401
       GENERIC MAP (
         freq      => 2400,--24*(I*5+1),
@@ -299,8 +298,8 @@ BEGIN  -- beh
     --ADC_data_s <= "00" & X"190";
   END GENERATE MODULE_RHF1401;
 
-  ADC_OEB_bar_CH_s <= TRANSPORT ADC_OEB_bar_CH AFTER 10 ns;
-  ADC_data         <= TRANSPORT ADC_data_s     AFTER 35 ns;
+  ADC_OEB_bar_CH_s <= TRANSPORT (ADC_OEB_bar_HK & ADC_OEB_bar_CH) AFTER 10 ns;
+  ADC_data         <= TRANSPORT ADC_data_s                        AFTER 55 ns;
   -----------------------------------------------------------------------------
   PROCESS (clk50MHz, reset)
   BEGIN  -- PROCESS
@@ -664,6 +663,9 @@ BEGIN  -- beh
   END PROCESS;
   -----------------------------------------------------------------------------
   ramsn(1 DOWNTO 0) <= nSRAM_E2 & nSRAM_E1;
+
+  data_ram <= TRANSPORT data     AFTER 45 ns WHEN nSRAM_W = '0' ELSE (OTHERS => 'Z');
+  data     <= TRANSPORT data_ram AFTER 45 ns WHEN nSRAM_W = '1' ELSE (OTHERS => 'Z'); 
   
   sbanks : FOR k IN 0 TO srambanks-1 GENERATE
     sram0 : FOR i IN 0 TO (sramwidth/8)-1 GENERATE
@@ -674,7 +676,7 @@ BEGIN  -- beh
           fname => sramfile)
         PORT MAP (
           address,
-          data(31-i*8 DOWNTO 24-i*8),
+          data_ram(31-i*8 DOWNTO 24-i*8),
           ramsn(k),
           nSRAM_W,
           nSRAM_G

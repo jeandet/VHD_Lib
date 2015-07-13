@@ -92,10 +92,9 @@ set_min_delay 0.000 -from [get_clocks {clk_25:Q}]  -to [get_ports { nSRAM_MBE }]
 
 ########   Delay Constraints  ########
 
-set_max_delay 4.000 -from [get_ports { spw2_sin spw2_din spw1_sin spw1_din reset }]  -to [get_clocks {spw_inputloop.0.spw_phy0/rxclki_RNO:Y}] 
+set_max_delay 4.000 -from [get_ports { spw2_sin spw2_din spw1_sin spw1_din reset }]  -to [get_clocks {spw_inputloop.1.spw_phy0/ntstrxclk.rx_clkbuf/pa3e.pae30/buf1.buf_RNO:Y}] 
 
-set_max_delay 4.000 -from [get_ports { spw2_sin spw2_din spw1_sin spw1_din reset }]  -to [get_clocks {spw_inputloop.1.spw_phy0/rxclki_RNO:Y}] 
-
+set_max_delay 4.000 -from [get_ports { spw2_sin spw2_din spw1_sin spw1_din reset }]  -to [get_clocks {spw_inputloop.0.spw_phy0/ntstrxclk.rx_clkbuf/pa3e.pae30/buf1.buf_RNO:Y}] 
 
 
 ########   Delay Constraints  ########

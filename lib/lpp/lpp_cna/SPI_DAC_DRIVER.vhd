@@ -42,23 +42,54 @@ ENTITY SPI_DAC_DRIVER IS
 END ENTITY SPI_DAC_DRIVER;
 
 ARCHITECTURE behav OF SPI_DAC_DRIVER IS
-  SIGNAL SHIFTREG  : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL INPUTREG  : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL SMP_CLK_R : STD_LOGIC                              := '0';
-  SIGNAL shiftcnt  : INTEGER                                := 0;
-  SIGNAL shifting  : STD_LOGIC                              := '0';
+  SIGNAL DATA_s               : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL SMP_CLK_R            : STD_LOGIC                              := '0';
+  SIGNAL SMP_CLK_RisingEdge   : STD_LOGIC                              := '0';
+  SIGNAL SMP_CLK_RisingEdge_1 : STD_LOGIC                              := '0';
+  SIGNAL SMP_CLK_RisingEdge_2 : STD_LOGIC                              := '0';
+
+  SIGNAL SHIFTREG : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL shiftcnt : INTEGER                                := 0;
+  SIGNAL shifting : STD_LOGIC                              := '0';
 
   SIGNAL SCLK_s : STD_LOGIC;
 BEGIN
 
+  -----------------------------------------------------------------------------
+  -- Data Re-Orderng
+  -----------------------------------------------------------------------------
 
   MSB : IF MSBFIRST = 1 GENERATE
-    INPUTREG <= DATA;
+    DATA_s <= DATA;
   END GENERATE;
 
   LSB : IF MSBFIRST = 0 GENERATE
-    INPUTREG(datawidth-1 DOWNTO 0) <= DATA(0 TO datawidth-1);
+    DATA_s(datawidth-1 DOWNTO 0) <= DATA(0 TO datawidth-1);
   END GENERATE;
+
+  -----------------------------------------------------------------------------
+  -- 
+  -----------------------------------------------------------------------------
+  PROCESS(clk, rstn)
+  BEGIN
+    IF rstn = '0' THEN
+      SMP_CLK_R            <= '0';
+      SMP_CLK_RisingEdge_2 <= '0';
+    ELSIF clk'EVENT AND clk = '1' THEN
+      SMP_CLK_R            <= SMP_CLK;
+      SMP_CLK_RisingEdge_2 <= SMP_CLK_RisingEdge_1;
+    END IF;
+  END PROCESS;
+
+  SMP_CLK_RisingEdge_1 <= '1' WHEN SMP_CLK = '1' AND SMP_CLK_R = '0'                        ELSE '0';
+  SMP_CLK_RisingEdge   <= '1' WHEN SMP_CLK_RisingEdge_1 = '1' OR SMP_CLK_RisingEdge_2 = '1' ELSE '0';
+
+
+  -----------------------------------------------------------------------------
+  -- 
+  -----------------------------------------------------------------------------
+  SCLK <= SCLK_s;
+  DOUT <= SHIFTREG(datawidth-1);
 
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
@@ -66,17 +97,6 @@ BEGIN
       SCLK_s <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
       SCLK_s <= NOT SCLK_s;
-      
-    END IF;
-  END PROCESS;
-  SCLK <= SCLK_s;
-
-  PROCESS(clk, rstn)
-  BEGIN
-    IF rstn = '0' THEN
-      SMP_CLK_R <= '0';
-    ELSIF clk'EVENT AND clk = '1' THEN
-      SMP_CLK_R <= SMP_CLK;
     END IF;
   END PROCESS;
 
@@ -87,28 +107,30 @@ BEGIN
       SHIFTREG <= (OTHERS => '0');
       SYNC     <= '0';
       shiftcnt <= 0;
-      DOUT     <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN
-      DOUT <= SHIFTREG(datawidth-1);
-      IF(SMP_CLK = '1' AND SMP_CLK_R = '0') THEN
-        SYNC     <= '1';
-        shifting <= '1';
-      ELSE
-        SYNC <= '0';
-        IF shiftcnt = datawidth-1 THEN
-          shifting <= '0';
-        END IF;
-      END IF;
-      IF shifting = '1' THEN
-        shiftcnt <= shiftcnt + 1;
-        SHIFTREG <= SHIFTREG (datawidth-2 DOWNTO 0) & '0';
 
-      ELSE
-        SHIFTREG <= INPUTREG;
-        shiftcnt <= 0;
+      IF SCLK_s = '0' THEN
+        
+        IF SMP_CLK_RisingEdge = '1' THEN
+          SYNC     <= '1';
+          shifting <= '1';
+        ELSE
+          SYNC <= '0';
+          IF shiftcnt = datawidth-1 THEN
+            shifting <= '0';
+          END IF;
+        END IF;
+
+        IF shifting = '1' THEN
+          shiftcnt <= shiftcnt + 1;
+          SHIFTREG(datawidth-1 DOWNTO 1) <= SHIFTREG (datawidth-2 DOWNTO 0);
+        ELSE
+          SHIFTREG <= DATA_s;
+          shiftcnt <= 0;
+        END IF;        
+        
       END IF;
     END IF;
   END PROCESS;
 
 END ARCHITECTURE behav;
-

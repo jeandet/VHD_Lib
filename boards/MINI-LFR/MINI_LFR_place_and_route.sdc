@@ -29,3 +29,7 @@ create_clock -name SPW_CLOCK -period 100.000000 -waveform {0.000000 50.000000} {
 # set_wire_load_mode top
 
 # Other Constraints
+
+set_max_delay 4.000 -from [get_ports { SPW_NOM_DIN SPW_NOM_SIN SPW_RED_DIN SPW_RED_SIN reset }]  -to [get_clocks {spw_inputloop.0.spw_phy0/rxclki_RNO:Y}] 
+
+set_max_delay 4.000 -from [get_ports { SPW_NOM_DIN SPW_NOM_SIN SPW_RED_DIN SPW_RED_SIN reset }]  -to [get_clocks {spw_inputloop.1.spw_phy0/rxclki_RNO:Y}] 

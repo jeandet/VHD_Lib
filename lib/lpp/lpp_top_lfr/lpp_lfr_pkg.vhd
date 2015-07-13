@@ -282,7 +282,7 @@ PACKAGE lpp_lfr_pkg IS
       HRESETn                 : IN  STD_ULOGIC;
       apbi                    : IN  apb_slv_in_type;
       apbo                    : OUT apb_slv_out_type;
-      run_ms                  : OUT STD_LOGIC;
+--      run_ms                  : OUT STD_LOGIC;
       ready_matrix_f0         : IN  STD_LOGIC;
       ready_matrix_f1         : IN  STD_LOGIC;
       ready_matrix_f2         : IN  STD_LOGIC;
