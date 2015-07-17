@@ -41,8 +41,9 @@ ENTITY lpp_lfr IS
 
     top_lfr_version : STD_LOGIC_VECTOR(23 DOWNTO 0) := X"020153";
 
-    DEBUG_FORCE_DATA_DMA : INTEGER := 0
-    
+    DEBUG_FORCE_DATA_DMA : INTEGER := 0;
+    RTL_DESIGN_LIGHT     : INTEGER := 0;
+    WINDOWS_HAANNING_PARAM_SIZE : INTEGER := 15
     );
   PORT (
     clk             : IN  STD_LOGIC;
@@ -189,7 +190,8 @@ BEGIN
   -----------------------------------------------------------------------------
   lpp_lfr_filter_1 : lpp_lfr_filter
     GENERIC MAP (
-      Mem_use => Mem_use)
+      Mem_use          => Mem_use,
+      RTL_DESIGN_LIGHT => RTL_DESIGN_LIGHT)
     PORT MAP (
       sample           => sample_s,
       sample_val       => sample_val,
@@ -386,7 +388,8 @@ BEGIN
   -----------------------------------------------------------------------------
   lpp_lfr_ms_1 : lpp_lfr_ms
     GENERIC MAP (
-      Mem_use => Mem_use)
+      Mem_use => Mem_use,
+      WINDOWS_HAANNING_PARAM_SIZE => WINDOWS_HAANNING_PARAM_SIZE)
     PORT MAP (
       clk  => clk,
       rstn => rstn,

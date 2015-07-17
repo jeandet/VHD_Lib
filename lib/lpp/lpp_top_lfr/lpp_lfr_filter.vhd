@@ -45,7 +45,8 @@ USE GRLIB.DMA2AHB_Package.ALL;
 
 ENTITY lpp_lfr_filter IS
   GENERIC(
-    Mem_use                 : INTEGER := use_RAM
+    Mem_use                 : INTEGER := use_RAM;
+    RTL_DESIGN_LIGHT        : INTEGER := 0
     );
   PORT (
     sample           : IN Samples(7 DOWNTO 0);
@@ -549,34 +550,41 @@ BEGIN
     sample_f3_cic_filter(J,17) <= sample_f3_cic(J,15);
   END GENERATE all_channel_sample_f_cic;
 
-  
-  IIR_CEL_CTRLR_v3_1:IIR_CEL_CTRLR_v3
-    GENERIC MAP (
-      tech         => 0,
-      Mem_use      => Mem_use,
-      Sample_SZ    => 18,
-      Coef_SZ      => f2_f3_COEFFICIENT_SIZE,
-      Coef_Nb      => f2_f3_CEL_NUMBER*5,
-      Coef_sel_SZ  => 5,
-      Cels_count   => f2_f3_CEL_NUMBER,
-      ChanelsCount => 6)
-    PORT MAP (
-      rstn            => rstn,
-      clk             => clk,
-      virg_pos        => f2_f3_POINT_POSITION,
-      coefs           => coefs_iir_cel_f2_f3,
+  NO_IIR_FILTER_f2_f3: IF RTL_DESIGN_LIGHT = 1 GENERATE
+    sample_f2_filter_val <= sample_f2_cic_val;
+    sample_f2_filter     <= sample_f2_cic_filter;
+    sample_f3_filter_val <= sample_f3_cic_val;
+    sample_f3_filter     <= sample_f3_cic_filter;
+  END GENERATE NO_IIR_FILTER_f2_f3;
 
-      sample_in1_val  => sample_f2_cic_val,
-      sample_in1      => sample_f2_cic_filter,
-      
-      sample_in2_val  => sample_f3_cic_val,
-      sample_in2      => sample_f3_cic_filter,
-      
-      sample_out1_val => sample_f2_filter_val,
-      sample_out1     => sample_f2_filter,
-      sample_out2_val => sample_f3_filter_val,
-      sample_out2     => sample_f3_filter);
-
+  YES_IIR_FILTER_f2_f3: IF RTL_DESIGN_LIGHT = 0 GENERATE
+    IIR_CEL_CTRLR_v3_1:IIR_CEL_CTRLR_v3
+      GENERIC MAP (
+        tech         => 0,
+        Mem_use      => Mem_use,
+        Sample_SZ    => 18,
+        Coef_SZ      => f2_f3_COEFFICIENT_SIZE,
+        Coef_Nb      => f2_f3_CEL_NUMBER*5,
+        Coef_sel_SZ  => 5,
+        Cels_count   => f2_f3_CEL_NUMBER,
+        ChanelsCount => 6)
+      PORT MAP (
+        rstn            => rstn,
+        clk             => clk,
+        virg_pos        => f2_f3_POINT_POSITION,
+        coefs           => coefs_iir_cel_f2_f3,
+        
+        sample_in1_val  => sample_f2_cic_val,
+        sample_in1      => sample_f2_cic_filter,
+        
+        sample_in2_val  => sample_f3_cic_val,
+        sample_in2      => sample_f3_cic_filter,
+        
+        sample_out1_val => sample_f2_filter_val,
+        sample_out1     => sample_f2_filter,
+        sample_out2_val => sample_f3_filter_val,
+        sample_out2     => sample_f3_filter);
+  END GENERATE YES_IIR_FILTER_f2_f3;
   
   all_channel_sample_f_filter : FOR J IN 5 DOWNTO 0 GENERATE
     all_bit_sample_f_filter : FOR I IN 15 DOWNTO 0 GENERATE
@@ -584,7 +592,6 @@ BEGIN
       sample_f3_cic_s(J,I) <= sample_f3_filter(J,I);
     END GENERATE all_bit_sample_f_filter;
   END GENERATE all_channel_sample_f_filter;
-  
 
   -----------------------------------------------------------------------------
   

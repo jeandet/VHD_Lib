@@ -225,7 +225,7 @@ BEGIN  -- beh
       ENABLE_FPU      => 1,
       FPU_NETLIST     => 0,
       ENABLE_DSU      => 1,
-      ENABLE_AHB_UART => 1,
+      ENABLE_AHB_UART => 0,
       ENABLE_APB_UART => 1,
       ENABLE_IRQMP    => 1,
       ENABLE_GPT      => 1,

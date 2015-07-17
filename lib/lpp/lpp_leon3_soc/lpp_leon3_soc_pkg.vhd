@@ -56,7 +56,8 @@ PACKAGE lpp_leon3_soc_pkg IS
       ADDRESS_SIZE    : INTEGER;
       USES_IAP_MEMCTRLR : INTEGER;
       BYPASS_EDAC_MEMCTRLR : STD_LOGIC;
-      SRBANKSZ        : INTEGER := 8
+      SRBANKSZ        : INTEGER := 8;
+      SLOW_TIMING_EMULATION : integer := 0
     );
   PORT (
     clk    : IN STD_ULOGIC;

@@ -265,7 +265,9 @@ BEGIN  -- beh
       ADDRESS_SIZE    => 19,
       USES_IAP_MEMCTRLR => 1,
       BYPASS_EDAC_MEMCTRLR => '0',
-      SRBANKSZ          => 8)
+      SRBANKSZ          => 8,
+      SLOW_TIMING_EMULATION => 0
+      )
     PORT MAP (
       clk    => clk_25,
       reset  => rstn_25,

@@ -38,7 +38,8 @@ DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	./lpp_sim \
 	./lpp_lfr_pkg \
 	./lpp_debug_lfr_pkg \
-	./lpp_top_lfr
+	./lpp_top_lfr \
+	./lfr_management
 
 FILESKIP =lpp_lfr_ms.vhd \
 	i2cmst.vhd \

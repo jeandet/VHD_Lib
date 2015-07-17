@@ -17,7 +17,8 @@ USE lpp.fft_components.ALL;
 
 ENTITY lpp_lfr_ms IS
   GENERIC (
-    Mem_use : INTEGER := use_RAM
+    Mem_use : INTEGER := use_RAM;
+    WINDOWS_HAANNING_PARAM_SIZE : INTEGER := 15    
     );
   PORT (
     clk  : IN STD_LOGIC;
@@ -710,6 +711,8 @@ BEGIN
   -- FFT
   -----------------------------------------------------------------------------
   lpp_lfr_ms_FFT_1 : lpp_lfr_ms_FFT
+    GENERIC MAP (
+      WINDOWS_HAANNING_PARAM_SIZE => WINDOWS_HAANNING_PARAM_SIZE)
     PORT MAP (
       clk            => clk,
       rstn           => rstn,

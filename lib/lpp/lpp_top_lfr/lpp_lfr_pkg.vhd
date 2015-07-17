@@ -69,7 +69,8 @@ PACKAGE lpp_lfr_pkg IS
   -----------------------------------------------------------------------------
   COMPONENT lpp_lfr_ms
     GENERIC (
-      Mem_use : INTEGER);
+      Mem_use : INTEGER;
+      WINDOWS_HAANNING_PARAM_SIZE : INTEGER);
     PORT (
       clk                    : IN  STD_LOGIC;
       rstn                   : IN  STD_LOGIC;
@@ -151,6 +152,8 @@ PACKAGE lpp_lfr_pkg IS
   END COMPONENT;
 
   COMPONENT lpp_lfr_ms_FFT
+    GENERIC (
+      WINDOWS_HAANNING_PARAM_SIZE : INTEGER);
     PORT (
       clk            : IN  STD_LOGIC;
       rstn           : IN  STD_LOGIC;
@@ -167,7 +170,9 @@ PACKAGE lpp_lfr_pkg IS
 
   COMPONENT lpp_lfr_filter
     GENERIC (
-      Mem_use : INTEGER);
+      Mem_use                 : INTEGER;
+      RTL_DESIGN_LIGHT        : INTEGER
+      );
     PORT (
       sample           : IN  Samples(7 DOWNTO 0);
       sample_val       : IN  STD_LOGIC;
@@ -210,7 +215,9 @@ PACKAGE lpp_lfr_pkg IS
       pirq_wfp               : INTEGER;
       hindex                 : INTEGER;
       top_lfr_version        : STD_LOGIC_VECTOR(23 DOWNTO 0);
-      DEBUG_FORCE_DATA_DMA   : INTEGER
+      DEBUG_FORCE_DATA_DMA   : INTEGER;
+      RTL_DESIGN_LIGHT       : INTEGER;
+      WINDOWS_HAANNING_PARAM_SIZE : INTEGER
       );
     PORT (
       clk             : IN  STD_LOGIC;

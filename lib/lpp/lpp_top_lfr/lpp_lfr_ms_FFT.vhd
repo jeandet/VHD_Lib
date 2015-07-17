@@ -16,6 +16,10 @@ USE lpp.fft_components.ALL;
 USE lpp.window_function_pkg.ALL;
 
 ENTITY lpp_lfr_ms_FFT IS
+  GENERIC (
+    WINDOWS_HAANNING_PARAM_SIZE : INTEGER := 15
+    );
+  
   PORT (
     clk  : IN STD_LOGIC;
     rstn : IN STD_LOGIC;
@@ -40,20 +44,34 @@ ARCHITECTURE Behavioral OF lpp_lfr_ms_FFT IS
   SIGNAL data_win       : STD_LOGIC_VECTOR(15 DOWNTO 0);
   SIGNAL data_win_valid : STD_LOGIC;
 
+  SIGNAL data_in_reg       : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL data_in_reg_valid : STD_LOGIC;
+
 BEGIN
 
+  PROCESS (clk, rstn)
+  BEGIN  -- PROCESS
+    IF rstn = '0' THEN                  -- asynchronous reset (active low)
+      data_in_reg       <= (OTHERS => '0');
+      data_in_reg_valid <= '0'; 
+    ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
+      data_in_reg       <= sample_data;
+      data_in_reg_valid <= sample_valid;       
+    END IF;
+  END PROCESS;
+  
   window_hanning: window_function
     GENERIC MAP (
       SIZE_DATA          => 16,
-      SIZE_PARAM         => 15,
+      SIZE_PARAM         => WINDOWS_HAANNING_PARAM_SIZE,
       NB_POINT_BY_WINDOW => 256)
     PORT MAP (
       clk            => clk,
       rstn           => rstn,
       
       restart_window => '0',
-      data_in        => sample_data,
-      data_in_valid  => sample_valid,
+      data_in        => data_in_reg,
+      data_in_valid  => data_in_reg_valid,
       
       data_out       => data_win,
       data_out_valid => data_win_valid);

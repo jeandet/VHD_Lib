@@ -74,7 +74,8 @@ ENTITY leon3_soc IS
     ADDRESS_SIZE      : INTEGER := 19;
     USES_IAP_MEMCTRLR : INTEGER := 1;
     BYPASS_EDAC_MEMCTRLR : STD_LOGIC := '0';
-    SRBANKSZ          : INTEGER := 8
+    SRBANKSZ          : INTEGER := 8;
+    SLOW_TIMING_EMULATION : integer := 0
 
     );
   PORT (
@@ -250,7 +251,8 @@ ARCHITECTURE Behavioral OF leon3_soc IS
   SIGNAL   dsui       : dsu_in_type;
   SIGNAL   dsuo       : dsu_out_type;
   -----------------------------------------------------------------------------
-  
+  SIGNAL memo_data : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL memi_data : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
 BEGIN
 
@@ -461,16 +463,37 @@ BEGIN
   memi.writen <= '1';
   memi.wrn    <= "1111";
   memi.bwidth <= "10";
-
+  
+  -----------------------------------------------------------------------------
+  -- SLOW TIMING EMULATION
+  -----------------------------------------------------------------------------
+  SLOW_TIMING_EMULATION_ON: IF SLOW_TIMING_EMULATION = 1 GENERATE
+    PROCESS (clkm, rstn)
+    BEGIN  -- PROCESS
+      IF rstn = '0' THEN                -- asynchronous reset (active low)
+        memi.data <= (OTHERS => '0');
+        memo_data <= (OTHERS => '0');        
+      ELSIF clkm'event AND clkm = '1' THEN  -- rising clock edge
+        memi.data <= memi_data;
+        memo_data <= memo.data;
+      END IF;
+    END PROCESS;
+  END GENERATE SLOW_TIMING_EMULATION_ON;
+  SLOW_TIMING_EMULATION_OFF: IF SLOW_TIMING_EMULATION = 0 GENERATE
+    memi.data <= memi_data;
+    memo_data <= memo.data;
+  END GENERATE SLOW_TIMING_EMULATION_OFF;
+  
   bdr : FOR i IN 0 TO 3 GENERATE
     data_pad : iopadv GENERIC MAP (tech => padtech, width => 8, oepol => USES_IAP_MEMCTRLR)
       PORT MAP (
         data(31-i*8 DOWNTO 24-i*8),
-        memo.data(31-i*8 DOWNTO 24-i*8),
+        memo_data(31-i*8 DOWNTO 24-i*8),
         memo.bdrive(i),
-        memi.data(31-i*8 DOWNTO 24-i*8));
+        memi_data(31-i*8 DOWNTO 24-i*8));
   END GENERATE;
-
+  -----------------------------------------------------------------------------
+  
   addr_pad : outpadv GENERIC MAP (width => ADDRESS_SIZE, tech => padtech)
     PORT MAP (address, memo.address(ADDRESS_SIZE+1 DOWNTO 2));
   rams_pad : outpadv GENERIC MAP (tech => padtech, width => 2) PORT MAP (nSRAM_CE, nSRAM_CE_s);
@@ -480,8 +503,6 @@ BEGIN
   nBWb_pad : outpad GENERIC MAP (tech  => padtech) PORT MAP (nSRAM_BE1, memo.mben(2));
   nBWc_pad : outpad GENERIC MAP (tech  => padtech) PORT MAP (nSRAM_BE2, memo.mben(1));
   nBWd_pad : outpad GENERIC MAP (tech  => padtech) PORT MAP (nSRAM_BE3, memo.mben(0));
-
-
 
 ----------------------------------------------------------------------
 ---  AHB CONTROLLER  -------------------------------------------------

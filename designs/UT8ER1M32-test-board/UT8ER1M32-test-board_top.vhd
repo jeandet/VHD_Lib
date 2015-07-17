@@ -110,14 +110,42 @@ ARCHITECTURE beh OF UT8ER1M32_test_board_top IS
   SIGNAL  ahbo_m_ext  :  soc_ahb_mst_out_vector(NB_AHB_MASTER-1+1 DOWNTO 1):= (OTHERS => ahbm_none);
   --SRAM-----------------------------------------------------------------------
   SIGNAL  SRAM_CE    :   STD_LOGIC_VECTOR(1 downto 0);
+
+  
+  SIGNAL rstn_25 : STD_LOGIC;
+  SIGNAL rstn_50 : STD_LOGIC;
+  SIGNAL rstn_49 : STD_LOGIC;
+    
+  SIGNAL clk_lock : STD_LOGIC;
+  SIGNAL clk_busy_counter : STD_LOGIC_VECTOR(3 DOWNTO 0);
+  SIGNAL nSRAM_BUSY_reg : STD_LOGIC;
   
 BEGIN  -- beh
 
+  rst_gen_global : rstgen PORT MAP (reset, clk_50, '1', rstn_50, OPEN);
+
+  PROCESS (clk_50, rstn_50)
+  BEGIN  -- PROCESS
+    IF rstn_50 = '0' THEN         -- asynchronous reset (active low)
+      clk_lock         <= '0';
+      clk_busy_counter <= (OTHERS => '0');
+      nSRAM_BUSY_reg    <= '0';
+    ELSIF clk_50'event AND clk_50 = '1' THEN  -- rising clock edge
+      nSRAM_BUSY_reg <= SRAM_nBUSY;
+      IF nSRAM_BUSY_reg = '1' AND SRAM_nBUSY = '0' THEN
+        IF clk_busy_counter = "1111"  THEN
+          clk_lock <= '1';
+        ELSE
+          clk_busy_counter <= STD_LOGIC_VECTOR(to_unsigned(to_integer(UNSIGNED(clk_busy_counter))+1,4));
+        END IF;
+      END IF;
+    END IF;
+  END PROCESS;
+  
+  rst_domain25 : rstgen PORT MAP (reset, clk_25, clk_lock, rstn_25, OPEN);
   -----------------------------------------------------------------------------
   -- CLK
   -----------------------------------------------------------------------------
-
-  
   PROCESS(clk_50)
   BEGIN
     IF clk_50'EVENT AND clk_50 = '1' THEN
@@ -126,22 +154,19 @@ BEGIN  -- beh
   END PROCESS;
 
   -----------------------------------------------------------------------------
-  
-  
-  PROCESS (clk_49, reset)
+  PROCESS (clk_49, rstn_49)
   BEGIN  -- PROCESS
-    IF reset = '0' THEN                 -- asynchronous reset (active low)
+    IF rstn_49 = '0' THEN                 -- asynchronous reset (active low)
       I00_s  <= '0';            
     ELSIF clk_49'event AND clk_49 = '1' THEN  -- rising clock edge
-        I00_s  <= NOT I00_s;
-      END IF;
+      I00_s  <= NOT I00_s;
+    END IF;
   END PROCESS;
 
   nCTS1  <= '1';
 
   SRAM_nCE1    <=  SRAM_CE(0);
   SRAM_nCE2    <=  SRAM_CE(1);
-
 
 
   leon3_soc_1 : leon3_soc
@@ -166,15 +191,20 @@ BEGIN  -- beh
       NB_AHB_SLAVE    => NB_AHB_SLAVE,
       NB_APB_SLAVE    => NB_APB_SLAVE,
       ADDRESS_SIZE    => 19,
-      USES_IAP_MEMCTRLR => 1)
+      USES_IAP_MEMCTRLR => 1,
+      BYPASS_EDAC_MEMCTRLR => '0',
+      SRBANKSZ          => 8,
+      SLOW_TIMING_EMULATION => 1
+      )
     PORT MAP (
       clk         => clk_25,
-      reset       => reset,
+      reset       => rstn_25,
       errorn      => errorn,
       ahbrxd      => TXD1,
       ahbtxd      => RXD1,
       urxd1       => TXD2,
       utxd1       => RXD2,
+      
       address     => SRAM_A,     
       data        => SRAM_DQ,    
       nSRAM_BE0   => LED0,
@@ -193,7 +223,9 @@ BEGIN  -- beh
       ahbo_s_ext => ahbo_s_ext,
       ahbi_m_ext => ahbi_m_ext,
       ahbo_m_ext => ahbo_m_ext);
+ 
+
   
 
-
 END beh;
+ 
