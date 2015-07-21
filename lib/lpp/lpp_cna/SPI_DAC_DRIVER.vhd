@@ -48,7 +48,7 @@ ARCHITECTURE behav OF SPI_DAC_DRIVER IS
   SIGNAL SMP_CLK_RisingEdge_1 : STD_LOGIC                              := '0';
   SIGNAL SMP_CLK_RisingEdge_2 : STD_LOGIC                              := '0';
 
-  SIGNAL SHIFTREG : STD_LOGIC_VECTOR(datawidth-1 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL SHIFTREG : STD_LOGIC_VECTOR(datawidth DOWNTO 0) := (OTHERS => '0');
   SIGNAL shiftcnt : INTEGER                                := 0;
   SIGNAL shifting : STD_LOGIC                              := '0';
 
@@ -64,7 +64,9 @@ BEGIN
   END GENERATE;
 
   LSB : IF MSBFIRST = 0 GENERATE
-    DATA_s(datawidth-1 DOWNTO 0) <= DATA(0 TO datawidth-1);
+    all_bits: FOR I IN 0 TO datawidth-1 GENERATE
+      DATA_s(datawidth-1 - I) <= DATA(I);
+    END GENERATE all_bits;
   END GENERATE;
 
   -----------------------------------------------------------------------------
@@ -89,7 +91,7 @@ BEGIN
   -- 
   -----------------------------------------------------------------------------
   SCLK <= SCLK_s;
-  DOUT <= SHIFTREG(datawidth-1);
+  DOUT <= SHIFTREG(datawidth);
 
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
@@ -123,9 +125,9 @@ BEGIN
 
         IF shifting = '1' THEN
           shiftcnt <= shiftcnt + 1;
-          SHIFTREG(datawidth-1 DOWNTO 1) <= SHIFTREG (datawidth-2 DOWNTO 0);
+          SHIFTREG(datawidth DOWNTO 1) <= SHIFTREG (datawidth-1 DOWNTO 0);
         ELSE
-          SHIFTREG <= DATA_s;
+          SHIFTREG(datawidth-1 DOWNTO 0) <= DATA_s;
           shiftcnt <= 0;
         END IF;        
         
