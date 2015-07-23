@@ -59,6 +59,9 @@ ARCHITECTURE ar_top_ad_conv_RHF1401 OF top_ad_conv_RHF1401_withFilter IS
   SIGNAL ADC_data_d1       : Samples14;
   SIGNAL ADC_data_selected : Samples14;
   SIGNAL ADC_data_result   : Samples15;
+
+  CONSTANT SAMPLE_FREQ_DIV_FACTOR : INTEGER := 10;
+  SIGNAL   sample_val_counter : INTEGER RANGE 0 TO SAMPLE_FREQ_DIV_FACTOR;
   
 
   CONSTANT FILTER_ENABLED_STDLOGIC : STD_LOGIC_VECTOR(ChanelCount-1 DOWNTO 0) := STD_LOGIC_VECTOR(to_unsigned(FILTER_ENABLED, ChanelCount));
@@ -135,6 +138,7 @@ BEGIN
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
       channel_counter <= MAX_CHANNEL_COUNTER;
       sample_val    <= '0';
+      sample_val_counter <= 0;
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
       IF cnv_sync_falling_edge = '1' THEN
         channel_counter <= 0;
@@ -145,7 +149,13 @@ BEGIN
       END IF;
 
       IF channel_counter = MAX_CHANNEL_COUNTER-1 THEN
-        sample_val    <= '1';
+        IF sample_val_counter = SAMPLE_FREQ_DIV_FACTOR-1 THEN
+          sample_val_counter <= 0;
+          sample_val         <= '1';
+        ELSE
+          sample_val_counter <= sample_val_counter +1; 
+          sample_val    <= '0';         
+        END IF;        
       ELSE
         sample_val    <= '0';
       END IF;      
