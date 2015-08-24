@@ -55,6 +55,8 @@ ARCHITECTURE beh OF window_function IS
   SIGNAL param_in       : STD_LOGIC_VECTOR(SIZE_PARAM-1 DOWNTO 0);
   SIGNAL param_index    : INTEGER RANGE 0 TO NB_POINT_BY_WINDOW-1;
   
+  SIGNAL PARAM_ALL_POSITIVE : STD_LOGIC;
+  
 BEGIN
 
   WF_rom_1: WF_rom
@@ -62,8 +64,9 @@ BEGIN
       SIZE_PARAM         => SIZE_PARAM,
       NB_POINT_BY_WINDOW => NB_POINT_BY_WINDOW)
     PORT MAP (
-      data  => param_in,
-      index => param_index);
+      data               => param_in,
+      index              => param_index,
+      PARAM_ALL_POSITIVE => PARAM_ALL_POSITIVE );
   
   WF_processing_1: WF_processing
     GENERIC MAP (
@@ -79,6 +82,7 @@ BEGIN
       data_out       => data_out,
       data_out_valid => data_out_valid,
       param_in       => param_in,
-      param_index    => param_index);
+      param_index    => param_index,
+      PARAM_ALL_POSITIVE => PARAM_ALL_POSITIVE );
   
 END beh;

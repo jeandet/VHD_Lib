@@ -34,7 +34,7 @@ ENTITY WF_processing IS
   GENERIC (
     SIZE_DATA  : INTEGER := 16;
     SIZE_PARAM : INTEGER := 10;
-    NB_POINT_BY_WINDOW : INTEGER := 256    
+    NB_POINT_BY_WINDOW : INTEGER := 256
     );
 
   PORT (
@@ -51,7 +51,8 @@ ENTITY WF_processing IS
     
     --window parameter interface
     param_in    : IN STD_LOGIC_VECTOR(SIZE_PARAM-1 DOWNTO 0);
-    param_index : OUT INTEGER RANGE 0 TO NB_POINT_BY_WINDOW-1 
+    param_index : OUT INTEGER RANGE 0 TO NB_POINT_BY_WINDOW-1;
+    PARAM_ALL_POSITIVE : IN STD_LOGIC
     );
 
 END WF_processing;
@@ -93,8 +94,10 @@ BEGIN
       OP2   => param_in,
       
       RES   => data_x_param);
-
-  data_out <= data_x_param(SIZE_DATA + SIZE_PARAM-1 DOWNTO SIZE_PARAM);
+  
+  data_out <= data_x_param(SIZE_DATA + SIZE_PARAM-2 DOWNTO SIZE_PARAM-1) WHEN PARAM_ALL_POSITIVE = '1' ELSE
+              data_x_param(SIZE_DATA + SIZE_PARAM-1 DOWNTO SIZE_PARAM);
+  
 
   WINDOWS_REG: SYNC_FF
     GENERIC MAP (

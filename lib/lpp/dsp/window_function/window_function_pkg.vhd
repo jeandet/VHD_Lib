@@ -56,7 +56,8 @@ PACKAGE window_function_pkg IS
       data_out       : OUT STD_LOGIC_VECTOR(SIZE_DATA-1 DOWNTO 0);
       data_out_valid : OUT STD_LOGIC;
       param_in       : IN  STD_LOGIC_VECTOR(SIZE_PARAM-1 DOWNTO 0);
-      param_index    : OUT INTEGER RANGE 0 TO NB_POINT_BY_WINDOW-1
+      param_index    : OUT INTEGER RANGE 0 TO NB_POINT_BY_WINDOW-1;
+      PARAM_ALL_POSITIVE : IN STD_LOGIC
       );
   END COMPONENT;
 
@@ -66,7 +67,8 @@ PACKAGE window_function_pkg IS
       NB_POINT_BY_WINDOW : INTEGER);
     PORT (
       data  : OUT STD_LOGIC_VECTOR(SIZE_PARAM-1 DOWNTO 0);
-      index : IN  INTEGER RANGE 0 TO NB_POINT_BY_WINDOW-1);
+      index : IN  INTEGER RANGE 0 TO NB_POINT_BY_WINDOW-1;
+      PARAM_ALL_POSITIVE : OUT STD_LOGIC);
   END COMPONENT;  
   
 END window_function_pkg;
