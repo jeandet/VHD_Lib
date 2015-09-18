@@ -16,23 +16,23 @@ nb_point  = 256
 t         = np.arange(nb_point)
 
 ## f0 
-ampl_f0_0 = pow(2,14)
+ampl_f0_0 = pow(2,16)-1
 freq_f0_0 = float(16)/256
 phi_f0_0  = 0
 
-ampl_f0_1 = pow(2,13)
+ampl_f0_1 = pow(2,15)-1
 freq_f0_1 = float(16)/256
 phi_f0_1  = 0
 
-ampl_f0_2 = pow(2,12)
+ampl_f0_2 = pow(2,14)-1
 freq_f0_2 = float(16)/256
 phi_f0_2  = 0
 
-ampl_f0_3 = pow(2,11)
+ampl_f0_3 = pow(2,13)-1
 freq_f0_3 = float(16)/256
 phi_f0_3  = 0
 
-ampl_f0_4 = pow(2,10)
+ampl_f0_4 = pow(2,10)-1
 freq_f0_4 = float(16)/256
 phi_f0_4  = 0
 
