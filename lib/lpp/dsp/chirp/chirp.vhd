@@ -23,7 +23,7 @@
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
-USE IEEE.std_logic_arith.ALL;
+use ieee.numeric_std.all;
 USE IEEE.std_logic_signed.ALL;
 USE IEEE.MATH_real.ALL;
 
@@ -42,7 +42,9 @@ ENTITY chirp IS
     run      : IN  STD_LOGIC;
     
     data_ack : IN  STD_LOGIC;
-    data     : OUT STD_LOGIC_VECTOR(NB_BITS-1 DOWNTO 0)
+    data     : OUT STD_LOGIC_VECTOR(NB_BITS-1 DOWNTO 0);
+
+    done     : OUT STD_LOGIC
     );
 
 END chirp;
@@ -63,16 +65,19 @@ BEGIN  -- beh
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
       reg <= (OTHERS => '0');
       n <= 0;
+      done <= '0';
     ELSIF clk'event AND clk = '1' THEN  -- rising clock edge
       IF run = '0' THEN
         reg <= (OTHERS => '0');
         n   <= 0;
+        done <= '0';
       ELSE
         IF data_ack = '1' THEN
           IF n < NB_POINT_TO_GEN THEN
             n <= n+1;
-            reg <= conv_std_logic_vector(INTEGER(REAL(AMPLITUDE) * SIN(MATH_2_PI*current_time*freq_chirp)),NB_BITS);
+            reg <= std_logic_vector(to_signed(INTEGER(REAL(AMPLITUDE) * SIN(MATH_2_PI*current_time*freq_chirp) ),NB_BITS));
           ELSE
+	    done <= '1';
             reg <= (OTHERS => '0');
           END IF;
         END IF;
