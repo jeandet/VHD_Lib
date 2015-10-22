@@ -38,7 +38,9 @@ PACKAGE chirp_pkg IS
       rstn     : IN  STD_LOGIC;
       run      : IN  STD_LOGIC;
       data_ack : IN  STD_LOGIC;
-      data     : OUT STD_LOGIC_VECTOR(NB_BITS-1 DOWNTO 0));
+      data     : OUT STD_LOGIC_VECTOR(NB_BITS-1 DOWNTO 0);
+      done     : OUT STD_LOGIC
+    );
   END COMPONENT;
   
 

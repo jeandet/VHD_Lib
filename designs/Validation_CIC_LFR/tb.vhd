@@ -50,6 +50,8 @@ ARCHITECTURE behav OF testbench IS
 
   SIGNAL param_r2 : STD_LOGIC;
   
+  SIGNAL chirp_done : STD_LOGIC;
+
 BEGIN
 
 
@@ -89,7 +91,7 @@ BEGIN
     WAIT FOR 30 ms;
     param_r2 <= '0';
     
-    WAIT FOR 30 ms;
+    WAIT UNTIL chirp_done = '1';
     REPORT "*** END simulation ***" SEVERITY failure;
     WAIT;    
   END PROCESS;
@@ -191,16 +193,17 @@ BEGIN
   chirp_gen: chirp
     GENERIC MAP (
       LOW_FREQUENCY_LIMIT  => 0,
-      HIGH_FREQUENCY_LIMIT => 1000,
-      NB_POINT_TO_GEN      => 10000,
-      AMPLITUDE            => 200,
+      HIGH_FREQUENCY_LIMIT => 4000, --1000
+      NB_POINT_TO_GEN      => 100000,  --10000
+      AMPLITUDE            => 32000,
       NB_BITS              => 16)
     PORT MAP (
       clk      => clk,
       rstn     => rstn,
       run      => run,
       data_ack => data_in_valid,
-      data     => data_in_0_s);
+      data     => data_in_0_s,
+      done     => chirp_done);
   
   -----------------------------------------------------------------------------
 
