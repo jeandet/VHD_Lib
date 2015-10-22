@@ -14,7 +14,7 @@
 --
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -------------------------------------------------------------------------------
 --                    Author : Jean-christophe Pellion
 --                     Mail : jean-christophe.pellion@lpp.polytechnique.fr
@@ -46,15 +46,10 @@ USE lpp.lpp_lfr_management.ALL;
 USE lpp.lpp_leon3_soc_pkg.ALL;
 
 ENTITY MINI_LFR_top IS
-  
+
   PORT (
-  -----------------------------------------------------------------------------
-  -- WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  -- clk_50 frequency is 100 Mhz !
-    clk_50 : IN  STD_LOGIC;
-  -- WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  -----------------------------------------------------------------------------
-    clk_49 : IN  STD_LOGIC;
+    clk100MHz : IN  STD_LOGIC;
+    clk49_152MHz : IN  STD_LOGIC;
     reset  : IN  STD_LOGIC;
     --BPs
     BP0    : IN  STD_LOGIC;
@@ -96,7 +91,7 @@ ENTITY MINI_LFR_top IS
     SPW_NOM_SIN  : IN  STD_LOGIC;
     SPW_NOM_DOUT : OUT STD_LOGIC;
     SPW_NOM_SOUT : OUT STD_LOGIC;
-    SPW_RED_DIN  : IN  STD_LOGIC;       -- REDUNDANT LINK 
+    SPW_RED_DIN  : IN  STD_LOGIC;       -- REDUNDANT LINK
     SPW_RED_SIN  : IN  STD_LOGIC;
     SPW_RED_DOUT : OUT STD_LOGIC;
     SPW_RED_SOUT : OUT STD_LOGIC;
@@ -137,7 +132,7 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   --
   SIGNAL errorn      : STD_LOGIC;
   -- UART AHB ---------------------------------------------------------------
---  SIGNAL ahbrxd      : STD_ULOGIC;      -- DSU rx data  
+--  SIGNAL ahbrxd      : STD_ULOGIC;      -- DSU rx data
 --  SIGNAL ahbtxd      : STD_ULOGIC;      -- DSU tx data
 
   -- UART APB ---------------------------------------------------------------
@@ -221,15 +216,15 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   SIGNAL HK_SEL    : STD_LOGIC_VECTOR(1 DOWNTO 0);
 
   SIGNAL nSRAM_READY : STD_LOGIC;
-  
+
 BEGIN  -- beh
-  
+
   -----------------------------------------------------------------------------
   -- WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   -- clk_50 frequency is 100 Mhz !
-  PROCESS (clk_50, reset)
+  PROCESS (clk100MHz, reset)
   BEGIN  -- PROCESS
-    IF clk_50'EVENT AND clk_50 = '1' THEN  -- rising clock edge
+    IF clk100MHz'EVENT AND clk100MHz = '1' THEN  -- rising clock edge
       clk_50_s   <= NOT clk_50_s;
     END IF;
   END PROCESS;
@@ -253,7 +248,7 @@ BEGIN  -- beh
     END IF;
   END PROCESS;
 
-  PROCESS (clk_49, reset)
+  PROCESS (clk49_152MHz, reset)
   BEGIN  -- PROCESS
     IF reset = '0' THEN                 -- asynchronous reset (active low)
       clk_24     <= '0';
@@ -261,7 +256,7 @@ BEGIN  -- beh
       rstn_24_d2 <= '0';
       rstn_24_d3 <= '0';
       rstn_24    <= '0';
-    ELSIF clk_49'EVENT AND clk_49 = '1' THEN  -- rising clock edge
+    ELSIF clk49_152MHz'EVENT AND clk49_152MHz = '1' THEN  -- rising clock edge
       clk_24     <= NOT clk_24;
       rstn_24_d1 <= '1';
       rstn_24_d2 <= rstn_24_d1;
@@ -285,11 +280,11 @@ BEGIN  -- beh
     END IF;
   END PROCESS;
 
-  PROCESS (clk_24, rstn_24)
+  PROCESS (clk49_152MHz, rstn_24)
   BEGIN  -- PROCESS
     IF rstn_24 = '0' THEN               -- asynchronous reset (active low)
       I00_s <= '0';
-    ELSIF clk_24'EVENT AND clk_24 = '1' THEN  -- rising clock edge
+    ELSIF clk49_152MHz'EVENT AND clk49_152MHz = '1' THEN  -- rising clock edge
       I00_s <= NOT I00_s;
     END IF;
   END PROCESS;
@@ -298,6 +293,8 @@ BEGIN  -- beh
   nCTS1 <= '1';
   nCTS2 <= '1';
   nDCD2 <= '1';
+  -- No AHB UART
+  RXD1  <= TXD1;
 
   --
 
@@ -364,8 +361,8 @@ BEGIN  -- beh
       END IF;
     END IF;
   END PROCESS;
-  
-  
+
+
 
   IAP:if USE_IAP_MEMCTRL = 1 GENERATE
     SRAM_CE <= not SRAM_CE_s(0);
@@ -590,7 +587,7 @@ BEGIN  -- beh
   grgpio0 : grgpio
     GENERIC MAP(pindex => 11, paddr => 11, imask => 16#0000#, nbits => 8)
     PORT MAP(rstn_25, clk_25, apbi_ext, apbo_ext(11), gpioi, gpioo);
-  
+
   gpioi.sig_en <= (OTHERS => '0');
   gpioi.sig_in <= (OTHERS => '0');
   gpioi.din    <= (OTHERS => '0');
@@ -630,11 +627,11 @@ BEGIN  -- beh
           IO11 <= observation_vector_1(11);
         WHEN OTHERS => NULL;
       END CASE;
-      
+
     END IF;
   END PROCESS;
   -----------------------------------------------------------------------------
-  -- 
+  --
   -----------------------------------------------------------------------------
   all_apbo_ext : FOR I IN NB_APB_SLAVE-1+5 DOWNTO 5 GENERATE
     apbo_ext_not_used : IF I /= 5 AND I /= 6 AND I /= 11 AND I /= 15 GENERATE

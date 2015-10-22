@@ -13,11 +13,9 @@ SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_const
 VHDLSYNFILES= MINI_LFR_top.vhd 
 VHDLSIMFILES= testbench.vhd
 SIMTOP=testbench
-##PDC=$(VHDLIB)/boards/$(BOARD)/default.pdc
-##SDC=$(VHDLIB)/boards/$(BOARD)/default.sdc
-PDC=$(VHDLIB)/boards/$(BOARD)/no_uart.pdc
-SDCFILE=$(VHDLIB)/boards/$(BOARD)/MINI_LFR_synthesis.sdc
-SDC=$(VHDLIB)/boards/$(BOARD)/MINI_LFR_place_and_route.sdc
+PDC=$(VHDLIB)/boards/$(BOARD)/default.pdc
+SDCFILE=$(VHDLIB)/boards/$(BOARD)/MINI-LFR.sdc
+SDC=$(VHDLIB)/boards/$(BOARD)/MINI-LFR.sdc
 BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut
 CLEAN=soft-clean
 
