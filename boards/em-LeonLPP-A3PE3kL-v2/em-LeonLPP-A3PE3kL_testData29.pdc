@@ -1,8 +1,0 @@
-set_io	clk50MHz	-pinname	B3	-fixed	yes	-DIRECTION	Inout
-set_io	data_29  	-pinname	J18	-fixed	yes	-DIRECTION	Inout
-
-set_io	{led[0]}	-pinname	K17	-fixed	yes	-DIRECTION	Inout
-set_io	{led[1]}	-pinname	L18	-fixed	yes	-DIRECTION	Inout
-set_io	{led[2]}	-pinname	M17	-fixed	yes	-DIRECTION	Inout
-
-set_io	Reset	-pinname	N18	-fixed	yes	-DIRECTION	Inout

@@ -22,7 +22,7 @@ CLEAN=soft-clean
 TECHLIBS = proasic3e
 
 LIBSKIP = core1553bbc core1553brm core1553brt gr1553 corePCIF \
-	tmtc openchip hynix ihp gleichmann micron usbhc 
+	tmtc openchip hynix ihp gleichmann micron usbhc ge_1000baseX
 
 DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	pci grusbhc haps slink ascs pwm coremp7 spi ac97 \
@@ -42,7 +42,8 @@ FILESKIP =i2cmst.vhd \
 	Top_MatrixSpec.vhd \
 	APB_FFT.vhd \
 	CoreFFT_simu.vhd \
-	lpp_lfr_apbreg_simu.vhd 
+	lpp_lfr_apbreg_simu.vhd \
+	sgmii.vhd
 
 include $(GRLIB)/bin/Makefile
 include $(GRLIB)/software/leon3/Makefile

@@ -38,8 +38,8 @@ USE esa.memoryctrl.ALL;
 LIBRARY lpp;
 USE lpp.lpp_memory.ALL;
 USE lpp.lpp_ad_conv.ALL;
-USE lpp.lpp_lfr_pkg.ALL;  -- contains lpp_lfr, not in the 206 rev of the VHD_Lib
-USE lpp.lpp_top_lfr_pkg.ALL;            -- contains top_wf_picker
+USE lpp.lpp_lfr_pkg.ALL;
+USE lpp.lpp_top_lfr_pkg.ALL;
 USE lpp.iir_filter.ALL;
 USE lpp.general_purpose.ALL;
 USE lpp.lpp_lfr_management.ALL;
@@ -131,13 +131,6 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   SIGNAL fine_time   : STD_LOGIC_VECTOR(15 DOWNTO 0);
   --
   SIGNAL errorn      : STD_LOGIC;
-  -- UART AHB ---------------------------------------------------------------
---  SIGNAL ahbrxd      : STD_ULOGIC;      -- DSU rx data
---  SIGNAL ahbtxd      : STD_ULOGIC;      -- DSU tx data
-
-  -- UART APB ---------------------------------------------------------------
---  SIGNAL urxd1 : STD_ULOGIC;            -- UART1 rx data
---  SIGNAL utxd1 : STD_ULOGIC;            -- UART1 tx data
   --
   SIGNAL I00_s : STD_LOGIC;
 
@@ -164,8 +157,6 @@ ARCHITECTURE beh OF MINI_LFR_top IS
   SIGNAL spw_clk     : STD_LOGIC;
   SIGNAL swni        : grspw_in_type;
   SIGNAL swno        : grspw_out_type;
---  SIGNAL clkmn                : STD_ULOGIC;
---  SIGNAL txclk                : STD_ULOGIC;
 
 --GPIO
   SIGNAL gpioi : gpio_in_type;
@@ -220,15 +211,12 @@ ARCHITECTURE beh OF MINI_LFR_top IS
 BEGIN  -- beh
 
   -----------------------------------------------------------------------------
-  -- WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  -- clk_50 frequency is 100 Mhz !
   PROCESS (clk100MHz, reset)
   BEGIN  -- PROCESS
     IF clk100MHz'EVENT AND clk100MHz = '1' THEN  -- rising clock edge
       clk_50_s   <= NOT clk_50_s;
     END IF;
   END PROCESS;
-  -- WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   -----------------------------------------------------------------------------
 
   PROCESS (clk_50_s, reset)
@@ -380,13 +368,10 @@ BEGIN  -- beh
       pindex           => 6,
       paddr            => 6,
       pmask            => 16#fff#,
---      FIRST_DIVISION   => 374,      -- ((49.152/2) /2^16) - 1  = 375 - 1 = 374
       NB_SECOND_DESYNC => 60)  -- 60 secondes of desynchronization before CoarseTime's MSB is Set
     PORT MAP (
       clk25MHz         => clk_25,
-      resetn_25MHz     => rstn_25,      --      TODO
---      clk24_576MHz     => clk_24,       -- 49.152MHz/2
---      resetn_24_576MHz => rstn_24,      --      TODO
+      resetn_25MHz     => rstn_25, 
       grspw_tick       => swno.tickout,
       apbi             => apbi_ext,
       apbo             => apbo_ext(6),
@@ -432,7 +417,6 @@ BEGIN  -- beh
     PORT MAP (SPW_RED_SOUT, swno.s(1));
 
   -- GRSPW PHY
-  --spw1_input: if CFG_SPW_GRSPW = 1 generate
   spw_inputloop : FOR j IN 0 TO 1 GENERATE
     spw_phy0 : grspw_phy
       GENERIC MAP(
@@ -496,8 +480,7 @@ BEGIN  -- beh
 
 
   LFR_rstn <= LFR_soft_rstn AND rstn_25;
-  --LFR_rstn <= rstn_25;
-
+  
   lpp_lfr_1 : lpp_lfr
     GENERIC MAP (
       Mem_use                => use_RAM,
@@ -533,7 +516,7 @@ BEGIN  -- beh
   observation_reg(31 DOWNTO 12)     <= (OTHERS => '0');
   observation_vector_0(11 DOWNTO 0) <= lfr_debug_vector;
   observation_vector_1(11 DOWNTO 0) <= lfr_debug_vector;
---  IO0                               <= rstn_25;
+
   IO1                               <= lfr_debug_vector_ms(0);  -- LFR MS FFT data_valid
   IO2                               <= lfr_debug_vector_ms(0);  -- LFR MS FFT ready
   IO3                               <= lfr_debug_vector(0);  -- LFR APBREG error_buffer_full
@@ -565,10 +548,6 @@ BEGIN  -- beh
       -- SAMPLE
       sample     => sample,
       sample_val => sample_val);
-
-  --IO10 <= ADC_SDO_sig(5);
-  --IO9  <= ADC_SDO_sig(4);
-  --IO8  <= ADC_SDO_sig(3);
 
   ADC_nCS     <= ADC_nCS_sig;
   ADC_CLK     <= ADC_CLK_sig;
