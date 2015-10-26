@@ -76,9 +76,9 @@ address[11] SRAM_A[12] SRAM_A[13] SRAM_A[14] SRAM_A[15] SRAM_A[16] SRAM_A[17] \
 address[18] SRAM_A[19] SRAM_A[1] SRAM_A[2] SRAM_A[3] SRAM_A[4] SRAM_A[5] SRAM_A[6] \
 address[7] SRAM_A[8] SRAM_A[9] }]
 
-set_output_delay 0.000 -clock { clk_25:Q }  [get_ports { nSRAM_BE[0] nSRAM_BE[1] nSRAM_BE[2] nSRAM_BE[3] nSRAM_WE nSRAM_CE nSRAM_OE }]
-set_max_delay 20.000 -from [get_clocks {clk_25:Q}]  -to [get_ports { nSRAM_BE[0] nSRAM_BE[1] nSRAM_BE[2] nSRAM_BE[3] nSRAM_WE nSRAM_CE nSRAM_OE }]
-set_min_delay 0.000  -from [get_clocks {clk_25:Q}]  -to [get_ports { nSRAM_BE[0] nSRAM_BE[1] nSRAM_BE[2] nSRAM_BE[3] nSRAM_WE nSRAM_CE nSRAM_OE }]
+set_output_delay 0.000 -clock { clk_25:Q }              [get_ports { SRAM_nBE[0] SRAM_nBE[1] SRAM_nBE[2] SRAM_nBE[3] SRAM_nWE SRAM_CE SRAM_nOE }]
+set_max_delay 20.000 -from [get_clocks {clk_25:Q}]  -to [get_ports { SRAM_nBE[0] SRAM_nBE[1] SRAM_nBE[2] SRAM_nBE[3] SRAM_nWE SRAM_CE SRAM_nOE }]
+set_min_delay 0.000  -from [get_clocks {clk_25:Q}]  -to [get_ports { SRAM_nBE[0] SRAM_nBE[1] SRAM_nBE[2] SRAM_nBE[3] SRAM_nWE SRAM_CE SRAM_nOE }]
 
 
 ########   Delay Constraints  ########
