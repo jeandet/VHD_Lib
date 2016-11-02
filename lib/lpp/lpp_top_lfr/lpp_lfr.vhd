@@ -190,6 +190,7 @@ BEGIN
   -----------------------------------------------------------------------------
   lpp_lfr_filter_1 : lpp_lfr_filter
     GENERIC MAP (
+      tech             => tech,
       Mem_use          => Mem_use,
       RTL_DESIGN_LIGHT => RTL_DESIGN_LIGHT)
     PORT MAP (

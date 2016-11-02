@@ -170,6 +170,7 @@ PACKAGE lpp_lfr_pkg IS
 
   COMPONENT lpp_lfr_filter
     GENERIC (
+      tech                    : INTEGER;
       Mem_use                 : INTEGER;
       RTL_DESIGN_LIGHT        : INTEGER
       );

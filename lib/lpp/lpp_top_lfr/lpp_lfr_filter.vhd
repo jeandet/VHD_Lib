@@ -45,6 +45,7 @@ USE GRLIB.DMA2AHB_Package.ALL;
 
 ENTITY lpp_lfr_filter IS
   GENERIC(
+    tech         : INTEGER := 0;
     Mem_use                 : INTEGER := use_RAM;
     RTL_DESIGN_LIGHT        : INTEGER := 0
     );
@@ -263,7 +264,7 @@ BEGIN
 
   IIR_CEL_CTRLR_v2_1 : IIR_CEL_CTRLR_v2
     GENERIC MAP (
-      tech         => 0,
+      tech         => tech,
       Mem_use      => Mem_use,          -- use_RAM
       Sample_SZ    => 18,
       Coef_SZ      => Coef_SZ,
@@ -443,7 +444,7 @@ BEGIN
   
   IIR_CEL_f0_to_f1 : IIR_CEL_CTRLR_v2
     GENERIC MAP (
-      tech         => 0,
+      tech         => tech,
       Mem_use      => Mem_use,          -- use_RAM
       Sample_SZ    => 18,
       Coef_SZ      => f0_to_f1_COEFFICIENT_SIZE,
@@ -518,7 +519,7 @@ BEGIN
   
   cic_lfr_1: cic_lfr_r2
     GENERIC MAP (
-      tech         => 0,
+      tech         => tech,
       use_RAM_nCEL => Mem_use)
     PORT MAP (
       clk                => clk,
@@ -560,7 +561,7 @@ BEGIN
   YES_IIR_FILTER_f2_f3: IF RTL_DESIGN_LIGHT = 0 GENERATE
     IIR_CEL_CTRLR_v3_1:IIR_CEL_CTRLR_v3
       GENERIC MAP (
-        tech         => 0,
+        tech         => tech,
         Mem_use      => Mem_use,
         Sample_SZ    => 18,
         Coef_SZ      => f2_f3_COEFFICIENT_SIZE,
