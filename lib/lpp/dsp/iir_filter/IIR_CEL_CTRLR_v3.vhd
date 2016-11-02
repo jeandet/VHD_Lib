@@ -69,6 +69,7 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v3 OF IIR_CEL_CTRLR_v3 IS
     PORT (
       rstn           : IN  STD_LOGIC;
       clk            : IN  STD_LOGIC;
+      init_mem_done  : out STD_LOGIC;
       ram_write      : IN  STD_LOGIC;
       ram_read       : IN  STD_LOGIC;
       raddr_rst      : IN  STD_LOGIC;
@@ -113,6 +114,9 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v3 OF IIR_CEL_CTRLR_v3 IS
       sample_in_rot  : OUT STD_LOGIC;
       sample_out_val : OUT STD_LOGIC;
       sample_out_rot : OUT STD_LOGIC;
+      
+      init_mem_done  : in  STD_LOGIC;  --TODO
+
       in_sel_src     : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
       ram_sel_Wdata  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
       ram_write      : OUT STD_LOGIC;
@@ -182,12 +186,14 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v3 OF IIR_CEL_CTRLR_v3 IS
   SIGNAL state_channel_selection : FSM_CHANNEL_SELECTION;
 
   --SIGNAL   sample_out_zero     : samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0);
-  
+  signal init_mem_done : std_logic;
+  signal init_mem_done_1 : std_logic;
+  signal init_mem_done_2 : std_logic;
 BEGIN
 
   -----------------------------------------------------------------------------
-  channel_val(0) <= sample_in1_val;
-  channel_val(1) <= sample_in2_val;
+  channel_val(0) <= sample_in1_val when init_mem_done = '1' else '0';
+  channel_val(1) <= sample_in2_val when init_mem_done = '1' else '0';
   all_channel_input_valid : FOR I IN 1 DOWNTO 0 GENERATE
     PROCESS (clk, rstn)
     BEGIN  -- PROCESS
@@ -285,6 +291,8 @@ BEGIN
   raddr_add1_2     <= raddr_add1     WHEN CHANNEL_SEL = '1' ELSE '0';
   waddr_previous_2 <= waddr_previous WHEN CHANNEL_SEL = '1' ELSE "00";
 
+  init_mem_done <= init_mem_done_1 and init_mem_done_2;
+  
   RAM_CTRLR_v2_1 : RAM_CTRLR_v2
     GENERIC MAP (
       tech       => tech,
@@ -293,6 +301,7 @@ BEGIN
     PORT MAP (
       clk            => clk,
       rstn           => rstn,
+      init_mem_done  => init_mem_done_1,
       ram_write      => ram_write_1,
       ram_read       => ram_read_1,
       raddr_rst      => raddr_rst_1,
@@ -309,6 +318,7 @@ BEGIN
     PORT MAP (
       clk            => clk,
       rstn           => rstn,
+      init_mem_done  => init_mem_done_2,
       ram_write      => ram_write_2,
       ram_read       => ram_read_2,
       raddr_rst      => raddr_rst_2,
@@ -358,6 +368,8 @@ BEGIN
       sample_in_rot  => sample_in_rotate,
       sample_out_val => sample_out_val_s,
       sample_out_rot => sample_out_rot_s,
+
+      init_mem_done  => init_mem_done,
 
       in_sel_src     => in_sel_src,
       ram_sel_Wdata  => ram_sel_Wdata,

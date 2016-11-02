@@ -71,6 +71,7 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v2 OF IIR_CEL_CTRLR_v2 IS
       virg_pos       : IN  INTEGER;
       coefs          : IN  STD_LOGIC_VECTOR((Coef_SZ*Coef_Nb)-1 DOWNTO 0);
       in_sel_src     : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+      init_mem_done  : out STD_LOGIC;
       ram_sel_Wdata  : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
       ram_write      : IN  STD_LOGIC;
       ram_read       : IN  STD_LOGIC;
@@ -97,6 +98,7 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v2 OF IIR_CEL_CTRLR_v2 IS
       sample_in_rot  : OUT STD_LOGIC;
       sample_out_val : OUT STD_LOGIC;
       sample_out_rot : OUT STD_LOGIC;
+      init_mem_done  : in  STD_LOGIC;  --TODO
       in_sel_src     : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
       ram_sel_Wdata  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
       ram_write      : OUT STD_LOGIC;
@@ -130,6 +132,8 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v2 OF IIR_CEL_CTRLR_v2 IS
 
   SIGNAL sample_out_s2 : samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0);
 
+  signal init_mem_done : std_logic;
+  
 BEGIN
 
   IIR_CEL_CTRLR_v2_DATAFLOW_1 : IIR_CEL_CTRLR_v2_DATAFLOW
@@ -147,6 +151,7 @@ BEGIN
       coefs          => coefs,
       --CTRL
       in_sel_src     => in_sel_src,
+      init_mem_done  => init_mem_done,  --TODO
       ram_sel_Wdata  => ram_sel_Wdata,
       ram_write      => ram_write,
       ram_read       => ram_read,
@@ -174,6 +179,8 @@ BEGIN
       sample_in_rot  => sample_in_rotate,
       sample_out_val => sample_out_val_s,
       sample_out_rot => sample_out_rot_s,
+      
+      init_mem_done  => init_mem_done,  --TODO
 
       in_sel_src     => in_sel_src,
       ram_sel_Wdata  => ram_sel_Wdata,

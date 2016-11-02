@@ -38,6 +38,8 @@ ENTITY RAM_CTRLR_v2 IS
   PORT(
     rstn : IN STD_LOGIC;
     clk  : IN STD_LOGIC;
+    -- ram init done
+    init_mem_done: out STD_LOGIC;
     -- R/W Ctrl
     ram_write : IN STD_LOGIC;
     ram_read  : IN STD_LOGIC;
@@ -56,24 +58,28 @@ ARCHITECTURE ar_RAM_CTRLR_v2 OF RAM_CTRLR_v2 IS
 
   SIGNAL WD       : STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
   SIGNAL RD       : STD_LOGIC_VECTOR(Input_SZ_1-1 DOWNTO 0);
-	SIGNAL WEN, REN : STD_LOGIC;
+  SIGNAL WEN, REN : STD_LOGIC;
   SIGNAL RADDR    : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL WADDR    : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL counter  : STD_LOGIC_VECTOR(7 DOWNTO 0);
+
+  signal rst_mem_done_s : std_logic;
+  signal ram_write_s : std_logic;
   
 BEGIN
 
-  sample_out                <= RD(Input_SZ_1-1 DOWNTO 0);
-  WD(Input_SZ_1-1 DOWNTO 0) <= sample_in;
+  init_mem_done <= rst_mem_done_s;
+  
+  sample_out                <= RD(Input_SZ_1-1 DOWNTO 0) when rst_mem_done_s = '1' else (others => '0');
+  WD(Input_SZ_1-1 DOWNTO 0) <= sample_in                 when rst_mem_done_s = '1' else (others => '0');
+  ram_write_s               <= ram_write                 when rst_mem_done_s = '1' else '1';
   -----------------------------------------------------------------------------
   -- RAM
   -----------------------------------------------------------------------------
 
   memCEL : IF Mem_use = use_CEL GENERATE
-    WEN <= NOT ram_write;
+    WEN <= NOT ram_write_s;
     REN <= NOT ram_read;
---    RAMblk : RAM_CEL_N
---       GENERIC MAP(Input_SZ_1)
     RAMblk : RAM_CEL
       GENERIC MAP(Input_SZ_1, 8)
       PORT MAP(
@@ -91,7 +97,7 @@ BEGIN
   memRAM : IF Mem_use = use_RAM GENERATE
     SRAM : syncram_2p
       GENERIC MAP(tech, 8, Input_SZ_1)
-      PORT MAP(clk, ram_read, RADDR, RD, clk, ram_write, WADDR, WD);
+      PORT MAP(clk, ram_read, RADDR, RD, clk, ram_write_s, WADDR, WD);
   END GENERATE;
 
   -----------------------------------------------------------------------------
@@ -100,13 +106,22 @@ BEGIN
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
-      counter <= (OTHERS => '0');
+      counter           <= (OTHERS => '0');
+      rst_mem_done_s    <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      IF raddr_rst = '1' THEN
-        counter <= (OTHERS => '0');
-      ELSIF raddr_add1 = '1' THEN
+      if rst_mem_done_s = '0' then
         counter <= STD_LOGIC_VECTOR(UNSIGNED(counter)+1);
-      END IF;
+      else
+        IF raddr_rst = '1' THEN
+          counter <= (OTHERS => '0');
+        ELSIF raddr_add1 = '1' THEN
+          counter <= STD_LOGIC_VECTOR(UNSIGNED(counter)+1);
+        END IF;
+      end if;
+      if counter = x"FF" then
+        rst_mem_done_s <= '1';
+      end if;
+      
     END IF;
   END PROCESS;
   RADDR <= counter;
@@ -114,7 +129,8 @@ BEGIN
   -----------------------------------------------------------------------------
   -- WADDR
   -----------------------------------------------------------------------------
-  WADDR <= STD_LOGIC_VECTOR(UNSIGNED(counter)-2) WHEN waddr_previous = "10" ELSE
+  WADDR <= STD_LOGIC_VECTOR(UNSIGNED(counter))   when rst_mem_done_s = '0' else
+           STD_LOGIC_VECTOR(UNSIGNED(counter)-2) WHEN waddr_previous = "10" ELSE
            STD_LOGIC_VECTOR(UNSIGNED(counter)-1) WHEN waddr_previous = "01" ELSE
            STD_LOGIC_VECTOR(UNSIGNED(counter));
   

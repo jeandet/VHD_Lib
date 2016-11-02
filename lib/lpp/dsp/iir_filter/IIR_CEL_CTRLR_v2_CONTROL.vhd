@@ -41,6 +41,8 @@ ENTITY IIR_CEL_CTRLR_v2_CONTROL IS
     sample_out_val : OUT STD_LOGIC;
     sample_out_rot : OUT STD_LOGIC;
 
+    init_mem_done  : in  STD_LOGIC;  --TODO
+    
     in_sel_src     : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
     ram_sel_Wdata  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
     ram_write      : OUT STD_LOGIC;
@@ -117,7 +119,7 @@ BEGIN
           ram_sel_Wdata      <= "00";
           ram_write          <= '0';
           waddr_previous     <= "00";
-          IF sample_in_val = '1' THEN
+          IF sample_in_val = '1' and init_mem_done = '1' THEN
             raddr_rst      <= '0';
             alu_sel_input  <= '1';
             ram_read       <= '1';

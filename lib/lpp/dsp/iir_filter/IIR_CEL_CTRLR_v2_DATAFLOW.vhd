@@ -46,6 +46,7 @@ ENTITY IIR_CEL_CTRLR_v2_DATAFLOW IS
     -- CONTROL
     in_sel_src    : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
     -- 
+    init_mem_done  : out STD_LOGIC;
     ram_sel_Wdata : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
     ram_write     : IN STD_LOGIC;
     ram_read      : IN STD_LOGIC;
@@ -73,6 +74,7 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v2_DATAFLOW  OF IIR_CEL_CTRLR_v2_DATAFLOW IS
     PORT (
       rstn           : IN  STD_LOGIC;
       clk            : IN  STD_LOGIC;
+      init_mem_done  : out STD_LOGIC;
       ram_write      : IN  STD_LOGIC;
       ram_read       : IN  STD_LOGIC;
       raddr_rst      : IN  STD_LOGIC;
@@ -131,6 +133,7 @@ BEGIN
     PORT MAP (
       clk            => clk,
       rstn           => rstn,
+      init_mem_done  => init_mem_done,
       ram_write      => ram_write,
       ram_read       => ram_read,
       raddr_rst      => raddr_rst,

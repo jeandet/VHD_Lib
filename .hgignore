@@ -39,3 +39,4 @@ actar.vhd
 *.bak
 *.pdc.ce
 *.zip
+*/.ipynb_checkpoints/*
