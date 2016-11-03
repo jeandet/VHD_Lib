@@ -22,6 +22,10 @@ USE lpp.lpp_lfr_pkg.ALL;
 USE lpp.general_purpose.ALL;
 
 ENTITY testbench IS
+GENERIC(
+    tech          : INTEGER := 0; --axcel,
+    Mem_use       : INTEGER := use_CEL --use_RAM
+);
 END;
 
 ARCHITECTURE behav OF testbench IS
@@ -121,14 +125,15 @@ BEGIN
 
   IIR_CEL_CTRLR_v2_1 : IIR_CEL_CTRLR_v2
     GENERIC MAP (
-      tech         => axcel,
+      tech         => tech,
       Mem_use      => use_RAM,
       Sample_SZ    => 18,
       Coef_SZ      => Coef_SZ,
       Coef_Nb      => 25,
       Coef_sel_SZ  => 5,
       Cels_count   => Cels_count,
-      ChanelsCount => ChanelCount)
+      ChanelsCount => ChanelCount,
+      FILENAME     => "RAM.txt")
     PORT MAP (
       rstn     => rstn,
       clk      => clk,

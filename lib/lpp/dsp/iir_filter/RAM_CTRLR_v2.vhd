@@ -33,7 +33,8 @@ ENTITY RAM_CTRLR_v2 IS
   GENERIC(
     tech       : INTEGER := 0;
     Input_SZ_1 : INTEGER := 16;
-    Mem_use    : INTEGER := use_RAM
+    Mem_use    : INTEGER := use_RAM;
+    FILENAME   : STRING:= ""
     );
   PORT(
     rstn : IN STD_LOGIC;
@@ -81,7 +82,7 @@ BEGIN
     WEN <= NOT ram_write_s;
     REN <= NOT ram_read;
     RAMblk : RAM_CEL
-      GENERIC MAP(Input_SZ_1, 8)
+      GENERIC MAP(Input_SZ_1, 8,FILENAME)
       PORT MAP(
         WD    => WD,
         RD    => RD,

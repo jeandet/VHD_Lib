@@ -35,7 +35,8 @@ ENTITY IIR_CEL_CTRLR_v2_DATAFLOW IS
     Sample_SZ     : INTEGER := 16;
     Coef_SZ       : INTEGER := 9;
     Coef_Nb       : INTEGER := 30;
-    Coef_sel_SZ   : INTEGER := 5
+    Coef_sel_SZ   : INTEGER := 5;
+    FILENAME      : STRING:= ""
     );
   PORT(
     rstn      : IN  STD_LOGIC;
@@ -70,7 +71,8 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v2_DATAFLOW  OF IIR_CEL_CTRLR_v2_DATAFLOW IS
     GENERIC (
       tech       : INTEGER;
       Input_SZ_1 : INTEGER;
-      Mem_use    : INTEGER);
+      Mem_use    : INTEGER;
+      FILENAME   : STRING);
     PORT (
       rstn           : IN  STD_LOGIC;
       clk            : IN  STD_LOGIC;
@@ -129,7 +131,8 @@ BEGIN
     GENERIC MAP (
       tech       => tech,
       Input_SZ_1 => Sample_SZ,
-      Mem_use    => Mem_use)
+      Mem_use    => Mem_use,
+      FILENAME   => FILENAME)
     PORT MAP (
       clk            => clk,
       rstn           => rstn,

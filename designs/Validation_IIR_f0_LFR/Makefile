@@ -26,8 +26,9 @@ TECHLIBS = axcelerator
 LIBSKIP = core1553bbc core1553brm core1553brt gr1553 corePCIF \
 	tmtc openchip hynix ihp gleichmann micron usbhc  opencores
 
-DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
+DIRSKIP = b1553 pcif leon2 leon3v3 leon2ft crypto satcan ddr usb ata i2c \
 	pci grusbhc haps slink ascs can pwm greth coremp7 spi ac97 \
+	./dsp/lpp_fft_rtax \
 	./amba_lcd_16x2_ctrlr \
 	./general_purpose/lpp_AMR \
 	./general_purpose/lpp_balise \
@@ -40,14 +41,18 @@ DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	./lpp_uart \
 	./lpp_usb \
 	./dsp/lpp_fft \
+	./lpp_leon3_soc \
+	./lpp_debug_lfr
 
 FILESKIP = i2cmst.vhd \
 	APB_MULTI_DIODE.vhd \
 	APB_MULTI_DIODE.vhd \
 	Top_MatrixSpec.vhd \
 	APB_FFT.vhd \
+        lpp_lfr_ms_FFT.vhd \
 	lpp_lfr_apbreg.vhd \
-	CoreFFT.vhd
+	CoreFFT.vhd \
+	lpp_lfr_ms.vhd
 
 include $(GRLIB)/bin/Makefile
 include $(GRLIB)/software/leon3/Makefile

@@ -40,7 +40,8 @@ ENTITY IIR_CEL_CTRLR_v2 IS
     Coef_Nb      : INTEGER := 25;
     Coef_sel_SZ  : INTEGER := 5;
     Cels_count   : INTEGER := 5;
-    ChanelsCount : INTEGER := 8);
+    ChanelsCount : INTEGER := 8;
+    FILENAME     : STRING  := "");
   PORT (
     rstn : IN STD_LOGIC;
     clk  : IN STD_LOGIC;
@@ -64,7 +65,8 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v2 OF IIR_CEL_CTRLR_v2 IS
       Sample_SZ   : INTEGER;
       Coef_SZ     : INTEGER;
       Coef_Nb     : INTEGER;
-      Coef_sel_SZ : INTEGER);
+      Coef_sel_SZ : INTEGER;
+      FILENAME    : STRING);
     PORT (
       rstn           : IN  STD_LOGIC;
       clk            : IN  STD_LOGIC;
@@ -143,7 +145,8 @@ BEGIN
       Sample_SZ   => Sample_SZ,
       Coef_SZ     => Coef_SZ,
       Coef_Nb     => Coef_Nb,
-      Coef_sel_SZ => Coef_sel_SZ)
+      Coef_sel_SZ => Coef_sel_SZ,
+      FILENAME    => FILENAME)
     PORT MAP (
       rstn           => rstn,
       clk            => clk,

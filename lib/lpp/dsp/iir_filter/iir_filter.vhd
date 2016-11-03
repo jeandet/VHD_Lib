@@ -128,7 +128,8 @@ PACKAGE iir_filter IS
       Coef_Nb       : INTEGER;
       Coef_sel_SZ   : INTEGER;
       Cels_count    : INTEGER;
-      ChanelsCount  : INTEGER);
+      ChanelsCount  : INTEGER;
+      FILENAME      : STRING);
     PORT (
       rstn          : IN  STD_LOGIC;
       clk            : IN  STD_LOGIC;
@@ -232,7 +233,8 @@ PACKAGE iir_filter IS
 
 COMPONENT RAM_CEL is
     generic(DataSz        :   integer range 1 to 32 := 8;
-            abits         :   integer range 2 to 12 := 8);
+            abits         :   integer range 2 to 12 := 8;
+            FILENAME      :   STRING:="");
     port( WD : in std_logic_vector(DataSz-1 downto 0); RD : out
         std_logic_vector(DataSz-1 downto 0);WEN, REN : in std_logic;
         WADDR : in std_logic_vector(abits-1 downto 0); RADDR : in 

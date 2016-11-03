@@ -21,12 +21,18 @@
 ------------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+USE ieee.std_logic_textio.ALL;
 USE IEEE.numeric_std.ALL;
+LIBRARY std;
+USE std.textio.ALL;
+
 
 ENTITY RAM_CEL IS
   GENERIC(
     DataSz : INTEGER RANGE 1 TO 32 := 8;
-    abits  : INTEGER RANGE 2 TO 12 := 8);
+    abits  : INTEGER RANGE 2 TO 12 := 8;
+    FILENAME : string:= ""
+    );
   PORT(
     WD           : IN  STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
     RD           : OUT STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
@@ -46,28 +52,53 @@ ARCHITECTURE ar_RAM_CEL OF RAM_CEL IS
 
   TYPE RAMarrayT IS ARRAY (0 TO MAX-1) OF STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
 
-  SIGNAL RAMarray : RAMarrayT := (OTHERS => VectInit);
   SIGNAL RD_int   : STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
   
   SIGNAL RADDR_reg        :  STD_LOGIC_VECTOR(abits-1 DOWNTO 0);
+  
+  
+  -- Read a *.hex file
+    impure function ReadMemFile(FileName : STRING) return RAMarrayT is
+      file FileHandle       : TEXT open READ_MODE is FileName;
+      variable CurrentLine  : LINE;
+      variable TempWord     : STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+      variable Result       : RAMarrayT    := (others => (others => '0'));
 
+    begin
+      for i in 0 to MAX - 1 loop
+        exit when endfile(FileHandle);
+        readline(FileHandle, CurrentLine);
+        hread(CurrentLine, TempWord);
+        Result(i)    := TempWord;
+      end loop;
+
+      return Result;
+    end function;
+    
+    impure function InitMem(FileName : STRING) return RAMarrayT is
+        variable Result       : RAMarrayT    := (others => (others => '0'));
+    begin
+        if FileName'length /= 0 then
+            Result := ReadMemFile(FileName);
+        end if;
+        return Result;
+    end function;
+    
+    SIGNAL RAMarray : RAMarrayT := InitMem(FILENAME);
 BEGIN
 
   RD_int <= RAMarray(to_integer(UNSIGNED(RADDR)));
-
 
   PROCESS(RWclk, reset)
   BEGIN
     IF reset = '0' THEN
       RD <= VectInit;
-      rst : FOR i IN 0 TO MAX-1 LOOP
-        RAMarray(i) <= (OTHERS => '0');
-      END LOOP;
+--      rst : FOR i IN 0 TO MAX-1 LOOP
+--        RAMarray(i) <= (OTHERS => '0');
+--      END LOOP;
 
     ELSIF RWclk'EVENT AND RWclk = '1' THEN
---      IF REN = '0' THEN
       RD <= RD_int;
---      END IF;
       IF REN = '0' THEN
         RADDR_reg <= RADDR;
       END IF;
