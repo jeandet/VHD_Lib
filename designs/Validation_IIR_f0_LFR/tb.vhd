@@ -20,6 +20,7 @@ USE lpp.general_purpose.ALL;
 USE lpp.data_type_pkg.ALL;
 USE lpp.lpp_lfr_pkg.ALL;
 USE lpp.general_purpose.ALL;
+USE lpp.lpp_sim_pkg.ALL;
 
 ENTITY testbench IS
 GENERIC(
@@ -74,20 +75,20 @@ ARCHITECTURE behav OF testbench IS
       data     : OUT STD_LOGIC_VECTOR(NB_BITS-1 DOWNTO 0)
       );
   END COMPONENT;
-  
-  COMPONENT sig_reader IS
-    GENERIC(
-        FNAME       : STRING  := "input.txt";
-        WIDTH       : INTEGER := 1;
-        RESOLUTION  : INTEGER := 8;
-        GAIN        : REAL    := 1.0
-    );
-    PORT(
-        clk             : IN std_logic;
-        end_of_simu     : out std_logic;
-        out_signal      : out sample_vector(0 to WIDTH-1,RESOLUTION-1 downto 0)
-    );
-  END COMPONENT;
+
+  -- COMPONENT sig_reader IS
+  --   GENERIC(
+  --       FNAME       : STRING  := "input.txt";
+  --       WIDTH       : INTEGER := 1;
+  --       RESOLUTION  : INTEGER := 8;
+  --       GAIN        : REAL    := 1.0
+  --   );
+  --   PORT(
+  --       clk             : IN std_logic;
+  --       end_of_simu     : out std_logic;
+  --       out_signal      : out sample_vector(0 to WIDTH-1,RESOLUTION-1 downto 0)
+  --   );
+  -- END COMPONENT;
 
 
   FILE input     : TEXT OPEN read_mode IS "input.txt";
@@ -110,7 +111,7 @@ BEGIN
     WAIT UNTIL clk = '1';
     rstn <= '1';
     WAIT UNTIL end_of_simu = '1';
-    WAIT UNTIL clk = '1';    
+    WAIT UNTIL clk = '1';
     REPORT "*** END simulation ***" SEVERITY failure;
     WAIT;
   END PROCESS;
@@ -188,8 +189,8 @@ BEGIN
       sample(i,17) <= signal_gen(i,17);
   END GENERATE;
 
-  
-    
+
+
   -----------------------------------------------------------------------------
   --  READ INPUT SIGNALS
   -----------------------------------------------------------------------------
@@ -206,8 +207,8 @@ BEGIN
         end_of_simu     => end_of_simu,
         out_signal      => signal_gen
     );
-    
-  
+
+
   -----------------------------------------------------------------------------
   --  RECORD OUTPUT SIGNALS
   -----------------------------------------------------------------------------

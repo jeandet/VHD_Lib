@@ -32,6 +32,9 @@ USE gaisler.jtagtst.ALL;
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
 
+LIBRARY lpp;
+USE lpp.data_type_pkg.ALL;
+
 PACKAGE lpp_sim_pkg IS
 
   PROCEDURE UART_INIT (
@@ -58,7 +61,19 @@ PACKAGE lpp_sim_pkg IS
     DATA      : OUT  STD_LOGIC_VECTOR
     );
   
-  
+  COMPONENT sig_reader IS
+    GENERIC(
+      FNAME       : STRING  := "input.txt";
+      WIDTH       : INTEGER := 1;
+      RESOLUTION  : INTEGER := 8;
+      GAIN        : REAL    := 1.0
+    );
+    PORT(
+      clk             : IN std_logic;
+      end_of_simu     : out std_logic;
+      out_signal      : out sample_vector(0 to WIDTH-1,RESOLUTION-1 downto 0)
+    );
+  END COMPONENT;
 END lpp_sim_pkg;
 
 PACKAGE BODY lpp_sim_pkg IS

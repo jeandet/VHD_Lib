@@ -12,8 +12,8 @@ EFFORT=high
 XSTOPT=
 SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_constraint 0"
 #VHDLSYNFILES=config.vhd ahbrom.vhd leon3mp.vhd
-VHDLSYNFILES= IIR_CEL_TEST.vhd tb.vhd IIR_CEL_TEST_v3.vhd generator.vhd sig_reader.vhd
-VHDLSIMFILES= tb.vhd sig_reader.vhd
+VHDLSYNFILES= IIR_CEL_TEST.vhd tb.vhd IIR_CEL_TEST_v3.vhd generator.vhd
+VHDLSIMFILES= tb.vhd
 SIMTOP=testbench
 #SDCFILE=$(GRLIB)/boards/$(BOARD)/synplify.sdc
 PDC=$(VHDLIB)/boards/$(BOARD)/LFR_EQM_RTAX.pdc
@@ -35,7 +35,6 @@ DIRSKIP = b1553 pcif leon2 leon3v3 leon2ft crypto satcan ddr usb ata i2c \
 	./general_purpose/lpp_delay \
 	./lpp_bootloader \
 	./lfr_management \
-	./lpp_sim \
 	./lpp_sim/CY7C1061DV33 \
 	./lpp_cna \
 	./lpp_uart \
@@ -52,7 +51,8 @@ FILESKIP = i2cmst.vhd \
         lpp_lfr_ms_FFT.vhd \
 	lpp_lfr_apbreg.vhd \
 	CoreFFT.vhd \
-	lpp_lfr_ms.vhd
+	lpp_lfr_ms.vhd \
+	lpp_lfr_sim_pkg.vhd
 
 include $(GRLIB)/bin/Makefile
 include $(GRLIB)/software/leon3/Makefile
