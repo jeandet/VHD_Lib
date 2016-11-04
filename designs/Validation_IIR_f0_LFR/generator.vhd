@@ -31,7 +31,8 @@ ENTITY generator IS
   
   GENERIC (
     AMPLITUDE            : INTEGER := 100;
-    NB_BITS              : INTEGER := 16);
+    NB_BITS              : INTEGER := 16
+    );
 
   PORT (
     clk      : IN  STD_LOGIC;
@@ -50,7 +51,6 @@ ARCHITECTURE beh OF generator IS
   SIGNAL reg : STD_LOGIC_VECTOR(NB_BITS-1 DOWNTO 0);
 BEGIN  -- beh
 
-  
   PROCESS (clk, rstn)
     variable seed1, seed2: positive; -- seed values for random generator
     variable rand: real; -- random real-number value in range 0 to 1.0  

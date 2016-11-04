@@ -79,8 +79,10 @@ ARCHITECTURE ar_RAM_CEL OF RAM_CEL IS
         variable Result       : RAMarrayT    := (others => (others => '0'));
     begin
         if FileName'length /= 0 then
+            report "initialysing RAM CEL From file "& FileName;
             Result := ReadMemFile(FileName);
         end if;
+        report "initialysing RAM CEL To 0";
         return Result;
     end function;
     

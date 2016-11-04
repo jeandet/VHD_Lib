@@ -23,8 +23,8 @@ USE lpp.general_purpose.ALL;
 
 ENTITY testbench IS
 GENERIC(
-    tech          : INTEGER := 0; --axcel,
-    Mem_use       : INTEGER := use_CEL --use_RAM
+    tech          : INTEGER := 0; --axcel,0
+    Mem_use       : INTEGER := use_CEL --use_RAM,use_CEL
 );
 END;
 
@@ -52,8 +52,7 @@ ARCHITECTURE behav OF testbench IS
   SIGNAL clk_24k_r : STD_LOGIC := '0';
   SIGNAL rstn      : STD_LOGIC;
 
-  SIGNAL signal_gen : Samples(7 DOWNTO 0);
-  SIGNAL offset_gen : Samples(7 DOWNTO 0);
+  SIGNAL signal_gen : sample_vector(0 to ChanelCount-1,17 downto 0);
 
   --SIGNAL sample_fx_wdata : STD_LOGIC_VECTOR((6*16)-1 DOWNTO 0);
 
@@ -75,10 +74,24 @@ ARCHITECTURE behav OF testbench IS
       data     : OUT STD_LOGIC_VECTOR(NB_BITS-1 DOWNTO 0)
       );
   END COMPONENT;
+  
+  COMPONENT sig_reader IS
+    GENERIC(
+        FNAME       : STRING  := "input.txt";
+        WIDTH       : INTEGER := 1;
+        RESOLUTION  : INTEGER := 8;
+        GAIN        : REAL    := 1.0
+    );
+    PORT(
+        clk             : IN std_logic;
+        end_of_simu     : out std_logic;
+        out_signal      : out sample_vector(0 to WIDTH-1,RESOLUTION-1 downto 0)
+    );
+  END COMPONENT;
 
 
-  FILE log_input     : TEXT OPEN write_mode IS "log_input.txt";
-  FILE log_output_fx : TEXT OPEN write_mode IS "log_output_fx.txt";
+  FILE input     : TEXT OPEN read_mode IS "input.txt";
+  FILE output_fx : TEXT OPEN write_mode IS "output_fx.txt";
 
   SIGNAL end_of_simu : STD_LOGIC := '0';
 
@@ -87,18 +100,16 @@ BEGIN
   -----------------------------------------------------------------------------
   -- CLOCK and RESET
   -----------------------------------------------------------------------------
-  clk <= NOT clk AFTER 5 ns;
+  clk <= NOT clk AFTER 20 ns;
   PROCESS
   BEGIN  -- PROCESS
-    end_of_simu <= '0';
     WAIT UNTIL clk = '1';
     rstn <= '0';
     WAIT UNTIL clk = '1';
     WAIT UNTIL clk = '1';
     WAIT UNTIL clk = '1';
     rstn <= '1';
-    WAIT FOR 2000 ms;
-    end_of_simu <= '1';
+    WAIT UNTIL end_of_simu = '1';
     WAIT UNTIL clk = '1';    
     REPORT "*** END simulation ***" SEVERITY failure;
     WAIT;
@@ -133,7 +144,7 @@ BEGIN
       Coef_sel_SZ  => 5,
       Cels_count   => Cels_count,
       ChanelsCount => ChanelCount,
-      FILENAME     => "RAM.txt")
+      FILENAME     => "")
     PORT MAP (
       rstn     => rstn,
       clk      => clk,
@@ -167,49 +178,39 @@ BEGIN
     END IF;
   END PROCESS;
   -----------------------------------------------------------------------------
-  generators : FOR I IN 0 TO 7 GENERATE
-    gen1 : generator
-      GENERIC MAP (
-        AMPLITUDE => 100,
-        NB_BITS   => 16)
-      PORT MAP (
-        clk      => clk,
-        rstn     => rstn,
-        run      => '1',
-        data_ack => sample_val,
-        offset   => offset_gen(I),
-        data     => signal_gen(I)
-        );
-    offset_gen(I) <= STD_LOGIC_VECTOR(to_signed((I*200), 16));
-  END GENERATE generators;
 
   ChanelLoop : FOR i IN 0 TO ChanelCount-1 GENERATE
     SampleLoop : FOR j IN 0 TO 15 GENERATE
-      sample(i,j) <= signal_gen(i)(j);
       sample_fx_wdata(i)(j) <= sample_fx(i,j);
+      sample(i,j) <= signal_gen(i,j);
     END GENERATE;
-
-    sample(i, 16) <= signal_gen(i)(15);
-    sample(i, 17) <= signal_gen(i)(15);
+      sample(i,16) <= signal_gen(i,16);
+      sample(i,17) <= signal_gen(i,17);
   END GENERATE;
 
   
     
   -----------------------------------------------------------------------------
-  --  RECORD SIGNALS
+  --  READ INPUT SIGNALS
   -----------------------------------------------------------------------------
 
-  -- PROCESS(sample_val)
-  --   VARIABLE line_var : LINE;
-  -- BEGIN
-  --   IF sample_val'EVENT AND sample_val = '1' THEN
-  --     write(line_var, INTEGER'IMAGE(TSTAMP));
-  --     FOR I IN 0 TO 7 LOOP
-  --       write(line_var, "  " & INTEGER'IMAGE(to_integer(SIGNED(signal_gen(I)))));
-  --     END LOOP;
-  --     writeline(log_input, line_var);
-  --   END IF;
-  --  END PROCESS;
+  gen: sig_reader
+  GENERIC MAP(
+        FNAME       => "input.txt",
+        WIDTH       => ChanelCount,
+        RESOLUTION  => 18,
+        GAIN        => 1.0
+    )
+    PORT MAP(
+        clk             => sample_val,
+        end_of_simu     => end_of_simu,
+        out_signal      => signal_gen
+    );
+    
+  
+  -----------------------------------------------------------------------------
+  --  RECORD OUTPUT SIGNALS
+  -----------------------------------------------------------------------------
 
   PROCESS(sample_fx_val,end_of_simu)
     VARIABLE line_var : LINE;
@@ -219,10 +220,10 @@ BEGIN
       FOR I IN 0 TO 5 LOOP
         write(line_var, "  " & INTEGER'IMAGE(to_integer(SIGNED(sample_fx_wdata(I)))));
       END LOOP;
-      writeline(log_output_fx, line_var);
+      writeline(output_fx, line_var);
     END IF;
     IF end_of_simu = '1' THEN
-      file_close(log_output_fx);
+      file_close(output_fx);
     END IF;
   END PROCESS;
 
