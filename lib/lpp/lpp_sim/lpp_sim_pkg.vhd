@@ -14,7 +14,7 @@
 --
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -------------------------------------------------------------------------------
 --                    Author : Jean-christophe Pellion
 --                    Mail   : jean-christophe.pellion@lpp.polytechnique.fr
@@ -60,7 +60,7 @@ PACKAGE lpp_sim_pkg IS
     CONSTANT ADDR      : IN  STD_LOGIC_VECTOR(31 DOWNTO 2);
     DATA      : OUT  STD_LOGIC_VECTOR
     );
-  
+
   COMPONENT sig_reader IS
     GENERIC(
       FNAME       : STRING  := "input.txt";
@@ -74,6 +74,21 @@ PACKAGE lpp_sim_pkg IS
       out_signal      : out sample_vector(0 to WIDTH-1,RESOLUTION-1 downto 0)
     );
   END COMPONENT;
+
+  COMPONENT sig_recorder IS
+  GENERIC(
+      FNAME       : STRING  := "output.txt";
+      WIDTH       : INTEGER := 1;
+      RESOLUTION  : INTEGER := 8
+  );
+  PORT(
+      clk             : IN STD_LOGIC;
+      end_of_simu     : IN STD_LOGIC;
+      timestamp       : IN INTEGER;
+      input_signal    : IN sample_vector(0 TO WIDTH-1,RESOLUTION-1 DOWNTO 0)
+  );
+  END COMPONENT;
+
 END lpp_sim_pkg;
 
 PACKAGE BODY lpp_sim_pkg IS
@@ -107,7 +122,7 @@ PACKAGE BODY lpp_sim_pkg IS
   CONSTANT DATA                   : IN  STD_LOGIC_VECTOR(31 DOWNTO 0)) IS
 
     CONSTANT ADDR_last : STD_LOGIC_VECTOR(7 DOWNTO 0) := ADDR(7 DOWNTO 2) & "00";
-    
+
   BEGIN
     txc(TX, 16#c0#, tx_period);
     txa(TX,
@@ -123,7 +138,7 @@ PACKAGE BODY lpp_sim_pkg IS
         to_integer(UNSIGNED(DATA(7 DOWNTO 0))),
         tx_period);
   END;
-  
+
   PROCEDURE UART_READ (
     SIGNAL   TX        : OUT STD_LOGIC;
     SIGNAL   RX        : IN  STD_LOGIC;
@@ -143,12 +158,12 @@ PACKAGE BODY lpp_sim_pkg IS
         tx_period);
     rxc(RX,V_DATA,tx_period);
     DATA(31 DOWNTO 24) := V_DATA;
-    rxc(RX,V_DATA,tx_period);   
+    rxc(RX,V_DATA,tx_period);
     DATA(23 DOWNTO 16) := V_DATA;
-    rxc(RX,V_DATA,tx_period);   
+    rxc(RX,V_DATA,tx_period);
     DATA(15 DOWNTO 8) := V_DATA;
-    rxc(RX,V_DATA,tx_period);  
+    rxc(RX,V_DATA,tx_period);
     DATA(7 DOWNTO 0) := V_DATA;
   END;
-  
+
 END lpp_sim_pkg;

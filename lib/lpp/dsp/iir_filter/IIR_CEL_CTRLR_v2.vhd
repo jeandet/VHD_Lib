@@ -14,7 +14,7 @@
 --
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -------------------------------------------------------------------------------
 --                    Author : Jean-christophe PELLION
 --                    Mail   : jean-christophe.pellion@lpp.polytechnique.fr
@@ -135,7 +135,7 @@ ARCHITECTURE ar_IIR_CEL_CTRLR_v2 OF IIR_CEL_CTRLR_v2 IS
   SIGNAL sample_out_s2 : samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0);
 
   signal init_mem_done : std_logic;
-  
+
 BEGIN
 
   IIR_CEL_CTRLR_v2_DATAFLOW_1 : IIR_CEL_CTRLR_v2_DATAFLOW
@@ -182,7 +182,7 @@ BEGIN
       sample_in_rot  => sample_in_rotate,
       sample_out_val => sample_out_val_s,
       sample_out_rot => sample_out_rot_s,
-      
+
       init_mem_done  => init_mem_done,  --TODO
 
       in_sel_src     => in_sel_src,

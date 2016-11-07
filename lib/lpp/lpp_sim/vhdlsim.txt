@@ -1,3 +1,4 @@
 sig_reader.vhd
+sig_recorder.vhd
 lpp_sim_pkg.vhd
 lpp_lfr_sim_pkg.vhd

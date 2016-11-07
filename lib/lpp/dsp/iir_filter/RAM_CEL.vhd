@@ -14,7 +14,7 @@
 --
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ------------------------------------------------------------------------------
 --                    Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@lpp.polytechnique.fr
@@ -53,10 +53,10 @@ ARCHITECTURE ar_RAM_CEL OF RAM_CEL IS
   TYPE RAMarrayT IS ARRAY (0 TO MAX-1) OF STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
 
   SIGNAL RD_int   : STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
-  
+
   SIGNAL RADDR_reg        :  STD_LOGIC_VECTOR(abits-1 DOWNTO 0);
-  
-  
+
+
   -- Read a *.hex file
     impure function ReadMemFile(FileName : STRING) return RAMarrayT is
       file FileHandle       : TEXT open READ_MODE is FileName;
@@ -74,18 +74,18 @@ ARCHITECTURE ar_RAM_CEL OF RAM_CEL IS
 
       return Result;
     end function;
-    
+
     impure function InitMem(FileName : STRING) return RAMarrayT is
         variable Result       : RAMarrayT    := (others => (others => '0'));
     begin
-        if FileName'length /= 0 then
+        if FileName /= "" then
             report "initialysing RAM CEL From file "& FileName;
             Result := ReadMemFile(FileName);
         end if;
         report "initialysing RAM CEL To 0";
         return Result;
     end function;
-    
+
     SIGNAL RAMarray : RAMarrayT := InitMem(FILENAME);
 BEGIN
 
@@ -104,7 +104,7 @@ BEGIN
       IF REN = '0' THEN
         RADDR_reg <= RADDR;
       END IF;
-      
+
       IF WEN = '0' THEN
         RAMarray(to_integer(UNSIGNED(WADDR))) <= WD;
       END IF;

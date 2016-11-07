@@ -14,7 +14,7 @@
 --
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -------------------------------------------------------------------------------
 --                    Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@lpp.polytechnique.fr
@@ -116,20 +116,20 @@ PACKAGE iir_filter IS
       LVLinput   : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
       INsample   : OUT samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0);
       OUTsample  : OUT samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0)
-      ); 
+      );
   END COMPONENT;
 
   COMPONENT IIR_CEL_CTRLR_v2
     GENERIC (
-      tech          : INTEGER;
-      Mem_use       : INTEGER;
-      Sample_SZ     : INTEGER;
-      Coef_SZ       : INTEGER;
-      Coef_Nb       : INTEGER;
-      Coef_sel_SZ   : INTEGER;
-      Cels_count    : INTEGER;
-      ChanelsCount  : INTEGER;
-      FILENAME      : STRING);
+      tech         : INTEGER := 0;
+      Mem_use      : INTEGER := use_RAM;
+      Sample_SZ    : INTEGER := 18;
+      Coef_SZ      : INTEGER := 9;
+      Coef_Nb      : INTEGER := 25;
+      Coef_sel_SZ  : INTEGER := 5;
+      Cels_count   : INTEGER := 5;
+      ChanelsCount : INTEGER := 8;
+      FILENAME     : STRING  := "");
     PORT (
       rstn          : IN  STD_LOGIC;
       clk            : IN  STD_LOGIC;
@@ -165,10 +165,10 @@ PACKAGE iir_filter IS
       sample_out2_val : OUT STD_LOGIC;
       sample_out2     : OUT samplT(ChanelsCount-1 DOWNTO 0, Sample_SZ-1 DOWNTO 0));
   END COMPONENT;
-  
 
 
-  
+
+
 --component  FilterCTRLR is
 --port(
 --    reset       :   in  std_logic;
@@ -237,7 +237,7 @@ COMPONENT RAM_CEL is
             FILENAME      :   STRING:="");
     port( WD : in std_logic_vector(DataSz-1 downto 0); RD : out
         std_logic_vector(DataSz-1 downto 0);WEN, REN : in std_logic;
-        WADDR : in std_logic_vector(abits-1 downto 0); RADDR : in 
+        WADDR : in std_logic_vector(abits-1 downto 0); RADDR : in
         std_logic_vector(abits-1 downto 0);RWCLK, RESET : in std_logic
         ) ;
 end COMPONENT;

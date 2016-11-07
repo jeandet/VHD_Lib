@@ -36,7 +36,7 @@ ARCHITECTURE behav OF testbench IS
   SIGNAL offset_gen     :  Samples(7 DOWNTO 0);
 
   SIGNAL sample       : Samples(7 DOWNTO 0);
-  
+
   SIGNAL sample_val   : STD_LOGIC;
 
   SIGNAL sample_f0_val   : STD_LOGIC;
@@ -53,12 +53,12 @@ ARCHITECTURE behav OF testbench IS
   SIGNAL sample_f1  : Samples(5 DOWNTO 0);
   SIGNAL sample_f2  : Samples(5 DOWNTO 0);
   SIGNAL sample_f3  : Samples(5 DOWNTO 0);
-  
-  
+
+
 
   SIGNAL temp : STD_LOGIC;
-  
-  
+
+
   COMPONENT generator IS
   GENERIC (
     AMPLITUDE            : INTEGER := 100;
@@ -68,7 +68,7 @@ ARCHITECTURE behav OF testbench IS
     clk      : IN  STD_LOGIC;
     rstn     : IN  STD_LOGIC;
     run      : IN  STD_LOGIC;
-    
+
     data_ack : IN  STD_LOGIC;
     offset   : IN  STD_LOGIC_VECTOR(NB_BITS-1 DOWNTO 0);
     data     : OUT STD_LOGIC_VECTOR(NB_BITS-1 DOWNTO 0)
@@ -82,7 +82,7 @@ ARCHITECTURE behav OF testbench IS
   file log_output_f2   : TEXT open write_mode is "log_output_f2.txt";
   file log_output_f3   : TEXT open write_mode is "log_output_f3.txt";
 
-    
+
 BEGIN
 
   -----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ BEGIN
     rstn <= '1';
     WAIT FOR 2000 ms;
     REPORT "*** END simulation ***" SEVERITY failure;
-    WAIT;    
+    WAIT;
   END PROCESS;
   -----------------------------------------------------------------------------
 
@@ -107,7 +107,7 @@ BEGIN
   -----------------------------------------------------------------------------
   -- COMMON TIMESTAMPS
   -----------------------------------------------------------------------------
-  
+
     PROCESS(clk)
     BEGIN
       IF clk'event and clk ='1' THEN
@@ -115,8 +115,8 @@ BEGIN
       END IF;
     END PROCESS;
   -----------------------------------------------------------------------------
- 
-  
+
+
   -----------------------------------------------------------------------------
   -- LPP_LFR_FILTER
   -----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ BEGIN
       );
   -----------------------------------------------------------------------------
 
-  
+
   -----------------------------------------------------------------------------
   -- SAMPLE GENERATION
   -----------------------------------------------------------------------------
@@ -200,8 +200,8 @@ output_splitter: FOR CHAN IN 0 TO 5 GENERATE
         sample_f3(CHAN)(BIT)  <= sample_f3_wdata((CHAN*16) + BIT);
     END GENERATE bits_splitter;
 END GENERATE output_splitter;
-  
-  
+
+
 sample  <= signal_gen;
 
   -----------------------------------------------------------------------------
@@ -211,7 +211,7 @@ sample  <= signal_gen;
 process(sample_val)
 variable line_var : line;
 begin
-if sample_val'event and sample_val='1' then 
+if sample_val'event and sample_val='1' then
     write(line_var,integer'image(TSTAMP) );
     for I IN 0 TO 7 loop
       write(line_var, "  " & integer'image(to_integer(signed(signal_gen(I)))));
@@ -223,7 +223,7 @@ end process;
 process(sample_f0_val)
 variable line_var : line;
 begin
-if sample_f0_val'event and sample_f0_val='1' then 
+if sample_f0_val'event and sample_f0_val='1' then
     write(line_var,integer'image(TSTAMP) );
     for I IN 0 TO 5 loop
       write(line_var, "  " & integer'image(to_integer(signed(sample_f0(I)))));
@@ -236,7 +236,7 @@ end process;
 process(sample_f1_val)
 variable line_var : line;
 begin
-if sample_f1_val'event and sample_f1_val='1' then 
+if sample_f1_val'event and sample_f1_val='1' then
     write(line_var,integer'image(TSTAMP) );
     for I IN 0 TO 5 loop
       write(line_var, "  " & integer'image(to_integer(signed(sample_f1(I)))));
@@ -249,7 +249,7 @@ end process;
 process(sample_f2_val)
 variable line_var : line;
 begin
-if sample_f2_val'event and sample_f2_val='1' then 
+if sample_f2_val'event and sample_f2_val='1' then
     write(line_var,integer'image(TSTAMP) );
     for I IN 0 TO 5 loop
       write(line_var, "  " & integer'image(to_integer(signed(sample_f2(I)))));
@@ -261,7 +261,7 @@ end process;
 process(sample_f3_val)
 variable line_var : line;
 begin
-if sample_f3_val'event and sample_f3_val='1' then 
+if sample_f3_val'event and sample_f3_val='1' then
     write(line_var,integer'image(TSTAMP) );
     for I IN 0 TO 5 loop
       write(line_var, "  " & integer'image(to_integer(signed(sample_f3(I)))));
@@ -271,6 +271,4 @@ end if;
 end process;
 
 
-  
-  
 END;
