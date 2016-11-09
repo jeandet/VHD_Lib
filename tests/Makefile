@@ -1,23 +1,10 @@
-SUBDIRS=Validation_IIR_f0_LFR \
-    Validation_IIR_f1_LFR \
-    Validation_LFR_Filters
+SUBDIRS := $(shell find ./  -maxdepth 1 -mindepth 1 -type d)
 
-SUBDIRS_distclean:=$(SUBDIRS)
-SUBDIRS_test:=$(SUBDIRS)
+all :
 
-.PHONY: distclean test $(SUBDIRS)
+.PHONY: force
 
-all:
-	echo ""
 
-test: $(SUBDIRS_test)
-
-distclean: $(SUBDIRS_distclean)
-
-$(SUBDIRS_distclean):
-	$(MAKE) -C $@ distclean
-
-$(SUBDIRS_test):
-	$(MAKE) -C $@ test
-
+%:
+	-for d in $(SUBDIRS); do (cd $$d; $(MAKE) $@ ); done
 
