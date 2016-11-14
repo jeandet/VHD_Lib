@@ -1,5 +1,3 @@
-#!/usr/bin/xonsh
-
 import numpy as np
 import random
 

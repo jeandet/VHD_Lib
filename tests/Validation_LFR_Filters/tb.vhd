@@ -61,7 +61,7 @@ ARCHITECTURE behav OF testbench IS
 
   SIGNAL end_of_simu : STD_LOGIC := '0';
 
-  CONSTANT half_samplig_period : time := INTEGER( REAL(1000**4) / REAL(2.0*4.0*24576.0)) * 1 ps;
+  CONSTANT half_samplig_period : time :=  5086263 ps;--INTEGER( REAL(REAL(1000**4) / REAL(2.0*4.0*24576.0))) * 1 ps;
 
 
 
