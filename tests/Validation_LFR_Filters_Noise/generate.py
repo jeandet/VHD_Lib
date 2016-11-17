@@ -2,6 +2,7 @@ import numpy as np
 import random
 
 W,H=8,100000
-test = np.ones((H,W))*[(random.random()*65535)-32768 for col in range(W)]
+low,high=-1000,1000
+test = np.random.randint(low=low,high=high,size=(H,W))
 np.savetxt("input.txt", test,fmt="%d", delimiter=" ")
-  
+

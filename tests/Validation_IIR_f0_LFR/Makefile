@@ -67,7 +67,7 @@ distclean:myclean
 vsim:cp_for_vsim
 
 myclean:
-	rm -f input.txt output_fx.txt
+	rm -f input.txt output_fx.txt *.log
 	rm -rf ./2016*
 
 generate :

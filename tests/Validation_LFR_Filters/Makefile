@@ -1,4 +1,5 @@
 VHDLIB=../..
+SELFDIR := $(dir $(lastword $(MAKEFILE_LIST)))
 SCRIPTSDIR=$(VHDLIB)/scripts/
 GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
 TOP=testbench
@@ -11,7 +12,7 @@ EFFORT=high
 XSTOPT=
 SYNPOPT=
 VHDLSYNFILES=
-VHDLSIMFILES= tb.vhd
+VHDLSIMFILES= $(SELFDIR)/tb.vhd
 SIMTOP=testbench
 CLEAN=soft-clean
 
@@ -66,7 +67,7 @@ distclean:myclean
 vsim:cp_for_vsim
 
 myclean:
-	rm -f input.txt output_f*.txt
+	rm -f input.txt output_f*.txt *.log
 	rm -rf ./2016*
 
 generate :
@@ -78,4 +79,8 @@ cp_for_vsim: generate
 archivate:
 	xonsh ./archivate.xsh
 
-test: | generate ghdl ghdl-run archivate
+test-common: | generate ghdl ghdl-run archivate
+
+test:
+	@echo "not a Test"
+
