@@ -77,7 +77,7 @@ cp_for_vsim: generate
 	cp ./input.txt simulation/
 
 archivate:
-	xonsh ./archivate.xsh
+	python ./archivate.py
 
 test-common: | generate ghdl ghdl-run archivate
 
