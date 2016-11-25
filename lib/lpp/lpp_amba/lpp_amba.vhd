@@ -29,7 +29,7 @@ use std.textio.all;
 
 package lpp_amba is
 
-component APB_CHENILLARD is
+component APB_ADVANCED_TRIGGER is
   generic (
     pindex   : integer := 0;
     paddr    : integer := 0;
@@ -37,12 +37,16 @@ component APB_CHENILLARD is
     pirq     : integer := 0;
     abits    : integer := 8);
   port (
-    rst    : in  std_ulogic;
+    rstn   : in  std_ulogic;
     clk    : in  std_ulogic;
-    RegLed : in std_logic_vector (7 downto 0);
     apbi   : in  apb_slv_in_type;
     apbo   : out apb_slv_out_type;
-    Leds   : out std_logic_vector (7 downto 0)
+    
+    SPW_Tickout : IN STD_LOGIC;
+    CoarseTime  : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    FineTime    : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+    Trigger     : OUT STD_LOGIC
     );
 end component;
 

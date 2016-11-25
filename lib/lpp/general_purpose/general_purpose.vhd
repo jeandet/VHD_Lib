@@ -14,7 +14,7 @@
 --
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -------------------------------------------------------------------------------
 --                    Author : Alexis Jeandet
 --                     Mail : alexis.jeandet@lpp.polytechnique.fr
@@ -32,7 +32,7 @@ USE IEEE.NUMERIC_STD.ALL;
 
 
 PACKAGE general_purpose IS
-  
+
   COMPONENT general_counter
     GENERIC (
       CYCLIC          : STD_LOGIC;
@@ -415,6 +415,28 @@ PACKAGE general_purpose IS
       rstn        : IN  STD_LOGIC;
       new_data    : IN  STD_LOGIC;
       output_data : OUT STD_LOGIC_VECTOR(DATA_SIZE-1 DOWNTO 0));
+  END COMPONENT;
+
+  COMPONENT TimeGenAdvancedTrigger
+    PORT(
+        clk         : IN STD_LOGIC;
+        rstn        : IN STD_LOGIC;
+
+        SPW_Tickout : IN STD_LOGIC;
+
+        CoarseTime  : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        FineTime    : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+        TrigPeriod  : IN STD_LOGIC_VECTOR(3 DOWNTO 0);   -- In seconds 0 to 15
+        TrigShift   : IN STD_LOGIC_VECTOR(15 DOWNTO 0);  -- In FineTime steps
+        Restart     : IN STD_LOGIC;
+        StartDate   : IN STD_LOGIC_VECTOR(31 DOWNTO 0);  -- Date in seconds since epoch
+
+        BypassTickout : IN STD_LOGIC; -- if set then Trigger output is driven by SPW tickout
+                                      -- else Trigger output is driven by advanced trig
+        Trigger     : OUT STD_LOGIC
+
+    );
   END COMPONENT;
 
 END;

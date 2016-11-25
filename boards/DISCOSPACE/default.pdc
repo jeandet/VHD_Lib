@@ -1,0 +1,521 @@
+# Actel Physical design constraints file
+# Generated file
+
+# Version: 9.1 SP3 9.1.3.4
+# Family: ProASIC3L , Die: A3PE3000L , Package: 324 FBGA
+# Date generated: Tue Oct 18 08:21:45 2011 
+
+
+# 
+# IO banks setting
+# 
+
+
+#
+# I/O constraints
+# 
+
+set_io clk100MHz         \
+    -pinname F7      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io clk49_152MHz         \
+    -pinname F8      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io reset          \
+    -pinname J12      \
+    -fixed yes        \
+    -DIRECTION Inout
+#====================================================================
+#        BPs
+#====================================================================
+set_io BP0            \
+    -pinname F16      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io BP1            \
+    -pinname F13      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+#====================================================================
+#        LEDs
+#====================================================================
+
+set_io LED0           \
+    -pinname R13      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io LED1           \
+    -pinname P13      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io LED2           \
+    -pinname N11      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+#====================================================================
+#        TRIGGERs
+#====================================================================
+	
+set_io DISCO1_TRIG1   \
+    -pinname J15      \
+    -fixed yes        \
+    -DIRECTION Inout
+	
+set_io DISCO2_TRIG1   \
+    -pinname H15      \
+    -fixed yes        \
+    -DIRECTION Inout
+	
+set_io DISCO3_TRIG1   \
+    -pinname D14      \
+    -fixed yes        \
+    -DIRECTION Inout
+	
+set_io DISCO4_TRIG1   \
+    -pinname A8       \
+    -fixed yes        \
+    -DIRECTION Inout
+	
+#====================================================================
+#        UARTS
+#====================================================================
+
+set_io TXD1           \
+    -pinname N12      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io RXD1           \
+    -pinname N10      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io nCTS1           \
+    -pinname L13      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io nRTS1           \
+    -pinname M9      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+
+set_io TXD2           \
+    -pinname G6      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io RXD2           \
+    -pinname F6      \
+    -fixed yes        \
+    -DIRECTION Inout
+    
+
+
+#====================================================================
+#        SPACE WIRE
+#====================================================================
+
+set_io SPW_EN   \
+    -pinname U9      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+         #================================
+         #        NOMINAL LINK
+         #================================
+
+set_io SPW_NOM_DIN   \
+    -pinname T9      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io SPW_NOM_SIN   \
+    -pinname T8      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io SPW_NOM_DOUT  \
+    -pinname U7      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io SPW_NOM_SOUT  \
+    -pinname U1      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+         #================================
+         #        REDUNDANT LINK
+         #================================
+
+set_io SPW_RED_DIN   \
+    -pinname R10      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io SPW_RED_SIN   \
+    -pinname T10      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io SPW_RED_DOUT  \
+    -pinname V2      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+set_io SPW_RED_SOUT  \
+    -pinname T11      \
+    -fixed yes        \
+    -DIRECTION Inout
+
+
+#====================================================================
+#        SRAM
+#====================================================================
+
+         #================================
+         #        SRAM CTRL
+         #================================
+
+set_io SRAM_nWE    \
+   -pinname D4     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_CE     \
+   -pinname J6      \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_nOE    \
+   -pinname J1     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_nBE\[0\]     \
+   -pinname N2     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_nBE\[1\]     \
+   -pinname K5     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_nBE\[2\]     \
+   -pinname G2     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_nBE\[3\]     \
+   -pinname J2     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+
+         #================================
+         #        SRAM ADDRESS
+         #================================
+
+set_io SRAM_A\[0\]     \
+   -pinname A3     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[1\]     \
+   -pinname A2     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[2\]     \
+   -pinname B1     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[3\]     \
+   -pinname C1     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[4\]     \
+   -pinname D1     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[5\]     \
+   -pinname B6     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[6\]     \
+   -pinname F1     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[7\]     \
+   -pinname C6     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[8\]     \
+   -pinname H1     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[9\]     \
+   -pinname A5     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[10\]     \
+   -pinname D5     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[11\]     \
+   -pinname K1     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[12\]     \
+   -pinname A4     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[13\]     \
+   -pinname E10     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_A\[14\]     \
+   -pinname C4     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_A\[15\]     \
+   -pinname G4     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_A\[16\]     \
+   -pinname K7     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_A\[17\]     \
+   -pinname F4     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_A\[18\]     \
+   -pinname K2     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_A\[19\]     \
+   -pinname E4     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+
+         #================================
+         #        SRAM DATA
+         #================================
+
+set_io SRAM_DQ\[0\]     \
+   -pinname M3     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_DQ\[1\]     \
+   -pinname N8     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[2\]     \
+   -pinname M2     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[3\]     \
+   -pinname N9     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[4\]     \
+   -pinname R11     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[5\]     \
+   -pinname K12     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[6\]     \
+   -pinname J4     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[7\]     \
+   -pinname N3     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[8\]     \
+   -pinname M6     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[9\]     \
+   -pinname L3    \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[10\]     \
+   -pinname L6     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_DQ\[11\]     \
+   -pinname K4     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_DQ\[12\]     \
+   -pinname L4     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[13\]     \
+   -pinname N7     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[14\]     \
+   -pinname M7     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[15\]     \
+   -pinname K6     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[16\]     \
+   -pinname E1     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[17\]     \
+   -pinname J7     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[18\]     \
+   -pinname H4     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[19\]     \
+   -pinname F10     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[20\]     \
+   -pinname B3     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[21\]     \
+   -pinname F3     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[22\]     \
+   -pinname C3     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+set_io SRAM_DQ\[23\]     \
+   -pinname G3     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[24\]     \
+   -pinname R6     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[25\]     \
+   -pinname P4     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[26\]     \
+   -pinname R4     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[27\]     \
+   -pinname M4     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[28\]     \
+   -pinname F9     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[29\]     \
+   -pinname B2     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[30\]     \
+   -pinname H3     \
+   -fixed yes        \
+   -DIRECTION Inout
+   
+set_io SRAM_DQ\[31\]     \
+   -pinname C2     \
+   -fixed yes        \
+   -DIRECTION Inout
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
