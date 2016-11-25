@@ -81,6 +81,11 @@ archivate:
 
 test-common: | generate ghdl ghdl-run archivate
 
+test-vsim-common: | generate vsim vsim-run archivate
+
+test-vsim:
+	@echo "not a Test"
+
 test:
 	@echo "not a Test"
 

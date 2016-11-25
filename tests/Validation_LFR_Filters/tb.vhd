@@ -120,7 +120,7 @@ BEGIN
     GENERIC MAP (
       tech    => tech,
       Mem_use => Mem_use,
-      RTL_DESIGN_LIGHT =>1
+      RTL_DESIGN_LIGHT =>0
       )
     PORT MAP (
       sample           => sample,
