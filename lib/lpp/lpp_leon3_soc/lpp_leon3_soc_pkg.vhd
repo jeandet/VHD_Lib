@@ -55,6 +55,7 @@ PACKAGE lpp_leon3_soc_pkg IS
       NB_APB_SLAVE    : INTEGER;
       ADDRESS_SIZE    : INTEGER;
       USES_IAP_MEMCTRLR : INTEGER;
+      USES_MBE_PIN      : INTEGER:=1;
       BYPASS_EDAC_MEMCTRLR : STD_LOGIC;
       SRBANKSZ        : INTEGER := 8;
       SLOW_TIMING_EMULATION : integer := 0

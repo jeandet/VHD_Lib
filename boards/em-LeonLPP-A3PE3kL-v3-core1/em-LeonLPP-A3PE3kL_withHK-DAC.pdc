@@ -78,7 +78,7 @@ set_io	{led[0]}	-pinname	K17	-fixed	yes	-DIRECTION	Inout
 set_io	{led[1]}	-pinname	L18	-fixed	yes	-DIRECTION	Inout
 set_io	{led[2]}	-pinname	M17	-fixed	yes	-DIRECTION	Inout
 
-set_io	TAG1    -pinname	J12	-fixed	yes	-DIRECTION	Inout
+#set_io	TAG1    -pinname	J12	-fixed	yes	-DIRECTION	Inout
 set_io	TAG2	-pinname	K13	-fixed	yes	-DIRECTION	Inout
 set_io	TAG3	-pinname	L16	-fixed	yes	-DIRECTION	Inout
 set_io	TAG4	-pinname	L15	-fixed	yes	-DIRECTION	Inout

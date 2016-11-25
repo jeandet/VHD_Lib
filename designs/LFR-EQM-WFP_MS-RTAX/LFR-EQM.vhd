@@ -256,6 +256,7 @@ BEGIN  -- beh
       NB_APB_SLAVE    => NB_APB_SLAVE,
       ADDRESS_SIZE    => 19,
       USES_IAP_MEMCTRLR => 1,
+      USES_MBE_PIN      => 1,
       BYPASS_EDAC_MEMCTRLR => '0',
       SRBANKSZ          => 8)
     PORT MAP (

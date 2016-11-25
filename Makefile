@@ -30,4 +30,5 @@ test:
 
 distclean:
 	$(MAKE) -C tests distclean
+	$(MAKE) -C designs distclean
 

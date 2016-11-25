@@ -164,6 +164,7 @@ ARCHITECTURE beh OF LFR_em IS
   ----------------------------------------------------------------------------
   SIGNAL nSRAM_CE_s : STD_LOGIC_VECTOR(1 DOWNTO 0);
   SIGNAL nSRAM_READY : STD_LOGIC;
+  SIGNAL SRAM_MBE : STD_LOGIC;
 
 BEGIN  -- beh
 
@@ -234,6 +235,7 @@ BEGIN  -- beh
       NB_APB_SLAVE    => NB_APB_SLAVE,
       ADDRESS_SIZE    => 20,
       USES_IAP_MEMCTRLR => USE_IAP_MEMCTRL,
+      USES_MBE_PIN      => 0,
       BYPASS_EDAC_MEMCTRLR => '0',
       SRBANKSZ          => 9)
     PORT MAP (
@@ -256,7 +258,7 @@ BEGIN  -- beh
       nSRAM_CE  => nSRAM_CE_s,
       nSRAM_OE  => nSRAM_OE,
       nSRAM_READY => nSRAM_READY,
-      SRAM_MBE    => '0',
+      SRAM_MBE    => SRAM_MBE,
 
       apbi_ext   => apbi_ext,
       apbo_ext   => apbo_ext,

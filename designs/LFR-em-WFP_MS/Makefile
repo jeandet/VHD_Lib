@@ -1,4 +1,3 @@
-#GRLIB=../..
 VHDLIB=../..
 SCRIPTSDIR=$(VHDLIB)/scripts/
 GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
@@ -11,13 +10,9 @@ QSF=$(GRLIB)/boards/$(BOARD)/$(TOP).qsf
 EFFORT=high
 XSTOPT=
 SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_constraint 0"
-#VHDLSYNFILES=config.vhd ahbrom.vhd leon3mp.vhd
-#VHDLSYNFILES=config.vhd leon3mp.vhd
 VHDLSYNFILES=LFR-em.vhd
 VHDLSIMFILES=testbench.vhd
-#SIMTOP=testbench
-#SDCFILE=$(GRLIB)/boards/$(BOARD)/synplify.sdc
-#SDC=$(GRLIB)/boards/$(BOARD)/leon3mp.sdc
+
 PDC=$(VHDLIB)/boards/$(BOARD)/em-LeonLPP-A3PE3kL_withHK-DAC.pdc
 
 SDCFILE=$(VHDLIB)/boards/$(BOARD)/LFR_EM_synthesis.sdc
@@ -29,7 +24,7 @@ CLEAN=soft-clean
 TECHLIBS = proasic3e
 
 LIBSKIP = core1553bbc core1553brm core1553brt gr1553 corePCIF \
-	tmtc openchip hynix ihp gleichmann micron usbhc
+	tmtc openchip hynix ihp gleichmann micron usbhc opencores can greth
 
 DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	pci grusbhc haps slink ascs pwm coremp7 spi ac97 \

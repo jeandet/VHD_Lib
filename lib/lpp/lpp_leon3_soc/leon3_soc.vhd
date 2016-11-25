@@ -73,6 +73,7 @@ ENTITY leon3_soc IS
     --
     ADDRESS_SIZE      : INTEGER := 19;
     USES_IAP_MEMCTRLR : INTEGER := 1;
+    USES_MBE_PIN      : INTEGER := 1;
     BYPASS_EDAC_MEMCTRLR : STD_LOGIC := '0';
     SRBANKSZ          : INTEGER := 8;
     SLOW_TIMING_EMULATION : integer := 0
@@ -446,16 +447,23 @@ BEGIN
         );
 
     memi.brdyn <= nSRAM_READY;
+    
+drv_mbe: IF USES_MBE_PIN = 1 GENERATE
+        mbe_pad : iopad
+          GENERIC MAP(tech => padtech, oepol => USES_IAP_MEMCTRLR)
+          PORT MAP(pad => SRAM_MBE,
+                   i   => mbe,
+                   en  => mbe_drive,
+                   o   => memi.bexcn);
 
-    mbe_pad : iopad
-      GENERIC MAP(tech => padtech, oepol => USES_IAP_MEMCTRLR)
-      PORT MAP(pad => SRAM_MBE,
-               i   => mbe,
-               en  => mbe_drive,
-               o   => memi.bexcn);
-
-    nSRAM_CE_s <= (memo.ramsn(1 DOWNTO 0));
-    nSRAM_OE_s <= memo.oen;
+        nSRAM_CE_s <= (memo.ramsn(1 DOWNTO 0));
+        nSRAM_OE_s <= memo.oen;
+    END GENERATE;
+    
+no_drv_mbe: IF USES_MBE_PIN /= 1 GENERATE
+        memi.bexcn <= '1';
+    END GENERATE;
+    
     
   END GENERATE;
 
