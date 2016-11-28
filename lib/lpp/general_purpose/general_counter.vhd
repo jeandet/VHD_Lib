@@ -14,7 +14,7 @@ ENTITY general_counter IS
     clk       : IN  STD_LOGIC;
     rstn      : IN  STD_LOGIC;
     --
-    MAX_VALUE : IN  STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0) := (OTHERS => '1');
+    MAX_VALUE : IN  STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0);
     --
     set       : IN  STD_LOGIC;
     set_value : IN  STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0);

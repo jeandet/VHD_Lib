@@ -37,8 +37,7 @@ entity APB_ADVANCED_TRIGGER is
     pindex   : integer := 0;
     paddr    : integer := 0;
     pmask    : integer := 16#fff#;
-    pirq     : integer := 0;
-    abits    : integer := 8);
+    pirq     : integer := 0);
   port (
     rstn   : in  std_ulogic;
     clk    : in  std_ulogic;
@@ -124,12 +123,12 @@ begin
 
 --APB Write OP
         if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
-            case apbi.paddr(abits-1 downto 2) is
-                when "000000" =>
+            case apbi.paddr(3 downto 2) is
+                when "00" =>
                     r.CFG <= apbi.pwdata;
-                when "000001" =>
+                when "01" =>
                     r.Restart <= apbi.pwdata;
-                when "000010" =>
+                when "10" =>
                     r.StartDate <= apbi.pwdata;
                 when others =>
                     null;
@@ -138,12 +137,12 @@ begin
 
 --APB READ OP
         if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
-            case apbi.paddr(abits-1 downto 2) is
-                when "000000" =>
+            case apbi.paddr(3 downto 2) is
+                when "00" =>
                     Rdata <= r.CFG;
-                when "000001" =>
+                when "01" =>
                     Rdata <= r.Restart;
-                when "000010" =>
+                when "10" =>
                     Rdata <= r.StartDate;
                 when others =>
                     Rdata <= r.Restart;

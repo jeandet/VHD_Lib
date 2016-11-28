@@ -127,19 +127,19 @@ BEGIN
 
       --APB Write OP
       IF (apbi.psel(pindex) AND apbi.penable AND apbi.pwrite) = '1' THEN
-        CASE apbi.paddr(abits-1 DOWNTO 2) IS
-          WHEN "000000" =>
+        CASE apbi.paddr(4 DOWNTO 2) IS
+          WHEN "000" =>
             DAC_CFG     <= apbi.pwdata(3 DOWNTO 0);
             Reload      <= apbi.pwdata(4);
             INTERLEAVED <= apbi.pwdata(5);
-          WHEN "000001" =>
+          WHEN "001" =>
             pre <= apbi.pwdata(PRESZ-1 DOWNTO 0);
-          WHEN "000010" =>
+          WHEN "010" =>
             N <= apbi.pwdata(CPTSZ-1 DOWNTO 0);
-          WHEN "000011" =>
+          WHEN "011" =>
             ADDRESS_IN    <= apbi.pwdata(abits-1 DOWNTO 0);
             LOAD_ADDRESSN <= '0';
-          WHEN "000100" =>
+          WHEN "100" =>
             DATA_IN <= apbi.pwdata(datawidth-1 DOWNTO 0);
             WEN     <= '0';
           WHEN OTHERS =>
@@ -152,22 +152,22 @@ BEGIN
 
       --APB Read OP
       IF (apbi.psel(pindex) AND (NOT apbi.pwrite)) = '1' THEN
-        CASE apbi.paddr(abits-1 DOWNTO 2) IS
-          WHEN "000000" =>
+        CASE apbi.paddr(4 DOWNTO 2) IS
+          WHEN "000" =>
             Rdata(3 DOWNTO 0)  <= DAC_CFG;
             Rdata(4)           <= Reload;
             Rdata(5)           <= INTERLEAVED;
             Rdata(31 DOWNTO 6) <= (OTHERS => '0');
-          WHEN "000001" =>
+          WHEN "001" =>
             Rdata(PRESZ-1 DOWNTO 0) <= pre;
             Rdata(31 DOWNTO PRESZ)  <= (OTHERS => '0');
-          WHEN "000010" =>
+          WHEN "010" =>
             Rdata(CPTSZ-1 DOWNTO 0) <= N;
             Rdata(31 DOWNTO CPTSZ)  <= (OTHERS => '0');
-          WHEN "000011" =>
+          WHEN "011" =>
             Rdata(abits-1 DOWNTO 0) <= ADDRESS_OUT;
             Rdata(31 DOWNTO abits)  <= (OTHERS => '0');
-          WHEN "000100" =>
+          WHEN "100" =>
             Rdata(datawidth-1 DOWNTO 0) <= DATA_IN;
             Rdata(31 DOWNTO datawidth)  <= (OTHERS => '0');
           WHEN OTHERS =>

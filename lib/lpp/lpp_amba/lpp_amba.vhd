@@ -34,8 +34,7 @@ component APB_ADVANCED_TRIGGER is
     pindex   : integer := 0;
     paddr    : integer := 0;
     pmask    : integer := 16#fff#;
-    pirq     : integer := 0;
-    abits    : integer := 8);
+    pirq     : integer := 0);
   port (
     rstn   : in  std_ulogic;
     clk    : in  std_ulogic;

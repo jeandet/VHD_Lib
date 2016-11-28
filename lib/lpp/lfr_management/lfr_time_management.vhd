@@ -38,7 +38,11 @@ ENTITY lfr_time_management IS
     fine_time       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
     fine_time_new   : OUT STD_LOGIC;
     coarse_time     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    coarse_time_new : OUT STD_LOGIC
+    coarse_time_new : OUT STD_LOGIC;
+    
+    ft_counter_low           : out STD_LOGIC_VECTOR( 8 downto 0);
+    ft_counter_low_max_value : out STD_LOGIC_VECTOR( 1 downto 0);
+    ft_counter               : out STD_LOGIC_VECTOR(15 downto 0)
     );
 END lfr_time_management;
 
@@ -92,8 +96,11 @@ BEGIN
       FT_half        => FT_half, 
       FT_wait        => FT_wait, 
       fine_time      => fine_time, 
-      fine_time_new  => fine_time_new);
-
+      fine_time_new  => fine_time_new,
+      ft_counter_low           =>  ft_counter_low          ,       
+      ft_counter_low_max_value =>  ft_counter_low_max_value,
+      ft_counter               =>  ft_counter              
+      );          
   -----------------------------------------------------------------------------
   -- COARSE_TIME
   -----------------------------------------------------------------------------

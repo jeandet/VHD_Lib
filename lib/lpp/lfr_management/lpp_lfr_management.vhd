@@ -70,7 +70,11 @@ PACKAGE lpp_lfr_management IS
       fine_time       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
       fine_time_new   : OUT STD_LOGIC;
       coarse_time     : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      coarse_time_new : OUT STD_LOGIC);
+      coarse_time_new : OUT STD_LOGIC;
+      ft_counter_low           : out STD_LOGIC_VECTOR( 8 downto 0);
+      ft_counter_low_max_value : out STD_LOGIC_VECTOR( 1 downto 0);
+      ft_counter               : out STD_LOGIC_VECTOR(15 downto 0)
+      );
   END COMPONENT;
 
   COMPONENT coarse_time_counter
@@ -103,7 +107,11 @@ PACKAGE lpp_lfr_management IS
       FT_half        : OUT STD_LOGIC;
       FT_wait        : OUT STD_LOGIC;
       fine_time      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-      fine_time_new  : OUT STD_LOGIC);
+      fine_time_new  : OUT STD_LOGIC;    
+      ft_counter_low           : out STD_LOGIC_VECTOR( 8 downto 0);
+      ft_counter_low_max_value : out STD_LOGIC_VECTOR( 1 downto 0);
+      ft_counter               : out STD_LOGIC_VECTOR(15 downto 0)
+      );
   END COMPONENT;
 
   COMPONENT fine_time_max_value_gen

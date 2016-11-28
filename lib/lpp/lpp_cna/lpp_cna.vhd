@@ -41,7 +41,7 @@ component apb_lfr_cal is
     CPTSZ    : integer := 16;
     datawidth : integer := 18;
     dacresolution : integer := 12;
-    abits     : integer := 8);
+    abits         : INTEGER := 8);
   port (
     rstn    : in  std_logic;
     clk     : in  std_logic;

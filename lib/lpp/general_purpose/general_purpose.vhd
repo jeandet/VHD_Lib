@@ -35,13 +35,13 @@ PACKAGE general_purpose IS
 
   COMPONENT general_counter
     GENERIC (
-      CYCLIC          : STD_LOGIC;
-      NB_BITS_COUNTER : INTEGER;
-      RST_VALUE       : INTEGER);
+      CYCLIC          : STD_LOGIC := '1';
+      NB_BITS_COUNTER : INTEGER   := 9;
+      RST_VALUE       : INTEGER   := 0);
     PORT (
       clk       : IN  STD_LOGIC;
       rstn      : IN  STD_LOGIC;
-      MAX_VALUE : IN  STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0);
+      MAX_VALUE : IN  STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0) := (OTHERS => '1');
       set       : IN  STD_LOGIC;
       set_value : IN  STD_LOGIC_VECTOR(NB_BITS_COUNTER-1 DOWNTO 0);
       add1      : IN  STD_LOGIC;

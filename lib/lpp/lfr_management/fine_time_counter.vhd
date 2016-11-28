@@ -23,7 +23,11 @@ ENTITY fine_time_counter IS
     FT_half       : OUT STD_LOGIC;
     FT_wait       : OUT STD_LOGIC;
     fine_time     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-    fine_time_new : OUT STD_LOGIC
+    fine_time_new : OUT STD_LOGIC;
+
+    ft_counter_low           : out STD_LOGIC_VECTOR( 8 downto 0);
+    ft_counter_low_max_value : out STD_LOGIC_VECTOR( 1 downto 0);
+    ft_counter               : out STD_LOGIC_VECTOR(15 downto 0)
     );
 
 END fine_time_counter;
@@ -38,6 +42,8 @@ ARCHITECTURE beh OF fine_time_counter IS
   SIGNAL tick_value_gen : STD_LOGIC;
   SIGNAL FT_max_s : STD_LOGIC;
 
+  SIGNAL ft_counter_low_max_value_s : STD_LOGIC_VECTOR( 1 downto 0);
+  
 BEGIN  -- beh
 
   tick_value_gen <= tick OR FT_max_s;
@@ -102,5 +108,24 @@ BEGIN  -- beh
       END IF;
     END IF;
   END PROCESS;
+
+  ft_counter_low_max_value_s <= "00" when fine_time_max_value = STD_LOGIC_VECTOR(to_unsigned(379,9)) else
+                                "01" when fine_time_max_value = STD_LOGIC_VECTOR(to_unsigned(380,9)) else
+                                "10";-- when fine_time_max_value = STD_LOGIC_VECTOR(to_unsigned(381,9)) 
+
+  process (clk, rstn) is
+  begin  -- process
+    if rstn = '0' then                  -- asynchronous reset (active low)
+      ft_counter_low           <= (others => '0');
+      ft_counter_low_max_value <= (others => '0');
+      ft_counter               <= (others => '0');
+    elsif clk'event and clk = '1' then  -- rising clock edge
+      if tick = '1' then
+        ft_counter_low           <= new_ft_counter;
+        ft_counter_low_max_value <= ft_counter_low_max_value_s;
+        ft_counter <= fine_time_counter;    
+      end if;  
+    end if;
+  end process;
   
 END beh;

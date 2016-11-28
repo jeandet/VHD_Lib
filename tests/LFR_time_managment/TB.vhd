@@ -30,7 +30,7 @@ USE grlib.stdlib.ALL;
 USE grlib.devices.ALL;
 
 LIBRARY lpp;
-USE lpp.lpp_lfr_time_management.ALL;
+USE lpp.lpp_lfr_management.ALL;
 
 ENTITY TB IS
   
@@ -44,7 +44,7 @@ END TB;
 ARCHITECTURE beh OF TB IS
 
   SIGNAL clk25MHz     : STD_LOGIC  := '0';
-  SIGNAL clk24_576MHz : STD_LOGIC  := '0';
+
   SIGNAL resetn       : STD_LOGIC;
   SIGNAL grspw_tick   : STD_LOGIC;
   SIGNAL apbi         : apb_slv_in_type;
@@ -66,28 +66,37 @@ ARCHITECTURE beh OF TB IS
   
 BEGIN  -- beh
 
-  apb_lfr_time_management_1: apb_lfr_time_management
+  apb_lfr_management_1: apb_lfr_management
     GENERIC MAP (
+      tech   => 0,
       pindex => 0,
       paddr  => 0,
       pmask  => 16#fff#,
-      FIRST_DIVISION => 20,
+--      FIRST_DIVISION => 20,
       NB_SECOND_DESYNC => 4)
     PORT MAP (
       clk25MHz     => clk25MHz,
-      clk24_576MHz => clk24_576MHz,
-      resetn       => resetn,
+      resetn_25MHz => resetn,
+      
       grspw_tick   => grspw_tick,
       apbi         => apbi,
       apbo         => apbo,
+
+      HK_sample    => (others => '0'),
+      HK_val       => '0',
+      HK_sel       => OPEN,
+
+      DAC_SDO      => OPEN,
+      DAC_SCK      => OPEN,
+      DAC_SYNC     => OPEN,
+      DAC_CAL_EN   => OPEN,
+            
       coarse_time  => coarse_time,
-      fine_time    => fine_time);
+      fine_time    => fine_time,
+      
+      LFR_soft_rstn => OPEN);
   
   clk25MHz     <= NOT clk25MHz     AFTER 20000 ps;
-  clk24_576MHz <= NOT clk24_576MHz AFTER 20345 ps;
-
-  
-  
 
   PROCESS
   BEGIN  -- PROCESS
