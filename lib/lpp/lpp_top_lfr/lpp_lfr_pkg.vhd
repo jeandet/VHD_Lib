@@ -13,6 +13,13 @@ LIBRARY techmap;
 USE techmap.gencomp.ALL;
 
 PACKAGE lpp_lfr_pkg IS
+
+  constant LPP_LFR_BOARD_MINI_LFR   : std_logic_vector(7 downto 0) := X"00"; -- with fpga A3PE3000
+  constant LPP_LFR_BOARD_LFR_EM     : std_logic_vector(7 downto 0) := X"01"; -- with fpga A3PE3000 
+  constant LPP_LFR_BOARD_LFR_EQM    : std_logic_vector(7 downto 0) := X"02"; -- with fpga A3PE3000 
+  constant LPP_LFR_BOARD_LFR_FM     : std_logic_vector(7 downto 0) := X"03"; -- with fpga RTAX4000D 
+  constant LPP_LFR_BOARD_DISCOSPACE : std_logic_vector(7 downto 0) := X"04"; -- with fpga A3PE3000
+  
   -----------------------------------------------------------------------------
   -- TEMP
   -----------------------------------------------------------------------------

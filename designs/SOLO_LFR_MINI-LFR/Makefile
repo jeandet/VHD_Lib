@@ -14,8 +14,8 @@ VHDLSYNFILES= MINI_LFR_top.vhd
 VHDLSIMFILES= testbench.vhd
 SIMTOP=testbench
 PDC=$(VHDLIB)/boards/$(BOARD)/default.pdc
-SDCFILE=$(VHDLIB)/boards/$(BOARD)/MINI-LFR.sdc
-SDC=$(VHDLIB)/boards/$(BOARD)/MINI-LFR.sdc
+SDCFILE=$(VHDLIB)/boards/$(BOARD)/MINI-LFR_PlaceAndRoute.sdc
+SDC=$(VHDLIB)/boards/$(BOARD)/MINI-LFR_PlaceAndRoute.sdc
 BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut
 CLEAN=soft-clean
 
