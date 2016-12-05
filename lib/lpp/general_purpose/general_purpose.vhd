@@ -33,6 +33,15 @@ USE IEEE.NUMERIC_STD.ALL;
 
 PACKAGE general_purpose IS
 
+  COMPONENT saturation
+    generic (
+      SIZE_INPUT  : integer := 18;
+      SIZE_OUTPUT : integer := 16);
+    port (
+      s_in  : in  std_logic_vector(SIZE_INPUT-1 downto 0);
+      s_out : out std_logic_vector(SIZE_OUTPUT-1 downto 0) );
+  end COMPONENT;
+
   COMPONENT general_counter
     GENERIC (
       CYCLIC          : STD_LOGIC := '1';

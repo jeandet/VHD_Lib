@@ -26,3 +26,4 @@ RR_Arbiter_4.vhd
 general_counter.vhd
 ramp_generator.vhd
 TimeGenAdvancedTrigger.vhd
+saturation.vhd

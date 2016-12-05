@@ -33,6 +33,7 @@ USE lpp.lpp_waveform_pkg.ALL;
 USE lpp.cic_pkg.ALL;
 USE lpp.data_type_pkg.ALL;
 USE lpp.lpp_lfr_filter_coeff.ALL;
+use lpp.general_purpose.all;
 
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
@@ -45,9 +46,10 @@ USE GRLIB.DMA2AHB_Package.ALL;
 
 ENTITY lpp_lfr_filter IS
   GENERIC(
-    tech         : INTEGER := 0;
+    tech                    : INTEGER := 0;
     Mem_use                 : INTEGER := use_RAM;
-    RTL_DESIGN_LIGHT        : INTEGER := 0
+    RTL_DESIGN_LIGHT        : INTEGER := 0;
+    DATA_SHAPING_SATURATION : INTEGER := 1
     );
   PORT (
     sample           : IN Samples(7 DOWNTO 0);
@@ -116,12 +118,14 @@ ARCHITECTURE tb OF lpp_lfr_filter IS
   SIGNAL sample_filter_v2_out     : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
   -----------------------------------------------------------------------------
   SIGNAL sample_data_shaping_out_val     : STD_LOGIC;
-  SIGNAL sample_data_shaping_out         : samplT(ChanelCount-1 DOWNTO 0, 17 DOWNTO 0);
+  SIGNAL sample_data_shaping_out         : samplT(ChanelCount-1 DOWNTO 0, 15 DOWNTO 0);
   SIGNAL sample_data_shaping_f0_s        : STD_LOGIC_VECTOR(17 DOWNTO 0);
   SIGNAL sample_data_shaping_f1_s        : STD_LOGIC_VECTOR(17 DOWNTO 0);
   SIGNAL sample_data_shaping_f2_s        : STD_LOGIC_VECTOR(17 DOWNTO 0);
-  SIGNAL sample_data_shaping_f1_f0_s     : STD_LOGIC_VECTOR(17 DOWNTO 0);
-  SIGNAL sample_data_shaping_f2_f1_s     : STD_LOGIC_VECTOR(17 DOWNTO 0);
+  SIGNAL sample_data_shaping_f1_f0_s     : STD_LOGIC_VECTOR(18 DOWNTO 0);
+  SIGNAL sample_data_shaping_f2_f1_s     : STD_LOGIC_VECTOR(18 DOWNTO 0);
+  SIGNAL sample_data_shaping_f1_f0_saturated_s : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL sample_data_shaping_f2_f1_saturated_s : STD_LOGIC_VECTOR(15 DOWNTO 0);
   -----------------------------------------------------------------------------
   SIGNAL sample_filter_v2_out_val_s      : STD_LOGIC;
   SIGNAL sample_filter_v2_out_s          : samplT(ChanelCount-1 DOWNTO 0, 15 DOWNTO 0);
@@ -311,9 +315,32 @@ BEGIN
     sample_data_shaping_f2_s(I) <= sample_filter_v2_out(2, I);
   END GENERATE all_data_shaping_in_loop;
 
-  sample_data_shaping_f1_f0_s <= sample_data_shaping_f1_s - sample_data_shaping_f0_s;
-  sample_data_shaping_f2_f1_s <= sample_data_shaping_f2_s - sample_data_shaping_f1_s;
+  sample_data_shaping_f1_f0_s <= STD_LOGIC_VECTOR(resize( SIGNED(sample_data_shaping_f1_s) - SIGNED(sample_data_shaping_f0_s),19));
+  sample_data_shaping_f2_f1_s <= STD_LOGIC_VECTOR(resize( SIGNED(sample_data_shaping_f2_s) - SIGNED(sample_data_shaping_f1_s),19));
 
+  DATA_SHAPING_SATURATION_ENABLED: if DATA_SHAPING_SATURATION = 1 generate
+    saturation_SP0 : saturation
+      generic map (
+        SIZE_INPUT  => 19,
+        SIZE_OUTPUT => 16)
+      port map (
+        s_in  => sample_data_shaping_f1_f0_s,
+        s_out => sample_data_shaping_f1_f0_saturated_s );
+
+    saturation_SP1 : saturation
+      generic map (
+        SIZE_INPUT  => 19,
+        SIZE_OUTPUT => 16)
+      port map (
+        s_in  => sample_data_shaping_f2_f1_s,
+        s_out => sample_data_shaping_f2_f1_saturated_s );
+  end generate DATA_SHAPING_SATURATION_ENABLED;
+
+  DATA_SHAPING_SATURATION_DISABLED: if DATA_SHAPING_SATURATION = 0 generate
+    sample_data_shaping_f1_f0_saturated_s <= sample_data_shaping_f1_f0_s(16 downto 1);
+    sample_data_shaping_f2_f1_saturated_s <= sample_data_shaping_f2_f1_s(16 downto 1);    
+  end generate DATA_SHAPING_SATURATION_DISABLED;
+  
   PROCESS (clk, rstn)
   BEGIN  -- PROCESS
     IF rstn = '0' THEN                  -- asynchronous reset (active low)
@@ -323,7 +350,7 @@ BEGIN
     END IF;
   END PROCESS;
 
-  SampleLoop_data_shaping : FOR j IN 0 TO 17 GENERATE
+  SampleLoop_data_shaping : FOR j IN 0 TO 15 GENERATE
     PROCESS (clk, rstn)
     BEGIN
       IF rstn = '0' THEN
@@ -338,12 +365,12 @@ BEGIN
       ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
         sample_data_shaping_out(0, j) <= sample_filter_v2_out(0, j);
         IF data_shaping_SP0 = '1' THEN
-          sample_data_shaping_out(1, j) <= sample_data_shaping_f1_f0_s(j);
+          sample_data_shaping_out(1, j) <= sample_data_shaping_f1_f0_saturated_s(j);
         ELSE
           sample_data_shaping_out(1, j) <= sample_filter_v2_out(1, j);
         END IF;
         IF data_shaping_SP1 = '1' THEN
-          sample_data_shaping_out(2, j) <= sample_data_shaping_f2_f1_s(j);
+          sample_data_shaping_out(2, j) <= sample_data_shaping_f2_f1_saturated_s(j);
         ELSE
           sample_data_shaping_out(2, j) <= sample_filter_v2_out(2, j);
         END IF;

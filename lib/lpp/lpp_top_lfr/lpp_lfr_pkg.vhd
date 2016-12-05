@@ -179,7 +179,8 @@ PACKAGE lpp_lfr_pkg IS
     GENERIC (
       tech                    : INTEGER;
       Mem_use                 : INTEGER;
-      RTL_DESIGN_LIGHT        : INTEGER
+      RTL_DESIGN_LIGHT        : INTEGER;
+      DATA_SHAPING_SATURATION : INTEGER
       );
     PORT (
       sample           : IN  Samples(7 DOWNTO 0);
@@ -225,7 +226,8 @@ PACKAGE lpp_lfr_pkg IS
       top_lfr_version        : STD_LOGIC_VECTOR(23 DOWNTO 0);
       DEBUG_FORCE_DATA_DMA   : INTEGER;
       RTL_DESIGN_LIGHT       : INTEGER;
-      WINDOWS_HAANNING_PARAM_SIZE : INTEGER
+      WINDOWS_HAANNING_PARAM_SIZE : INTEGER;
+      DATA_SHAPING_SATURATION : INTEGER
       );
     PORT (
       clk             : IN  STD_LOGIC;
