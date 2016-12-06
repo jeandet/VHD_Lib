@@ -494,7 +494,8 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => LPP_LFR_BOARD_MINI_LFR & X"015A")  -- aa.bb.cc version
+      top_lfr_version        => LPP_LFR_BOARD_MINI_LFR & X"015B",
+      DATA_SHAPING_SATURATION => 1)  -- aa.bb.cc version
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
