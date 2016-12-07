@@ -193,7 +193,8 @@ BEGIN
     GENERIC MAP (
       tech             => tech,
       Mem_use          => Mem_use,
-      RTL_DESIGN_LIGHT => RTL_DESIGN_LIGHT)
+      RTL_DESIGN_LIGHT => RTL_DESIGN_LIGHT,
+      DATA_SHAPING_SATURATION => DATA_SHAPING_SATURATION)
     PORT MAP (
       sample           => sample_s,
       sample_val       => sample_val,
