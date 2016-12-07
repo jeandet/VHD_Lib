@@ -35,15 +35,14 @@ use lpp.general_purpose.TimeGenAdvancedTrigger;
 entity APB_ADVANCED_TRIGGER is
   generic (
     pindex   : integer := 0;
-    paddr    : integer := 0;
-    pmask    : integer := 16#fff#;
-    pirq     : integer := 0);
+    paddr    : integer := 0
+    );
   port (
     rstn   : in  std_ulogic;
     clk    : in  std_ulogic;
     apbi   : in  apb_slv_in_type;
     apbo   : out apb_slv_out_type;
-    
+
     SPW_Tickout : IN STD_LOGIC;
     CoarseTime  : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     FineTime    : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -59,7 +58,7 @@ constant REVISION : integer := 1;
 
 constant pconfig : apb_config_type := (
   0 => ahb_device_reg (VENDOR_LPP, LPP_APB_ADVANCED_TRIGGER, 0, REVISION, 0),
-  1 => apb_iobar(paddr, pmask));
+  1 => apb_iobar(paddr,  16#fff#));
 
 
 
@@ -116,19 +115,20 @@ adv_trig0: TimeGenAdvancedTrigger
 process(rstn,clk)
 begin
     if rstn = '0' then
-        r.CFG        <= (others=>'0');
+        r.CFG(31 DOWNTO 1)   <= (others=>'0');
+        r.CFG(0)     <= '0';
         r.Restart    <= (others=>'0');
         r.StartDate  <= (others=>'0');
     elsif clk'event and clk = '1' then
 
 --APB Write OP
         if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
-            case apbi.paddr(3 downto 2) is
-                when "00" =>
+            case apbi.paddr(8-1 downto 2) is
+                when "000000" =>
                     r.CFG <= apbi.pwdata;
-                when "01" =>
+                when "000001" =>
                     r.Restart <= apbi.pwdata;
-                when "10" =>
+                when "000010" =>
                     r.StartDate <= apbi.pwdata;
                 when others =>
                     null;
@@ -137,21 +137,23 @@ begin
 
 --APB READ OP
         if (apbi.psel(pindex) and (not apbi.pwrite)) = '1' then
-            case apbi.paddr(3 downto 2) is
-                when "00" =>
+            case apbi.paddr(8-1 downto 2) is
+                when "000000" =>
                     Rdata <= r.CFG;
-                when "01" =>
+                when "000001" =>
                     Rdata <= r.Restart;
-                when "10" =>
+                when "000010" =>
                     Rdata <= r.StartDate;
                 when others =>
                     Rdata <= r.Restart;
             end case;
         end if;
-    
+
     end if;
-    apbo.pconfig <= pconfig;
 end process;
 
+apbo.pconfig    <=   pconfig;
 apbo.prdata     <=   Rdata when apbi.penable = '1';
+apbo.pirq    <= (OTHERS => '0');
+apbo.pindex  <= pindex;
 end beh;

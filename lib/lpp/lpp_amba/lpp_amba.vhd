@@ -32,9 +32,8 @@ package lpp_amba is
 component APB_ADVANCED_TRIGGER is
   generic (
     pindex   : integer := 0;
-    paddr    : integer := 0;
-    pmask    : integer := 16#fff#;
-    pirq     : integer := 0);
+    paddr    : integer := 0
+    );
   port (
     rstn   : in  std_ulogic;
     clk    : in  std_ulogic;
@@ -46,6 +45,26 @@ component APB_ADVANCED_TRIGGER is
     FineTime    : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 
     Trigger     : OUT STD_LOGIC
+    );
+end component;
+
+component APB_ADVANCED_TRIGGER_v is
+  generic (
+    pindex   : integer;
+    paddr    : integer;
+    count    : integer range 1 to 8 := 1
+  );
+  port (
+    rstn   : in  std_ulogic;
+    clk    : in  std_ulogic;
+    apbi   : in  apb_slv_in_type;
+    apbo   : out apb_slv_out_type;
+
+    SPW_Tickout : IN STD_LOGIC;
+    CoarseTime  : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    FineTime    : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+
+    Trigger     : OUT STD_LOGIC_VECTOR(count-1 DOWNTO 0)
     );
 end component;
 
