@@ -44,6 +44,7 @@ PACKAGE apb_devices_list IS
   CONSTANT LPP_DEBUG_LFR       : amba_device_type := 16#A1#;
   constant APB_ADC_READER      : amba_device_type := 16#F1#;
   CONSTANT LPP_DEBUG_LFR_ID    : amba_device_type := 16#A2#;
-  CONSTANT LPP_APB_ADVANCED_TRIGGER    : amba_device_type := 16#A3#;
-  
+  CONSTANT LPP_APB_ADVANCED_TRIGGER      : amba_device_type := 16#A3#;
+  CONSTANT LPP_APB_ADVANCED_TRIGGER_v    : amba_device_type := 16#A4#;
+
 END;
