@@ -2,7 +2,7 @@ VHDLIB=../..
 SCRIPTSDIR=$(VHDLIB)/scripts/
 GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
 TOP=LFR_em
-BOARD=em-LeonLPP-A3PE3kL-v3-core1
+BOARD=LFR-EM
 include $(VHDLIB)/boards/$(BOARD)/Makefile.inc
 DEVICE=$(PART)-$(PACKAGE)$(SPEED)
 UCF=$(GRLIB)/boards/$(BOARD)/$(TOP).ucf
@@ -13,9 +13,9 @@ SYNPOPT="set_option -pipe 0; set_option -retiming 0; set_option -write_apr_const
 VHDLSYNFILES=LFR-em.vhd
 VHDLSIMFILES=testbench.vhd
 
-PDC=$(VHDLIB)/boards/$(BOARD)/em-LeonLPP-A3PE3kL_withHK-DAC.pdc
+PDC=$(VHDLIB)/boards/$(BOARD)/LFR-EM.pdc
 
-SDCFILE=$(VHDLIB)/boards/$(BOARD)/LFR_EM_synthesis.sdc
+SDCFILE=$(VHDLIB)/boards/$(BOARD)/LFR_EM_place_and_route.sdc
 SDC=$(VHDLIB)/boards/$(BOARD)/LFR_EM_place_and_route.sdc
 
 BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut

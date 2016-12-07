@@ -425,11 +425,9 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"010153",  -- aa.bb.cc version
-                                            -- AA : BOARD NUMBER
-                                            --      0 => MINI_LFR
-                                            --      1 => EM
-      DEBUG_FORCE_DATA_DMA  => 0)      
+      top_lfr_version        => LPP_LFR_BOARD_LFR_EM & X"015B",
+      DEBUG_FORCE_DATA_DMA    => 0,
+      DATA_SHAPING_SATURATION => 1 )      
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
