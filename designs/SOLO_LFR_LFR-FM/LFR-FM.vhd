@@ -51,7 +51,7 @@ USE lpp.lpp_leon3_soc_pkg.ALL;
 --library proasic3l;
 --use proasic3l.all;
 
-ENTITY LFR_EQM IS
+ENTITY LFR_FM IS
   GENERIC (
     Mem_use                : INTEGER := use_RAM;
     USE_BOOTLOADER         : INTEGER := 0;
@@ -113,10 +113,10 @@ ENTITY LFR_EQM IS
     HK_SEL         : OUT   STD_LOGIC_VECTOR(1 DOWNTO 0)
     );
 
-END LFR_EQM;
+END LFR_FM;
 
 
-ARCHITECTURE beh OF LFR_EQM IS
+ARCHITECTURE beh OF LFR_FM IS
   
   SIGNAL clk_25_int  : STD_LOGIC := '0';
   SIGNAL clk_25      : STD_LOGIC := '0';

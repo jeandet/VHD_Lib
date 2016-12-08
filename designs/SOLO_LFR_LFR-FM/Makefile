@@ -2,8 +2,8 @@ VHDLIB=../..
 SCRIPTSDIR=$(VHDLIB)/scripts/
 GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
 
-TOP=LFR_EQM
-BOARD=LFR-EQM
+TOP=LFR_FM
+BOARD=LFR-FM
 
 include $(VHDLIB)/boards/$(BOARD)/Makefile_RTAX.inc
 
@@ -13,10 +13,10 @@ QSF=$(GRLIB)/boards/$(BOARD)/$(TOP).qsf
 EFFORT=high
 XSTOPT=
 
-VHDLSYNFILES=LFR-EQM.vhd
-VHDLSIMFILES=testbench.vhd
+VHDLSYNFILES=LFR-FM.vhd
+VHDLSIMFILES=
 
-PDC=$(VHDLIB)/boards/$(BOARD)/LFR_EQM_RTAX.pdc
+PDC=$(VHDLIB)/boards/$(BOARD)/LFR_FM_RTAX.pdc
 SDC=$(VHDLIB)/boards/$(BOARD)/LFR_EQM_altran_syn_fanout.sdc
 
 BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut
