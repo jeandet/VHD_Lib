@@ -17,7 +17,7 @@ VHDLSYNFILES=LFR-FM.vhd
 VHDLSIMFILES=
 
 PDC=$(VHDLIB)/boards/$(BOARD)/LFR_FM_RTAX.pdc
-SDC=$(VHDLIB)/boards/$(BOARD)/LFR_EQM_altran_syn_fanout.sdc
+SDC=$(VHDLIB)/boards/$(BOARD)/LFR_FM_RTAX_layout.sdc
 
 BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut
 CLEAN=soft-clean
