@@ -1,8 +1,8 @@
 VHDLIB=../..
 SCRIPTSDIR=$(VHDLIB)/scripts/
 GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
-TOP=testbench
-BOARD=LFR-EQM
+TOP=TB
+BOARD=LFR-FM
 include $(VHDLIB)/boards/$(BOARD)/Makefile_RTAX.inc
 DEVICE=$(PART)-$(PACKAGE)$(SPEED)
 UCF=
@@ -11,8 +11,8 @@ EFFORT=high
 XSTOPT=
 SYNPOPT=
 VHDLSYNFILES=
-VHDLSIMFILES= tb.vhd
-SIMTOP=TB
+VHDLSIMFILES= TB.vhd
+SIMTOP=tb
 CLEAN=soft-clean
 
 TECHLIBS = axcelerator
