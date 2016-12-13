@@ -452,12 +452,9 @@ BEGIN  -- beh
       pirq_ms                => 6,
       pirq_wfp               => 14,
       hindex                 => 2,
-      top_lfr_version        => X"020153",  -- aa.bb.cc version
-                                            -- AA : BOARD NUMBER
-                                            --      0 => MINI_LFR
-                                            --      1 => EM
-                                            --      2 => EQM (with A3PE3000)
-      DEBUG_FORCE_DATA_DMA  => DEBUG_FORCE_DATA_DMA)
+      top_lfr_version        => LPP_LFR_BOARD_LFR_EQM & "015B",
+      DEBUG_FORCE_DATA_DMA  => DEBUG_FORCE_DATA_DMA,
+      DATA_SHAPING_SATURATION => 1)
     PORT MAP (
       clk             => clk_25,
       rstn            => LFR_rstn,
