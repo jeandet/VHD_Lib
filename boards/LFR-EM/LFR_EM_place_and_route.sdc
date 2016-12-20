@@ -22,9 +22,9 @@ create_clock  -name { clk_25:Q } -period 40.000 -waveform { 0.000 20.000  }  { c
 
 create_clock  -name { clk_24:Q } -period 40.690 -waveform { 0.000 20.345  }  { clk_24:Q  }
 
-create_clock  -name { SPW1_CLK } -period 100.000 -waveform { 0.000 50.000  }  { spw_inputloop.1.spw_phy0/ntstrxclk.rx_clkbuf/pa3e.pae30/buf1.buf_RNO:Y  }
+create_clock  -name { SPW1_CLK } -period 100.000 -waveform { 0.000 50.000  }  { spw_inputloop.1.spw_phy0/rxclki_RNO:Y }
 
-create_clock  -name { SPW0_CLK } -period 100.000 -waveform { 0.000 50.000  }  { spw_inputloop.0.spw_phy0/ntstrxclk.rx_clkbuf/pa3e.pae30/buf1.buf_RNO:Y  }
+create_clock  -name { SPW0_CLK } -period 100.000 -waveform { 0.000 50.000  }  { spw_inputloop.0.spw_phy0/rxclki_RNO:Y }
 
 
 
@@ -83,9 +83,9 @@ set_min_delay 0.000  -from [get_clocks {clk_25:Q}]  -to [get_ports { nSRAM_BE0 n
 
 ########   Delay Constraints  ########
 
-set_max_delay 4.000 -from [get_ports { spw2_sin spw2_din spw1_sin spw1_din reset }]  -to [get_clocks { spw_inputloop.1.spw_phy0/ntstrxclk.rx_clkbuf/pa3e.pae30/buf1.buf_RNO:Y}]
+set_max_delay 4.000 -from [get_ports { spw2_sin spw2_din spw1_sin spw1_din reset }]  -to [get_clocks { spw_inputloop.1.spw_phy0/rxclki_RNO:Y}]
 
-set_max_delay 4.000 -from [get_ports { spw2_sin spw2_din spw1_sin spw1_din reset }]  -to [get_clocks {spw_inputloop.0.spw_phy0/ntstrxclk.rx_clkbuf/pa3e.pae30/buf1.buf_RNO:Y}]
+set_max_delay 4.000 -from [get_ports { spw2_sin spw2_din spw1_sin spw1_din reset }]  -to [get_clocks { spw_inputloop.0.spw_phy0/rxclki_RNO:Y}]
 
 
 ########   Delay Constraints  ########
