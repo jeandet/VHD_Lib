@@ -93,7 +93,7 @@ with open("run.do.in","r") as inFile, open("run.do","w") as outFile:
     input = inFile.read()
     outFile.write(input.replace("#RAM_INIT#",args))
 
-W,H=8,400
+W,H=8,100000
 test = np.ones((H,W))*[(random.random()*65535)-32768 for col in range(W)]
 np.savetxt("input.txt", test,fmt="%d", delimiter=" ")
   
