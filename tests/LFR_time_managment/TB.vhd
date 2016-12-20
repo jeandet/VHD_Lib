@@ -21,8 +21,11 @@
 -------------------------------------------------------------------------------
 
 LIBRARY IEEE;
+use ieee.std_logic_textio.all; 
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
+use std.textio.all; 
+
 
 LIBRARY grlib;
 USE grlib.amba.ALL;
@@ -63,7 +66,10 @@ ARCHITECTURE beh OF TB IS
   SIGNAL ASSERTION_1 : STD_LOGIC;
   SIGNAL ASSERTION_2 : STD_LOGIC;
   SIGNAL ASSERTION_3 : STD_LOGIC;
-  
+  SIGNAL ASSERTION_3_ERROR : STD_LOGIC;
+
+  SIGNAL end_of_simu : STD_LOGIC := '0';
+    
 BEGIN  -- beh
 
   apb_lfr_management_1: apb_lfr_management
@@ -95,14 +101,28 @@ BEGIN  -- beh
       fine_time    => fine_time,
       
       LFR_soft_rstn => OPEN);
+
+  -----------------------------------------------------------------------------
+  -- CLOCK GEN
+  PROCESS IS
+  BEGIN  -- PROCESS
+    IF end_of_simu /= '1' THEN
+      clk25MHz     <= NOT clk25MHz;
+      WAIT FOR 20000 ps;
+    ELSE
+      WAIT FOR 20 ps;
+      ASSERT false REPORT "END OF TEST" SEVERITY note;
+      WAIT;
+    END IF;
+  END PROCESS;
+  -----------------------------------------------------------------------------
   
-  clk25MHz     <= NOT clk25MHz     AFTER 20000 ps;
 
   PROCESS
   BEGIN  -- PROCESS
     WAIT UNTIL clk25MHz = '1';
-    TB_string <= "RESET   ";
-  
+    TB_string <= "RESET   ";  REPORT "RESET" SEVERITY note;
+    
     resetn        <= '0';
     
     apbi.psel(0)  <= '0';
@@ -119,25 +139,25 @@ BEGIN  -- beh
     -- DESYNC TO SYNC 
     ---------------------------------------------------------------------------
     WAIT UNTIL clk25MHz = '1';
-    TB_string <= "TICK 1  ";
+    TB_string <= "TICK 1  "; REPORT "Tick 1" SEVERITY note;
     grspw_tick   <= '1';------------------------------------------------------1
     WAIT UNTIL clk25MHz = '1';
     grspw_tick   <= '0';
     WAIT FOR 53333 us;
     WAIT UNTIL clk25MHz = '1';
-    TB_string <= "TICK 2  ";
+    TB_string <= "TICK 2  "; REPORT "Tick 2" SEVERITY note;
     grspw_tick   <= '1';------------------------------------------------------2
     WAIT UNTIL clk25MHz = '1';
     grspw_tick   <= '0';
     WAIT FOR 56000 us;
     WAIT UNTIL clk25MHz = '1';
-    TB_string <= "TICK 3  ";
+    TB_string <= "TICK 3  "; REPORT "Tick 3" SEVERITY note;
     grspw_tick   <= '1';------------------------------------------------------3
     WAIT UNTIL clk25MHz = '1';
     grspw_tick   <= '0';
     WAIT FOR 200 ms;
     WAIT UNTIL clk25MHz = '1';
-    TB_string <= "CT new  ";
+    TB_string <= "CT new  "; REPORT "CT new" SEVERITY note;
     -- WRITE NEW COARSE_TIME
     apbi.psel(0)      <= '1';
     apbi.pwrite       <= '1';
@@ -154,7 +174,7 @@ BEGIN  -- beh
     
     WAIT FOR 10 ms;
     WAIT UNTIL clk25MHz = '1';
-    TB_string <= "TICK 4  ";
+    TB_string <= "TICK 4  "; REPORT "Tick 4" SEVERITY note;
     grspw_tick   <= '1';------------------------------------------------------3
     WAIT UNTIL clk25MHz = '1';
     grspw_tick   <= '0';
@@ -162,7 +182,7 @@ BEGIN  -- beh
     
     WAIT FOR 250 ms;
     WAIT UNTIL clk25MHz = '1';
-    TB_string <= "CT new  ";
+    TB_string <= "CT new  "; REPORT "CT new" SEVERITY note;
     -- WRITE NEW COARSE_TIME
     apbi.psel(0)      <= '1';
     apbi.pwrite       <= '1';
@@ -179,7 +199,7 @@ BEGIN  -- beh
     
     WAIT FOR 10 ms;
     WAIT UNTIL clk25MHz = '1';
-    TB_string <= "TICK 5  ";
+    TB_string <= "TICK 5  "; REPORT "Tick 5" SEVERITY note;
     grspw_tick   <= '1';------------------------------------------------------3
     WAIT UNTIL clk25MHz = '1';
     grspw_tick   <= '0';
@@ -187,7 +207,7 @@ BEGIN  -- beh
     
     WAIT FOR 20 ms;
     WAIT UNTIL clk25MHz = '1';
-    TB_string <= "CT new  ";
+    TB_string <= "CT new  "; REPORT "CT new" SEVERITY note;
     -- WRITE NEW COARSE_TIME
     apbi.psel(0)      <= '1';
     apbi.pwrite       <= '1';
@@ -204,7 +224,7 @@ BEGIN  -- beh
     
     WAIT FOR 25 ms;
     WAIT UNTIL clk25MHz = '1';
-    TB_string <= "Soft RST";
+    TB_string <= "Soft RST"; REPORT "Soft Reset" SEVERITY note;
     -- WRITE SOFT RESET
     apbi.psel(0)      <= '1';
     apbi.pwrite       <= '1';
@@ -220,7 +240,7 @@ BEGIN  -- beh
     WAIT UNTIL clk25MHz = '1';
     
     WAIT FOR 250 ms;
-    TB_string <= "READ 1  ";
+    TB_string <= "READ 1  "; REPORT "Read 1" SEVERITY note;
     apbi.psel(0)      <= '1';
     apbi.pwrite       <= '0';
     apbi.penable      <= '1';
@@ -232,7 +252,7 @@ BEGIN  -- beh
     apbi.paddr        <= (OTHERS => '0');
     WAIT UNTIL clk25MHz = '1';
     WAIT FOR 250 ms;
-    TB_string <= "READ 2  ";
+    TB_string <= "READ 2  "; REPORT "Read 2" SEVERITY note;
     apbi.psel(0)      <= '1';
     apbi.pwrite       <= '0';
     apbi.penable      <= '1';
@@ -244,7 +264,7 @@ BEGIN  -- beh
     apbi.paddr        <= (OTHERS => '0');
     WAIT UNTIL clk25MHz = '1';
     WAIT FOR 250 ms;
-    TB_string <= "READ 3  ";
+    TB_string <= "READ 3  "; REPORT "Read 3" SEVERITY note;
     apbi.psel(0)      <= '1';
     apbi.pwrite       <= '0';
     apbi.penable      <= '1';
@@ -255,10 +275,32 @@ BEGIN  -- beh
     apbi.penable      <= '0';
     apbi.paddr        <= (OTHERS => '0');
     WAIT UNTIL clk25MHz = '1';
+    WAIT FOR 10 ps;
+    end_of_simu <= '1';
+    REPORT "end_of_simu set to 1" SEVERITY note;
 
+    IF ASSERTION_1 = '1' THEN
+      REPORT "ASSERTION 1 : **UPDATE(CoarseTime) => RESET(fineTime)**  OK" SEVERITY note;
+    ELSE
+      REPORT "ASSERTION 1 : **UPDATE(CoarseTime) => RESET(fineTime)**  !! FAILED !!" SEVERITY note;
+    END IF;
 
-        
-    REPORT "*** END simulation ***" SEVERITY failure;
+    IF ASSERTION_2 = '1' THEN
+      REPORT "ASSERTION 2 : **Tick => NEXT(fineTime) = RESET(fineTime) OK" SEVERITY note;
+    ELSE
+      REPORT "ASSERTION 2 : **Tick => NEXT(fineTime) = RESET(fineTime) !! FAILED !!" SEVERITY note;
+    END IF;
+    
+    IF ASSERTION_3 = '1' THEN
+      REPORT "ASSERTION 3 : **NEXT(TIME) > TIME **                     OK" SEVERITY note;
+    ELSE
+      REPORT "ASSERTION 3 : **NEXT(TIME) > TIME **                     !! FAILED !!" SEVERITY note;
+    END IF;
+
+    
+
+    
+    ASSERT false REPORT "*** END simulation ***" SEVERITY note;
     WAIT;   
     
   END PROCESS;
@@ -298,17 +340,26 @@ BEGIN  -- beh
   -- False after a TRANSITION !
   -----------------------------------------------------------------------------
   PROCESS (clk25MHz, resetn)
+    VARIABLE coarse_time_integer : INTEGER;
   BEGIN  -- PROCESS
     IF resetn = '0' THEN                -- asynchronous reset (active low)
       ASSERTION_1 <= '1';
     ELSIF clk25MHz'event AND clk25MHz = '1' THEN  -- rising clock edge
+      coarse_time_integer := to_integer(UNSIGNED(coarse_time));
+      
       IF coarse_time /= coarse_time_reg THEN
         IF fine_time /= X"0000" THEN
           IF fine_time /= X"0041" THEN
             ASSERTION_1 <= '0';
+            REPORT "ASSERTION 1 : **UPDATE(CoarseTime) => RESET(fineTime)**                     !! FAILED !!  " SEVERITY note;
           ELSE
+            REPORT "ASSERTION 1 : **UPDATE(CoarseTime) => RESET(fineTime)** false after a transition" SEVERITY note;
             ASSERTION_1 <= 'U';            
           END IF;
+          REPORT "COARSE_TIME_REG= " & integer'IMAGE(to_integer(UNSIGNED(coarse_time_reg))) SEVERITY note;
+          REPORT "COARSE_TIME    = " & integer'IMAGE(to_integer(UNSIGNED(coarse_time    ))) SEVERITY note;
+          REPORT "FINE_TIME_REG  = " & integer'IMAGE(to_integer(UNSIGNED(fine_time_reg  ))) SEVERITY note;
+          REPORT "FINE_TIME      = " & integer'IMAGE(to_integer(UNSIGNED(fine_time      ))) SEVERITY note;
         ELSE
           ASSERTION_1 <= '1';          
         END IF;
@@ -328,7 +379,12 @@ BEGIN  -- beh
       IF tick_ongoing = '1'  THEN
         IF fine_time_reg /= fine_time OR coarse_time_reg /= coarse_time THEN
           IF fine_time /= X"0000" THEN
+            REPORT "ASSERTION 2 : **Tick => NEXT(fineTime) = RESET(fineTime)                    !! FAILED !!  " SEVERITY note;
             ASSERTION_2 <= '0';
+          REPORT "COARSE_TIME_REG= " & integer'IMAGE(to_integer(UNSIGNED(coarse_time_reg))) SEVERITY note;
+          REPORT "COARSE_TIME    = " & integer'IMAGE(to_integer(UNSIGNED(coarse_time    ))) SEVERITY note;
+          REPORT "FINE_TIME_REG  = " & integer'IMAGE(to_integer(UNSIGNED(fine_time_reg  ))) SEVERITY note;
+          REPORT "FINE_TIME      = " & integer'IMAGE(to_integer(UNSIGNED(fine_time      ))) SEVERITY note;
           END IF;
         END IF;
       END IF;
@@ -343,15 +399,21 @@ BEGIN  -- beh
   PROCESS (clk25MHz, resetn)
   BEGIN  -- PROCESS
     IF resetn = '0' THEN                -- asynchronous reset (active low)
-      ASSERTION_3 <= '1';
+      ASSERTION_3       <= '1';
     ELSIF clk25MHz'event AND clk25MHz = '1' THEN  -- rising clock edge
       ASSERTION_3 <= '1';
       IF global_time_reg(46 DOWNTO 0) > global_time(46 DOWNTO 0) THEN
         IF global_time(47) = '0' AND global_time_reg(47) = '1' THEN
+          REPORT "ASSERTION 3 : **NEXT(TIME) > TIME ** can be false after a resynchro" SEVERITY note;
           ASSERTION_3 <= 'U';           -- RESYNCHRO ....
         ELSE
+          REPORT "ASSERTION 3 : **NEXT(TIME) > TIME ** can be false after a NEW coarse time" SEVERITY note;
           ASSERTION_3 <= '0';                 
         END IF;
+        REPORT "COARSE_TIME_REG= " & integer'IMAGE(to_integer(UNSIGNED(coarse_time_reg))) SEVERITY note;
+        REPORT "COARSE_TIME    = " & integer'IMAGE(to_integer(UNSIGNED(coarse_time    ))) SEVERITY note;
+        REPORT "FINE_TIME_REG  = " & integer'IMAGE(to_integer(UNSIGNED(fine_time_reg  ))) SEVERITY note;
+        REPORT "FINE_TIME      = " & integer'IMAGE(to_integer(UNSIGNED(fine_time      ))) SEVERITY note;
       END IF;
     END IF;
   END PROCESS;
