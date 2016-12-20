@@ -24,8 +24,8 @@ USE lpp.lpp_sim_pkg.ALL;
 
 ENTITY testbench IS
 GENERIC(
-    tech          : INTEGER := 0; --axcel,0
-    Mem_use       : INTEGER := use_CEL --use_RAM,use_CEL
+    tech          : INTEGER := axcel; --axcel,0
+    Mem_use       : INTEGER := use_RAM --use_RAM,use_CEL
 );
 END;
 
@@ -121,7 +121,7 @@ BEGIN
       tech    => tech,
       Mem_use => Mem_use,
       RTL_DESIGN_LIGHT =>0,
-      DATA_SHAPING_SATURATION => 0
+      DATA_SHAPING_SATURATION => 0                 
       )
     PORT MAP (
       sample           => sample,
@@ -158,12 +158,14 @@ BEGIN
       sample_val <= '0';
       clk_98304Hz_r  <= '0';
     ELSIF clk'EVENT AND clk = '1' THEN  -- rising clock edge
-      clk_98304Hz_r <= clk_98304Hz;
-      IF clk_98304Hz = '1' AND clk_98304Hz_r = '0' THEN
-        sample_val <= '1';
-      ELSE
-        sample_val <= '0';
-      END IF;
+        IF end_of_simu /= '1' THEN
+            clk_98304Hz_r <= clk_98304Hz;
+            IF clk_98304Hz = '1' AND clk_98304Hz_r = '0' THEN
+                sample_val <= '1';
+            ELSE
+                sample_val <= '0';
+            END IF;
+        END IF;
     END IF;
   END PROCESS;
   -----------------------------------------------------------------------------

@@ -3,7 +3,7 @@ SELFDIR := $(dir $(lastword $(MAKEFILE_LIST)))
 SCRIPTSDIR=$(VHDLIB)/scripts/
 GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
 TOP=testbench
-BOARD=LFR-EQM
+BOARD=LFR-FM
 include $(VHDLIB)/boards/$(BOARD)/Makefile_RTAX.inc
 DEVICE=$(PART)-$(PACKAGE)$(SPEED)
 UCF=

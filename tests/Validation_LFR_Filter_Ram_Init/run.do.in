@@ -1,0 +1,12 @@
+quietly set ACTELLIBNAME Axcelerator
+quietly set PROJECT_DIR "C:/opt/VHDLIB/tests/Validation_LFR_Filter_Ram_Init"
+
+
+vsim -L Axcelerator -L presynth -L grlib -L synplify -L techmap -L spw -L eth -L gaisler -L esa -L fmf -L spansion -L gsi -L iap -L lpp -L cypress  -t 1ps work.testbench
+# The following lines are commented because no testbench is associated with the project
+# do "wave.do"
+
+#RAM_INIT# 
+ 
+run 20000ms
+quit
