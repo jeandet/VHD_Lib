@@ -79,6 +79,9 @@ test: test-vsim
 
 test-vsim: custom-vsim-run archivate
 
+re-run-vsim: vsim run.do RAM1.txt RAM2.txt RAM3.txt RAM4.txt RAM5.txt RAM6.txt input.txt
+	vsim -c -do run.do 
+
 custom-vsim-run: | vsim generate 
 	vsim -c -do run.do 
 
