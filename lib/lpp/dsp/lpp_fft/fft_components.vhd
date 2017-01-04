@@ -39,8 +39,9 @@ package FFT_COMPONENTS is
   function to_integer( x : boolean) return integer;
   function maskbar   (barn, bar_enable,dma_reg_bar,dma_reg_loc : integer) return integer;
   function anyfifo   (bar0, bar1, bar2, bar3, bar4, bar5 : integer) return integer;
-  FUNCTION reverse   (x : std_logic_vector) RETURN bit_vector;
-  FUNCTION reverseStd(x : std_logic_vector) RETURN std_logic_vector;
+  FUNCTION reverse   (x :IN std_logic_vector) RETURN bit_vector;
+
+  FUNCTION reverseStd(x :IN std_logic_vector) RETURN std_logic_vector;
   
   COMPONENT counter
     GENERIC (

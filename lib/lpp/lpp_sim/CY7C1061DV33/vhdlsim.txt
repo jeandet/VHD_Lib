@@ -1,4 +1,4 @@
 package_utility.vhd
 package_timing.vhd
-CY7C1061DV33_pkg.vhd
 CY7C1061DV33.vhd
+CY7C1061DV33_pkg.vhd
