@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<soc name="Leon">
+ <peripheral vid="8" name="SpaceWire Light" pid="305">
+   <register name="Control register" addOffset="0">
+     <bitField size="1" offset="0" name="Reset" mode="3" desc="Write '1' to reset SPWAMBA core (auto-clear)."/>
+     <bitField size="1" offset="1" name="Reset DMA" mode="3" desc="Write '1' to reset DMA engines (auto-clear)."/>
+     <bitField name="Link Start" offset="2" size="1" mode="3" desc="Link start signal. '1' = actively try to start a SpaceWire link."/>
+     <bitField name="Link Auto Start" offset="3" size="1" mode="3" desc="Link autostart signal. '1' = start link after receiving NULL from other side."/>
+     <bitField name="Link Disable" offset="4" size="1" mode="3" desc="Link disable signal. '1' = shut down current link and do not establish new link."/>
+     <bitField name="Time Code EN" offset="5" size="1" mode="3" desc="Allow time-code transmission through tick_in signal."/>
+     <bitField name="Restart RX DMA" offset="6" size="1" mode="3" desc="Write '1' to (re-)start RX DMA (auto-clear)."/>
+     <bitField name="Restart TX DMA" offset="7" size="1" mode="3" desc="Write '1' to (re-)start TX DMA (auto-clear)."/>
+     <bitField name="Cancel TX DMA" offset="8" size="1" mode="3" desc="Write '1' to cancel running TX DMA and discard data from TX FIFO (auto-clear)."/>
+     <bitField name="Link Up/Down IE" offset="9" size="1" mode="3" desc="Enable interrupt on link up/down."/>
+     <bitField name="Time Code IE" offset="10" size="1" mode="3" desc="Enable interrupt on time code received."/>
+     <bitField name="RXDESCIE" offset="11" size="1" mode="3" desc="Enable interrupt on completed RX descriptor with IE='1'."/>
+     <bitField name="TXDESCIE" offset="12" size="1" mode="3" desc="Enable interrupt on completed TX descriptor with IE='1'."/>
+     <bitField name="RXIE" offset="13" size="1" mode="3" desc="Enable interrupt on RX packet received."/>
+     <bitField name="DescSz" offset="24" size="4" mode="1" desc="Value of desctablesize generic (read-only)."/>
+   </register>
+   <register name="Status register" addOffset="4">
+     <bitField size="2" offset="0" name="LSTAT" mode="1" desc="Link status: 0=off, 1=started, 2=connecting, 3=run (read-only)."/>
+     <bitField size="1" offset="2" name="DISCERR" mode="3" desc="Got disconnect error (sticky, write '1' to clear)."/>
+     <bitField size="1" offset="3" name="PARERR" mode="3" desc="Got parity error (sticky, write '1' to clear)."/>
+     <bitField size="1" offset="4" name="ESCERR" mode="3" desc="Got escape error (sticky, write '1' to clear)."/>
+     <bitField size="1" offset="5" name="CREDERR" mode="3" desc="Got credit error (sticky, write '1' to clear)."/>
+     <bitField size="1" offset="6" name="RXDMA" mode="1" desc="RX DMA running (read-only)."/>
+     <bitField size="1" offset="7" name="RXDMA" mode="1" desc="TX DMA running (read-only)."/>
+     <bitField size="1" offset="8" name="AHBERR" mode="1" desc="AHB error occurred (sticky, reset DMA engine to clear)."/>
+     <bitField size="1" offset="9" name="UNUSED" mode="3" desc="unused"/>
+     <bitField size="1" offset="10" name="TIMECODE" mode="3" desc="Received time-code (sticky, write '1' to clear)."/>
+     <bitField size="1" offset="11" name="RXDESCCOMP" mode="3" desc="Completed RX descriptor with IE='1' (sticky, write '1' to clear)."/>
+     <bitField size="1" offset="12" name="TXDESCCOMP" mode="3" desc="Completed TX descriptor with IE='1' (sticky, write '1' to clear)."/>
+     <bitField size="1" offset="13" name="RECPACKT" mode="3" desc="Received packet (sticky, write '1' to clear)."/>
+     <bitField size="1" offset="14" name="RXE" mode="1" desc="RX buffer is empty and last packet has been completely transfered to RX DMA (read-only)."/>
+   </register>
+   <register name="Transmission clock scaler" addOffset="8">
+     <bitField size="8" offset="0" name="N" mode="3" desc="Clock division factor minus 1. The actual TX bit rate is determined by (txclk frequency) / (scaler + 1).
+During the handshake phase, this register is ignored and the TX bit rate is forced to 10 Mbit. After reset, this
+register defaults to the scaler value needed for 10 Mbit."/>
+   </register>
+   <register name="Time-code register" addOffset="12">
+     <bitField size="6" offset="0" name="Address" mode="1" desc="Last received time-code value (read-only)."/>
+     <bitField size="2" offset="6" name="Address" mode="1" desc="Control bits received with last time-code (read-only)."/>
+     <bitField size="6" offset="12" name="Address" mode="3" desc="Time-code value to send on next tick_in (auto-increment)."/>
+     <bitField size="2" offset="14" name="Address" mode="3" desc="Reserved, write as zero."/>
+     <bitField size="1" offset="15" name="Address" mode="3" desc="Write '1' to send a time-code immediately (auto-clear)."/>
+   </register>
+   <register name="Descriptor pointer for RX DMA" addOffset="16">
+     <bitField size="3" offset="0" name="DATA" mode="3" desc="Reserved, write as zero."/>
+     <bitField size="10" offset="3" name="DATA" mode="3" desc="Descriptor index (auto-increment)."/>
+     <bitField size="19" offset="13" name="DATA" mode="3" desc="Fixed address bits of descriptor table."/>
+   </register>
+   <register name="Descriptor pointer for TX DMA" addOffset="20">
+     <bitField size="3" offset="0" name="DATA" mode="3" desc="Reserved, write as zero."/>
+     <bitField size="10" offset="3" name="DATA" mode="3" desc="Descriptor index (auto-increment)."/>
+     <bitField size="19" offset="13" name="DATA" mode="3" desc="Fixed address bits of descriptor table."/>
+   </register>
+ </peripheral>
+</soc>
+
+
+
+
+
+
+
+
+

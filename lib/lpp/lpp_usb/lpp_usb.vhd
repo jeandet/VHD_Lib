@@ -24,12 +24,79 @@ use ieee.std_logic_1164.all;
 library grlib;
 use grlib.amba.all;
 use std.textio.all;
+library gaisler;
+use gaisler.libdcom.all;
 library lpp;
 use lpp.lpp_amba.all;
 
 --! Package contenant tous les programmes qui forment le composant intégré dans le léon 
 
 package lpp_usb is
+
+component ahb_ftdi_fifo is
+generic (
+  oepol : integer := 0;
+  hindex  : integer := 0
+);
+port (
+  clk         : in  std_logic;
+  rstn        : in  std_logic;
+
+  ahbi    : in  ahb_mst_in_type;
+  ahbo    : out ahb_mst_out_type;
+
+  FTDI_RXF     : in  std_logic;
+  FTDI_TXE     : in  std_logic;
+  FTDI_SIWUA   : out std_logic;
+  FTDI_WR      : out std_logic;
+  FTDI_RD      : out std_logic;
+  FTDI_D_in    : in  std_logic_vector(7 downto 0);
+  FTDI_D_out   : out std_logic_vector(7 downto 0);
+  FTDI_D_drive : out std_logic
+);
+end component;
+
+component ftdi_async_fifo is
+generic (
+  oepol : integer := 0
+);
+port (
+  clk         : in  std_logic;
+  rstn        : in  std_logic;
+
+  dcom_in     : in  dcom_uart_in_type;
+  dcom_out    : out dcom_uart_out_type;
+
+  FTDI_RXF     : in  std_logic;
+  FTDI_TXE     : in  std_logic;
+  FTDI_SIWUA   : out std_logic;
+  FTDI_WR      : out std_logic;
+  FTDI_RD      : out std_logic;
+  FTDI_D_in    : in  std_logic_vector(7 downto 0);
+  FTDI_D_out   : out std_logic_vector(7 downto 0);
+  FTDI_D_drive : out std_logic
+);
+end component;
+
+component ftdi_async_fifo_loopback is
+generic (
+  oepol : integer := 0
+);
+port (
+  clk         : in  std_logic;
+  rstn        : in  std_logic;
+
+
+  FTDI_RXF     : in  std_logic;
+  FTDI_TXE     : in  std_logic;
+  FTDI_SIWUA   : out std_logic;
+  FTDI_WR      : out std_logic;
+  FTDI_RD      : out std_logic;
+  FTDI_D_in    : in  std_logic_vector(7 downto 0);
+  FTDI_D_out   : out std_logic_vector(7 downto 0);
+  FTDI_D_drive : out std_logic
+);
+end component;
 
 component FX2_Driver is
 port(

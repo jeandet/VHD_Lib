@@ -1,0 +1,11 @@
+F0 -> L46P   -> DOUT+  -> 9 -> Grey
+F1 -> L46N   -> DOUT-  -> 5 -> Yellow
+
+F5 -> L40P   -> SOUT+  -> 8 -> Violet
+F7 -> L40N   -> SOUT-  -> 4 -> Orange
+
+F3 -> L53P   -> SIN+  -> 2 -> Brown
+F6 -> L53N   -> SIN-  -> 7 -> Blue
+
+F9  -> L39N   -> DIN-  -> 6 -> Green
+F10 -> L39P   -> DIN+  -> 1 -> Black

@@ -131,3 +131,13 @@ INST "dram_dq(13)" TNM = dram_in;
 INST "dram_dq(14)" TNM = dram_in;
 INST "dram_dq(15)" TNM = dram_in;
 TIMEGRP "dram_in" OFFSET = IN 3 ns BEFORE "CLK50" RISING;
+
+
+NET "spw_rxdp" LOC = "h2";# | IOSTANDARD = LVDS_33;
+NET "spw_rxdn" LOC = "h1";# | IOSTANDARD = LVDS_33;
+NET "spw_rxsp" LOC = "f4";# | IOSTANDARD = LVDS_33;
+NET "spw_rxsn" LOC = "f3";#  | IOSTANDARD = LVDS_33;
+NET "spw_txdp" LOC = "e2";# | IOSTANDARD = LVTTL;
+NET "spw_txdn" LOC = "e1";# | IOSTANDARD = LVTTL;
+NET "spw_txsp" LOC = "g3";# | IOSTANDARD = LVTTL;
+NET "spw_txsn" LOC = "g1";# | IOSTANDARD = LVTTL;

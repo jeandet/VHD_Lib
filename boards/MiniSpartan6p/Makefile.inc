@@ -9,3 +9,9 @@ MANUFACTURER=Xilinx
 MGCPART=XC6SLX25$(PACKAGE)
 MGCTECHNOLOGY=SPARTAN-6
 MGCPACKAGE=$(PACKAGE)
+
+config_USB_as_FIFO:
+	ftdi_eeprom --flash-eeprom $(VHDLIB)/boards/$(BOARD)/ft2232h_JTAG_FIFO.conf
+
+config_USB_as_UART:
+	ftdi_eeprom --flash-eeprom $(VHDLIB)/boards/$(BOARD)/ft2232h_JTAG_UART.conf

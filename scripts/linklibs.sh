@@ -39,9 +39,14 @@ if [ -d "$GRLIBPATH" ]; then
 
 				echo "Patch $1/lib/libs.txt..."
 				if(grep -q $LPP_PATCHPATH/lib/lpp $1/lib/libs.txt); then
-					echo "No need to Patch $1/lib/libs.txt..."
+					echo "No need to add lpp in $1/lib/libs.txt..."
 				else
 					echo $LPP_PATCHPATH/lib/lpp >>$1/lib/libs.txt
+				fi
+				if(grep -q $LPP_PATCHPATH/lib/opencores $1/lib/libs.txt); then
+					echo "No need to add opencores in $1/lib/libs.txt..."
+				else
+					echo $LPP_PATCHPATH/lib/opencores >>$1/lib/libs.txt
 				fi
 				echo
 				echo

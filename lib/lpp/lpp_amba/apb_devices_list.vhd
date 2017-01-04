@@ -47,4 +47,6 @@ PACKAGE apb_devices_list IS
   CONSTANT LPP_APB_ADVANCED_TRIGGER      : amba_device_type := 16#A3#;
   CONSTANT LPP_APB_ADVANCED_TRIGGER_v    : amba_device_type := 16#A4#;
 
+  CONSTANT LPP_AHB_FTDI_FIFO : amba_device_type := 16#A5#;
+
 END;
