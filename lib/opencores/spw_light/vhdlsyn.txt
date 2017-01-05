@@ -1,0 +1,13 @@
+spwpkg.vhd
+spwambapkg.vhd
+spwlink.vhd
+spwrecv.vhd
+spwxmit.vhd
+spwxmit_fast.vhd
+spwrecvfront_generic.vhd
+spwrecvfront_fast.vhd
+syncdff.vhd
+spwram.vhd
+spwamba.vhd
+spwstream.vhd
+spwahbmst.vhd
