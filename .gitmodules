@@ -1,0 +1,3 @@
+[submodule "grlib-gpl"]
+	path = grlib-gpl
+	url = https://github.com/jeandet/grlib-gpl

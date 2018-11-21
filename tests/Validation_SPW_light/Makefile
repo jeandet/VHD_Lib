@@ -1,6 +1,5 @@
+GRLIB ?= ../../grlib-gpl/
 VHDLIB=../..
-SCRIPTSDIR=$(VHDLIB)/scripts/
-GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
 TOP=testbench
 BOARD=MiniSpartan6p
 include $(VHDLIB)/boards/$(BOARD)/Makefile.inc

@@ -1,7 +1,5 @@
+GRLIB ?= ../../grlib-gpl/
 VHDLIB=../..
-SELFDIR := $(dir $(lastword $(MAKEFILE_LIST)))
-SCRIPTSDIR=$(VHDLIB)/scripts/
-GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
 TOP=testbench
 BOARD=LFR-FM
 include $(VHDLIB)/boards/$(BOARD)/Makefile_RTAX.inc

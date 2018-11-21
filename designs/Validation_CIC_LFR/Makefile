@@ -1,7 +1,5 @@
-#GRLIB=../..
+GRLIB ?= ../../grlib-gpl/
 VHDLIB=../..
-SCRIPTSDIR=$(VHDLIB)/scripts/
-GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
 TOP=leon3mp
 BOARD=em-LeonLPP-A3PE3kL-v3-core1
 #include $(GRLIB)/boards/$(BOARD)/Makefile.inc

@@ -1,6 +1,5 @@
+GRLIB ?= ../../grlib-gpl/
 VHDLIB=../..
-SCRIPTSDIR=$(VHDLIB)/scripts/
-GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
 
 TOP=LFR_FM
 BOARD=LFR-FM

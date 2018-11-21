@@ -1,8 +1,11 @@
+GRLIB ?= grlib-gpl/
 SCRIPTSDIR=scripts/
 LIBDIR=lib/
 BOARDSDIR=boards/
 DESIGNSDIR=designs/
 
+include $(GRLIB)/bin/Makefile
+include $(GRLIB)/software/leon3/Makefile
 
 .PHONY:doc
 

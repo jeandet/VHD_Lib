@@ -1,3 +1,5 @@
+GRLIB ?= ../../grlib-gpl/
+
 include .config
 
 TOP=leon3mp

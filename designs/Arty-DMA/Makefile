@@ -1,3 +1,4 @@
+GRLIB ?= ../../grlib-gpl/
 include .config
 TOP=leon3mp
 BOARD=digilent-arty-a7-35

@@ -1,7 +1,6 @@
+GRLIB ?= ../../grlib-gpl/
 VHDLIB=../..
-SCRIPTSDIR=$(VHDLIB)/scripts/
 
-GRLIB := $(shell sh $(VHDLIB)/scripts/lpp_relpath.sh)
 TOP=TB
 
 CMD_VLIB=vlib
