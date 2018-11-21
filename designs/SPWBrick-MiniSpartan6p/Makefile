@@ -15,7 +15,7 @@ XSTOPT=-uc leon3mp.xcf
 SYNPOPT="set_option -pipe 1; set_option -retiming 1; set_option -write_apr_constraint 0"
 
 
-VHDLOPTSYNFILES = sdctrl16.vhd config.vhd leon3mp.vhd
+VHDLOPTSYNFILES = apb_counter.vhd sdctrl16.vhd config.vhd leon3mp.vhd
 
 VHDLSIMFILES=mt48lc16m16a2.vhd testbench.vhd
 

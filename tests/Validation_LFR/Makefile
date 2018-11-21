@@ -45,8 +45,12 @@ include $(GRLIB)/software/leon3/Makefile
 distclean:myclean
 
 myclean:
-	rm -f input.txt output_fx.txt *.log
-	rm -rf ./2016*
+	rm -f input*.txt output*.txt *.log
+
+spw_input.txt:
+	python3 ./generator.py
+
+vsim:spw_input.txt
 
 test: | ghdl ghdl-run archivate
 

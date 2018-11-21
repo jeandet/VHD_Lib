@@ -1,7 +1,7 @@
 echo  "======================================================================================="
 echo  "---------------------------------------------------------------------------------------"
 echo  "                                LPP's GRLIB GLOBAL PATCHER				"
-echo  "                    Copyright (C) 2013 Laboratory of Plasmas Physic.			" 
+echo  "                    Copyright (C) 2013 Laboratory of Plasmas Physic.			"
 echo  "======================================================================================="
 echo '------------------------------------------------------------------------------
 --  This file is a part of the LPP VHDL IP LIBRARY
@@ -19,11 +19,11 @@ echo '--------------------------------------------------------------------------
 --
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -------------------------------------------------------------------------------'
-echo 
 echo
-echo 
+echo
+echo
 
 
 VHDLIB_LIB_PATH=`pwd -L`
@@ -46,7 +46,7 @@ if [ -d "$GRLIBPATH" ]; then
 				if(grep -q $LPP_PATCHPATH/lib/opencores $1/lib/libs.txt); then
 					echo "No need to add opencores in $1/lib/libs.txt..."
 				else
-					echo $LPP_PATCHPATH/lib/opencores >>$1/lib/libs.txt
+					echo $LPP_PATCHPATH/lib/opencores_spw >>$1/lib/libs.txt
 				fi
 				echo
 				echo

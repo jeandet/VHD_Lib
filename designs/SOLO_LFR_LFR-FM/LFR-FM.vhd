@@ -25,6 +25,7 @@ USE IEEE.std_logic_1164.ALL;
 LIBRARY grlib;
 USE grlib.amba.ALL;
 USE grlib.stdlib.ALL;
+library axcelerator;
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
 USE techmap.axcomp.ALL;
@@ -48,8 +49,7 @@ USE lpp.general_purpose.ALL;
 USE lpp.lpp_lfr_management.ALL;
 USE lpp.lpp_leon3_soc_pkg.ALL;
 
---library proasic3l;
---use proasic3l.all;
+
 
 ENTITY LFR_FM IS
   GENERIC (
@@ -170,7 +170,8 @@ ARCHITECTURE beh OF LFR_FM IS
   
   SIGNAL clk50MHz_int : STD_LOGIC := '0';
 
-  component clkint port(A : in std_ulogic; Y :out std_ulogic); end component;
+  --component clkint port(A : in std_ulogic; Y :out std_ulogic); end component;
+  --component hclkint port(A : in std_ulogic; Y :out std_ulogic); end component;
 
   SIGNAL rstn_50 : STD_LOGIC;
   SIGNAL clk_lock : STD_LOGIC;

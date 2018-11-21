@@ -55,7 +55,7 @@ ARCHITECTURE behav OF testbench IS
 --    nSRAM_SCRUB    : OUT   STD_LOGIC;   -- new
     SIGNAL nSRAM_W        :     STD_LOGIC;   -- new
     SIGNAL nSRAM_G        :     STD_LOGIC;   -- new
-    SIGNAL nSRAM_BUSY     :     STD_LOGIC;   -- new
+    SIGNAL nSRAM_BUSY     :     STD_LOGIC := '1';   -- new
     -- SPW --------------------------------------------------------------------
     SIGNAL spw1_en        :     STD_LOGIC;   -- new
     SIGNAL spw1_din       :     STD_LOGIC;
@@ -181,6 +181,10 @@ ARCHITECTURE behav OF testbench IS
         -- This indication is auto-clearing.
       SIGNAL  errcred:     std_logic;
 
+      SIGNAL got_rmap_packet  : std_logic;
+      SIGNAL got_ccsds_packet : std_logic;
+      SIGNAL current_packet   : STRING(1 to 256);
+
 
 BEGIN
 
@@ -222,7 +226,7 @@ BEGIN
   BEGIN
     IF end_of_simu /= '1' THEN
       clk <= NOT clk;
-      TSTAMP <= TSTAMP+20;
+      TSTAMP <= TSTAMP+10;
       WAIT FOR 10 ns;
     ELSE
       WAIT FOR 10 ps;
@@ -293,7 +297,19 @@ spw2_sin <= '1';
   -----------------------------------------------------------------------------
   --  SRAMS Same as EM, we don't have UT8ER1M32 models
   -----------------------------------------------------------------------------
- nSRAM_BUSY  <= '1';  -- TODO emulate scrubbing
+  buy_gen: process
+  begin
+  IF end_of_simu /= '1' THEN
+      nSRAM_BUSY <= '0';
+      wait for 100 ns;
+      nSRAM_BUSY <= '1';
+      WAIT FOR 100 us;
+    ELSE
+      WAIT FOR 10 ps;
+      assert false report "end of test" severity note;
+      WAIT;
+    END IF;
+  end process;
 
  nSRAM_CE <= not nSRAM_E1;
 
@@ -335,7 +351,36 @@ spw2_sin <= '1';
 
 
 
+  spw_sender_1: spw_sender
+    GENERIC MAP (
+      FNAME => "spw_input.txt")
+    PORT MAP (
+      end_of_simu => OPEN,
+      start_of_simu => running,
+      clk         => clk,
+      ack_ccsds_packet => got_ccsds_packet,
+      ack_rmap_packet  => got_rmap_packet,
+      current_packet   => current_packet,
+      txwrite     => txwrite,
+      txflag      => txflag,
+      txdata      => txdata,
+      txrdy       => txrdy,
+      txhalff     => txhalff);
 
+    spw_receiver_1: spw_receiver
+    GENERIC MAP (
+      FNAME => "spw_output.txt")
+    PORT MAP (
+      end_of_simu => end_of_simu,
+      timestamp   => TSTAMP,
+      clk         => clk,
+      got_rmap_packet  => got_rmap_packet,
+      got_ccsds_packet => got_ccsds_packet,
+      rxread      => rxread,
+      rxflag      => rxflag,
+      rxdata      => rxdata,
+      rxvalid     => rxvalid,
+      rxhalff     => rxhalff);
 
 SPW: spwstream
 
@@ -466,7 +511,22 @@ SPW: spwstream
   -----------------------------------------------------------------------------
   --  RECORD OUTPUT SIGNALS
   -----------------------------------------------------------------------------
-
+  -----------------------------------------------------------------------------
+  lfr_input_gen_1: lfr_input_gen
+    GENERIC MAP (
+      FNAME => "adc_input.txt")
+    PORT MAP (
+      end_of_simu            => end_of_simu,
+      rhf1401_data           => ADC_data,
+      adc_rhf1401_smp_clk    => ADC_smpclk,
+      adc_rhf1401_oeb_bar_ch => ADC_OEB_bar_CH(7 DOWNTO 0),
+      adc_bias_fail_sel      => bias_fail_sw,
+      hk_rhf1401_smp_clk     => HK_smpclk,
+      hk_rhf1401_oeb_bar_ch  => ADC_OEB_bar_HK,
+      hk_sel                 => HK_SEL,
+      error_oeb              => OPEN,
+      error_hksel            => OPEN);
+  -----------------------------------------------------------------------------
 
 
 END;

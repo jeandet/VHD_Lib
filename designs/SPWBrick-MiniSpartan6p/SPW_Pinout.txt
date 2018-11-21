@@ -9,3 +9,5 @@ F6 -> L53N   -> SIN-  -> 7 -> Blue
 
 F9  -> L39N   -> DIN-  -> 6 -> Green
 F10 -> L39P   -> DIN+  -> 1 -> Black
+
+E10 -> L49N   -> Lesia GEN -> D1

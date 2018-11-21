@@ -1,0 +1,9 @@
+==============================================================================
+Library 'secureip' compilation error(s)
+==============================================================================
+QuestaSim-64 vmap 10.7_1 Lib Mapping Utility 2018.01 Jan 21 2018
+vmap secureip /home/jeandet/Documents/prog/VHD_Lib/designs/Arty-DMA/xilinx_lib/secureip 
+Modifying modelsim.ini
+** Error (suppressible): (vlog-12110) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+** Error (suppressible): (vlog-12110) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+

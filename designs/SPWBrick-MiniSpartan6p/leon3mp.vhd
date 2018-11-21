@@ -15,6 +15,7 @@ use gaisler.memctrl.all;
 use gaisler.leon3.all;
 use gaisler.uart.all;
 use gaisler.misc.all;
+use gaisler.spi.all;
 --pragma translate_off
 use gaisler.sim.all;
 --pragma translate_on
@@ -64,7 +65,20 @@ entity leon3mp is
     spw_txdp      : out std_logic;
     spw_txdn      : out std_logic;
     spw_txsp      : out std_logic;
-    spw_txsn      : out std_logic
+    spw_txsn      : out std_logic;
+
+    lesia_gen     : in std_logic;
+    GPS_PPS_in    : in std_logic;
+
+    LCD_TXD       : in std_logic;
+    LCD_RXD       : out std_logic;
+
+    spi_c         : out std_ulogic;
+    spi_d         : out std_ulogic;
+    spi_q         : in std_ulogic;
+    spi_sn        : out std_ulogic;
+    spi_wpn       : out std_ulogic;
+    spi_hodln     : out std_ulogic
     );
 end;
 
@@ -109,6 +123,9 @@ architecture rtl of leon3mp is
   signal gpioi_0 : gpio_in_type;
   signal gpioo_0 : gpio_out_type;
 
+  SIGNAL   apbuarti   : uart_in_type;
+  SIGNAL   apbuarto   : uart_out_type;
+
   signal dsubren : std_logic :='0';
 
   signal spw_di: std_logic;
@@ -116,6 +133,11 @@ architecture rtl of leon3mp is
   signal spw_do: std_logic;
   signal spw_so: std_logic;
   signal spw_tick_in: std_logic;
+  signal spw_tick_out: std_logic;
+
+  -- SPIMCTRL signals
+signal spmi1 : spimctrl_in_type;
+signal spmo1 : spimctrl_out_type;
 
   component sdctrl16
   generic (
@@ -240,6 +262,30 @@ begin
       dram_clk_pad : outpad generic map (tech => padtech)
 	   port map (dram_clk, clkm_inv);
 
+
+
+	   -- SPMCTRL core, configured for use with generic SPI Flash memory with read
+    -- command 0x0B and a dummy byte following the address.
+    spimctrl1 : spimctrl
+      generic map (hindex => 4, hirq => 4, faddr => 16#000#, fmask => 16#fff#,
+        ioaddr => 16#200#, iomask => 16#fff#, spliten => CFG_SPLIT,
+        sdcard => 0, readcmd => 16#0B#, dummybyte => 1, dualoutput => 0,
+        scaler => 1, altscaler => 1)
+      port map (rstn, clkm, ahbsi, ahbso(4), spmi1, spmo1);
+
+    spi_miso_pad : inpad generic map (tech => padtech)
+      port map (spi_q, spmi1.miso);
+    spi_mosi_pad : outpad generic map (tech => padtech)
+      port map (spi_d, spmo1.mosi);
+    spi_sck_pad : outpad generic map (tech => padtech)
+      port map (spi_c, spmo1.sck);
+    spi_slvsel0_pad : outpad generic map (tech => padtech)
+      port map (spi_sn, spmo1.csn);
+    spi_wpn_pad : outpad generic map (tech => padtech)
+      port map (spi_wpn, '1');
+    spi_holdn_pad : outpad generic map (tech => padtech)
+      port map (spi_hodln, '1');
+
 ----------------------------------------------------------------------
 ---  APB Bridge and various periherals -------------------------------
 ----------------------------------------------------------------------
@@ -282,6 +328,21 @@ begin
   end generate;
   nogpio0: if CFG_GRGPIO_ENABLE = 0 generate apbo(9) <= apb_none; end generate;
 
+----------------------------------------------------------------------
+---  APB UART  -------------------------------------------------------
+----------------------------------------------------------------------
+  ua1 : IF CFG_UART1_ENABLE /= 0 GENERATE
+    uart1 : apbuart                     -- UART 1
+      GENERIC MAP (pindex   => 1, paddr => 1, pirq => 2, console => dbguart,
+                   fifosize => CFG_UART1_FIFO)
+      PORT MAP (rstn, clkm, apbi, apbo(1), apbuarti, apbuarto);
+    apbuarti.rxd    <= LCD_TXD;
+    apbuarti.extclk <= '0';
+    LCD_RXD           <= apbuarto.txd;
+    apbuarti.ctsn   <= '0';
+  END GENERATE;
+  noua0 : IF CFG_UART1_ENABLE = 0 GENERATE apbo(1) <= apb_none; END GENERATE;
+
 
 -----------------------------------------------------------------------
 ---  SpaceWire Light --------------------------------------------------
@@ -314,7 +375,7 @@ begin
          ahbi    => ahbmi,
          ahbo    => ahbmo(2),
          tick_in => spw_tick_in,
-         tick_out => open,
+         tick_out => spw_tick_out,
          spw_di  => spw_di,
          spw_si  => spw_si,
          spw_do  => spw_do,
@@ -345,6 +406,24 @@ spw_txsp_pad : outpad generic map (tech => padtech)
 	   port map (spw_txsp, spw_so);
 spw_txsn_pad : outpad generic map (tech => padtech)
 	   port map (spw_txsn, not spw_so);
+
+
+
+ apb_counter: entity work.APB_counter
+  generic map(
+    pindex   => 4,
+    paddr    => 4
+    )
+  port map(
+    rstn   => rstn,
+    clk    => clkm,
+    apbi   => apbi,
+    apbo   => apbo(4),
+
+    GPS_PPS     => GPS_PPS_in,
+    SPW_Tickout => spw_tick_out,
+    gene_in     => lesia_gen
+    );
 
 end rtl;
 

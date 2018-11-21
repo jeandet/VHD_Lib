@@ -448,4 +448,28 @@ PACKAGE general_purpose IS
     );
   END COMPONENT;
 
+
+  COMPONENT D_FF is
+    generic(reset_value : std_logic := '0');
+    port(
+        rstn    :   in  std_logic;
+        clk     :   in  std_logic;
+        enable  :   in  std_logic;
+        D       :   in  std_logic;
+        Q       :   out std_logic
+    );
+  end COMPONENT;
+
+  COMPONENT D_FF_v is
+    generic(size: INTEGER :=1; reset_value : INTEGER := 0);
+    port(
+        rstn    :   in  std_logic;
+        clk     :   in  std_logic;
+        enable  :   in  std_logic;
+        D       :   in  std_logic_vector(size-1 downto 0);
+        Q       :   out std_logic_vector(size-1 downto 0)
+    );
+  end COMPONENT;
+
+
 END;

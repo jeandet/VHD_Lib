@@ -15,7 +15,7 @@ XSTOPT=-uc leon3mp.xcf
 SYNPOPT="set_option -pipe 1; set_option -retiming 1; set_option -write_apr_constraint 0"
 
 
-VHDLOPTSYNFILES = sdctrl16.vhd config.vhd leon3mp.vhd
+VHDLOPTSYNFILES = LFR_patterns_serializer.vhd sdctrl16.vhd config.vhd leon3mp.vhd
 
 VHDLSIMFILES=mt48lc16m16a2.vhd testbench.vhd
 
@@ -26,7 +26,7 @@ BITGEN=$(VHDLIB)/boards/$(BOARD)/default.ut
 TECHLIBS = unisim
 
 LIBSKIP = core1553bbc core1553brm core1553brt gr1553 corePCIF \
-	tmtc openchip hynix ihp gleichmann  usbhc fmf ftlib gsi
+	tmtc openchip hynix ihp gleichmann fmf usbhc ftlib gsi
 
 DIRSKIP = b1553 pcif leon2 leon2ft crypto satcan ddr usb ata i2c \
 	pci grusbhc haps slink ascs can pwm greth coremp7 ac97 atf \

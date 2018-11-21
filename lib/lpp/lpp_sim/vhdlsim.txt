@@ -3,3 +3,6 @@ sig_reader.vhd
 sig_recorder.vhd
 lpp_sim_pkg.vhd
 lpp_lfr_sim_pkg.vhd
+spw_sender.vhd
+spw_receiver.vhd
+lfr_input_gen.vhd

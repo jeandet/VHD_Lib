@@ -88,6 +88,31 @@ signal dram_udqm : std_logic;
 signal sdclk    : std_logic;
 signal dram_ba  : std_logic_vector(1 downto 0);
 
+signal    DISCO_TRIG  :  std_logic_vector(3 downto 0);
+
+signal    Tick_in     :  std_logic := '0';
+
+signal    LCD_TXD       :  std_logic;
+signal    LCD_RXD       :  std_logic :='0';
+
+signal    sec_serial_out :  std_logic_vector(2 downto 0);
+
+signal    spi_c         :  std_logic;
+signal    spi_d         :  std_logic;
+signal    spi_q         :  std_logic;
+signal    spi_sn        :  std_logic;
+signal    spi_wpn       :  std_logic;
+signal    spi_hodln     :  std_logic;
+
+signal    spw_rxdp      :  std_logic :='0';
+signal    spw_rxdn      :  std_logic :='0';
+signal    spw_rxsp      :  std_logic :='0';
+signal    spw_rxsn      :  std_logic :='0';
+signal    spw_txdp      :  std_logic;
+signal    spw_txdn      :  std_logic;
+signal    spw_txsp      :  std_logic;
+signal    spw_txsn      :  std_logic;
+
 
 
 constant lresp : boolean := false;
@@ -109,6 +134,7 @@ begin
         generic map ( fabtech, memtech, padtech, clktech, disas, dbguart, pclow )
         port map (
             CLK50  => clk,
+            reset => Rst,
             LEDS   => open,
             SW     => SW,
             dram_addr => sa,
@@ -124,7 +150,39 @@ begin
             dram_ldqm	  => dram_ldqm,
             dram_udqm	  => dram_udqm,
             uart_txd  	=> dsutx,
-            uart_rxd  	=> dsurx);
+            uart_rxd  	=> dsurx,
+            DISCO_TRIG  => DISCO_TRIG,
+
+	    Tick_in     => Tick_in,
+
+	    LCD_TXD     => LCD_RXD,
+	    LCD_RXD     => LCD_TXD,
+
+	    sec_serial_out => sec_serial_out,
+
+	    spi_c         => spi_c,
+	    spi_d         => spi_d,
+	    spi_q         => spi_q,
+	    spi_sn        => spi_sn,
+	    spi_wpn       => spi_wpn,
+	    spi_hodln     => spi_hodln,
+
+	    spw_rxdp      => spw_rxdp,
+	    spw_rxdn      => spw_rxdn,
+	    spw_rxsp      => spw_rxsp,
+	    spw_rxsn      => spw_rxsn,
+	    spw_txdp      => spw_txdp,
+	    spw_txdn      => spw_txdn,
+	    spw_txsp      => spw_txsp,
+	    spw_txsn      => spw_txsn
+            );
+
+
+s0 : spi_flash generic map (ftype => 4, debug => 0, fname => promfile,
+                                readcmd => CFG_SPIMCTRL_READCMD,
+                                dummybyte => CFG_SPIMCTRL_DUMMYBYTE,
+                                dualoutput => CFG_SPIMCTRL_DUALOUTPUT)
+      port map (spi_c, spi_d, spi_q, spi_sn);
 
     u1: entity work.mt48lc16m16a2 generic map (addr_bits => 13, col_bits => 9, index => 1024, fname => sdramfile)
 	PORT MAP(
@@ -171,29 +229,27 @@ begin
     variable c8  : std_logic_vector(7 downto 0);
     begin
         dsutx <= '1';
-    dsurst <= '0'; --reset low
+        dsurst <= '0'; --reset low
     wait for 500 ns;
     dsurst <= '1'; --reset high
     --wait; --evig w8
     wait for 5000 ns;
-    txc(dsutx, 16#55#, txp);
-    --dsucfg(dsutx, dsurx);
-    writeReg(dsutx,16#40000000#,16#12345678#);
-    writeReg(dsutx,16#40000004#,16#22222222#);
-    writeReg(dsutx,16#40000008#,16#33333333#);
-    writeReg(dsutx,16#4000000C#,16#44444444#);
+    -- txc(dsutx, 16#55#, txp);
+    -- dsucfg(dsutx, dsurx);
+    -- writeReg(dsutx,16#40000000#,16#12345678#);
+    -- writeReg(dsutx,16#40000004#,16#22222222#);
+    -- writeReg(dsutx,16#40000008#,16#33333333#);
+    -- writeReg(dsutx,16#4000000C#,16#44444444#);
 
-    readReg(dsurx,dsutx,16#40000000#,w32);
-    readReg(dsurx,dsutx,16#40000004#,w32);
-    readReg(dsurx,dsutx,16#40000008#,w32);
-    readReg(dsurx,dsutx,16#4000000C#,w32);
+    -- readReg(dsurx,dsutx,16#40000000#,w32);
+    -- readReg(dsurx,dsutx,16#40000004#,w32);
+    -- readReg(dsurx,dsutx,16#40000008#,w32);
+    -- readReg(dsurx,dsutx,16#4000000C#,w32);
 
     end;
 
   begin
-  dsucfg(dsutx, dsurx);
-
-
+  --dsucfg(dsutx, dsurx);
     wait;
  end process;
 end ;

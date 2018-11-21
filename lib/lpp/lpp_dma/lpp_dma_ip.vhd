@@ -82,14 +82,14 @@ ENTITY lpp_dma_ip IS
     status_ready_matrix_f2               :IN  STD_LOGIC;
     status_error_anticipating_empty_fifo :IN  STD_LOGIC;
     status_error_bad_component_error     :IN  STD_LOGIC;
-                                          
+
     config_active_interruption_onNewMatrix : IN STD_LOGIC;
     config_active_interruption_onError     : IN STD_LOGIC;
     addr_matrix_f0_0                       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f0_1                       : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f1                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
     addr_matrix_f2                         : IN STD_LOGIC_VECTOR(31 DOWNTO 0)
-    );                                      
+    );
 END;
 
 ARCHITECTURE Behavioral OF lpp_dma_ip IS
@@ -137,16 +137,16 @@ ARCHITECTURE Behavioral OF lpp_dma_ip IS
   -----------------------------------------------------------------------------
   SIGNAL fifo_ren_trash     : STD_LOGIC;
   SIGNAL component_fifo_ren : STD_LOGIC;
-  
+
   -----------------------------------------------------------------------------
   SIGNAL debug_reg_s          : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  
+
 BEGIN
 
   -----------------------------------------------------------------------------
   -- DMA to AHB interface
   -----------------------------------------------------------------------------
-  
+
   DMA2AHB_1 : DMA2AHB
     GENERIC MAP (
       hindex   => hindex,
@@ -162,13 +162,13 @@ BEGIN
       DMAOut  => DMAOut,
       AHBIn   => AHB_Master_In,
       AHBOut  => AHB_Master_Out);
-  
+
   debug_reg <= debug_reg_s;
 
   debug_info: PROCESS (HCLK, HRESETn)
   BEGIN  -- PROCESS debug_info
     IF HRESETn = '0' THEN               -- asynchronous reset (active low)
-      debug_reg_s <= (OTHERS => '0');                  
+      debug_reg_s <= (OTHERS => '0');
     ELSIF HCLK'event AND HCLK = '1' THEN  -- rising clock edge
       debug_reg_s(0) <= debug_reg_s(0) OR (DMAOut.Retry );
       debug_reg_s(1) <= debug_reg_s(1) OR (DMAOut.Grant AND DMAOut.Retry) ;
@@ -177,12 +177,12 @@ BEGIN
       debug_reg_s(4) <= debug_reg_s(4) OR (header_send_ok);
       debug_reg_s(5) <= debug_reg_s(5) OR (component_send_ko);
       debug_reg_s(6) <= debug_reg_s(6) OR (component_send_ok);
-      
+
       debug_reg_s(31 DOWNTO 7) <= (OTHERS => '1');
     END IF;
   END PROCESS debug_info;
-    
-  
+
+
 
 
   send_matrix <= '1' WHEN matrix_type = "00" AND status_ready_matrix_f0_0 = '0' ELSE
@@ -190,7 +190,7 @@ BEGIN
                  '1' WHEN matrix_type = "10" AND status_ready_matrix_f1 = '0'   ELSE
                  '1' WHEN matrix_type = "11" AND status_ready_matrix_f2 = '0'   ELSE
                  '0';
-  
+
   header_check_ok <= '0' WHEN component_type = "1111" ELSE -- ?? component_type_pre = "1111"
                      '1' WHEN component_type = "0000" AND component_type_pre = "0000" ELSE
                      '1' WHEN component_type = component_type_pre + "0001"            ELSE
@@ -228,7 +228,7 @@ BEGIN
     ELSIF HCLK'EVENT AND HCLK = '1' THEN  -- rising clock edge
 
       CASE state IS
-        WHEN IDLE =>    
+        WHEN IDLE =>
           matrix_type    <= header(1 DOWNTO 0);
           --component_type <= header(5 DOWNTO 2);
 
@@ -244,7 +244,7 @@ BEGIN
               component_type_pre <= component_type;
               state <= CHECK_COMPONENT_TYPE;
           END IF;
-        
+
         WHEN CHECK_COMPONENT_TYPE =>
             IF header_check_ok = '1' THEN
               header_ack         <= '1';
@@ -316,12 +316,12 @@ BEGIN
             error_anticipating_empty_fifo <= '0';
             state <= TRASH_FIFO;
           END IF;
-          
+
         WHEN CHECK_LENGTH =>
           state <= IDLE;
         WHEN OTHERS => NULL;
       END CASE;
-      
+
     END IF;
   END PROCESS DMAWriteFSM_p;
 
@@ -352,12 +352,12 @@ BEGIN
       DMAIn   => component_dmai,
       DMAOut  => DMAOut,
 
-      send    => component_send,      
-      address => address,            
+      send    => component_send,
+      address => address,
       data    => fifo_data,
       ren     => component_fifo_ren,
-      send_ok => component_send_ok,    
-      send_ko => component_send_ko);   
+      send_ok => component_send_ok,
+      send_ko => component_send_ko);
 
   DMAIn    <= header_dmai    WHEN header_select = '1' ELSE component_dmai;
   fifo_ren <= fifo_ren_trash WHEN header_select = '1' ELSE component_fifo_ren;

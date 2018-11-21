@@ -15,13 +15,13 @@ package config is
   constant CFG_FABTECH : integer := spartan6;
   constant CFG_MEMTECH : integer := spartan6;
   constant CFG_PADTECH : integer := spartan6;
-  constant CFG_TRANSTECH : integer := GTP0;
+  constant CFG_TRANSTECH : integer := spartan6;
   constant CFG_NOASYNC : integer := 0;
   constant CFG_SCAN : integer := 0;
 -- Clock generator
   constant CFG_CLKTECH : integer := spartan6;
   constant CFG_CLKMUL : integer := (3);
-  constant CFG_CLKDIV : integer := (2);
+  constant CFG_CLKDIV : integer := (3);
   constant CFG_OCLKDIV : integer := 1;
   constant CFG_OCLKBDIV : integer := 0;
   constant CFG_OCLKCDIV : integer := 0;
@@ -71,7 +71,7 @@ package config is
   constant CFG_MMU_PAGE : integer := 0;
   constant CFG_DSU : integer := 1;
   constant CFG_ITBSZ : integer := 0 + 64*0;
-  constant CFG_ATBSZ : integer := 0;
+  constant CFG_ATBSZ : integer := 4;
   constant CFG_AHBPF : integer := 0;
   constant CFG_LEON3FT_EN : integer := 0;
   constant CFG_IUFT_EN : integer := 0;
@@ -104,7 +104,7 @@ package config is
 -- DSU UART
   constant CFG_AHB_UART : integer := 1;
 -- JTAG based DSU interface
-  constant CFG_AHB_JTAG : integer := 1;
+  constant CFG_AHB_JTAG : integer := 0;
 -- Xilinx MIG
   constant CFG_MIG_DDR2 : integer := 1;
   constant CFG_MIG_RANKS : integer := (1);
@@ -156,6 +156,16 @@ package config is
   constant CFG_SPICTRL_MAXWLEN : integer := (0);
   constant CFG_SPICTRL_SYNCRAM : integer := 0;
   constant CFG_SPICTRL_FT : integer := 0;
+
+  constant CFG_SPIMCTRL : integer := 1;
+  constant CFG_SPIMCTRL_SDCARD : integer := 0;
+  constant CFG_SPIMCTRL_READCMD : integer := 16#03#;
+  constant CFG_SPIMCTRL_DUMMYBYTE : integer := 0;
+  constant CFG_SPIMCTRL_DUALOUTPUT : integer := 0;
+  constant CFG_SPIMCTRL_SCALER : integer := (2);
+  constant CFG_SPIMCTRL_ASCALER : integer := (8);
+  constant CFG_SPIMCTRL_PWRUPCNT : integer := (0);
+  constant CFG_SPIMCTRL_OFFSET : integer := 16#0#;
 
 -- GRLIB debugging
   constant CFG_DUART : integer := 0;

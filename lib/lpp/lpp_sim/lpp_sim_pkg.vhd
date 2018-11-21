@@ -89,6 +89,61 @@ PACKAGE lpp_sim_pkg IS
   );
   END COMPONENT;
 
+  -----------------------------------------------------------------------------
+  -- SPW
+  -----------------------------------------------------------------------------
+  COMPONENT spw_sender IS
+    GENERIC (
+      FNAME : STRING);
+    PORT (
+          end_of_simu : OUT STD_LOGIC;
+          start_of_simu  : IN  STD_LOGIC;
+          ack_rmap_packet  : IN STD_LOGIC;
+          ack_ccsds_packet : IN STD_LOGIC;
+          current_packet   : OUT STRING(1 to 256);
+          clk     : IN  STD_LOGIC;
+          txwrite : OUT STD_LOGIC;
+          txflag  : OUT STD_LOGIC;
+          txdata  : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+          txrdy   : IN  STD_LOGIC;
+          txhalff : IN  STD_LOGIC);
+  END COMPONENT spw_sender;
+
+  COMPONENT spw_receiver IS
+    GENERIC (
+      FNAME : STRING);
+    PORT (
+          end_of_simu : IN STD_LOGIC;
+          timestamp : IN integer;
+          got_rmap_packet  : OUT STD_LOGIC;
+          got_ccsds_packet : OUT STD_LOGIC;
+          clk     : IN  STD_LOGIC;
+          rxread  : out STD_LOGIC;
+          rxflag  : in STD_LOGIC;
+          rxdata  : in STD_LOGIC_VECTOR(7 DOWNTO 0);
+          rxvalid : in  STD_LOGIC;
+          rxhalff : out  STD_LOGIC);
+  END COMPONENT spw_receiver;
+
+  -----------------------------------------------------------------------------
+  -- LFR-I/O
+  -----------------------------------------------------------------------------
+  COMPONENT lfr_input_gen IS
+    GENERIC (
+      FNAME : STRING);
+    PORT (
+      end_of_simu            : OUT STD_LOGIC;
+      rhf1401_data           : OUT STD_LOGIC_VECTOR(13 DOWNTO 0);
+      adc_rhf1401_smp_clk    : IN  STD_LOGIC;
+      adc_rhf1401_oeb_bar_ch : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
+      adc_bias_fail_sel      : IN  STD_LOGIC;
+      hk_rhf1401_smp_clk     : IN  STD_LOGIC;
+      hk_rhf1401_oeb_bar_ch  : IN  STD_LOGIC;
+      hk_sel                 : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+      error_oeb              : OUT STD_LOGIC;
+      error_hksel            : OUT STD_LOGIC);
+  END COMPONENT lfr_input_gen;
+
 END lpp_sim_pkg;
 
 PACKAGE BODY lpp_sim_pkg IS
