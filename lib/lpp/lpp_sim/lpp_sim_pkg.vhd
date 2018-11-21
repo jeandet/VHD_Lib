@@ -61,6 +61,16 @@ PACKAGE lpp_sim_pkg IS
     DATA      : OUT  STD_LOGIC_VECTOR
     );
 
+  PROCEDURE NEGATIVE_SYNCHRONOUS_PULSE(
+    signal clk : IN  STD_LOGIC;
+    signal sig : OUT STD_LOGIC
+    );
+
+  procedure WAIT_N_CYCLES(
+    signal clk : in std_logic;
+    constant N: integer
+    );
+
   COMPONENT sig_reader IS
     GENERIC(
       FNAME       : STRING  := "input.txt";
@@ -220,5 +230,20 @@ PACKAGE BODY lpp_sim_pkg IS
     rxc(RX,V_DATA,tx_period);
     DATA(7 DOWNTO 0) := V_DATA;
   END;
+
+  procedure NEGATIVE_SYNCHRONOUS_PULSE(signal clk : in std_logic;  signal sig : out std_logic) is
+    begin
+        sig <= '0';
+        wait until rising_edge(clk);
+        wait for 10 ps;
+        sig <= '1';
+    end;
+
+    procedure WAIT_N_CYCLES(signal clk : in std_logic;  constant N: integer) is
+    begin
+        FOR I in 1 TO N LOOP
+            wait until rising_edge(clk);
+        END LOOP;
+    end;
 
 END lpp_sim_pkg;
