@@ -152,14 +152,21 @@ PACKAGE lpp_dma_pkg IS
 
   COMPONENT fifo_latency_correction
     PORT (
-      HCLK       : IN  STD_ULOGIC;
-      HRESETn    : IN  STD_ULOGIC;
-      fifo_data  : IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
-      fifo_empty : IN  STD_LOGIC;
-      fifo_ren   : OUT STD_LOGIC;
-      dma_data   : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-      dma_empty  : OUT STD_LOGIC;
-      dma_ren    : IN  STD_LOGIC);
+        clk     : IN STD_LOGIC;
+        rstn    : IN STD_LOGIC;
+
+        FIFO_empty           : IN  STD_LOGIC;
+        FIFO_empty_threshold : IN  STD_LOGIC;
+        FIFO_ren             : OUT STD_LOGIC;
+        FIFO_rdata           : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+        DMA_ren              : IN STD_LOGIC;
+        DMA_data             : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+
+        DMA_send             : OUT STD_LOGIC;
+        DMA_valid_burst      : OUT STD_LOGIC;
+        DMA_done             : IN STD_LOGIC
+    );
   END COMPONENT;
 
   COMPONENT lpp_dma_ip

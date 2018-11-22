@@ -28,7 +28,7 @@ USE lpp.data_type_pkg.ALL;
 USE lpp.lpp_sim_pkg.ALL;
 USE lpp.lpp_memory.ALL;
 USE lpp.iir_filter.ALL;
-use LPP.lpp_dma_pkg.lpp_dma_SEND16B_FIFO2DMA;
+use LPP.lpp_dma_pkg.ALL;
 
 ENTITY testbench IS
 GENERIC(
@@ -86,21 +86,20 @@ ARCHITECTURE behav OF testbench IS
   SIGNAL run   : STD_LOGIC := '0';
 
     --IN
-  SIGNAL ren   : STD_LOGIC := '1';
-  SIGNAL rdata : STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
+  SIGNAL FIFO_ren   : STD_LOGIC := '1';
+  SIGNAL FIFO_rdata : STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
 
     --OUT
-  SIGNAL  wen   : STD_LOGIC := '1';
-  SIGNAL  wdata : STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0) := (others => '1');
+  SIGNAL  FIFO_wen   : STD_LOGIC := '1';
+  SIGNAL  FIFO_wdata : STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0) := (others => '1');
 
-  SIGNAL  empty           : STD_LOGIC;
-  SIGNAL  empty_d0        : STD_LOGIC := 'U';
-  SIGNAL  empty_d1        : STD_LOGIC := 'U';
-  SIGNAL  empty_d2        : STD_LOGIC := 'U';
-  SIGNAL  full            : STD_LOGIC;
-  SIGNAL  full_almost     : STD_LOGIC;
-  SIGNAL  empty_threshold : STD_LOGIC;
-  SIGNAL  full_threshold  : STD_LOGIC;
+  SIGNAL  FIFO_empty           : STD_LOGIC;
+  SIGNAL  FIFO_empty_d0        : STD_LOGIC := 'U';
+  SIGNAL  FIFO_empty_d1        : STD_LOGIC := 'U';
+  SIGNAL  FIFO_full            : STD_LOGIC;
+  SIGNAL  FIFO_full_almost     : STD_LOGIC;
+  SIGNAL  FIFO_empty_threshold : STD_LOGIC;
+  SIGNAL  FIFO_full_threshold  : STD_LOGIC;
 
   SIGNAL preloader_armed  : STD_LOGIC := '0';
   SIGNAL preloader_ren    : STD_LOGIC := '1';
@@ -116,7 +115,7 @@ ARCHITECTURE behav OF testbench IS
   signal DMA_send        : STD_LOGIC := '0';
   signal DMA_valid_burst : STD_LOGIC := '0';        -- (1 => BURST , 0 => SINGLE)
   signal DMA_done        : STD_LOGIC := '0';
-  signal DMA_address     : STD_LOGIC_VECTOR(31 DOWNTO 0):= X"0000_0000";
+  signal DMA_address     : STD_LOGIC_VECTOR(31 DOWNTO 0):= X"4000_0000";
 
 
 BEGIN
@@ -199,17 +198,36 @@ BEGIN
     run   => run,
 
     --IN
-    ren   => ren,
-    rdata => rdata,
+    ren   => FIFO_ren,
+    rdata => FIFO_rdata,
     --OUT
-    wen   => wen,
-    wdata => wdata,
+    wen   => FIFO_wen,
+    wdata => FIFO_wdata,
 
-    empty           => empty,
-    full            => full,
-    full_almost     => full_almost,
-    empty_threshold => empty_threshold,
-    full_threshold  => full_threshold
+    empty           => FIFO_empty,
+    full            => FIFO_full,
+    full_almost     => FIFO_full_almost,
+    empty_threshold => FIFO_empty_threshold,
+    full_threshold  => FIFO_full_threshold
+    );
+
+
+latency0: fifo_latency_correction
+  PORT MAP(
+    clk     => clk,
+    rstn    => rstn,
+
+    FIFO_empty           => FIFO_empty,
+    FIFO_empty_threshold => FIFO_empty_threshold,
+    FIFO_ren             => FIFO_ren,
+    FIFO_rdata           => FIFO_rdata,
+
+    DMA_ren              => DMA_ren,
+    DMA_data             => DMA_data,
+
+    DMA_send             => DMA_send,
+    DMA_valid_burst      => DMA_valid_burst,
+    DMA_done             => DMA_done
     );
 
     dma0: lpp_dma_SEND16B_FIFO2DMA
@@ -233,31 +251,6 @@ BEGIN
         address => DMA_address
     );
 
-    DMA_data <= rdata when DMA_ren_d = '0' and preloader_armed = '1' else preloader_data;
-
-  -----------------------------------------------------------------------------
-    ren <= preloader_ren and DMA_ren;
-  process(clk)
-  begin
-    if rising_edge(clk) then
-      DMA_send <= not empty_threshold;
-      empty_d0  <= empty;
-      empty_d1  <= empty_d0;
-      empty_d2  <= empty_d1;
-      DMA_ren_d <= DMA_ren;
-      preloader_ren      <= '1';
-      if empty_d0 = '0' and empty_d1 = '0' and preloader_armed = '0' then
-        preloader_ren   <= '0';
-        preloader_armed <= '1';
-        preloader_data  <= rdata;
-      elsif DMA_ren = '0' or preloader_armed = '0' then
-        preloader_data  <= rdata;
-      elsif DMA_done = '1' then
-        preloader_armed <= '0';
-      end if;
-    end if;
-  end process;
-
     process
     begin
         wait until DMA_done = '1';
@@ -273,13 +266,13 @@ BEGIN
         wait until rstn = '1';
         run <= '1';
         WAIT_N_CYCLES(clk, 10);
-        if empty = '0' then
-            wait until empty = '1';
+        if FIFO_empty = '0' then
+            wait until FIFO_empty = '1';
         end if;
         FOR I in 0 TO 256 LOOP
-            NEGATIVE_SYNCHRONOUS_PULSE(clk, wen);
+            NEGATIVE_SYNCHRONOUS_PULSE(clk, FIFO_wen);
             wait until rising_edge(clk);
-            wdata <= std_logic_vector(UNSIGNED(wdata) + 1);
+            FIFO_wdata <= std_logic_vector(UNSIGNED(FIFO_wdata) + 1);
         end loop;
 
         WAIT_N_CYCLES(clk, 1000);
