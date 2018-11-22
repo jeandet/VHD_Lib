@@ -13,7 +13,7 @@ EFFORT=high
 XSTOPT=-uc leon3mp.xcf
 SYNPOPT="set_option -pipe 1; set_option -retiming 1; set_option -write_apr_constraint 0"
 
-VHDLSYNFILES=config.vhd ahbrom.vhd ADC_DMA_APBREGS.vhd ADC_DMA.vhd leon3mp.vhd
+VHDLSYNFILES=config.vhd ahbrom.vhd AD747XA_pkg.vhd SerDes.vhd serial_clk.vhd CLK_DIV.vhd AD747XA_CTRL.vhd ADC_DMA_CTRL.vhd ADC_DMA_APBREGS.vhd ADC_DMA.vhd leon3mp.vhd
 VHDLSIMFILES=testbench.vhd
 
 #SDCFILE=$(GRLIB)/boards/$(BOARD)/default.sdc
@@ -118,3 +118,5 @@ include $(GRLIB)/software/leon3/Makefile
 
 
 ##################  project specific targets ##########################
+
+vsim-launch: | map_xilinx_7series_lib vsim mig_7series

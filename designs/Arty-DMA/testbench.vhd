@@ -106,6 +106,10 @@ architecture behav of testbench is
 
   signal gnd                : std_ulogic;
 
+  signal ADC_SCLK           : std_logic;
+  signal ADC_MISO           : std_logic_vector(1 downto 0):="00";
+  signal ADC_csn            : std_logic;
+
 begin
 
   gnd <= '0';
@@ -129,7 +133,10 @@ begin
       ddr3_ras_n => ddr3_ras_n, ddr3_cas_n => ddr3_cas_n,
       ddr3_we_n => ddr3_we_n, ddr3_reset_n => ddr3_reset_n,
       ddr3_ck_p => ddr3_ck_p, ddr3_ck_n => ddr3_ck_n,
-      ddr3_cke => ddr3_cke, ddr3_dm  => ddr3_dm, ddr3_odt => ddr3_odt
+      ddr3_cke => ddr3_cke, ddr3_dm  => ddr3_dm, ddr3_odt => ddr3_odt,
+      ADC_SCLK => ADC_SCLK,
+      ADC_MISO => ADC_MISO,
+      ADC_csn  => ADC_csn
      );
 
   ddr3mem0 : ddr3ram

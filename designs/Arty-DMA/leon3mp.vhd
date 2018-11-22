@@ -53,6 +53,7 @@ library esa;
 use esa.memoryctrl.all;
 
 use work.config.all;
+use WORK.AD747X.all;
 
 entity leon3mp is
   generic (
@@ -95,7 +96,11 @@ entity leon3mp is
     ddr3_ck_n         : out   std_logic_vector(0 downto 0);
     ddr3_cke          : out   std_logic_vector(0 downto 0);
     ddr3_dm           : out   std_logic_vector(1 downto 0);
-    ddr3_odt          : out   std_logic_vector(0 downto 0)
+    ddr3_odt          : out   std_logic_vector(0 downto 0);
+
+    ADC_SCLK          : out   std_logic;
+    ADC_MISO          : in    std_logic_vector(1 downto 0);
+    ADC_csn           : out   std_logic
 
     );
 end;
@@ -226,6 +231,10 @@ end component;
   signal ADC_enable         : std_logic;
   signal ADC_data           : std_logic_vector(31 downto 0);
   signal sample_ready       : std_logic;
+  signal ADC_SCLK_s         : std_logic;
+
+  signal smp_clk            : std_logic;
+  signal ADC_data_r         : ad747X_sample_v(1 downto 0);
 
   attribute keep                     : boolean;
   attribute syn_keep                 : boolean;
@@ -509,10 +518,51 @@ dma: if ENABLE_DMA /=0 generate
 
         ADC_enable   => ADC_enable,
         ADC_data     => ADC_data,
-        sample_ready => sample_ready
+        ADC_sample_ready => sample_ready
         );
 
+SMP_CLK0 : entity work.serial_clk
+        generic map(
+            N => 99_999
+               )
+        Port map(
+               serial_clk    => smp_clk,
+               clk           => clkm,
+               rstn          => rstn
+              );
+
+
+  SCLK_0 : entity work.serial_clk
+        generic map(
+            N => 99
+               )
+        Port map(
+               serial_clk    => ADC_SCLK_s,
+               clk           => clkm,
+               rstn          => rstn
+              );
+
+    ADC_SCLK <= ADC_SCLK_s;
+
+AD1 : entity work.AD747XA_CTRL
+    generic map(
+    chan_count => 2
+       )
+    Port MAP(
+           clk         => clkm,
+           rstn        => rstn,
+           serial_clk  => ADC_SCLK_s,
+           sdata       => ADC_MISO,
+           csn         => ADC_csn,
+           sampleValid => sample_ready,
+           convert     => smp_clk,
+           data        => ADC_data_r
+           );
+
+ADC_data <= ADC_data_r(0) & ADC_data_r(1);
+
 end generate;
+
 -----------------------------------------------------------------------
 ---  AHB ROM ----------------------------------------------------------
 -----------------------------------------------------------------------

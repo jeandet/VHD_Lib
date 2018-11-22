@@ -101,9 +101,6 @@ ARCHITECTURE behav OF testbench IS
   SIGNAL  FIFO_empty_threshold : STD_LOGIC;
   SIGNAL  FIFO_full_threshold  : STD_LOGIC;
 
-  SIGNAL preloader_armed  : STD_LOGIC := '0';
-  SIGNAL preloader_ren    : STD_LOGIC := '1';
-  SIGNAL preloader_data   : STD_LOGIC_VECTOR(31 DOWNTO 0) := (others => '0');
   -- DMA Module
 
   -- FIFO Interface

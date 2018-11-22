@@ -33,18 +33,19 @@ USE gaisler.memctrl.ALL;
 LIBRARY techmap;
 USE techmap.gencomp.ALL;
 
---! Package contenant tous les programmes qui forment le composant intégré dans le léon 
+--! Package contenant tous les programmes qui forment le composant intÃ©grÃ© dans le lÃ©on
 
 PACKAGE lpp_memory IS
 
   COMPONENT lpp_fifo
     GENERIC (
-      tech                  : INTEGER;
-      Mem_use               : INTEGER;
-      EMPTY_THRESHOLD_LIMIT : INTEGER;
-      FULL_THRESHOLD_LIMIT  : INTEGER;
-      DataSz                : INTEGER RANGE 1 TO 32;
-      AddrSz                : INTEGER RANGE 2 TO 12);
+    tech                  : INTEGER               := 0;
+    Mem_use               : INTEGER               := use_RAM;
+    EMPTY_THRESHOLD_LIMIT : INTEGER               := 16;
+    FULL_THRESHOLD_LIMIT  : INTEGER               := 5;
+    DataSz                : INTEGER RANGE 1 TO 32 := 8;
+    AddrSz                : INTEGER RANGE 2 TO 12 := 8
+      );
     PORT (
       clk             : IN  STD_LOGIC;
       rstn            : IN  STD_LOGIC;
@@ -189,15 +190,15 @@ PACKAGE lpp_memory IS
       rclk  : IN  STD_LOGIC;
       wclk  : IN  STD_LOGIC;
       ReUse : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);
-      REN   : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);  --! Instruction de lecture en mémoire
-      WEN   : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);  --! Instruction d'écriture en mémoire
-      Empty : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);  --! Flag, Mémoire vide
-      Full  : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);  --! Flag, Mémoire pleine
-      RDATA : OUT STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);  --! Registre de données en entrée
-      WDATA : IN  STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);  --! Registre de données en sortie
-      WADDR : OUT STD_LOGIC_VECTOR((FifoCnt*Addr_sz)-1 DOWNTO 0);  --! Registre d'addresse (écriture)
+      REN   : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);  --! Instruction de lecture en mÃ©moire
+      WEN   : IN  STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);  --! Instruction d'Ã©criture en mÃ©moire
+      Empty : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);  --! Flag, MÃ©moire vide
+      Full  : OUT STD_LOGIC_VECTOR(FifoCnt-1 DOWNTO 0);  --! Flag, MÃ©moire pleine
+      RDATA : OUT STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);  --! Registre de donnÃ©es en entrÃ©e
+      WDATA : IN  STD_LOGIC_VECTOR((FifoCnt*Data_sz)-1 DOWNTO 0);  --! Registre de donnÃ©es en sortie
+      WADDR : OUT STD_LOGIC_VECTOR((FifoCnt*Addr_sz)-1 DOWNTO 0);  --! Registre d'addresse (Ã©criture)
       RADDR : OUT STD_LOGIC_VECTOR((FifoCnt*Addr_sz)-1 DOWNTO 0);  --! Registre d'addresse (lecture)
-      apbi  : IN  apb_slv_in_type;  --! Registre de gestion des entrées du bus
+      apbi  : IN  apb_slv_in_type;  --! Registre de gestion des entrÃ©es du bus
       apbo  : OUT apb_slv_out_type  --! Registre de gestion des sorties du bus
       );
   END COMPONENT;

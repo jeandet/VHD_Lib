@@ -1,12 +1,30 @@
+------------------------------------------------------------------------------
+--  This file is a part of the LPP VHDL IP LIBRARY
+--  Copyright (C) 2009 - 2018, Laboratory of Plasmas Physic - CNRS
+--
+--  This program is free software; you can redistribute it and/or modify
+--  it under the terms of the GNU General Public License as published by
+--  the Free Software Foundation; either version 3 of the License, or
+--  (at your option) any later version.
+--
+--  This program is distributed in the hope that it will be useful,
+--  but WITHOUT ANY WARRANTY; without even the implied warranty of
+--  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--  GNU General Public License for more details.
+--
+--  You should have received a copy of the GNU General Public License
+--  along with this program; if not, write to the Free Software
+--  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+------------------------------------------------------------------------------
+--                    Author : Alexis Jeandet
+--                     Mail : alexis.jeandet@member.fsf.org
+------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 USE ieee.numeric_std.ALL;
 library grlib;
 use grlib.amba.all;
-use grlib.stdlib.all;
-use grlib.devices.all;
 library LPP;
-use LPP.lpp_dma_pkg.lpp_dma_SEND16B_FIFO2DMA;
 USE lpp.apb_devices_list.ALL;
 
 entity ADC_DMA_APBREGS is
