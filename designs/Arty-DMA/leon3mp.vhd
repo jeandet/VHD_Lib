@@ -523,7 +523,7 @@ dma: if ENABLE_DMA /=0 generate
 
 SMP_CLK0 : entity work.serial_clk
         generic map(
-            N => 99_999
+            N => 999
                )
         Port map(
                serial_clk    => smp_clk,

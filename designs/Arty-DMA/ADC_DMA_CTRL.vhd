@@ -28,7 +28,9 @@ entity ADC_DMA_CTRL is
     clk  : IN STD_LOGIC;
     rstn : IN STD_LOGIC;
 
-    CFG_DMA_enable  : in  std_logic;
+    done : OUT STD_LOGIC;
+
+    CFG_DMA_start   : in  std_logic;
     CFG_DMA_Address : in  std_logic_vector(31 downto 0);
     CFG_DMA_Size    : in  std_logic_vector(31 downto 0);
 
@@ -74,17 +76,19 @@ begin
         state         <= idle;
         ADC_enable    <= '0';
         ADC_sample_ready_r <= '0';
+        done          <= '0';
     elsif clk'event and clk = '1'then
         ADC_sample_ready_r <= ADC_sample_ready;
         case state is
             WHEN IDLE =>
                 FIFO_RUN    <= '0';
-                if CFG_DMA_enable = '1' then
+                if CFG_DMA_start = '1' then
                     state           <= transfert;
                     DMA_address_r   <= CFG_DMA_Address;
                     CFG_DMA_Size_r  <= CFG_DMA_Size;
                     FIFO_RUN        <= '1';
                     ADC_enable      <= '1';
+        	    done            <= '0';
                 end if;
             WHEN transfert =>
                 if DMA_done = '1' then
@@ -93,6 +97,7 @@ begin
                         state           <= idle;
                         Sent_counter    <= (others => '0');
                         DMA_address_r   <= (others => '0');
+        	    	done            <= '1';
                     else
                         Sent_counter    <= std_logic_vector(UNSIGNED(Sent_counter) + 16);
                         DMA_address_r   <= std_logic_vector(UNSIGNED(DMA_address_r) + (4 * 16));

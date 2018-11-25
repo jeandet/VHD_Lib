@@ -80,10 +80,11 @@ architecture behave of ADC_DMA is
     signal BURST_done        : STD_LOGIC := '0';
     signal BURST_address     : STD_LOGIC_VECTOR(31 DOWNTO 0):= (others => '0');
 
-    signal CFG_DMA_enable  : std_logic;
+    signal CFG_DMA_start   : std_logic;
     signal CFG_DMA_Address : std_logic_vector(31 downto 0);
     signal CFG_DMA_Size    : std_logic_vector(31 downto 0);
 
+    signal CTRL_done       : std_logic;
 
     SIGNAL FIFO_ren   : STD_LOGIC := '1';
     SIGNAL FIFO_rdata : STD_LOGIC_VECTOR(DataSz-1 DOWNTO 0);
@@ -145,11 +146,11 @@ apb_regs : entity work.adc_dma_apbregs
         apbi => apbi,
         apbo => apbo,
 
-        DMA_enable  => CFG_DMA_enable,
+        DMA_start   => CFG_DMA_start,
         DMA_Address => CFG_DMA_Address,
         DMA_Size    => CFG_DMA_Size,
 
-        DMA_done    => DMA_done
+        DMA_done    => CTRL_done
     );
 
 FIFO0: lpp_fifo
@@ -205,8 +206,9 @@ CTRL0:   entity work.ADC_DMA_CTRL
   PORT MAP(
     clk    => clk,
     rstn   => rstn,
+    done   => CTRL_done,
 
-    CFG_DMA_enable  => CFG_DMA_enable,
+    CFG_DMA_start   => CFG_DMA_start,
     CFG_DMA_Address => CFG_DMA_Address,
     CFG_DMA_Size    => CFG_DMA_Size,
 

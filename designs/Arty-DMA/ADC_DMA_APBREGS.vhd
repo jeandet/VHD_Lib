@@ -45,7 +45,7 @@ GENERIC (
     apbi : IN  apb_slv_in_type;
     apbo : OUT apb_slv_out_type;
 
-    DMA_enable  : out std_logic;
+    DMA_start   : out std_logic;
     DMA_Address : out std_logic_vector(31 downto 0);
     DMA_Size    : out std_logic_vector(31 downto 0);
 
@@ -70,7 +70,7 @@ end record;
 
 begin
 
-    DMA_enable  <= Rec.CTRL(0);
+    DMA_start   <= Rec.CTRL(0);
     DMA_Address <= Rec.address;
     DMA_Size    <= Rec.size;
     Rec.CTRL(1) <= DMA_done;
@@ -80,11 +80,14 @@ begin
         if(rstn = '0')then
             Rec.CTRL <= (others => '0');
         elsif(clk'event and clk='1')then
+		        if Rec.CTRL(0) = '1' then
+			        Rec.CTRL(0) <= '0';
+		        end if;
     --APB Write OP
             if (apbi.psel(pindex) and apbi.penable and apbi.pwrite) = '1' then
                 case apbi.paddr(7 downto 2) is
                     when "000000" =>
-                        Rec.CTRL <= apbi.pwdata;
+                        Rec.CTRL(0) <= apbi.pwdata(0);
                     when "000001" =>
                         Rec.Address <= apbi.pwdata;
                     when "000010" =>
