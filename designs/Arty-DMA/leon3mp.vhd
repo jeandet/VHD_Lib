@@ -336,20 +336,6 @@ stop_cpu0:  if STOP_CPU /= 0 generate
     ahbso(2) <= ahbs_none; dsuo.tstop <= '0'; dsuo.active <= '0';
   end generate;
 
-  -- Debug UART
-  dcomgen : if CFG_AHB_UART = 1 generate
-    dcom0 : ahbuart
-      generic map (hindex => CFG_NCPU, pindex => 4, paddr => 4)
-      port map (rstn, clkm, dui, duo, apbi, apbo(4), ahbmi, ahbmo(CFG_NCPU));
-    dsurx_pad : inpad generic map (tech  => padtech) port map (uart_tx_in, dui.rxd);
-    dsutx_pad : outpad generic map (tech => padtech) port map (uart_rx_out, duo.txd);
-    led(0) <= not dui.rxd;
-    led(1) <= not duo.txd;
-    dui.extclk <= '0';
-    dui.ctsn   <= '0';
-  end generate;
-  nouah : if CFG_AHB_UART = 0 generate apbo(4) <= apb_none; end generate;
-
   ahbjtaggen0 :if CFG_AHB_JTAG = 1 generate
     ahbjtag0 : ahbjtag generic map(tech => fabtech, hindex => CFG_NCPU+CFG_AHB_UART)
       port map(rstn, clkm, tck, tms, tdi, tdo, ahbmi, ahbmo(CFG_NCPU+CFG_AHB_UART),
@@ -490,10 +476,10 @@ stop_cpu0:  if STOP_CPU /= 0 generate
     uart1 : apbuart                     -- UART 1
       generic map (pindex   => 1, paddr => 1, pirq => 2, console => dbguart, fifosize => CFG_UART1_FIFO)
       port map (rstn, clkm, apbi, apbo(1), u1i, u1o);
-    u1i.rxd    <= rxd1;
-    u1i.ctsn   <= '0';
-    u1i.extclk <= '0';
-    txd1       <= u1o.txd;
+    u1i.rxd      <= uart_tx_in;
+    u1i.ctsn     <= '0';
+    u1i.extclk   <= '0';
+    uart_rx_out  <= u1o.txd;
   end generate;
   noua0 : if CFG_UART1_ENABLE = 0 generate apbo(1) <= apb_none; end generate;
 
