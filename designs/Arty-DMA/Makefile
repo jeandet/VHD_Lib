@@ -123,4 +123,4 @@ vsim-launch: | map_xilinx_7series_lib vsim mig_7series
 
 .PHONY:vhdltool-config.yaml
 vhdltool-config.yaml:
-	@../../scripts/vhdl-tool-yaml.py -l $(GRLIB)/lib/libs.txt --dir-skip '$(DIRSKIP)' --file-skip '$(FILESKIP)' --work '$(VHDLSYNFILES)'
+	@../../scripts/vhdl-tool-yaml.py -l $(GRLIB)/lib/libs.txt --dir-skip '$(DIRSKIP)' --file-skip '$(FILESKIP)' --work '$(VHDLSYNFILES)' --ieee '$(XILINX_VIVADO)/ids_lite/ISE/vhdl/src/ieee'
