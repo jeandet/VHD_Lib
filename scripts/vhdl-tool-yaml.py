@@ -87,7 +87,7 @@ def parse_lib(lib_path):
 def main():
     relpath = os.path.dirname(args.libs_file)
     apply_for_each(args.libs_file, parse_lib, relpath)
-    work_lib["path"] = work
+    work_lib["paths"] = work
     output_file["Libraries"].append(work_lib)
     yaml.dump(output_file, open('vhdltool-config.yaml','w'), default_flow_style=False)
 
