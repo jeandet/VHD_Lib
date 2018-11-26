@@ -120,3 +120,7 @@ include $(GRLIB)/software/leon3/Makefile
 ##################  project specific targets ##########################
 
 vsim-launch: | map_xilinx_7series_lib vsim mig_7series
+
+.PHONY:vhdltool-config.yaml
+vhdltool-config.yaml:
+	@../../scripts/vhdl-tool-yaml.py -l $(GRLIB)/lib/libs.txt --dir-skip '$(DIRSKIP)' --file-skip '$(FILESKIP)' --work '$(VHDLSYNFILES)'
